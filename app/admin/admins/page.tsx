@@ -13,7 +13,21 @@ export default async function AdminsPage() {
         orderBy: { createdAt: 'desc' }
     });
 
-    const superAdmins = allUsers.filter(u => u.role === 'SUPER_ADMIN' || SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
+    // Demote mobilesouls.in@gmail.com if still set to SUPER_ADMIN/ADMIN in DB
+    const mobilesoulsUser = allUsers.find(u => u.email.toLowerCase() === 'mobilesouls.in@gmail.com');
+    if (mobilesoulsUser && ['SUPER_ADMIN', 'ADMIN'].includes(mobilesoulsUser.role)) {
+        try {
+            await prisma.user.update({
+                where: { id: mobilesoulsUser.id },
+                data: { role: 'USER' }
+            });
+            mobilesoulsUser.role = 'USER';
+        } catch (e) {
+            console.error('Failed to demote mobilesouls in DB:', e);
+        }
+    }
+
+    const superAdmins = allUsers.filter(u => u.email.toLowerCase() !== 'mobilesouls.in@gmail.com' && (u.role === 'SUPER_ADMIN' || SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase())));
 
     // Ensure all configured super admins appear even if not yet in database
     for (const email of SUPER_ADMIN_EMAILS) {
@@ -36,7 +50,7 @@ export default async function AdminsPage() {
         }
     }
 
-    const admins = allUsers.filter(u => u.role === 'ADMIN' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
+    const admins = allUsers.filter(u => u.email.toLowerCase() !== 'mobilesouls.in@gmail.com' && u.role === 'ADMIN' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
     const zonalHeads = allUsers.filter(u => u.role === 'ZONAL_HEAD' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
     const relationshipManagers = allUsers.filter(u => u.role === 'RELATIONSHIP_MANAGER' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
     const partners = allUsers.filter(u => u.role === 'PARTNER' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));

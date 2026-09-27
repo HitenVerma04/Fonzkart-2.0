@@ -32,6 +32,8 @@ export async function getSession(): Promise<SessionPayload | null> {
         const payload = await decrypt(sessionCookie);
         if (payload?.user?.email && SUPER_ADMIN_EMAILS.includes(payload.user.email.toLowerCase())) {
             payload.user.role = 'SUPER_ADMIN';
+        } else if (payload?.user?.email?.toLowerCase() === 'mobilesouls.in@gmail.com') {
+            payload.user.role = 'USER';
         }
         return payload;
     } catch (e) {
@@ -42,6 +44,8 @@ export async function getSession(): Promise<SessionPayload | null> {
 export async function login(userData: { id: string; email: string; name: string; role: string }) {
     if (userData.email && SUPER_ADMIN_EMAILS.includes(userData.email.toLowerCase())) {
         userData.role = 'SUPER_ADMIN';
+    } else if (userData.email?.toLowerCase() === 'mobilesouls.in@gmail.com') {
+        userData.role = 'USER';
     }
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week
     const session = await encrypt({ user: userData, expires });

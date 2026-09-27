@@ -230,6 +230,16 @@ export async function signin(prevState: { error?: string } | null, formData: For
         } catch (e) {
             console.error('Failed to sync superadmin in DB:', e);
         }
+    } else if (user.email.toLowerCase() === 'mobilesouls.in@gmail.com') {
+        user.role = 'USER';
+        try {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { role: 'USER' }
+            });
+        } catch (e) {
+            console.error('Failed to demote mobilesouls in DB:', e);
+        }
     }
 
     console.log('DEBUG SIGNIN USER:', user);
