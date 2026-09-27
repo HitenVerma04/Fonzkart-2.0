@@ -19,7 +19,8 @@ import {
     Compass,
     FileText,
     Download,
-    Eye
+    Eye,
+    Users
 } from 'lucide-react';
 
 interface JobRole {
@@ -31,6 +32,7 @@ interface JobRole {
     experience: string;
     compensation: string;
     badge: string;
+    positions: number;
     icon: React.ElementType;
     overview: string;
     responsibilities: string[];
@@ -50,7 +52,8 @@ const JOB_OPENINGS: JobRole[] = [
         type: 'Full-Time | On-Site',
         experience: '1 – 3 Years',
         compensation: 'Competitive Monthly Salary + Performance Bonus',
-        badge: 'Urgent Requirement',
+        badge: '2 Open Positions',
+        positions: 2,
         icon: FileSpreadsheet,
         overview:
             'We are seeking a detail-oriented Accountant to take charge of daily financial bookkeeping, office administration, and transaction reconciliation on the FonzKart Admin Panel. You will work closely with management, coordinating with field executives to ensure zero cash/UPI discrepancy and maintaining crystal-clear ledgers.',
@@ -87,7 +90,8 @@ const JOB_OPENINGS: JobRole[] = [
         type: 'Full-Time | On-Field',
         experience: '0 – 2 Years (Freshers Welcome)',
         compensation: 'Fixed Salary + Daily Fuel/Travel Allowance + High Per-Pickup Commission',
-        badge: 'Multiple Openings',
+        badge: '5 Open Positions',
+        positions: 5,
         icon: Bike,
         overview:
             'Be the face of FonzKart on the ground! As a Field Executive, you will travel to customer doorsteps across Bangalore to evaluate pre-owned smartphones and gadgets, confirm transparent spot valuations, initiate instant digital payouts, and safely transport devices to the central hub.',
@@ -210,7 +214,7 @@ ${formState.name || 'Applicant'}`;
                         <span className="font-semibold text-foreground/90">Hiring in Bangalore</span>
                         <span className="h-3.5 w-px bg-emerald-500/40 shrink-0" />
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950 font-black text-[11px] shrink-0 shadow-2xs">
-                            2 Open Roles
+                            7 Open Positions (2 Roles)
                         </span>
                     </div>
 
@@ -242,8 +246,8 @@ ${formState.name || 'Applicant'}`;
                             <div className="text-xs text-muted-foreground mt-0.5">Central Hub HQ</div>
                         </div>
                         <div className="p-4 rounded-2xl bg-card/60 border border-border/60 shadow-xs">
-                            <div className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">100%</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">Merit Driven Growth</div>
+                            <div className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">7 Positions</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">Actively Hiring</div>
                         </div>
                     </div>
                 </div>
@@ -317,7 +321,7 @@ ${formState.name || 'Applicant'}`;
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
-                            All Openings (2)
+                            All Openings (7 Positions)
                         </button>
                         <button
                             type="button"
@@ -328,7 +332,7 @@ ${formState.name || 'Applicant'}`;
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
-                            Accountant (1)
+                            Accountant (2 Positions)
                         </button>
                         <button
                             type="button"
@@ -339,7 +343,7 @@ ${formState.name || 'Applicant'}`;
                                     : 'text-muted-foreground hover:text-foreground'
                             }`}
                         >
-                            Field Executive (1)
+                            Field Executive (5 Positions)
                         </button>
                     </div>
                 </div>
@@ -378,6 +382,10 @@ ${formState.name || 'Applicant'}`;
 
                                         {/* Meta Pills */}
                                         <div className="flex flex-wrap gap-2.5 text-xs text-muted-foreground">
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-bold">
+                                                <Users className="h-3.5 w-3.5 text-primary" />
+                                                {job.positions} Open Positions
+                                            </span>
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/60 border border-border/40 font-medium">
                                                 <MapPin className="h-3.5 w-3.5 text-primary" />
                                                 {job.location}
@@ -553,7 +561,7 @@ ${formState.name || 'Applicant'}`;
                             <div className="flex flex-col justify-between space-y-4 flex-1">
                                 <div className="space-y-2">
                                     <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary/10 text-primary">
-                                        Finance &amp; Admin
+                                        2 Positions • Finance &amp; Admin
                                     </span>
                                     <h4 className="text-lg font-bold text-foreground">
                                         Accountant &amp; Operations Executive
@@ -611,7 +619,7 @@ ${formState.name || 'Applicant'}`;
                             <div className="flex flex-col justify-between space-y-4 flex-1">
                                 <div className="space-y-2">
                                     <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                                        Field Operations
+                                        5 Positions • Field Operations
                                     </span>
                                     <h4 className="text-lg font-bold text-foreground">
                                         Field Executive / Evaluation Specialist
@@ -711,7 +719,7 @@ ${formState.name || 'Applicant'}`;
                             <form onSubmit={handleFormSubmit} className="space-y-5">
                                 <div>
                                     <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 mb-2">
-                                        Bangalore Openings
+                                        Bangalore Openings • 7 Positions Active
                                     </div>
                                     <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                                         Apply for Position
@@ -725,7 +733,7 @@ ${formState.name || 'Applicant'}`;
                                     {/* Position Selector */}
                                     <div>
                                         <label className="block text-xs font-semibold text-foreground mb-1.5">
-                                            Role Applying For *
+                                             Role Applying For *
                                         </label>
                                         <select
                                             value={formState.role}
@@ -733,10 +741,10 @@ ${formState.name || 'Applicant'}`;
                                             className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm font-medium"
                                         >
                                             <option value="Accountant & Operations Executive">
-                                                Accountant &amp; Operations Executive (Admin Panel &amp; Accounts)
+                                                Accountant &amp; Operations Executive (2 Open Positions)
                                             </option>
                                             <option value="Field Executive / Device Evaluation Specialist">
-                                                Field Executive / Device Evaluation Specialist (Doorstep Evaluations)
+                                                Field Executive / Device Evaluation Specialist (5 Open Positions)
                                             </option>
                                         </select>
                                     </div>
