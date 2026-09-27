@@ -2,7 +2,7 @@
 
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import { SessionPayload } from './auth-utils';
+import { SessionPayload, SUPER_ADMIN_EMAILS } from './auth-utils';
 
 const secret = process.env.AUTH_SECRET;
 if (!secret) {
@@ -29,13 +29,20 @@ export async function getSession(): Promise<SessionPayload | null> {
     const sessionCookie = (await cookies()).get('session')?.value;
     if (!sessionCookie) return null;
     try {
-        return await decrypt(sessionCookie);
+        const payload = await decrypt(sessionCookie);
+        if (payload?.user?.email && SUPER_ADMIN_EMAILS.includes(payload.user.email.toLowerCase())) {
+            payload.user.role = 'SUPER_ADMIN';
+        }
+        return payload;
     } catch (e) {
         return null;
     }
 }
 
 export async function login(userData: { id: string; email: string; name: string; role: string }) {
+    if (userData.email && SUPER_ADMIN_EMAILS.includes(userData.email.toLowerCase())) {
+        userData.role = 'SUPER_ADMIN';
+    }
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week
     const session = await encrypt({ user: userData, expires });
 

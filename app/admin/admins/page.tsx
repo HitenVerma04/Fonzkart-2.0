@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db';
 import AdminManager from '@/components/admin/AdminManager';
+import { SUPER_ADMIN_EMAILS } from '@/lib/auth-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,11 +13,33 @@ export default async function AdminsPage() {
         orderBy: { createdAt: 'desc' }
     });
 
-    const superAdmins = allUsers.filter(u => u.role === 'SUPER_ADMIN');
-    const admins = allUsers.filter(u => u.role === 'ADMIN');
-    const zonalHeads = allUsers.filter(u => u.role === 'ZONAL_HEAD');
-    const relationshipManagers = allUsers.filter(u => u.role === 'RELATIONSHIP_MANAGER');
-    const partners = allUsers.filter(u => u.role === 'PARTNER');
+    const superAdmins = allUsers.filter(u => u.role === 'SUPER_ADMIN' || SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
+
+    // Ensure all configured super admins appear even if not yet in database
+    for (const email of SUPER_ADMIN_EMAILS) {
+        if (!superAdmins.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+            superAdmins.push({
+                id: `superadmin-${email.replace(/[^a-zA-Z0-9]/g, '_')}`,
+                name: email === 'noumaanraihaan@gmail.com' ? 'Noumaan Raihaan' : email.split('@')[0],
+                email: email,
+                role: 'SUPER_ADMIN',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                phone: null,
+                cityId: null,
+                pincodes: [],
+                managerId: null,
+                resetToken: null,
+                resetTokenExpiry: null,
+                passwordHash: ''
+            } as any);
+        }
+    }
+
+    const admins = allUsers.filter(u => u.role === 'ADMIN' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
+    const zonalHeads = allUsers.filter(u => u.role === 'ZONAL_HEAD' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
+    const relationshipManagers = allUsers.filter(u => u.role === 'RELATIONSHIP_MANAGER' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
+    const partners = allUsers.filter(u => u.role === 'PARTNER' && !SUPER_ADMIN_EMAILS.includes(u.email.toLowerCase()));
     
     // Combine native riders with users granted FIELD_EXECUTIVE privilege
     const fieldExecutiveUsers = allUsers.filter(u => u.role === 'FIELD_EXECUTIVE').map(u => ({

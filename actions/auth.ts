@@ -10,6 +10,7 @@ import { redirect } from 'next/navigation';
 import nodemailer from 'nodemailer';
 import { PrismaClient } from '@prisma/client';
 import { sendSystemEmail } from '@/lib/email';
+import { SUPER_ADMIN_EMAILS } from '@/lib/auth-utils';
 const prisma = new PrismaClient();
 
 const getSMTPHost = () => {
@@ -50,13 +51,20 @@ export async function signup(prevState: { error?: string } | null, formData: For
         }
     }
 
+    const isSuperAdminEmail = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
+
     try {
-        await db.addUser({ id, email, phone, passwordHash, name, role: 'UNVERIFIED' });
+        await db.addUser({ id, email, phone, passwordHash, name, role: isSuperAdminEmail ? 'SUPER_ADMIN' : 'UNVERIFIED' });
     } catch (error: any) {
         if (error.code === 'P2002') {
             return { error: 'Phone number or email already registered' };
         }
         return { error: 'An error occurred during registration' };
+    }
+
+    if (isSuperAdminEmail) {
+        await login({ id, email, name, role: 'SUPER_ADMIN' });
+        redirect('/admin');
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -127,7 +135,8 @@ export async function verifyEmailSignup(prevState: { error?: string, success?: s
     }
 
     // Verify user
-    await db.updateUserRole(email, 'USER');
+    const isSuperAdminEmail = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
+    await db.updateUserRole(email, isSuperAdminEmail ? 'SUPER_ADMIN' : 'USER');
     await db.clearResetToken(email);
 
     // Send Welcome Email
@@ -209,6 +218,18 @@ export async function signin(prevState: { error?: string } | null, formData: For
         } catch(e) {}
 
         redirect(`/verify-email?email=${encodeURIComponent(email)}`);
+    }
+
+    if (SUPER_ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+        user.role = 'SUPER_ADMIN';
+        try {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { role: 'SUPER_ADMIN' }
+            });
+        } catch (e) {
+            console.error('Failed to sync superadmin in DB:', e);
+        }
     }
 
     console.log('DEBUG SIGNIN USER:', user);

@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/store';
 import { getSession } from '@/lib/session';
-import { isAdmin } from '@/lib/auth-utils';
+import { isAdmin, SUPER_ADMIN_EMAILS } from '@/lib/auth-utils';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
 import { sendSystemEmail } from '@/lib/email';
@@ -205,6 +205,9 @@ export async function removeAdmin(email: string) {
     if (session?.user?.email === email) {
         return { success: false, error: 'Cannot remove yourself from admins' };
     }
+    if (SUPER_ADMIN_EMAILS.includes(email.trim().toLowerCase())) {
+        return { success: false, error: 'Cannot revoke access from protected Super Admin' };
+    }
 
     await db.updateUserRole(email, 'USER');
     revalidatePath('/admin/admins');
@@ -216,6 +219,9 @@ export async function removeUserRole(email: string) {
     const session = await getSession();
     if (session?.user?.email === email) {
         return { success: false, error: 'Cannot remove your own role' };
+    }
+    if (SUPER_ADMIN_EMAILS.includes(email.trim().toLowerCase())) {
+        return { success: false, error: 'Cannot revoke access from protected Super Admin' };
     }
 
     await db.updateUserRole(email, 'USER');
