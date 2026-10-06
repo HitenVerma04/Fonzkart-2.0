@@ -13,7 +13,7 @@ export default function RMPartnerView({ partners }: { partners: any[] }) {
     if (partners.length === 0) {
         return (
             <div className="bg-card border border-dashed rounded-xl p-12 text-center text-muted-foreground">
-                <p>No partners found in the system.</p>
+                <p>No partners are assigned to you yet. An admin can assign partners to you on the Partners page.</p>
             </div>
         );
     }

@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import { addPartner } from '@/actions/admin';
 
 import PartnerUpgradeForm from '@/components/admin/PartnerUpgradeForm';
+import { PARTNER_MANAGERS, hasStaffRole, requireStaffRole } from '@/lib/staff-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +20,13 @@ export default async function PartnersPage() {
         include: { managedCities: true }
     });
     if (!currentUser) redirect('/login');
+    // The sidebar offers this page to administrators, zonal heads and relationship managers only.
+    if (!(await hasStaffRole(PARTNER_MANAGERS))) redirect('/admin');
 
     const isZonalHead = currentUser.role === 'ZONAL_HEAD';
+    // A relationship manager's partners are their own: an RM registers partners under themselves and cannot move
+    // partners between RMs. Administrators and zonal heads choose each partner's RM.
+    const isRelationshipManager = currentUser.role === 'RELATIONSHIP_MANAGER';
     const managedCityIds = isZonalHead ? (currentUser.managedCities || []).map((c: any) => c.id) : [];
 
     const partners = await prisma.user.findMany({
@@ -35,7 +41,8 @@ export default async function PartnersPage() {
         },
         include: { 
             city: true,
-            manager: true 
+            manager: true,
+            relationshipManager: true
         },
         orderBy: { name: 'asc' }
     });
@@ -44,6 +51,13 @@ export default async function PartnersPage() {
         where: { role: 'ZONAL_HEAD' },
         orderBy: { name: 'asc' }
     });
+
+    const relationshipManagers = await prisma.user.findMany({
+        where: { role: 'RELATIONSHIP_MANAGER' },
+        select: { id: true, name: true, email: true },
+        orderBy: { name: 'asc' }
+    });
+    const rmIds = relationshipManagers.map(rm => rm.id);
 
     const availableCities = await prisma.city.findMany({
         where: {
@@ -69,12 +83,16 @@ export default async function PartnersPage() {
                         <h2 className="text-xl font-bold mb-6">Register Partner</h2>
                         <form action={async (data) => {
                             'use server';
+                            const actor = await requireStaffRole(PARTNER_MANAGERS);
+                            // Decided by who submits, not by who rendered the form.
+                            const actorIsRm = actor.role === 'RELATIONSHIP_MANAGER';
                             const name = data.get('name') as string;
                             const email = data.get('email') as string;
                             const phone = data.get('phone') as string;
                             const password = data.get('password') as string;
                             const cityId = data.get('cityId') as string;
                             const managerId = data.get('managerId') as string;
+                            const rmId = data.get('relationshipManagerId') as string;
 
                             if (name && email && password) {
                                 const passwordHash = await bcrypt.hash(password, 10);
@@ -98,7 +116,10 @@ export default async function PartnersPage() {
                                         passwordHash,
                                         role: 'PARTNER',
                                         cityId: finalCityId,
-                                        managerId: finalManagerId
+                                        managerId: finalManagerId,
+                                        relationshipManagerId: actorIsRm
+                                            ? actor.id
+                                            : (rmIds.includes(rmId) ? rmId : null)
                                     }
                                 });
                                 revalidatePath('/admin/partners');
@@ -141,6 +162,17 @@ export default async function PartnersPage() {
                                     </select>
                                 </div>
                             )}
+                            {!isRelationshipManager && (
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Relationship Manager</label>
+                                    <select name="relationshipManagerId" className="w-full h-10 px-3 rounded-md border text-sm outline-none focus:border-primary bg-background">
+                                        <option value="none">None</option>
+                                        {relationshipManagers.map(rm => (
+                                            <option key={rm.id} value={rm.id}>{rm.name} ({rm.email})</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
                             <button type="submit" className="w-full h-10 mt-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90">
                                 Create New Partner
                             </button>
@@ -172,6 +204,11 @@ export default async function PartnersPage() {
                                         <span className="hidden sm:inline">•</span>
                                         <span className="truncate">{p.phone}</span>
                                     </div>
+                                    {p.relationshipManager && (
+                                        <div className="mt-2 mr-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-black uppercase tracking-tighter shadow-sm">
+                                            RM: {p.relationshipManager.name}
+                                        </div>
+                                    )}
                                     {p.manager && (
                                         <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-black uppercase tracking-tighter shadow-sm">
                                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
@@ -183,8 +220,12 @@ export default async function PartnersPage() {
                                 <div className="w-full xl:w-auto flex-1 min-w-0">
                                     <form action={async (data) => {
                                         'use server';
+                                        const actor = await requireStaffRole(PARTNER_MANAGERS);
+                                        // Decided by who submits, not by who rendered the form.
+                                        const actorIsRm = actor.role === 'RELATIONSHIP_MANAGER';
                                         const newCityId = data.get('cityId') as string;
                                         const managerId = data.get('managerId') as string;
+                                        const rmId = data.get('relationshipManagerId') as string;
 
                                         const finalCityId = isZonalHead
                                             ? (managedCityIds.includes(newCityId) ? newCityId : p.cityId)
@@ -198,7 +239,10 @@ export default async function PartnersPage() {
                                             where: { id: p.id },
                                             data: {
                                                 cityId: finalCityId,
-                                                managerId: finalManagerId
+                                                managerId: finalManagerId,
+                                                relationshipManagerId: actorIsRm
+                                                    ? p.relationshipManagerId // RMs cannot move partners between RMs
+                                                    : (rmId === 'none' ? null : rmIds.includes(rmId) ? rmId : p.relationshipManagerId)
                                             }
                                         });
                                         revalidatePath('/admin/partners');
@@ -228,6 +272,22 @@ export default async function PartnersPage() {
                                                     <option value="none" className="italic text-muted-foreground">No Zonal Head</option>
                                                     {zonalHeads.map(zh => (
                                                         <option key={zh.id} value={zh.id}>{zh.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
+
+                                        {!isRelationshipManager && (
+                                            <div className="flex flex-col gap-1 shrink-0">
+                                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Relationship Manager</label>
+                                                <select
+                                                    name="relationshipManagerId"
+                                                    defaultValue={p.relationshipManagerId || 'none'}
+                                                    className="w-full h-9 px-3 rounded-md border text-sm outline-none focus:border-primary bg-background shrink-0"
+                                                >
+                                                    <option value="none" className="italic text-muted-foreground">No RM</option>
+                                                    {relationshipManagers.map(rm => (
+                                                        <option key={rm.id} value={rm.id}>{rm.name}</option>
                                                     ))}
                                                 </select>
                                             </div>

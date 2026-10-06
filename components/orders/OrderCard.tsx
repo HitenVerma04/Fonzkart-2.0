@@ -11,20 +11,25 @@ interface OrderCardProps {
 }
 
 import OrderStepper from './OrderStepper';
+import { ORDER_STATUS, TONE_BADGE, displayPhone, parseAnswers, payoutOf, priceReviewOf, quotedPriceOf, statusLabel, statusTone } from '@/lib/order-status';
 export default function OrderCard({ order }: OrderCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    const answers = (typeof order.answers === 'string')
-        ? JSON.parse(order.answers)
-        : (order.answers as Record<string, any> || {});
+    const answers = parseAnswers(order.answers);
 
     const isExpress = !!answers.isExpress;
     const scheduledDate = answers.scheduledDate ? new Date(answers.scheduledDate) : null;
     const scheduledSlot = answers.scheduledSlot;
     const phone = answers.phone || 'N/A';
 
-    // Filter out scheduling keys to just show condition details
-    const conditionKeys = Object.keys(answers).filter(k => !['isExpress', 'scheduledDate', 'scheduledSlot', 'phone', 'paymentMethod', 'upiId', 'bankAccount', 'bankIfsc', 'bankAccountName'].includes(k));
+    const payout = payoutOf(order);
+    const quotedPrice = quotedPriceOf(order);
+    const review = priceReviewOf(order);
+    const inReview = order.status === ORDER_STATUS.PRICE_REVIEW;
+
+    // Filter out scheduling keys and the order's internal records to just show condition details
+    const conditionKeys = Object.keys(answers).filter(k => !['isExpress', 'scheduledDate', 'scheduledSlot', 'phone', 'paymentMethod', 'upiId', 'bankAccount', 'bankIfsc', 'bankAccountName',
+        'detectedAddress', 'hubStatus', 'hubHandoverAt', 'hubReceivedBy', 'failLog', 'restoreLog', 'adminRejectionLog', 'routingLog', 'priceReview', 'quotedPrice', 'payout'].includes(k));
 
     return (
         <div className={`bg-card border rounded-xl shadow-sm transition-all overflow-hidden ${isExpanded ? 'ring-2 ring-primary/20' : 'hover:border-primary/30'}`}>
@@ -72,11 +77,18 @@ export default function OrderCard({ order }: OrderCardProps) {
 
                 <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
                     <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Offered Price</p>
-                        <p className="text-xl font-bold text-primary">₹{order.price?.toLocaleString() || 0}</p>
+                        <p className="text-sm text-muted-foreground">
+                            {inReview ? 'Revised Offer' : quotedPrice !== order.price ? 'Final Price' : 'Offered Price'}
+                        </p>
+                        <p className="text-xl font-bold text-primary">
+                            ₹{(inReview ? (review?.requestedPrice ?? order.offeredPrice ?? order.price) : order.price)?.toLocaleString() || 0}
+                        </p>
+                        {(inReview || quotedPrice !== order.price) && (
+                            <p className="text-xs text-muted-foreground">quoted <span className="line-through">₹{quotedPrice.toLocaleString()}</span></p>
+                        )}
                     </div>
-                    <div className={`shrink-0 px-4 py-2 rounded-full text-sm font-bold ${order.status === 'Pending Pickup' ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300' : 'bg-green-100 dark:bg-green-500/20 text-green-800 dark:text-green-300'}`}>
-                        {order.status}
+                    <div className={`shrink-0 px-4 py-2 rounded-full text-sm font-bold ${TONE_BADGE[statusTone(order.status)]}`}>
+                        {statusLabel(order.status, 'customer')}
                     </div>
                     <div className="text-primary hidden sm:flex items-center gap-1 font-semibold text-sm hover:underline">
                         <span>{isExpanded ? 'Hide Info' : 'View Info'}</span>
@@ -96,7 +108,23 @@ export default function OrderCard({ order }: OrderCardProps) {
                     >
                         {/* Stepper tracking order status */}
                         <div className="pt-6 px-6 pb-2 border-b border-border/50">
-                            <OrderStepper status={order.status} />
+                            <OrderStepper order={order} />
+                            {order.executive?.name && !['completed', 'failed'].includes(order.status) && (
+                                <div className="mb-4 flex flex-wrap items-center gap-2 text-sm bg-card border rounded-lg p-3">
+                                    <span className="text-muted-foreground">Your pickup executive:</span>
+                                    <span className="font-semibold">{order.executive.name}</span>
+                                    {order.executive.phone && (
+                                        <a href={`tel:${order.executive.phone}`} className="font-bold text-primary hover:underline" onClick={e => e.stopPropagation()}>
+                                            {order.executive.phone}
+                                        </a>
+                                    )}
+                                </div>
+                            )}
+                            {inReview && (
+                                <div className="mb-4 text-sm rounded-lg border border-orange-200 bg-orange-50 dark:border-orange-900/40 dark:bg-orange-950/20 p-3 text-orange-900 dark:text-orange-200">
+                                    After checking your device the executive offered <b>₹{(review?.requestedPrice ?? order.offeredPrice ?? order.price).toLocaleString()}</b> instead of ₹{quotedPrice.toLocaleString()}. Our team is reviewing it — the executive will confirm the final price with you before collecting the device.
+                                </div>
+                            )}
                         </div>
 
                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
@@ -114,7 +142,7 @@ export default function OrderCard({ order }: OrderCardProps) {
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Contact Number:</span>
-                                            <span className="font-medium text-foreground">+91 {phone}</span>
+                                            <span className="font-medium text-foreground">{phone === 'N/A' ? phone : displayPhone(phone)}</span>
                                         </div>
                                         {order.user?.email && (
                                             <div className="flex justify-between">
@@ -240,6 +268,16 @@ export default function OrderCard({ order }: OrderCardProps) {
                                             </span>
                                         </div>
                                     )}
+
+                                    {/* Payout status */}
+                                    <div className="flex justify-between items-start gap-4 pt-3 border-t border-border">
+                                        <span className="text-muted-foreground">Payment Status</span>
+                                        <span className={`font-bold text-right max-w-[65%] ${payout.paid ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                                            {payout.paid
+                                                ? `Paid ₹${payout.amount.toLocaleString()} by ${payout.methodLabel}${payout.paidAt ? ` on ${new Date(payout.paidAt).toLocaleDateString()}` : ''}`
+                                                : order.status === 'failed' ? 'Not applicable' : `Pending — ₹${payout.amount.toLocaleString()} by ${payout.methodLabel}`}
+                                        </span>
+                                    </div>
 
                                     {/* Fallback for anything else (like non-smartphone categories) */}
                                     {!answers.physical_condition && conditionKeys.length > 0 && conditionKeys.map(key => {

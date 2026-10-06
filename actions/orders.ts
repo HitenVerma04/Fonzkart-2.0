@@ -59,7 +59,17 @@ export async function getUserOrders() {
     const session = await getSession();
     if (!session || !session.user) return [];
 
-    return await db.getOrders(session.user.id);
+    const orders = await db.getOrders(session.user.id);
+    // The tracker shows who is coming: the assigned executive's name and phone (also sent by email on assignment).
+    const { prisma } = await import('@/lib/db');
+    const riderIds = [...new Set(orders.map(o => o.riderId).filter((id): id is string => !!id))];
+    const riders = riderIds.length
+        ? await prisma.rider.findMany({ where: { id: { in: riderIds } }, select: { id: true, name: true, phone: true } })
+        : [];
+    return orders.map(o => {
+        const rider = riders.find(r => r.id === o.riderId);
+        return { ...o, executive: rider ? { name: rider.name, phone: rider.phone } : null };
+    });
 }
 
 export async function checkPincodeAvailability(pincode: string) {

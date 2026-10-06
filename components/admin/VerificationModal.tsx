@@ -403,7 +403,9 @@ export default function VerificationModal({ order, onClose, onSubmit }: { order:
                                     <button 
                                         type="button"
                                         onClick={() => {
-                                            if (confirm(`Confirm pickup at ₹${finalPrice.toLocaleString()}?`)) {
+                                            if (confirm(finalPrice !== order.price
+                                                ? `The price changed from ₹${order.price.toLocaleString()} to ₹${finalPrice.toLocaleString()}. Send it for approval? Do not pay or collect the device until it is approved.`
+                                                : `Confirm pickup at ₹${finalPrice.toLocaleString()}?`)) {
                                                 const updatedAnswers = {
                                                     ...answers,
                                                     paymentMethod,
@@ -417,7 +419,7 @@ export default function VerificationModal({ order, onClose, onSubmit }: { order:
                                         }}
                                         className="flex-[2] h-14 bg-emerald-600 text-white font-black rounded-xl shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
                                     >
-                                        <Check className="w-5 h-5" /> Confirm Pickup
+                                        <Check className="w-5 h-5" /> {finalPrice !== order.price ? 'Send for Approval' : 'Confirm Pickup'}
                                     </button>
                                 </div>
                             </div>

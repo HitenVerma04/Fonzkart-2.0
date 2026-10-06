@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import RiderManager from "@/components/admin/RiderManager";
 import { getSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
+import { withoutSecrets } from '@/lib/safe-records';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,7 +58,7 @@ export default async function RidersPage() {
         <div className="space-y-6">
             <h1 className="text-3xl font-bold">Manage Field Executives</h1>
             <p className="text-muted-foreground">Add logistics partners and field executives.</p>
-            <RiderManager initialRiders={riders} partners={partners} currentUserRole={currentUser.role} currentUserId={currentUser.id} />
+            <RiderManager initialRiders={withoutSecrets(riders)} partners={withoutSecrets(partners)} currentUserRole={currentUser.role} currentUserId={currentUser.id} />
         </div>
     );
 }

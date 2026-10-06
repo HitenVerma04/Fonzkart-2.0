@@ -1,54 +1,57 @@
-import { Check } from 'lucide-react';
+import { Check, X } from 'lucide-react';
+import { TrackableOrder, failureReasonOf, isFailed, trackerSteps } from '@/lib/order-status';
 
-export default function OrderStepper({ status }: { status: string }) {
-    const steps = [
-        "Order Placed",
-        "RM Assigned",
-        "Executive Assigned",
-        "Pickup Completed",
-    ];
-
-    const statusStr = (status || '').toLowerCase();
-    
-    let completedSteps = 1;
-    if (statusStr.includes('complete') || statusStr.includes('paid') || statusStr.includes('success')) completedSteps = 4;
-    else if (statusStr.includes('executive') || statusStr.includes('rider') || statusStr.includes('field') || statusStr.includes('out for')) completedSteps = 3;
-    else if (statusStr.includes('rm assigned') || statusStr.includes('manager') || statusStr.includes('assigned')) completedSteps = 2;
+// The order tracker shown to customers (My Orders) and in the admin panel's order details. Steps and their states
+// come from lib/order-status.ts → trackerSteps, the same rules the admin panel and the executive's list use.
+export default function OrderStepper({ order }: { order: TrackableOrder }) {
+    const steps = trackerSteps(order);
+    const failed = isFailed(order.status);
+    const reason = failed ? failureReasonOf(order) : null;
 
     return (
-        <div className="w-full py-4 mb-6 mt-2 relative">
-            {/* Background Line */}
-            <div className="absolute top-[34px] left-[15%] right-[15%] h-[3px] bg-muted z-0 rounded-full" />
-            <div 
-                className="absolute top-[34px] left-[15%] h-[3px] bg-green-500 z-0 rounded-full transition-all duration-700 ease-in-out" 
-                style={{ width: `${Math.min(100, Math.max(0, (completedSteps - 1) * (100 / (steps.length - 1)))) * 0.7}%` }} 
-            />
-            
-            <div className="flex justify-between items-start relative z-10">
+        <div className="w-full py-2 mb-4 mt-2">
+            {failed && (
+                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950/20 p-3 text-sm text-red-800 dark:text-red-300">
+                    <span className="font-bold">This pickup was cancelled.</span>{reason ? ` Reason: ${reason}` : ''}
+                </div>
+            )}
+            <ol className="flex flex-col sm:flex-row sm:items-start gap-0 sm:gap-1">
                 {steps.map((step, idx) => {
-                    const isCompleted = idx < completedSteps;
-                    const isPending = idx === completedSteps;
-
+                    const done = step.state === 'done';
+                    const current = step.state === 'current';
+                    const stepFailed = step.state === 'failed';
+                    const last = idx === steps.length - 1;
                     return (
-                        <div key={step} className="flex flex-col items-center gap-2 relative z-10 w-1/4">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-[3px] transition-all duration-500 bg-card ${
-                                isCompleted ? 'border-green-500 text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]' : 
-                                isPending ? 'border-amber-500 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 
+                        <li key={step.key} className="relative flex sm:flex-1 sm:flex-col sm:items-center gap-3 sm:gap-2 pb-5 sm:pb-0 min-w-0">
+                            {/* connector to the next step: vertical on phones, horizontal from sm up */}
+                            {!last && (
+                                <span aria-hidden className={`absolute left-[17px] top-9 bottom-0 w-[3px] sm:left-[calc(50%+20px)] sm:right-[calc(-50%+20px)] sm:top-[17px] sm:bottom-auto sm:w-auto sm:h-[3px] rounded-full ${done ? 'bg-green-500' : 'bg-muted'}`} />
+                            )}
+                            <span className={`relative z-10 shrink-0 w-9 h-9 rounded-full flex items-center justify-center border-[3px] bg-card transition-all ${
+                                done ? 'border-green-500 text-green-500' :
+                                current ? 'border-amber-500 text-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.35)]' :
+                                stepFailed ? 'border-red-500 text-red-500' :
                                 'border-muted text-muted-foreground'
                             }`}>
-                                {isCompleted ? <Check className="w-5 h-5 stroke-[3]" /> : <span className="font-bold">{idx + 1}</span>}
-                            </div>
-                            <span className={`text-[11px] sm:text-xs font-bold text-center px-1 leading-tight ${
-                                isCompleted ? 'text-green-600 dark:text-green-500' :
-                                isPending ? 'text-amber-600 dark:text-amber-500' :
-                                'text-muted-foreground'
-                            }`}>
-                                {step}
+                                {done ? <Check className="w-4 h-4 stroke-[3]" /> : stepFailed ? <X className="w-4 h-4 stroke-[3]" /> : <span className="text-xs font-bold">{idx + 1}</span>}
                             </span>
-                        </div>
+                            <div className="min-w-0 sm:text-center sm:px-1">
+                                <p className={`text-xs sm:text-[11px] font-bold leading-tight ${
+                                    done ? 'text-green-600 dark:text-green-500' :
+                                    current ? 'text-amber-600 dark:text-amber-500' :
+                                    stepFailed ? 'text-red-600 dark:text-red-400' :
+                                    'text-muted-foreground'
+                                }`}>
+                                    {step.label}
+                                </p>
+                                {step.detail && (
+                                    <p className="text-[11px] sm:text-[10px] text-muted-foreground leading-snug mt-0.5 break-words">{step.detail}</p>
+                                )}
+                            </div>
+                        </li>
                     );
                 })}
-            </div>
+            </ol>
         </div>
     );
 }

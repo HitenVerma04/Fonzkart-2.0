@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AlertCircle, Clock, CheckCircle2, User, Building2, Package, Search } from "lucide-react";
 import RMPartnerView from "@/components/admin/RMPartnerView";
+import { withoutSecrets } from '@/lib/safe-records';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +15,9 @@ export default async function RMDashboard() {
         redirect('/login');
     }
 
+    // Only this RM's partners ("User"."relationshipManagerId"), as on the Orders page (lib/order-access.ts).
     const partners = await prisma.user.findMany({
-        where: { role: 'PARTNER' },
+        where: { role: 'PARTNER', relationshipManagerId: session.user.id },
         include: {
             riders: true,
             manager: true,
@@ -27,12 +29,14 @@ export default async function RMDashboard() {
     const allOrders = await db.getAllOrders();
     const now = new Date();
 
-    // Map orders to partners based on pincodes
+    // An order belongs to the partner it is routed to; an order from before routing existed (no partnerId) to the
+    // partner covering its pincode or owning its executive.
     const partnersWithData = partners.map(partner => {
         const partnerPincodes = partner.pincodes || [];
-        const partnerOrders = allOrders.filter(o => 
-            (o.pincode && partnerPincodes.includes(o.pincode)) ||
-            (o.riderId && partner.riders.some(r => r.id === o.riderId))
+        const partnerOrders = allOrders.filter(o => o.partnerId
+            ? o.partnerId === partner.id
+            : (!!o.pincode && partnerPincodes.includes(o.pincode)) ||
+              (!!o.riderId && partner.riders.some(r => r.id === o.riderId))
         );
 
         const unassignedOrders = partnerOrders.filter(o => !o.riderId && o.status !== 'Completed' && o.status !== 'Cancelled');
@@ -60,7 +64,7 @@ export default async function RMDashboard() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">Relationship Manager Dashboard</h1>
-                    <p className="text-muted-foreground mt-2">Oversee all Partners across zones and monitor order assignments.</p>
+                    <p className="text-muted-foreground mt-2">Your partners, their executives and order assignments. Route and assign orders on the Orders page.</p>
                 </div>
             </div>
 
@@ -77,7 +81,7 @@ export default async function RMDashboard() {
                 </div>
             )}
 
-            <RMPartnerView partners={partnersWithData} />
+            <RMPartnerView partners={withoutSecrets(partnersWithData)} />
         </div>
     );
 }

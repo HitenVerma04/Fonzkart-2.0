@@ -2,8 +2,13 @@ import { db } from "@/lib/store";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
-import OrderManager from "@/components/admin/OrderManager";
+import OrderManager, { type OrderPermissions } from "@/components/admin/OrderManager";
 import RiderOrderList from "@/components/admin/RiderOrderList";
+import { withoutSecrets } from '@/lib/safe-records';
+import { getCurrentStaff } from '@/lib/staff-access';
+import {
+    BULK_ORDER_STAFF, ORDER_DELETERS, ORDER_STAFF, PARTNER_ROUTERS, PRICE_APPROVERS, canRouteTo, orderInScope, orderScopeFor,
+} from '@/lib/order-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,86 +23,78 @@ export default async function OrdersPage(props: { searchParams?: Promise<{ rider
         where: { id: session.user.id },
         include: { managedCities: true }
     });
+    const staff = await getCurrentStaff();
 
-    if (!currentUser) redirect('/login');
+    if (!currentUser || !staff) redirect('/login');
 
     let orders = await db.getAllOrders();
-    let riders = await prisma.rider.findMany({
-        include: {
-            partner: {
-                select: { pincodes: true }
-            }
-        }
-    });
 
-    if (currentUser.role === 'PARTNER') {
-        const allowedPincodes = currentUser.pincodes || [];
-        orders = orders.filter(o => o.pincode && allowedPincodes.includes(o.pincode));
-        riders = riders.filter(r => r.partnerId === currentUser.id);
-    } else if (currentUser.role === 'FIELD_EXECUTIVE') {
+    if (staff.role === 'FIELD_EXECUTIVE') {
         const rider = await prisma.rider.findFirst({
             where: { phone: currentUser.phone || '' }
         });
-        if (rider) {
-            orders = orders.filter(o => o.riderId === rider.id);
-        } else {
-            orders = [];
-        }
-        riders = []; // Riders don't need to see other riders
-    } else if (currentUser.role === 'ZONAL_HEAD') {
-        if (currentUser.managedCities.length > 0) {
-            const managedCityIds = currentUser.managedCities.map((c: any) => c.id);
-            const managedCityNames = currentUser.managedCities.map((c: any) => c.name.toLowerCase());
-
-            // Find all Pincodes managed by Partners in this Zonal Head's cities
-            const cityPartners = await prisma.user.findMany({
-                where: { 
-                    role: 'PARTNER', 
-                    cityId: { in: managedCityIds } 
-                }
-            });
-            const allowedPincodes = cityPartners.flatMap(p => p.pincodes);
-            const partnerIds = cityPartners.map(p => p.id);
-
-            orders = orders.filter(o =>
-                (o.pincode && allowedPincodes.includes(o.pincode)) ||
-                (o.address && managedCityNames.some((name: any) => o.address?.toLowerCase().includes(name)))
-            );
-            riders = riders.filter(r => r.partnerId && partnerIds.includes(r.partnerId));
-        } else {
-            // If they are not assigned to any city, they see no orders
-            orders = [];
-            riders = [];
-        }
+        orders = rider ? orders.filter(o => o.riderId === rider.id) : [];
+        return <RiderOrderList orders={orders} executiveName={currentUser.name} isEmbedded={true} />;
     }
-    // SUPER_ADMIN and ADMIN see all orders
 
+    // Who sees which orders, executives and partners: lib/order-access.ts.
+    const scope = await orderScopeFor(staff);
+    orders = orders.filter(o => orderInScope(scope, o));
     if (filterRiderId) {
         orders = orders.filter(o => o.riderId === filterRiderId);
     }
 
-    if (currentUser.role === 'FIELD_EXECUTIVE') {
-        return <RiderOrderList orders={orders} executiveName={currentUser.name} isEmbedded={true} />;
-    }
+    const riders = await prisma.rider.findMany({
+        where: scope.all ? {} : { partnerId: { in: scope.partnerIds } },
+        include: { partner: { select: { name: true, pincodes: true } } },
+        orderBy: { name: 'asc' },
+    });
+
+    const referencedPartnerIds = orders.map(o => o.partnerId).filter((id): id is string => !!id);
+    const partners = (await prisma.user.findMany({
+        where: {
+            role: 'PARTNER',
+            ...(scope.all ? {} : { id: { in: [...new Set([...scope.partnerIds, ...referencedPartnerIds])] } }),
+        },
+        select: { id: true, name: true, phone: true, email: true, pincodes: true, relationshipManager: { select: { name: true, phone: true } } },
+        orderBy: { name: 'asc' },
+    })).map(p => ({ ...p, routable: canRouteTo(scope, p.id) }));
+
+    const permissions: OrderPermissions = {
+        assignPartner: PARTNER_ROUTERS.includes(staff.role),
+        assignRider: ORDER_STAFF.includes(staff.role),
+        approvePrice: PRICE_APPROVERS.includes(staff.role),
+        manage: ORDER_STAFF.includes(staff.role),
+        bulk: BULK_ORDER_STAFF.includes(staff.role),
+        delete: ORDER_DELETERS.includes(staff.role),
+    };
 
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent uppercase">
-                {currentUser.role === 'FIELD_EXECUTIVE' ? 'My Pickups' : filterRiderId ? `Orders for Field Executive` : `Manage Orders`}
+                {filterRiderId ? `Orders for Field Executive` : `Manage Orders`}
             </h1>
-            {currentUser.role === 'ZONAL_HEAD' && (
+            {staff.role === 'ZONAL_HEAD' && (
                 <p className="text-muted-foreground text-sm font-medium text-primary">
                     Territory Overview: {currentUser.managedCities.map((c: any) => c.name).join(', ') || 'Unassigned'}
                 </p>
             )}
-            {currentUser.role === 'PARTNER' && <p className="text-muted-foreground text-sm font-medium text-emerald-600">Assigned Pincodes: {currentUser.pincodes?.join(', ') || 'None'}</p>}
+            {staff.role === 'RELATIONSHIP_MANAGER' && (
+                <p className="text-muted-foreground text-sm font-medium text-primary">
+                    Your partners: {partners.filter(p => p.routable).map(p => p.name).join(', ') || 'None assigned yet'} — plus new orders not yet routed to a partner.
+                </p>
+            )}
+            {staff.role === 'PARTNER' && <p className="text-muted-foreground text-sm font-medium text-emerald-600">Assigned Pincodes: {currentUser.pincodes?.join(', ') || 'None'}</p>}
             <p className="text-muted-foreground">
-                {currentUser.role === 'FIELD_EXECUTIVE' 
-                    ? 'View and manage your currently assigned sell requests and pick-up tasks.'
-                    : 'View incoming sell requests and assign field executives for pickup.'
-                }
+                View incoming sell requests, route them to partners and assign field executives for pickup.
             </p>
-            <OrderManager initialOrders={orders} riders={riders} userRole={currentUser.role} />
+            <OrderManager
+                initialOrders={orders}
+                riders={withoutSecrets(riders)}
+                partners={partners}
+                permissions={permissions}
+                userRole={staff.role}
+            />
         </div>
     );
 }

@@ -1,4 +1,5 @@
 import { AlertTriangle, Smartphone, FileText, Clock, Box, MapPin, User, Phone, Mail, Wallet } from 'lucide-react';
+import { displayPhone, parseAnswers } from '@/lib/order-status';
 
 interface OrderDetailsProps {
     order: {
@@ -14,9 +15,7 @@ interface OrderDetailsProps {
 }
 
 export default function OrderDetails({ order }: OrderDetailsProps) {
-    const answers = (typeof order.answers === 'string')
-        ? JSON.parse(order.answers)
-        : (order.answers || {});
+    const answers = parseAnswers(order.answers);
 
     // Normalize logic for older data if necessary
 
@@ -61,7 +60,7 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
                             {(answers.phone || order.user.phone) && (
                                 <div className="flex items-center gap-2 text-sm text-foreground">
                                     <Phone className="w-3.5 h-3.5 text-green-600" />
-                                    <span className="font-bold">+91 {answers.phone || order.user.phone}</span>
+                                    <span className="font-bold">{displayPhone(answers.phone || order.user.phone)}</span>
                                 </div>
                             )}
 

@@ -3,10 +3,15 @@ import { getDeviceDisplayPrices, updateDeviceDisplayPrice, toggleFeaturedCity, u
 import { Banknote, MapPin, Save, Star, ArrowUpDown, Layout } from 'lucide-react';
 import BannerPriceCard from '@/components/admin/BannerPriceCard';
 import CityOrderCard from '@/components/admin/CityOrderCard';
+import { redirect } from 'next/navigation';
+import { ADMINS, hasStaffRole } from '@/lib/staff-access';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomepageModificationsPage() {
+    // Landing-page settings are for administrators (sidebar: SUPER_ADMIN and ADMIN only).
+    if (!(await hasStaffRole(ADMINS))) redirect('/admin');
+
     const bannerPrices = await getDeviceDisplayPrices();
 
     const cities = await prisma.city.findMany({

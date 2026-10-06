@@ -242,7 +242,8 @@ export async function signin(prevState: { error?: string } | null, formData: For
         }
     }
 
-    console.log('DEBUG SIGNIN USER:', user);
+    // Never log the user record: it holds the password hash and the password-reset code.
+    console.log('[Auth] Sign-in succeeded', { userId: user.id, role: user.role });
     await login({ id: user.id, email: user.email, name: user.name, role: user.role });
     
     // Redirect privileged users to admin panel, normal users to homepage

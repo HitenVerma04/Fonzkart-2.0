@@ -2,23 +2,22 @@
 
 import { db } from '@/lib/store';
 import { getSession } from '@/lib/session';
-import { isAdmin, SUPER_ADMIN_EMAILS } from '@/lib/auth-utils';
+import { SUPER_ADMIN_EMAILS } from '@/lib/auth-utils';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
 import { sendSystemEmail } from '@/lib/email';
 import { prisma } from '@/lib/db';
+import {
+    ADMINS, FORBIDDEN_SCOPE, FORBIDDEN_TEAM, PARTNER_MANAGERS, RIDER_MANAGERS, requireAssignableTarget,
+    requireStaffRole, riderTeamPartnerIds, zonalHeadManagedCityIds,
+} from '@/lib/staff-access';
+import { ORDER_DELETERS, ORDER_STAFF, PARTNER_ROUTERS, requireOrderAccess } from '@/lib/order-access';
+import * as orderWorkflow from '@/lib/order-workflow';
 
-// Auth check helper
+// Auth check helper: SUPER_ADMIN or ADMIN only (database role). Partners, field executives, zonal heads and
+// relationship managers may enter the admin panel, but that does not make them administrators.
 async function requireAdmin() {
-    const session = await getSession();
-    if (!session || !session.user) {
-        throw new Error('Unauthorized');
-    }
-
-    if (!isAdmin(session.user)) {
-        console.log(`[Auth] Blocked non-admin user: ${session.user.email} (${session.user.role})`);
-        throw new Error('Forbidden: Admin access required');
-    }
+    return requireStaffRole(ADMINS);
 }
 
 // --- Admins & Staff ---
@@ -72,18 +71,27 @@ export async function addRelationshipManager(email: string) {
     return { success: true };
 }
 
+// Used by the Users page (admins) and the Partners page (also zonal heads and relationship managers).
 export async function addPartner(email: string, cityId?: string, managerId?: string) {
-    await requireAdmin();
+    const staff = await requireStaffRole(PARTNER_MANAGERS);
     const cleanEmail = email.trim().toLowerCase();
     const user = await db.findUserByEmail(cleanEmail);
     if (!user) return { success: false, error: `User "${cleanEmail}" not found. They must register first.` };
+    requireAssignableTarget(staff, user, 'PARTNER');
+    // A zonal head may only place partners in their own cities (as the Partners page offers) and under themselves.
+    if (staff.role === 'ZONAL_HEAD'
+        && ((cityId && !(await zonalHeadManagedCityIds(staff)).includes(cityId)) || (managerId && managerId !== staff.id))) {
+        throw new Error(FORBIDDEN_SCOPE);
+    }
 
     await prisma.user.update({
         where: { id: user.id },
         data: { 
             role: 'PARTNER',
             managerId: managerId || null,
-            ...(cityId ? { cityId } : {})
+            ...(cityId ? { cityId } : {}),
+            // A partner brought in by a relationship manager is that RM's partner (orders, executives, routing).
+            ...(staff.role === 'RELATIONSHIP_MANAGER' ? { relationshipManagerId: staff.id } : {})
         }
     });
 
@@ -131,14 +139,10 @@ async function requireZonalOrAdmin() {
     if (!roles.includes(session.user.role || '')) throw new Error('Forbidden: Admin or Zonal Head access required');
 }
 
-async function requirePartnerOrAbove() {
-    const session = await getSession();
-    if (!session || !session.user) throw new Error('Unauthorized');
-    const roles = ['SUPER_ADMIN', 'ADMIN', 'ZONAL_HEAD', 'RELATIONSHIP_MANAGER', 'PARTNER'];
-    if (!roles.includes(session.user.role || '')) throw new Error('Forbidden: Insufficient privileges');
-}
-
+// Not used by any page. Admins may list anyone's partners, a zonal head only their own.
 export async function getPartnersManagedBy(managerId: string) {
+    const staff = await requireStaffRole([...ADMINS, 'ZONAL_HEAD']);
+    if (staff.role === 'ZONAL_HEAD' && managerId !== staff.id) throw new Error(FORBIDDEN_SCOPE);
     return await prisma.user.findMany({
         where: { 
             managerId: managerId,
@@ -150,17 +154,14 @@ export async function getPartnersManagedBy(managerId: string) {
     });
 }
 
+// Used by the Users page (admins) and the Field Executives page (also zonal heads and partners).
 export async function addFieldExecutive(email: string) {
-    const session = await getSession();
-    if (!session || !session.user) throw new Error('Unauthorized');
-    
-    if (!isAdmin(session.user)) {
-        throw new Error('Forbidden: Insufficient privileges to grant executive access');
-    }
+    const staff = await requireStaffRole(RIDER_MANAGERS, 'Forbidden: Insufficient privileges to grant executive access');
 
     const cleanEmail = email.trim().toLowerCase();
     const user = await db.findUserByEmail(cleanEmail);
     if (!user) return { success: false, error: 'User not found. They must register first.' };
+    requireAssignableTarget(staff, user, 'FIELD_EXECUTIVE');
 
     await prisma.user.update({
         where: { id: user.id },
@@ -174,7 +175,7 @@ export async function addFieldExecutive(email: string) {
 
         if (!existingRider) {
             console.log(`[RoleMgmt] Synchronizing: Creating Rider record for ${user.name} (${user.phone})`);
-            const partnerId = session.user.role === 'PARTNER' ? session.user.id : null;
+            const partnerId = staff.role === 'PARTNER' ? staff.id : null;
 
             await prisma.rider.create({
                 data: {
@@ -185,10 +186,10 @@ export async function addFieldExecutive(email: string) {
                     partnerId: partnerId
                 }
             });
-        } else if (session.user.role === 'PARTNER' && !existingRider.partnerId) {
+        } else if (staff.role === 'PARTNER' && !existingRider.partnerId) {
             await prisma.rider.update({
                 where: { id: existingRider.id },
-                data: { partnerId: session.user.id }
+                data: { partnerId: staff.id }
             });
         }
     }
@@ -380,8 +381,11 @@ export async function deleteVariant(id: string) {
 
 // --- Riders ---
 
+// Field Executives page: admins (any partner), zonal heads (their partners or none), partners (themselves).
 export async function addRider(name: string, phone: string, email?: string | null, partnerId?: string | null) {
-    await requireAdmin();
+    const staff = await requireStaffRole(RIDER_MANAGERS);
+    const team = await riderTeamPartnerIds(staff);
+    if (team && !(partnerId ? team.includes(partnerId) : staff.role === 'ZONAL_HEAD')) throw new Error(FORBIDDEN_TEAM);
     await db.addRider({
         id: randomUUID(),
         name,
@@ -395,8 +399,17 @@ export async function addRider(name: string, phone: string, email?: string | nul
     return { success: true };
 }
 
+// Admins: any rider or field-executive account. Zonal heads and partners: only riders of their own team, and only if
+// an account with the same id is an ordinary or field-executive account (its role is reset to USER).
 export async function deleteRider(id: string) {
-    await requireAdmin();
+    const staff = await requireStaffRole(RIDER_MANAGERS);
+    const team = await riderTeamPartnerIds(staff);
+    if (team) {
+        const rider = await prisma.rider.findUnique({ where: { id } });
+        if (!rider?.partnerId || !team.includes(rider.partnerId)) throw new Error(FORBIDDEN_TEAM);
+        const account = await prisma.user.findUnique({ where: { id } });
+        if (account) requireAssignableTarget(staff, account, 'FIELD_EXECUTIVE');
+    }
     let wasUserResetted = false;
     let wasRiderDeleted = false;
 
@@ -434,33 +447,52 @@ export async function deleteRider(id: string) {
     }
 }
 
+// Admins: any rider. Zonal heads: a rider of their team, moved to another of their partners or to none.
+// (The page does not offer this to partners.)
 export async function updateRiderPartner(riderId: string, partnerId: string | null) {
-    await requireAdmin();
+    const staff = await requireStaffRole([...ADMINS, 'ZONAL_HEAD']);
+    const team = await riderTeamPartnerIds(staff);
+    if (team) {
+        const rider = await prisma.rider.findUnique({ where: { id: riderId } });
+        if (!rider?.partnerId || !team.includes(rider.partnerId) || (partnerId && !team.includes(partnerId))) {
+            throw new Error(FORBIDDEN_TEAM);
+        }
+    }
     await db.updateRiderPartner(riderId, partnerId);
     revalidatePath('/admin/riders');
     return { success: true };
 }
 
 // --- Orders ---
+// Who may act on which order: lib/order-access.ts. What each change does: lib/order-workflow.ts.
 
+// Route (or re-route) an order to a partner: admins any partner, zonal heads their team, RMs their own partners.
+export async function assignPartner(orderId: string, partnerId: string) {
+    const ctx = await requireOrderAccess(orderId, PARTNER_ROUTERS);
+    const result = await orderWorkflow.assignPartner(ctx, partnerId);
+    revalidatePath('/admin/orders');
+    revalidatePath('/admin/rm-dashboard');
+    return { success: true, changed: result.changed };
+}
+
+// Give an order to an executive: admins any; zonal heads, RMs and partners only executives of their partners.
 export async function assignRider(orderId: string, riderId: string) {
-    await requirePartnerOrAbove();
-    const success = await db.updateOrderRider(orderId, riderId);
-    if (!success) throw new Error('Database level failure: Could not update order with assigned executive. Please check if the executive still exists.');
+    const ctx = await requireOrderAccess(orderId, ORDER_STAFF);
+    const rider = await orderWorkflow.assignRider(ctx, riderId);
 
     const order = await prisma.order.findUnique({
         where: { id: orderId },
-        include: { user: true, rider: true }
+        include: { user: true }
     });
 
-    if (order?.user?.email && order?.rider) {
+    if (order?.user?.email) {
         const mailHtml = `
           <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #3b82f6; border-radius: 10px;">
             <h2 style="color: #3b82f6;">Executive Assigned! 🚚</h2>
             <p>Dear ${order.user.name}, we have assigned an executive for your <b>${order.device}</b> pickup!</p>
             <div style="background-color: #f0fdf4; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #10b981;">
-                <p style="margin: 5px 0;"><b>Executive Name:</b> ${order.rider.name}</p>
-                <p style="margin: 5px 0;"><b>Executive Contact:</b> ${order.rider.phone}</p>
+                <p style="margin: 5px 0;"><b>Executive Name:</b> ${rider.name}</p>
+                <p style="margin: 5px 0;"><b>Executive Contact:</b> ${rider.phone}</p>
                 <p style="margin: 5px 0;"><b>Estimated Offer:</b> ₹${order.price}</p>
             </div>
             <p>They will contact you shortly to coordinate the pickup time at your provided address.</p>
@@ -476,72 +508,35 @@ export async function assignRider(orderId: string, riderId: string) {
 }
 
 export async function restoreOrder(orderId: string) {
-    await requirePartnerOrAbove();
-    const order = await prisma.order.findUnique({ where: { id: orderId } });
-    if (!order) throw new Error('Order not found');
-
-    const session = await getSession();
-    let answersObj: any = {};
-    if (order.answers && typeof order.answers === 'string') {
-        try { answersObj = JSON.parse(order.answers); } catch { }
-    }
-
-    if (!answersObj.restoreLog) answersObj.restoreLog = [];
-    answersObj.restoreLog.push({
-        date: new Date().toISOString(),
-        restoredBy: session?.user?.email || 'Admin',
-        previousStatus: order.status
-    });
-
-    const restoredStatus = order.riderId ? 'assigned' : 'Pending Pickup';
-
-    await prisma.order.update({
-        where: { id: orderId },
-        data: {
-            status: restoredStatus,
-            answers: JSON.stringify(answersObj)
-        }
-    });
-
+    const { order, staff } = await requireOrderAccess(orderId, ORDER_STAFF);
+    const restoredStatus = await orderWorkflow.restoreOrder(order, await orderWorkflow.staffActor(staff));
     revalidatePath('/admin/orders');
     return { success: true, status: restoredStatus };
 }
 
+// Permanent deletion: admins and zonal heads (their orders) only, as the order API's DELETE.
 export async function deleteOrder(orderId: string) {
-    await requirePartnerOrAbove();
+    await requireOrderAccess(orderId, ORDER_DELETERS);
     await prisma.order.delete({ where: { id: orderId } });
     revalidatePath('/admin/orders');
     return { success: true };
 }
 
 export async function updateOrderHubStatus(orderId: string, hubStatus: 'handed_over' | 'pending') {
-    await requirePartnerOrAbove();
-    const order = await prisma.order.findUnique({ where: { id: orderId } });
-    if (!order) throw new Error('Order not found');
-
-    const session = await getSession();
-    let answersObj: any = {};
-    if (order.answers && typeof order.answers === 'string') {
-        try { answersObj = JSON.parse(order.answers); } catch { }
-    }
-
-    answersObj.hubStatus = hubStatus;
-    if (hubStatus === 'handed_over') {
-        answersObj.hubHandoverAt = new Date().toISOString();
-        answersObj.hubReceivedBy = session?.user?.name || session?.user?.email || 'Hub Staff';
-    } else {
-        answersObj.hubHandoverAt = null;
-        answersObj.hubReceivedBy = null;
-    }
-
-    await prisma.order.update({
-        where: { id: orderId },
-        data: { answers: JSON.stringify(answersObj) }
-    });
-
+    const { order, staff } = await requireOrderAccess(orderId, ORDER_STAFF);
+    await orderWorkflow.setHubStatus(order, await orderWorkflow.staffActor(staff), hubStatus);
     revalidatePath('/admin/orders');
     revalidatePath('/admin/riders');
     return { success: true, hubStatus };
+}
+
+// Record that the customer was paid (once the device is collected).
+export async function markPayoutPaid(orderId: string, reference?: string) {
+    const { order, staff } = await requireOrderAccess(orderId, ORDER_STAFF);
+    const payout = await orderWorkflow.markPayoutPaid(order, await orderWorkflow.staffActor(staff), reference);
+    revalidatePath('/admin/orders');
+    revalidatePath('/orders');
+    return { success: true, payout };
 }
 
 // --- Evaluation Rules ---

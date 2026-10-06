@@ -7,7 +7,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Noumaanr@2026}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
     volumes:
@@ -28,16 +28,16 @@ services:
     environment:
       API_EXTERNAL_URL: ${NEXT_PUBLIC_SUPABASE_URL:-https://api.89.116.27.217.sslip.io}
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-Noumaanr@2026}@supabase-db:5432/postgres?sslmode=disable
+      GOTRUE_DB_DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@supabase-db:5432/postgres?sslmode=disable
       GOTRUE_SITE_URL: ${NEXT_PUBLIC_APP_URL:-https://fonzkart.in}
       GOTRUE_API_EXTERNAL_URL: ${NEXT_PUBLIC_SUPABASE_URL:-https://api.89.116.27.217.sslip.io}
-      GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-change-me}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
       GOTRUE_JWT_EXP: 3600
       GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
       GOTRUE_SMTP_HOST: "89.116.27.217"
       GOTRUE_SMTP_PORT: "25"
       GOTRUE_SMTP_USER: "noreply@fonzkart.in"
-      GOTRUE_SMTP_PASS: "Noumaanr@2026"
+      GOTRUE_SMTP_PASS: "${SMTP_PASSWORD:?set SMTP_PASSWORD}"
       GOTRUE_SMTP_ADMIN_EMAIL: "noreply@fonzkart.in"
       GOTRUE_MAILER_AUTOCONFIRM: "true"
     restart: unless-stopped
@@ -49,10 +49,10 @@ services:
       supabase-db:
         condition: service_healthy
     environment:
-      PGRST_DB_URI: postgresql://postgres:${POSTGRES_PASSWORD:-Noumaanr@2026}@supabase-db:5432/postgres?sslmode=disable
+      PGRST_DB_URI: postgresql://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@supabase-db:5432/postgres?sslmode=disable
       PGRST_DB_SCHEMA: public
       PGRST_DB_ANON_ROLE: anon
-      PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-change-me}
+      PGRST_JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
     restart: unless-stopped
 
   supabase-kong:
@@ -84,7 +84,7 @@ services:
     image: supabase/postgres-meta:v0.96.6
     container_name: supabase-pg-meta-obb7umbk0gs648rprjwjd15p
     environment:
-      PG_META_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD:-Noumaanr@2026}@supabase-db:5432/postgres?sslmode=disable
+      PG_META_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@supabase-db:5432/postgres?sslmode=disable
     restart: unless-stopped
 
 volumes:

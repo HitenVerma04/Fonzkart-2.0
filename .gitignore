@@ -55,3 +55,17 @@ check_*.js
 test-*.js
 test-*.html
 server.js
+
+# local run (scripts/local)
+scripts/local/.local-secret
+
+# Local backups, planning notes and tools: not part of the app
+/security-hardening/
+/order-flow/
+/notifications-fix/
+/catalog-fix/
+/deploy/originals/
+/mobile/
+/.claude/
+/backend/target/
+*.mutbak

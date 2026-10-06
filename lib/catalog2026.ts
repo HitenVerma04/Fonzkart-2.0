@@ -852,6 +852,23 @@ export function getCanonicalModelKey(name: string): string {
         .trim();
 }
 
+/** Redmi and POCO are Xiaomi sub-brands: their models may be filed under any of these brand ids. */
+const BRAND_FAMILY: Record<string, string> = { redmi: 'xiaomi', poco: 'xiaomi', mi: 'xiaomi' };
+
+export function brandFamily(brandId?: string | null): string {
+    const b = (brandId || '').toLowerCase().trim();
+    return BRAND_FAMILY[b] || b;
+}
+
+/**
+ * Brand family + canonical name. The canonical name alone drops brand words ("iPhone 14" and "Realme 14" both become
+ * "14"), so models are only matched or merged within the same brand (models without a brand among themselves).
+ */
+export function getModelIdentityKey(brandId: string | null | undefined, name: string): string {
+    const key = getCanonicalModelKey(name);
+    return key ? `${brandFamily(brandId)}|${key}` : '';
+}
+
 export const BRAND_DEFAULT_IMAGES: Record<string, string> = {
     samsung: '/models/samsung/Samsung_Galaxy_S25_Ultra.png',
     xiaomi: '/models/xiaomi/Xiaomi_15.png',
@@ -871,9 +888,12 @@ export function resolveModelImage(brandId: string, modelName: string, currentImg
     const cleanName = (modelName || '').toLowerCase().trim();
     const cKey = getCanonicalModelKey(modelName);
 
-    // 1. Check 2026 Catalog first for the most accurate dedicated product render
+    // 1. Check 2026 Catalog first for the most accurate dedicated product render — of the same brand: "iPhone 14"
+    // must not get the "Realme 14" picture. A model without a brand may match any brand, as before.
+    const family = brandFamily(cleanBrand);
     const catalogMatch = CATALOG_2026_MODELS.find(
-        m => m.name.toLowerCase().trim() === cleanName || getCanonicalModelKey(m.name) === cKey
+        m => (!family || brandFamily(m.brandId) === family)
+            && (m.name.toLowerCase().trim() === cleanName || getCanonicalModelKey(m.name) === cKey)
     );
     if (catalogMatch && catalogMatch.img) {
         return catalogMatch.img;
@@ -904,7 +924,8 @@ export function deduplicateModels<T extends { name: string; priority?: number; i
         const resolvedImg = resolveModelImage(rawModel.brandId || '', rawModel.name, rawModel.img);
         const model = { ...rawModel, img: resolvedImg };
 
-        const key = getCanonicalModelKey(model.name);
+        // Same model of the same brand only: "iPhone 14 Pro" and "Realme 14 Pro" are different phones.
+        const key = getModelIdentityKey(model.brandId, model.name);
         if (!key) {
             seen.set(model.name, model);
             continue;

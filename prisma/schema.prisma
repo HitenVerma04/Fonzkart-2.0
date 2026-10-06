@@ -27,7 +27,13 @@ model User {
   manager          User?     @relation("UserManagement", fields: [managerId], references: [id])
   managedUsers     User[]    @relation("UserManagement")
 
-  orders           Order[]
+  // A partner's relationship manager (RELATIONSHIP_MANAGER), who routes the partner's orders
+  relationshipManagerId String?
+  relationshipManager   User?     @relation("PartnerRelationshipManager", fields: [relationshipManagerId], references: [id], onDelete: SetNull)
+  rmPartners            User[]    @relation("PartnerRelationshipManager")
+
+  orders           Order[]    @relation("OrderCustomer")
+  partnerOrders    Order[]    @relation("OrderPartner")
   riders           Rider[]
   city             City?     @relation("UserCity", fields: [cityId], references: [id])
 }
@@ -78,8 +84,11 @@ model Order {
   offeredPrice       Int?
   riderAnswers       String?
   verificationImages String[] @default([])
+  // The partner the order is routed to (set from the pincode on creation; RMs and admins may reassign)
+  partnerId          String?
+  partner            User?    @relation("OrderPartner", fields: [partnerId], references: [id], onDelete: SetNull)
   rider              Rider?   @relation(fields: [riderId], references: [id])
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User     @relation("OrderCustomer", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Brand {

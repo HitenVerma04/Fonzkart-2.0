@@ -41,7 +41,7 @@ export function NotificationProvider({
 
     const fetchNotifications = async () => {
         if (!userId && !riderId && !userRole) return;
-        const res = await getNotifications(userRole || '', userId || '');
+        const res = await getNotifications(); // the server identifies the caller
         if (res.success && res.notifications) {
             setNotifications(res.notifications.map((n: any) => ({
                 ...n,
@@ -106,8 +106,9 @@ export function NotificationProvider({
             }
         }
 
+        // Live updates when Supabase Realtime is configured; otherwise the 30-second poll below is enough.
         const channel = supabaseClient
-            .channel('notifications')
+            ?.channel('notifications')
             .on(
                 'postgres_changes',
                 {
@@ -154,7 +155,7 @@ export function NotificationProvider({
         }, 30000);
 
         return () => {
-            supabaseClient.removeChannel(channel);
+            if (supabaseClient && channel) supabaseClient.removeChannel(channel);
             clearInterval(pollTimer);
         };
     }, [userId, userRole, riderId, audioEnabled]);

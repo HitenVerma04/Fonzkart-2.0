@@ -1,128 +1,55 @@
-
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getSession } from '@/lib/session';
+import { requireStaffRole } from '@/lib/staff-access';
+import { BULK_ORDER_STAFF, FORBIDDEN_ORDER, ORDER_DELETERS, httpStatusFor, orderInScope, orderScopeFor } from '@/lib/order-access';
+import * as orderWorkflow from '@/lib/order-workflow';
 
+// Bulk actions from the admin panel's order lists. Every selected order must be one the caller may act on, or
+// nothing is changed. Orders whose status does not allow the action (e.g. restoring an order that is not failed)
+// are skipped; `count` is the number actually changed.
 export async function POST(request: Request) {
     try {
-        const session = await getSession();
-        if (!session || !['SUPER_ADMIN', 'ADMIN', 'ZONAL_HEAD'].includes(session.user?.role || '')) {
-            return new NextResponse('Unauthorized', { status: 401 });
-        }
+        const body = await request.json().catch(() => ({}));
+        const { action, ids, reason } = body ?? {};
 
-        const body = await request.json();
-        const { action, ids, reason } = body;
-
-        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        if (!ids || !Array.isArray(ids) || ids.length === 0 || !ids.every((i: unknown) => typeof i === 'string')) {
             return new NextResponse('No IDs provided', { status: 400 });
         }
 
-        if (action === 'bulk_fail') {
-            const orders = await prisma.order.findMany({
-                where: { id: { in: ids } }
-            });
+        const staff = await requireStaffRole(action === 'bulk_delete' ? ORDER_DELETERS : BULK_ORDER_STAFF);
+        const scope = await orderScopeFor(staff);
+        const orders = await prisma.order.findMany({ where: { id: { in: ids } } });
+        if (orders.some(o => !orderInScope(scope, o))) throw new Error(FORBIDDEN_ORDER);
+        const actor = await orderWorkflow.staffActor(staff);
 
-            const updates = orders.map(async (order) => {
-                let answersObj: any = {};
-                if (order.answers && typeof order.answers === 'string') {
-                    try { answersObj = JSON.parse(order.answers); } catch (e) { }
+        const apply = async (change: (order: (typeof orders)[number]) => Promise<unknown>) => {
+            let count = 0;
+            for (const order of orders) {
+                try {
+                    await change(order);
+                    count++;
+                } catch (e) {
+                    if (httpStatusFor(e) !== 400) throw e; // not possible in this order's status: skip it
                 }
+            }
+            return NextResponse.json({ success: true, count });
+        };
 
-                if (!answersObj.failLog) answersObj.failLog = [];
-                answersObj.failLog.push({ 
-                    date: new Date().toISOString(), 
-                    reason: reason || 'Bulk failure' 
-                });
-
-                return prisma.order.update({
-                    where: { id: order.id },
-                    data: {
-                        status: 'failed',
-                        answers: JSON.stringify(answersObj)
-                    }
-                });
-            });
-
-            await Promise.all(updates);
-            return NextResponse.json({ success: true, count: ids.length });
-        }
-
-        if (action === 'bulk_restore') {
-            const orders = await prisma.order.findMany({
-                where: { id: { in: ids } }
-            });
-
-            const updates = orders.map(async (order) => {
-                let answersObj: any = {};
-                if (order.answers && typeof order.answers === 'string') {
-                    try { answersObj = JSON.parse(order.answers); } catch { }
-                }
-
-                if (!answersObj.restoreLog) answersObj.restoreLog = [];
-                answersObj.restoreLog.push({ 
-                    date: new Date().toISOString(), 
-                    restoredBy: session.user.email || 'Admin', 
-                    previousStatus: order.status 
-                });
-
-                const restoredStatus = order.riderId ? 'assigned' : 'Pending Pickup';
-
-                return prisma.order.update({
-                    where: { id: order.id },
-                    data: {
-                        status: restoredStatus,
-                        answers: JSON.stringify(answersObj)
-                    }
-                });
-            });
-
-            await Promise.all(updates);
-            return NextResponse.json({ success: true, count: ids.length });
-        }
-
-        if (action === 'bulk_hub_handover') {
-            const targetStatus = body.hubStatus || 'handed_over';
-            const orders = await prisma.order.findMany({
-                where: { id: { in: ids } }
-            });
-
-            const updates = orders.map(async (order) => {
-                let answersObj: any = {};
-                if (order.answers && typeof order.answers === 'string') {
-                    try { answersObj = JSON.parse(order.answers); } catch { }
-                }
-
-                answersObj.hubStatus = targetStatus;
-                if (targetStatus === 'handed_over') {
-                    answersObj.hubHandoverAt = new Date().toISOString();
-                    answersObj.hubReceivedBy = session.user.name || session.user.email || 'Hub Staff';
-                } else {
-                    answersObj.hubHandoverAt = null;
-                    answersObj.hubReceivedBy = null;
-                }
-
-                return prisma.order.update({
-                    where: { id: order.id },
-                    data: {
-                        answers: JSON.stringify(answersObj)
-                    }
-                });
-            });
-
-            await Promise.all(updates);
-            return NextResponse.json({ success: true, count: ids.length });
-        }
-
+        if (action === 'bulk_fail') return apply(o => orderWorkflow.failOrder(o, actor, reason || 'Bulk failure'));
+        if (action === 'bulk_restore') return apply(o => orderWorkflow.restoreOrder(o, actor));
+        if (action === 'bulk_hub_handover') return apply(o => orderWorkflow.setHubStatus(o, actor, body.hubStatus || 'handed_over'));
         if (action === 'bulk_delete') {
-            await prisma.order.deleteMany({
-                where: { id: { in: ids } }
-            });
-            return NextResponse.json({ success: true, count: ids.length });
+            const { count } = await prisma.order.deleteMany({ where: { id: { in: orders.map(o => o.id) } } });
+            return NextResponse.json({ success: true, count });
         }
 
         return new NextResponse('Invalid action', { status: 400 });
     } catch (error: any) {
-        console.error('Bulk Order API error:', error);
-        return new NextResponse('Internal error', { status: 500 });
+        const status = httpStatusFor(error);
+        if (status === 500) {
+            console.error('Bulk Order API error:', error);
+            return new NextResponse('Internal error', { status });
+        }
+        return new NextResponse(error.message, { status });
     }
 }

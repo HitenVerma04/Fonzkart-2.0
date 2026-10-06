@@ -1,10 +1,16 @@
 import { prisma } from '@/lib/db';
 import AdminManager from '@/components/admin/AdminManager';
 import { SUPER_ADMIN_EMAILS } from '@/lib/auth-utils';
+import { withoutSecrets } from '@/lib/safe-records';
+import { redirect } from 'next/navigation';
+import { ADMINS, hasStaffRole } from '@/lib/staff-access';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminsPage() {
+    // The user directory and role management are for administrators (sidebar: SUPER_ADMIN and ADMIN only).
+    if (!(await hasStaffRole(ADMINS))) redirect('/admin');
+
     const allUsers = await prisma.user.findMany({
         orderBy: { createdAt: 'desc' }
     });
@@ -43,6 +49,7 @@ export default async function AdminsPage() {
                 cityId: null,
                 pincodes: [],
                 managerId: null,
+                relationshipManagerId: null,
                 resetToken: null,
                 resetTokenExpiry: null,
                 passwordHash: ''
@@ -74,12 +81,12 @@ export default async function AdminsPage() {
             </div>
 
             <AdminManager
-                superAdmins={superAdmins}
-                admins={admins}
-                zonalHeads={zonalHeads}
-                relationshipManagers={relationshipManagers}
-                partners={partners}
-                riders={combinedRiders}
+                superAdmins={withoutSecrets(superAdmins)}
+                admins={withoutSecrets(admins)}
+                zonalHeads={withoutSecrets(zonalHeads)}
+                relationshipManagers={withoutSecrets(relationshipManagers)}
+                partners={withoutSecrets(partners)}
+                riders={withoutSecrets(combinedRiders)}
             />
         </div>
     );

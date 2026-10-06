@@ -1,11 +1,18 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getCurrentStaff } from '@/lib/staff-access';
 
+// Support lookup of one account by email. Only a signed-in SUPER_ADMIN (role re-read from the database) may use
+// it, in every environment; the old ?key= check is no longer enough. Secrets are never returned: the password
+// hash and the reset/OTP code are reduced to yes/no flags.
 export async function GET(req: NextRequest) {
-    const key = req.nextUrl.searchParams.get('key');
-    if (key !== process.env.INTERNAL_API_KEY && process.env.NODE_ENV === 'production') {
+    const staff = await getCurrentStaff();
+    if (!staff) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (staff.role !== 'SUPER_ADMIN') {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const email = req.nextUrl.searchParams.get('email');
@@ -13,10 +20,25 @@ export async function GET(req: NextRequest) {
 
     try {
         const user = await prisma.user.findUnique({
-            where: { email }
+            where: { email },
+            select: {
+                id: true, name: true, email: true, phone: true, role: true, cityId: true, pincodes: true,
+                managerId: true, createdAt: true, updatedAt: true,
+                passwordHash: true, resetToken: true, resetTokenExpiry: true,
+            }
         });
-        return NextResponse.json({ user });
+        if (!user) return NextResponse.json({ user: null });
+        const { passwordHash, resetToken, resetTokenExpiry, ...profile } = user;
+        return NextResponse.json({
+            user: {
+                ...profile,
+                hasPassword: Boolean(passwordHash),
+                hasPendingResetCode: Boolean(resetToken),
+                resetCodeExpiresAt: resetTokenExpiry,
+            }
+        });
     } catch (e) {
-        return NextResponse.json({ error: String(e) });
+        console.error('[diagnose-user] lookup failed', e);
+        return NextResponse.json({ error: 'Lookup failed' }, { status: 500 });
     }
 }

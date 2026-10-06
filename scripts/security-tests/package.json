@@ -1,0 +1,13 @@
+{
+  "name": "fonzkart-security-tests",
+  "private": true,
+  "description": "Dependencies for scripts/security-tests (installed inside Docker only, never into the project).",
+  "dependencies": {
+    "@prisma/client": "5.21.1",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.1.3",
+    "nodemailer": "^8.0.1",
+    "prisma": "5.21.1",
+    "tsx": "4.19.2"
+  }
+}

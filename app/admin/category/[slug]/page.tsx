@@ -1,8 +1,13 @@
 
 import { db } from '@/lib/store';
 import ClientCategoryManager from '@/components/admin/ClientCategoryManager';
+import { redirect } from 'next/navigation';
+import { ADMINS, hasStaffRole } from '@/lib/staff-access';
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+    // Catalog and pricing rules are for administrators (sidebar "Inventory": SUPER_ADMIN and ADMIN only).
+    if (!(await hasStaffRole(ADMINS))) redirect('/admin');
+
     const { slug } = await params;
 
     // Fetch Data Server Side

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { Rider as PrismaRider, Brand as PrismaBrand, Model as PrismaModel, Variant as PrismaVariant, Order as PrismaOrder } from '@prisma/client';
-import { CATALOG_2026_MODELS, get2026ModelsForBrand, deduplicateModels, getCanonicalModelKey } from '@/lib/catalog2026';
+import { CATALOG_2026_MODELS, get2026ModelsForBrand, deduplicateModels, getModelIdentityKey } from '@/lib/catalog2026';
 
 // Re-export interfaces for app compatibility, though Prisma types are preferred
 export interface User {
@@ -35,6 +35,7 @@ export interface Order {
         lng: number;
     } | null;
     riderId?: string | null;
+    partnerId?: string | null;
     answers?: unknown;
     riderAnswers?: unknown;
     verificationImages?: string[];
@@ -128,8 +129,12 @@ export const db = {
         return orders.map(mapPrismaOrderToAppOrder);
     },
     addOrder: async (order: Order) => {
+        // Route the order to the partner covering its pincode (see partnerForPincode); none: it stays unrouted.
+        const { partnerForPincode, orderCaretakers } = await import('@/lib/order-workflow');
+        const routedPartner = await partnerForPincode(order.pincode);
         const newOrder = await prisma.order.create({
             data: {
+                partnerId: routedPartner?.id ?? null,
                 id: order.id,
                 userId: order.userId,
                 device: order.device,
@@ -161,18 +166,12 @@ export const db = {
                 where: { role: 'ZONAL_HEAD' }
             });
 
-            // Partners (Specific to pincode or city)
-            const targetedPartners = await prisma.user.findMany({
-                where: {
-                    role: 'PARTNER',
-                    OR: [
-                        { pincodes: { has: order.pincode || '' } },
-                        // Fallback: If no pincodes defined for partner but they are in the same city (future use)
-                    ]
-                }
+            // The partner the order was routed to and their RM (every RM when no partner covers the pincode).
+            const caretakers = await prisma.user.findMany({
+                where: { id: { in: await orderCaretakers(routedPartner?.id ?? null) } }
             });
 
-            const allRecipients = [...globalAdmins, ...zonalHeads, ...targetedPartners];
+            const allRecipients = [...globalAdmins, ...zonalHeads, ...caretakers];
             // Remove duplicates by email
             const uniqueRecipients = Array.from(new Map(allRecipients.map(r => [r.email, r])).values());
 
@@ -445,8 +444,8 @@ export const db = {
 
         // Get 2026 catalog models for this brand/category
         const models2026 = get2026ModelsForBrand(brandId, category);
-        const existingCanonicalKeys = new Set(dbModels.map(m => getCanonicalModelKey(m.name)));
-        const missing2026 = models2026.filter(m => !existingCanonicalKeys.has(getCanonicalModelKey(m.name)));
+        const existingCanonicalKeys = new Set(dbModels.map(m => getModelIdentityKey(m.brandId, m.name)));
+        const missing2026 = models2026.filter(m => !existingCanonicalKeys.has(getModelIdentityKey(m.brandId, m.name)));
 
         // Background auto-seeding to persist missing 2026 models into PostgreSQL
         if (missing2026.length > 0) {
@@ -497,9 +496,9 @@ export const db = {
         }
 
         // Map any existing DB models to their high-res 2026 product images if matching
-        const catalogMap = new Map(CATALOG_2026_MODELS.map(m => [getCanonicalModelKey(m.name), m.img]));
+        const catalogMap = new Map(CATALOG_2026_MODELS.map(m => [getModelIdentityKey(m.brandId, m.name), m.img]));
         const updatedDbModels = dbModels.map(m => {
-            const catalogImg = catalogMap.get(getCanonicalModelKey(m.name));
+            const catalogImg = catalogMap.get(getModelIdentityKey(m.brandId, m.name));
             if (catalogImg && (!m.img || m.img.endsWith('.svg') || m.img.includes('wikimedia') || m.img.includes('Logo'))) {
                 return { ...m, img: catalogImg };
             }
@@ -692,6 +691,7 @@ function mapPrismaOrderToAppOrder(o: PrismaOrder & { orderNumber?: number, user?
         pincode: o.pincode,
         location: (o.locationLat && o.locationLng) ? { lat: o.locationLat, lng: o.locationLng } : null,
         riderId: o.riderId,
+        partnerId: o.partnerId ?? null,
         answers: answersObj,
         riderAnswers: o.riderAnswers ? JSON.parse(o.riderAnswers) : null,
         verificationImages: o.verificationImages || [],

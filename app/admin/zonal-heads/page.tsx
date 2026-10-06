@@ -7,6 +7,7 @@ import { isAdmin } from '@/lib/auth-utils';
 import { redirect } from 'next/navigation';
 import { addZonalHead } from '@/actions/admin';
 import ZonalHeadUpgradeForm from '@/components/admin/ZonalHeadUpgradeForm';
+import { ADMINS, hasStaffRole, requireStaffRole } from '@/lib/staff-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,8 @@ export default async function ZonalHeadsPage() {
     if (!session || !session.user || !isAdmin(session.user)) {
         redirect('/');
     }
+    // Managing zonal heads is for administrators (the sidebar shows this page to SUPER_ADMIN and ADMIN only).
+    if (!(await hasStaffRole(ADMINS))) redirect('/admin');
 
     const zonalHeads = await prisma.user.findMany({
         where: { role: 'ZONAL_HEAD' },
@@ -49,6 +52,7 @@ export default async function ZonalHeadsPage() {
                         <h2 className="text-xl font-bold mb-6">Register Zonal Head</h2>
                         <form action={async (data) => {
                             'use server';
+                            await requireStaffRole(ADMINS);
                             const name = data.get('name') as string;
                             const email = data.get('email') as string;
                             const phone = data.get('phone') as string;
@@ -143,6 +147,7 @@ export default async function ZonalHeadsPage() {
                                                     {city.name}
                                                     <form action={async () => {
                                                         'use server';
+                                                        await requireStaffRole(ADMINS);
                                                         await prisma.city.update({
                                                             where: { id: city.id },
                                                             data: { managerId: null }
@@ -160,6 +165,7 @@ export default async function ZonalHeadsPage() {
 
                                     <form action={async (data) => {
                                         'use server';
+                                        await requireStaffRole(ADMINS);
                                         const cityId = data.get('cityId') as string;
                                         if (cityId) {
                                             await prisma.city.update({

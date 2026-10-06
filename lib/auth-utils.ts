@@ -30,6 +30,11 @@ export function isSuperAdmin(user?: SessionUser | null) {
     return user.role === 'SUPER_ADMIN' || SUPER_ADMIN_EMAILS.includes(user.email.toLowerCase());
 }
 
+/**
+ * Whether the user may open the staff panel (/admin) — true for every staff role, including partners and field
+ * executives. It is NOT an authorization check for sensitive actions: those use the explicit role lists in
+ * lib/staff-access.ts.
+ */
 export function isAdmin(user?: SessionUser | null) {
     if (!user || !user.email) return false;
     if (user.email.toLowerCase() === 'mobilesouls.in@gmail.com') return false;

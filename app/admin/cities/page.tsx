@@ -3,12 +3,16 @@ import { revalidatePath } from 'next/cache';
 import { getSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import CityCard from '@/components/admin/CityCard';
+import { CITY_ADMIN_ROLES, CITY_STAFF, hasStaffRole, requireStaffRole } from '@/lib/staff-access';
+import { withoutSecrets } from '@/lib/safe-records';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CitiesAdminPage() {
     const session = await getSession();
     if (!session || !session.user) redirect('/login');
+    // The sidebar offers the Cities workspace to administrators and zonal heads only.
+    if (!(await hasStaffRole(CITY_STAFF))) redirect('/admin');
 
     const currentUser = await prisma.user.findUnique({ where: { id: session.user.id } });
     const isZonalHead = currentUser?.role === 'ZONAL_HEAD';
@@ -71,6 +75,8 @@ export default async function CitiesAdminPage() {
 
                     <form action={async (data) => {
                         'use server';
+                        // Server actions can be called directly, so check access here, not only in the layout.
+                        await requireStaffRole([...CITY_ADMIN_ROLES, 'ZONAL_HEAD']);
                         const name = data.get('cityName') as string;
                         if (name) {
                             await prisma.city.upsert({
@@ -104,9 +110,9 @@ export default async function CitiesAdminPage() {
                     return (
                         <CityCard 
                             key={city.id} 
-                            city={city} 
-                            partners={partners} 
-                            zonalHeads={zonalHeads} 
+                            city={withoutSecrets(city)} 
+                            partners={withoutSecrets(partners)} 
+                            zonalHeads={withoutSecrets(zonalHeads)} 
                             isZonalHead={isZonalHead} 
                         />
                     );

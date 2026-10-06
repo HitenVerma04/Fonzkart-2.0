@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { updateOrderStatus, submitVerification, logoutExecutive } from '@/actions/executive';
+import { updateOrderStatus, submitVerification, logoutExecutive, markPayoutPaidByExecutive } from '@/actions/executive';
 import { MapPin, Phone, Calendar, CheckCircle2, Navigation, LogOut, Zap, Eye, X, Camera, AlertTriangle, Package, User, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Order } from '@/lib/store';
 import OrderDetails from '@/components/OrderDetails';
 import VerificationModal from '@/components/admin/VerificationModal';
+import { ORDER_STATUS, TONE_BADGE, displayPhone, parseAnswers, payoutOf, telHref, priceReviewOf, quotedPriceOf, statusLabel, statusTone } from '@/lib/order-status';
 
 interface OrderAnswers {
     accessories?: string[];
@@ -55,7 +56,7 @@ export default function RiderOrderList({
         const isDecline = data.action === 'decline';
         const status = isDecline ? 'failed' : 'picked_up';
         try {
-            await submitVerification(verifyingOrder.id, {
+            const result = await submitVerification(verifyingOrder.id, {
                 status,
                 riderAnswers: { 
                     notes: data.notes, 
@@ -69,13 +70,32 @@ export default function RiderOrderList({
             });
             if (isDecline) {
                 alert('Order verification declined and failed successfully.');
+            } else if (result.status === ORDER_STATUS.PRICE_REVIEW) {
+                alert('Revised price sent for approval. Do not collect the device or pay yet — please ask the customer to wait.');
             } else {
                 alert('Order verified and marked as Picked Up successfully!');
             }
             setVerifyingOrder(null);
             router.refresh();
-        } catch {
-            alert(isDecline ? 'Failed to decline order' : 'Failed to pick up order');
+        } catch (error: any) {
+            alert(error?.message || (isDecline ? 'Failed to decline order' : 'Failed to pick up order'));
+        } finally {
+            setUpdatingId(null);
+        }
+    };
+
+    const handleMarkPaid = async (order: Order) => {
+        const payout = payoutOf(order);
+        const reference = window.prompt(
+            `Confirm you paid the customer ₹${payout.amount.toLocaleString()} by ${payout.methodLabel}.\n` +
+            'Reference (UPI / bank transaction or gift-card order ID — NOT the gift card code). Leave empty for cash:', '');
+        if (reference === null) return;
+        setUpdatingId(order.id);
+        try {
+            await markPayoutPaidByExecutive(order.id, reference);
+            router.refresh();
+        } catch (error: any) {
+            alert(error?.message || 'Failed to record the payment');
         } finally {
             setUpdatingId(null);
         }
@@ -127,8 +147,13 @@ export default function RiderOrderList({
             ) : (
                 <div className="space-y-4">
                     {displayedOrders.map((order) => {
-                        const answersObj: OrderAnswers = (typeof order.answers === 'string') ? JSON.parse(order.answers) : (order.answers || {});
-                        const hasRejection = answersObj.adminRejectionLog && answersObj.adminRejectionLog.length > 0;
+                        const answersObj: OrderAnswers = parseAnswers(order.answers);
+                        const review = priceReviewOf(order);
+                        const payout = payoutOf(order);
+                        // Show the last rejection only while it is the latest price decision.
+                        const hasRejection = !!answersObj.adminRejectionLog && answersObj.adminRejectionLog.length > 0 && (!review || review.decision === 'rejected');
+                        const priceApproved = review?.decision === 'approved';
+                        const isOpen = order.status === ORDER_STATUS.ASSIGNED || order.status === ORDER_STATUS.PRICE_REVIEW;
                         const lastRejection = hasRejection ? answersObj.adminRejectionLog![answersObj.adminRejectionLog!.length - 1] : null;
 
                         return (
@@ -190,7 +215,7 @@ export default function RiderOrderList({
                                                 {(answersObj.phone || order.user?.phone) && (
                                                     <div className="flex items-center gap-2 text-sm text-foreground">
                                                         <Phone className="w-4 h-4 text-green-600" />
-                                                        <span className="font-bold">+91 {answersObj.phone || order.user?.phone}</span>
+                                                        <span className="font-bold">{displayPhone(answersObj.phone || order.user?.phone)}</span>
                                                     </div>
                                                 )}
 
@@ -207,28 +232,30 @@ export default function RiderOrderList({
                                         <div className="flex flex-col gap-3">
                                             <div className="bg-muted/10 border p-3 rounded-lg flex items-center gap-2 overflow-hidden text-sm h-fit">
                                                 <CheckCircle2 className={`w-4 h-4 shrink-0 ${order.status === 'completed' ? 'text-green-500' : order.status === 'failed' ? 'text-red-500' : 'text-muted-foreground'}`} />
-                                                <span className="truncate text-muted-foreground font-medium capitalize">
-                                                    {order.status === 'pending_verification' ? 'Awaiting Approval' : order.status}
+                                                <span className={`truncate font-medium px-2 py-0.5 rounded-full text-xs ${TONE_BADGE[statusTone(order.status)]}`}>
+                                                    {statusLabel(order.status)}
                                                 </span>
                                             </div>
                                             <div className="flex gap-2">
                                                 <a 
-                                                    href={`tel:+91${answersObj.phone || order.user?.phone}`}
+                                                    href={telHref(answersObj.phone || order.user?.phone)}
                                                     className="flex-1 flex items-center justify-center gap-2 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 font-bold transition-all shadow-sm"
                                                 >
                                                     <Phone className="w-4 h-4" /> Call
                                                 </a>
-                                                <button
-                                                    onClick={() => {
-                                                        const reason = window.prompt("Mark order as FAILED. Reason:", "Customer not reachable");
-                                                        if (reason === null) return;
-                                                        handleStatusUpdate(order.id, 'failed', reason);
-                                                    }}
-                                                    className="px-4 py-3 border border-red-200 text-red-600 hover:bg-red-50 rounded-xl font-bold transition-all"
-                                                    title="Fail Order"
-                                                >
-                                                    Fail
-                                                </button>
+                                                {isOpen && (
+                                                    <button
+                                                        onClick={() => {
+                                                            const reason = window.prompt("Mark order as FAILED. Reason:", "Customer not reachable");
+                                                            if (reason === null) return;
+                                                            handleStatusUpdate(order.id, 'failed', reason);
+                                                        }}
+                                                        className="px-4 py-3 border border-red-200 text-red-600 hover:bg-red-50 rounded-xl font-bold transition-all"
+                                                        title="Fail Order"
+                                                    >
+                                                        Fail
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -236,6 +263,17 @@ export default function RiderOrderList({
 
                                 {order.status === 'assigned' && (
                                     <div className="pt-4 space-y-4 mx-4 sm:mx-6 mb-4 sm:mb-6">
+                                        {priceApproved && (
+                                            <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/40 p-4 rounded-xl mb-4">
+                                                <h4 className="font-bold text-green-800 dark:text-green-300 flex items-center gap-2 mb-1">
+                                                    <CheckCircle2 className="w-5 h-5" /> Revised price approved: ₹{order.price.toLocaleString()}
+                                                </h4>
+                                                <p className="text-sm text-green-900/80 dark:text-green-200/80">
+                                                    Quoted ₹{quotedPriceOf(order).toLocaleString()}. Pay the customer ₹{order.price.toLocaleString()} ({payout.methodLabel}), collect the device and confirm the pickup below.
+                                                </p>
+                                            </div>
+                                        )}
+
                                         {hasRejection && (
                                             <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-xl mb-4">
                                                 <h4 className="font-bold text-destructive flex items-center gap-2 mb-2">
@@ -258,7 +296,7 @@ export default function RiderOrderList({
 
                                             <div className="bg-muted/50 p-4 rounded-lg text-xs space-y-2 border">
                                                 {order.answers ? (() => {
-                                                    const ans = (typeof order.answers === 'string') ? JSON.parse(order.answers) : order.answers;
+                                                    const ans = parseAnswers(order.answers);
                                                     return (
                                                         <div className="grid grid-cols-2 gap-2">
                                                             <div className="col-span-2 sm:col-span-1">
@@ -302,7 +340,9 @@ export default function RiderOrderList({
                                             </div>
                                             <button
                                                 onClick={() => {
-                                                    if (confirm(`Confirm you have verified device perfectly matches the report and user accepted ₹${order.price}?`)) {
+                                                    if (confirm(priceApproved
+                                                        ? `Confirm you collected the device at the approved price of ₹${order.price}?`
+                                                        : `Confirm you have verified device perfectly matches the report and user accepted ₹${order.price}?`)) {
                                                         handleStatusUpdate(order.id, 'picked_up');
                                                     }
                                                 }}
@@ -310,7 +350,7 @@ export default function RiderOrderList({
                                                 className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
                                             >
                                                 <CheckCircle2 className="w-5 h-5" />
-                                                Condition Matches Perfectly
+                                                {priceApproved ? `Confirm Pickup at ₹${order.price.toLocaleString()}` : 'Condition Matches Perfectly'}
                                             </button>
                                         </div>
                                     </div>
@@ -319,15 +359,38 @@ export default function RiderOrderList({
                                 {order.status === 'pending_verification' && (
                                     <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-4 rounded-xl text-center space-y-2">
                                         <AlertTriangle className="w-8 h-8 mx-auto text-amber-500" />
-                                        <h4 className="font-bold text-amber-700 dark:text-amber-400">Awaiting Admin Approval</h4>
+                                        <h4 className="font-bold text-amber-700 dark:text-amber-400">Awaiting Price Approval</h4>
                                         <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
-                                            You've submitted new photos and a revised price of ₹{order.offeredPrice}. Please ask the customer to wait while the Zonal Head approves it.
+                                            You offered ₹{(review?.requestedPrice ?? order.offeredPrice ?? order.price).toLocaleString()} instead of the quoted ₹{(review?.quotedPrice ?? order.price).toLocaleString()}.
+                                            Do not pay or collect the device yet — your partner, RM or an admin must approve it first. Please ask the customer to wait.
                                         </p>
                                     </div>
                                 )}
 
+                                {(order.status === ORDER_STATUS.PICKED_UP || order.status === ORDER_STATUS.COMPLETED) && (
+                                    <div className={`mx-4 sm:mx-6 mb-4 p-4 rounded-xl border text-sm space-y-2 ${payout.paid ? 'bg-green-50/60 border-green-200 dark:bg-green-950/20 dark:border-green-900/40' : 'bg-amber-50/60 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/40'}`}>
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Customer Payment</span>
+                                            <span className="font-bold">₹{payout.amount.toLocaleString()} · {payout.methodLabel}</span>
+                                        </div>
+                                        {payout.paid ? (
+                                            <p className="text-xs text-green-800 dark:text-green-300">
+                                                Paid{payout.paidAt ? ` on ${new Date(payout.paidAt).toLocaleDateString()}` : ''}{payout.reference ? ` · Ref ${payout.reference}` : ''}
+                                            </p>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleMarkPaid(order)}
+                                                disabled={!!updatingId}
+                                                className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-all disabled:opacity-50"
+                                            >
+                                                I Have Paid the Customer
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+
                                 {order.status === 'picked_up' && (
-                                    <div className="pt-2 space-y-3">
+                                    <div className="pt-2 space-y-3 mx-4 sm:mx-6 mb-4 sm:mb-6">
                                         <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 p-3 rounded-lg text-sm text-center font-bold">
                                             Device Verified & Payment Accepted! <br /> <span className="font-medium">Please proceed to deliver to the Hub.</span>
                                         </div>
