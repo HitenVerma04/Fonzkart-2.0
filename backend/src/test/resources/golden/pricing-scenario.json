@@ -1,0 +1,44 @@
+{
+  "description": "Evaluation-rule management and its effect on quotes. Executed against the website actions (scripts/security-tests/run.sh golden) (actions/admin.ts getEvaluationRules / upsertEvaluationRule, actions/priceCalculation.ts calculatePrice, actions/auth.ts signin) on db/01-prisma-schema.sql + db/03-staff-seed.sql + db/04-pricing-rules-seed.sql to produce pricing-scenario-expected.json; replayed against Spring Boot by PricingScenarioParityTest. Since the staff-permission hardening only SUPER_ADMIN and ADMIN may change rules; partners, zonal heads, relationship managers and field executives are refused.",
+  "steps": [
+    { "actor": "super", "action": "signin", "input": { "email": "admin@fonzkart.in", "password": "pw" } },
+    { "actor": "user", "action": "signin", "input": { "email": "user@example.test", "password": "pw" } },
+    { "actor": "p1", "action": "signin", "input": { "email": "p1@example.test", "password": "pw" } },
+    { "actor": "admin", "action": "signin", "input": { "email": "ops@example.test", "password": "pw" } },
+    { "actor": "zh1", "action": "signin", "input": { "email": "zh1@example.test", "password": "pw" } },
+    { "actor": "rm", "action": "signin", "input": { "email": "rm@example.test", "password": "pw" } },
+    { "actor": "fe", "action": "signin", "input": { "email": "fe@example.test", "password": "pw" } },
+
+    { "actor": "anon", "action": "getEvaluationRules", "input": { "category": "smartphone" } },
+    { "actor": "anon", "action": "getEvaluationRules", "input": { "category": "watch" } },
+    { "actor": "anon", "action": "getEvaluationRules", "input": { "category": "nothing-here" } },
+    { "actor": "anon", "action": "getEvaluationRules", "input": {} },
+
+    { "actor": "anon", "action": "calculatePrice", "input": { "basePrice": 42000, "category": "smartphone", "answers": { "physical_condition": "good", "body_condition": "average", "functional_issues": ["wifi", "battery"], "accessories": ["charger"], "warranty": "3_6_months", "purchase_location": "global" } } },
+    { "actor": "anon", "action": "calculatePrice", "input": { "basePrice": 42000, "category": "laptop", "answers": { "power": true, "ports": false, "physical_condition": ["screen_damage"], "specs": ["box_missing"] } } },
+    { "actor": "anon", "action": "calculatePrice", "input": { "basePrice": 8000, "category": "smartwatch", "answers": { "power": false, "accessories": [] } } },
+    { "actor": "anon", "action": "calculatePrice", "input": { "basePrice": 8000, "category": "watch", "answers": { "power": false, "accessories": [] } } },
+
+    { "actor": "user", "action": "upsertEvaluationRule", "input": { "category": "smartphone", "questionKey": "physical_condition", "answerKey": "good", "label": "Hacked", "deductionAmount": 0, "deductionPercent": 0 } },
+    { "actor": "anon", "action": "upsertEvaluationRule", "input": { "category": "smartphone", "questionKey": "physical_condition", "answerKey": "good", "label": "Hacked", "deductionAmount": 0, "deductionPercent": 0 } },
+    { "actor": "super", "action": "upsertEvaluationRule", "input": { "category": "smartphone", "questionKey": "physical_condition", "answerKey": "good", "label": "Good (updated)", "deductionAmount": 100, "deductionPercent": 20 } },
+    { "actor": "super", "action": "upsertEvaluationRule", "input": { "category": "smartphone", "questionKey": "functional_issues", "answerKey": "speaker", "label": "Speaker", "deductionAmount": 700, "deductionPercent": 0 } },
+    { "actor": "p1", "action": "upsertEvaluationRule", "input": { "category": "laptop", "questionKey": "ports", "answerKey": "false", "label": "Ports faulty", "deductionAmount": 1200, "deductionPercent": 2.5 } },
+    { "actor": "zh1", "action": "upsertEvaluationRule", "input": { "category": "laptop", "questionKey": "ports", "answerKey": "false", "label": "Ports faulty", "deductionAmount": 1200, "deductionPercent": 2.5 } },
+    { "actor": "rm", "action": "upsertEvaluationRule", "input": { "category": "laptop", "questionKey": "ports", "answerKey": "false", "label": "Ports faulty", "deductionAmount": 1200, "deductionPercent": 2.5 } },
+    { "actor": "fe", "action": "upsertEvaluationRule", "input": { "category": "laptop", "questionKey": "ports", "answerKey": "false", "label": "Ports faulty", "deductionAmount": 1200, "deductionPercent": 2.5 } },
+    { "actor": "admin", "action": "upsertEvaluationRule", "input": { "category": "laptop", "questionKey": "ports", "answerKey": "false", "label": "Ports faulty", "deductionAmount": 1200, "deductionPercent": 2.5 } },
+    { "actor": "super", "action": "upsertEvaluationRule", "input": { "category": "smartphone", "questionKey": "body_condition", "answerKey": "average", "deductionPercent": 11.5 } },
+    { "actor": "super", "action": "upsertEvaluationRule", "input": { "category": "smartphone", "questionKey": "warranty", "answerKey": "no", "label": "No warranty", "deductionAmount": 2.5, "deductionPercent": 0 } },
+    { "actor": "super", "action": "upsertEvaluationRule", "input": { "category": "tablet", "questionKey": "touch", "answerKey": "false", "deductionAmount": 900 } },
+    { "actor": "super", "action": "upsertEvaluationRule", "input": { "category": "tablet", "questionKey": "body_condition", "answerKey": "average", "label": "Average body" } },
+    { "actor": "super", "action": "upsertEvaluationRule", "input": { "category": "smartphone", "questionKey": "physical_condition", "answerKey": "good", "label": null, "deductionAmount": 0, "deductionPercent": 0 } },
+
+    { "actor": "anon", "action": "getEvaluationRules", "input": { "category": "smartphone" } },
+    { "actor": "anon", "action": "getEvaluationRules", "input": { "category": "laptop" } },
+    { "actor": "anon", "action": "getEvaluationRules", "input": { "category": "tablet" } },
+    { "actor": "anon", "action": "calculatePrice", "input": { "basePrice": 42000, "category": "smartphone", "answers": { "physical_condition": "good", "body_condition": "average", "functional_issues": ["wifi", "battery", "speaker"], "accessories": ["charger"], "warranty": "3_6_months", "purchase_location": "global" } } },
+    { "actor": "anon", "action": "calculatePrice", "input": { "basePrice": 42000, "category": "laptop", "answers": { "power": true, "ports": false, "physical_condition": ["screen_damage"], "specs": ["box_missing"] } } },
+    { "actor": "anon", "action": "calculatePrice", "input": { "basePrice": 55000, "category": "tablet", "answers": { "touch": false, "physical_condition": "good", "body_condition": "average", "accessories": ["box"] } } }
+  ]
+}

@@ -1,0 +1,950 @@
+{
+ "steps": [
+  {
+   "step": "anon:signin",
+   "outcome": {
+    "returned": {
+     "error": "Please fill all fields"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:signup",
+   "outcome": {
+    "returned": {
+     "error": "Please fill all fields"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:signup",
+   "outcome": {
+    "redirect": "/verify-email?email=alice%40example.test"
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:signup",
+   "outcome": {
+    "returned": {
+     "error": "Email already registered"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:signup",
+   "outcome": {
+    "returned": {
+     "error": "Phone number already registered"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:signup",
+   "outcome": {
+    "returned": {
+     "error": "Email already registered"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "alice:signin",
+   "outcome": {
+    "redirect": "/verify-email?email=alice%40example.test"
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "alice:signin",
+   "outcome": {
+    "returned": {
+     "error": "Invalid email/phone or password"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "alice:verifyEmail",
+   "outcome": {
+    "returned": {
+     "error": "Invalid OTP provided."
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "alice:verifyEmail",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "alice:session",
+   "outcome": {
+    "returned": {
+     "user": {
+      "id": "<id:alice@example.test>",
+      "email": "alice@example.test",
+      "name": "Alice",
+      "role": "USER"
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "alicePhone:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "alicePhone2:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "mallory:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "mallory:session",
+   "outcome": {
+    "returned": {
+     "user": {
+      "id": "<id:alice@example.test>",
+      "email": "alice@example.test",
+      "name": "Alice",
+      "role": "USER"
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "anon:signin",
+   "outcome": {
+    "returned": {
+     "error": "Invalid email/phone or password"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "alice:updateProfile",
+   "outcome": {
+    "returned": {
+     "error": "Name cannot be empty"
+    }
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "alice:updateProfile",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "anon:updateProfile",
+   "outcome": {
+    "returned": {
+     "error": "Unauthorized"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:requestPasswordReset",
+   "outcome": {
+    "returned": {
+     "error": "Please enter your registered email address."
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:requestPasswordReset",
+   "outcome": {
+    "returned": {
+     "error": "Invalid email. We could not verify ownership."
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:requestPasswordReset",
+   "outcome": {
+    "returned": {
+     "success": "OTP successfully sent to your registered email address.",
+     "email": "alice@example.test",
+     "step": "verify"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:verifyAndResetPassword",
+   "outcome": {
+    "returned": {
+     "error": "Invalid OTP provided."
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:verifyAndResetPassword",
+   "outcome": {
+    "returned": {
+     "error": "Please fill all fields."
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:verifyAndResetPassword",
+   "outcome": {
+    "returned": {
+     "success": "Password reset successfully! You can now login."
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "anon:signin",
+   "outcome": {
+    "returned": {
+     "error": "Invalid email/phone or password"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "alice:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice B",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "bob:quickRegister",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "user": {
+      "id": "<id:bob@example.test>",
+      "email": "bob@example.test",
+      "name": "Bob",
+      "role": "USER",
+      "phone": null
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:bob@example.test>",
+    "email": "bob@example.test",
+    "name": "Bob",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "bob:quickRegister",
+   "outcome": {
+    "returned": {
+     "error": "Email already registered. Please sign in instead."
+    }
+   },
+   "cookieUser": {
+    "id": "<id:bob@example.test>",
+    "email": "bob@example.test",
+    "name": "Bob",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "dave:quickRegister",
+   "outcome": {
+    "returned": {
+     "error": "Phone number already registered"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "dave:quickRegister",
+   "outcome": {
+    "returned": {
+     "error": "Please fill name, email and password"
+    }
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "bob:quickLogin",
+   "outcome": {
+    "returned": {
+     "error": "Invalid email or password"
+    }
+   },
+   "cookieUser": {
+    "id": "<id:bob@example.test>",
+    "email": "bob@example.test",
+    "name": "Bob",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "bob:quickLogin",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "user": {
+      "id": "<id:bob@example.test>",
+      "email": "bob@example.test",
+      "name": "Bob",
+      "role": "USER",
+      "phone": null
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:bob@example.test>",
+    "email": "bob@example.test",
+    "name": "Bob",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "admin:signup",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "admin:session",
+   "outcome": {
+    "returned": {
+     "user": {
+      "id": "<id:admin@fonzkart.in>",
+      "email": "admin@fonzkart.in",
+      "name": "Root",
+      "role": "SUPER_ADMIN"
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "alice:addAdmin",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice B",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "anon:addAdmin",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "admin:addAdmin",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "User not found. They must register first."
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "admin:addPartner",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "admin:addPartner",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "User \"ghost@example.test\" not found. They must register first."
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "bob:session",
+   "outcome": {
+    "returned": {
+     "user": {
+      "id": "<id:bob@example.test>",
+      "email": "bob@example.test",
+      "name": "Bob",
+      "role": "USER"
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:bob@example.test>",
+    "email": "bob@example.test",
+    "name": "Bob",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "bob:quickLogin",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "user": {
+      "id": "<id:bob@example.test>",
+      "email": "bob@example.test",
+      "name": "Bob",
+      "role": "PARTNER",
+      "phone": null
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:bob@example.test>",
+    "email": "bob@example.test",
+    "name": "Bob",
+    "role": "PARTNER"
+   }
+  },
+  {
+   "step": "bob:addAdmin",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "cookieUser": {
+    "id": "<id:bob@example.test>",
+    "email": "bob@example.test",
+    "name": "Bob",
+    "role": "PARTNER"
+   }
+  },
+  {
+   "step": "admin:getAdmins",
+   "outcome": {
+    "returned": []
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "bob:getAdmins",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "cookieUser": {
+    "id": "<id:bob@example.test>",
+    "email": "bob@example.test",
+    "name": "Bob",
+    "role": "PARTNER"
+   }
+  },
+  {
+   "step": "dave:getAdmins",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "admin:addZonalHead",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "admin:addRelationshipManager",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "User not found. They must register first."
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "admin:removeAdmin",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Cannot remove yourself from admins"
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "alice:signin",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice B",
+    "role": "ZONAL_HEAD"
+   }
+  },
+  {
+   "step": "alice:removeAdmin",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "cookieUser": {
+    "id": "<id:alice@example.test>",
+    "email": "alice@example.test",
+    "name": "Alice B",
+    "role": "ZONAL_HEAD"
+   }
+  },
+  {
+   "step": "admin:removeUserRole",
+   "outcome": {
+    "thrown": "<server-error>"
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "admin:removeUserRole",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "admin:addPartner",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "anon:getPartnersManagedBy",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "admin:updatePartnerManager",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "anon:getPartnersManagedBy",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "admin:updatePartnerManager",
+   "outcome": {
+    "thrown": "<server-error>"
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "ms:quickRegister",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "user": {
+      "id": "<id:mobilesouls.in@gmail.com>",
+      "email": "mobilesouls.in@gmail.com",
+      "name": "MS",
+      "role": "USER",
+      "phone": null
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:mobilesouls.in@gmail.com>",
+    "email": "mobilesouls.in@gmail.com",
+    "name": "MS",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "ms:session",
+   "outcome": {
+    "returned": {
+     "user": {
+      "id": "<id:mobilesouls.in@gmail.com>",
+      "email": "mobilesouls.in@gmail.com",
+      "name": "MS",
+      "role": "USER"
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:mobilesouls.in@gmail.com>",
+    "email": "mobilesouls.in@gmail.com",
+    "name": "MS",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "admin:addAdmin",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "cookieUser": {
+    "id": "<id:admin@fonzkart.in>",
+    "email": "admin@fonzkart.in",
+    "name": "Root",
+    "role": "SUPER_ADMIN"
+   }
+  },
+  {
+   "step": "ms:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:mobilesouls.in@gmail.com>",
+    "email": "mobilesouls.in@gmail.com",
+    "name": "MS",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "ms:addAdmin",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "cookieUser": {
+    "id": "<id:mobilesouls.in@gmail.com>",
+    "email": "mobilesouls.in@gmail.com",
+    "name": "MS",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "alice:logout",
+   "outcome": {
+    "returned": null
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "alice:session",
+   "outcome": {
+    "returned": null
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "carol:signup",
+   "outcome": {
+    "redirect": "/verify-email?email=carol%40example.test"
+   },
+   "cookieUser": null
+  },
+  {
+   "step": "carol:quickLogin",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "user": {
+      "id": "<id:carol@example.test>",
+      "email": "carol@example.test",
+      "name": "Carol",
+      "role": "UNVERIFIED",
+      "phone": "+919222222222"
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:carol@example.test>",
+    "email": "carol@example.test",
+    "name": "Carol",
+    "role": "UNVERIFIED"
+   }
+  },
+  {
+   "step": "carol:session",
+   "outcome": {
+    "returned": {
+     "user": {
+      "id": "<id:carol@example.test>",
+      "email": "carol@example.test",
+      "name": "Carol",
+      "role": "UNVERIFIED"
+     }
+    }
+   },
+   "cookieUser": {
+    "id": "<id:carol@example.test>",
+    "email": "carol@example.test",
+    "name": "Carol",
+    "role": "UNVERIFIED"
+   }
+  },
+  {
+   "step": "carol:verifyEmail",
+   "outcome": {
+    "thrown": "<server-error>"
+   },
+   "cookieUser": {
+    "id": "<id:carol@example.test>",
+    "email": "carol@example.test",
+    "name": "Carol",
+    "role": "UNVERIFIED"
+   }
+  },
+  {
+   "step": "carol:verifyEmail",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:carol@example.test>",
+    "email": "carol@example.test",
+    "name": "Carol",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "carol:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:carol@example.test>",
+    "email": "carol@example.test",
+    "name": "Carol",
+    "role": "USER"
+   }
+  },
+  {
+   "step": "phoneOnly:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "cookieUser": {
+    "id": "<id:carol@example.test>",
+    "email": "carol@example.test",
+    "name": "Carol",
+    "role": "USER"
+   }
+  }
+ ],
+ "users": [
+  {
+   "email": "admin@fonzkart.in",
+   "name": "Root",
+   "role": "SUPER_ADMIN",
+   "phone": "+919111111111",
+   "cityId": null,
+   "managerId": null,
+   "pincodes": [],
+   "hasResetToken": false
+  },
+  {
+   "email": "alice@example.test",
+   "name": "Alice B",
+   "role": "ZONAL_HEAD",
+   "phone": "+919000000001",
+   "cityId": null,
+   "managerId": null,
+   "pincodes": [],
+   "hasResetToken": false
+  },
+  {
+   "email": "bob@example.test",
+   "name": "Bob",
+   "role": "PARTNER",
+   "phone": null,
+   "cityId": null,
+   "managerId": null,
+   "pincodes": [],
+   "hasResetToken": false
+  },
+  {
+   "email": "carol@example.test",
+   "name": "Carol",
+   "role": "USER",
+   "phone": "+919222222222",
+   "cityId": null,
+   "managerId": null,
+   "pincodes": [],
+   "hasResetToken": false
+  },
+  {
+   "email": "mobilesouls.in@gmail.com",
+   "name": "MS",
+   "role": "USER",
+   "phone": null,
+   "cityId": null,
+   "managerId": null,
+   "pincodes": [],
+   "hasResetToken": false
+  }
+ ],
+ "mails": [
+  "alice@example.test|Verify your Fonzkart Account",
+  "alice@example.test|Verify your Fonzkart Account",
+  "alice@example.test|Welcome to Fonzkart! 🚀",
+  "alice@example.test|Your Password Reset OTP - Fonzkart",
+  "carol@example.test|Verify your Fonzkart Account",
+  "carol@example.test|Welcome to Fonzkart! 🚀"
+ ]
+}

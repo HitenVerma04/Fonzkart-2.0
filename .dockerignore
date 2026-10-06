@@ -26,6 +26,8 @@ scratch/
 exporter/
 imgs/
 coolify/
+# Spring Boot backend is built and deployed separately (see backend/README.md)
+backend/
 coolify_*.js
 ssh_*.js
 test-*.js

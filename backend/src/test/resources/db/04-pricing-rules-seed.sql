@@ -1,0 +1,33 @@
+-- Evaluation rules for the pricing parity tests (golden/pricing-cases.json, golden/pricing-scenario.json).
+-- Covers: percent and amount deductions, combined amount+percent, fractional percents, negative values (bonuses),
+-- zero rules, boolean rules ('true'/'false'), multi-select '!' (missing item) rules, a rule larger than any price,
+-- and the 'watch' rules that the sell flow never reaches (it asks for category 'smartwatch').
+-- Insertion order = physical order = the order the original applies rules in (findMany without orderBy).
+INSERT INTO "EvaluationRule" ("id","category","questionKey","answerKey","label","deductionAmount","deductionPercent","createdAt","updatedAt") VALUES
+ ('er-01','smartphone','physical_condition','flawless','Flawless',0,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-02','smartphone','physical_condition','good','Good',0,15,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-03','smartphone','physical_condition','average','Average',0,30,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-04','smartphone','physical_condition','below_average','Below Average',0,50,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-05','smartphone','body_condition','good','Good',0,5,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-06','smartphone','body_condition','average','Average',250,10,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-07','smartphone','body_condition','below_average','Below Average',0,22.5,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-08','smartphone','functional_issues','wifi','WiFi',1000,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-09','smartphone','functional_issues','front_camera','Front Camera',1500,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-10','smartphone','functional_issues','battery','Battery',1200,2.5,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-11','smartphone','functional_issues','display','Display',3000,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-12','smartphone','accessories','!charger','No charger',800,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-13','smartphone','accessories','!box','No box',300,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-14','smartphone','accessories','!bill','No bill',0,15,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-15','smartphone','warranty','0_3_months','0-3 months',-500,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-16','smartphone','warranty','3_6_months','3-6 months',0,-7,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-17','smartphone','warranty','no','No warranty',0,10,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-18','smartphone','calls','false','Calls not working',0,20,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-19','smartphone','touch','false','Touch faulty',2500,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-20','smartphone','touch','true','Touch fine',0,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-21','smartphone','purchase_location','global','Bought abroad',0,12.75,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-22','tablet','physical_condition','good','Good',0,33.333,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-23','tablet','power','false','Does not power on',100000,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-24','tablet','functional_issues','wifi','WiFi',999,0.1,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-25','tablet','accessories','!charger','No charger',650,0,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-26','watch','power','false','Does not switch on',0,50,'2026-01-01 00:00:00','2026-01-01 00:00:00'),
+ ('er-27','watch','accessories','!strap','No strap',300,0,'2026-01-01 00:00:00','2026-01-01 00:00:00');

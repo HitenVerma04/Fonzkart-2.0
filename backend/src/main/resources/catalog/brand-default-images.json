@@ -1,0 +1,13 @@
+{
+  "samsung": "/models/samsung/Samsung_Galaxy_S25_Ultra.png",
+  "xiaomi": "/models/xiaomi/Xiaomi_15.png",
+  "realme": "/models/realme/Realme_GT_7_Pro_5G.png",
+  "poco": "/models/poco/Poco_F7.png",
+  "vivo": "/models/vivo/Vivo_X300_Pro.png",
+  "apple": "https://fdn2.gsmarena.com/vv/bigpic/apple-iphone-14.jpg",
+  "oneplus": "/models/oneplus/Oneplus_15R.png",
+  "iqoo": "/models/vivo/Vivo_X300_Pro.png",
+  "oppo": "/models/realme/Realme_GT_6.png",
+  "motorola": "/models/xiaomi/Xiaomi_15.png",
+  "google": "/models/samsung/Samsung_Galaxy_S25_Ultra.png"
+}

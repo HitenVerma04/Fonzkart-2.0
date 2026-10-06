@@ -1,0 +1,301 @@
+{
+ "bcrypt": [
+  {
+   "password": "password123",
+   "hash": "$2b$10$f9PFJWcXHKWJclR7FJW2leeUn/FDOSQWQkbuor73oGm99zpaqhOzS",
+   "jsCompareOk": true
+  },
+  {
+   "password": "P@ssw0rd!",
+   "hash": "$2b$10$0mehek.BIqE/oX6GyTP6Ne.gchv4uziIWu0j8FMAYdQyMy06kL2eS",
+   "jsCompareOk": true
+  },
+  {
+   "password": "pässwörd",
+   "hash": "$2b$10$HXp2SHGjwpmMJpkRnHIju..seok95Y3HQ9uCE.CZIcSD5pJBg2Vwu",
+   "jsCompareOk": true
+  },
+  {
+   "password": "पासवर्ड123",
+   "hash": "$2b$10$cfuPg0p9vsFNT3cDeHsdiuyNTW7y4dgblsBZhvn48OKXXGteF6CKu",
+   "jsCompareOk": true
+  },
+  {
+   "password": "🔑🔒secret",
+   "hash": "$2b$10$o6un.OBDABhIup8knP9.I.FS1t2q/.bnGkJy48Hr.ivOojlL4RhK2",
+   "jsCompareOk": true
+  },
+  {
+   "password": " spaced pw ",
+   "hash": "$2b$10$bNvwPY4pAH9r91PWRLxbIeKgnzl0MOYd41hIBOroaA9PNnqkNqO/y",
+   "jsCompareOk": true
+  },
+  {
+   "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "hash": "$2b$10$EOySJj873KYAYYHtuYL/q./m.Dt/xlk9g8P5K8ynzUyKQMEfkJkaO",
+   "jsCompareOk": true
+  },
+  {
+   "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "hash": "$2b$10$RPQyqYRq.1G7YEERmKZKgufzhq0SFvLNUI15kK/6XiYjEGyhsJp2e",
+   "jsCompareOk": true
+  },
+  {
+   "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "hash": "$2b$10$qvyFmmozQNOBquJesm19S.1tuUaKgMPGC6R3NBCAlmWXLkjSfQ9/O",
+   "jsCompareOk": true
+  },
+  {
+   "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "hash": "$2b$10$a/nr2rhMj7GeK3k.Om4JeOshnwhWT3JXqprp.a9t9sXfNDoQAFUkS",
+   "jsCompareOk": true
+  },
+  {
+   "password": "éééééééééééééééééééééééééééééééééééé",
+   "hash": "$2b$10$m7y.Z4TijEqr.MSIJFIEAevltRJBGkO0GoweKTGyIoMQwdiruRH9e",
+   "jsCompareOk": true
+  },
+  {
+   "password": "aéééééééééééééééééééééééééééééééééééé",
+   "hash": "$2b$10$BlPCXYJ6Sz1W8KnG6MI/DuhRmH3nOV2uYeW7VwIZEpt5pBNPKRfR6",
+   "jsCompareOk": true
+  },
+  {
+   "password": "legacy-2a",
+   "hash": "$2a$10$ws11acAgwLLcGTD3HQlBbub0wesn.Gwt8GunhLhlJ18A7e5wVUFn2",
+   "jsCompareOk": true
+  }
+ ],
+ "truncation": {
+  "hash": "$2b$10$MGc4Irc5BFyU8fB5MuMvh.17ev3kyTZYtQA3VNsMyi.8dG5kzyHkG",
+  "other": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyBBBB",
+  "jsCompare": true
+ },
+ "signed": [
+  {
+   "secret": "abc",
+   "user": {
+    "id": "u-1",
+    "email": "alice@example.com",
+    "name": "Alice",
+    "role": "USER"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjEyM1oiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.8GGxlgkKed7TecRCiaAzWcqNyyR6L_-nFPsxVxt79Xs"
+  },
+  {
+   "secret": "abc",
+   "user": {
+    "id": "6f1c2b7a-0000-4000-8000-000000000001",
+    "email": "admin@fonzkart.in",
+    "name": "Admin \"Root\"  / <b>",
+    "role": "SUPER_ADMIN"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNmYxYzJiN2EtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIiwiZW1haWwiOiJhZG1pbkBmb256a2FydC5pbiIsIm5hbWUiOiJBZG1pbiBcIlJvb3RcIiAgLyA8Yj4iLCJyb2xlIjoiU1VQRVJfQURNSU4ifSwiZXhwaXJlcyI6IjIwMjYtMTAtMDhUMTA6MjA6MDAuMTIzWiIsImlhdCI6MTc5MDg1MDAwMCwiZXhwIjoxNzkxNDU0ODAwfQ.DJpANGHe2e3xJYPSau5AYXoBrcy1G37D3RG8KMtbnGQ"
+  },
+  {
+   "secret": "abc",
+   "user": {
+    "id": "ckkkkkkkkkkkkkkkkkkkkkkkk",
+    "email": "ravi@x.in",
+    "name": "रवि कुमार 😀",
+    "role": "PARTNER"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiY2tra2tra2tra2tra2tra2tra2tra2trayIsImVtYWlsIjoicmF2aUB4LmluIiwibmFtZSI6IuCksOCkteCkvyDgpJXgpYHgpK7gpL7gpLAg8J-YgCIsInJvbGUiOiJQQVJUTkVSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjEyM1oiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.Ah3bWjKPqEE85yqUFSTCEPWzocKxAWEWr4cArnPFJ0U"
+  },
+  {
+   "secret": "a-much-longer-production-like-secret-value-0123456789",
+   "user": {
+    "id": "u-1",
+    "email": "alice@example.com",
+    "name": "Alice",
+    "role": "USER"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjEyM1oiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.e6CMsChpmbK-01YK4mK14x1pmUGOZ_cefWv7-DRuPbc"
+  },
+  {
+   "secret": "a-much-longer-production-like-secret-value-0123456789",
+   "user": {
+    "id": "6f1c2b7a-0000-4000-8000-000000000001",
+    "email": "admin@fonzkart.in",
+    "name": "Admin \"Root\"  / <b>",
+    "role": "SUPER_ADMIN"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNmYxYzJiN2EtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIiwiZW1haWwiOiJhZG1pbkBmb256a2FydC5pbiIsIm5hbWUiOiJBZG1pbiBcIlJvb3RcIiAgLyA8Yj4iLCJyb2xlIjoiU1VQRVJfQURNSU4ifSwiZXhwaXJlcyI6IjIwMjYtMTAtMDhUMTA6MjA6MDAuMTIzWiIsImlhdCI6MTc5MDg1MDAwMCwiZXhwIjoxNzkxNDU0ODAwfQ.BJAp8GKlFYsWLEKIKA9zr5__87RTutqEJiwNQj1-rxQ"
+  },
+  {
+   "secret": "a-much-longer-production-like-secret-value-0123456789",
+   "user": {
+    "id": "ckkkkkkkkkkkkkkkkkkkkkkkk",
+    "email": "ravi@x.in",
+    "name": "रवि कुमार 😀",
+    "role": "PARTNER"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiY2tra2tra2tra2tra2tra2tra2tra2trayIsImVtYWlsIjoicmF2aUB4LmluIiwibmFtZSI6IuCksOCkteCkvyDgpJXgpYHgpK7gpL7gpLAg8J-YgCIsInJvbGUiOiJQQVJUTkVSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjEyM1oiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.jLk8ZppjlwaJsm84iuKWE4nc8jxrM9GalMFEZQ1cmWs"
+  },
+  {
+   "secret": "sécrét-🔑",
+   "user": {
+    "id": "u-1",
+    "email": "alice@example.com",
+    "name": "Alice",
+    "role": "USER"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjEyM1oiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.8NgE5CIrsKm_8KyKJlhRXu21DBHKO6JqGXTGY_DmWx8"
+  },
+  {
+   "secret": "sécrét-🔑",
+   "user": {
+    "id": "6f1c2b7a-0000-4000-8000-000000000001",
+    "email": "admin@fonzkart.in",
+    "name": "Admin \"Root\"  / <b>",
+    "role": "SUPER_ADMIN"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNmYxYzJiN2EtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIiwiZW1haWwiOiJhZG1pbkBmb256a2FydC5pbiIsIm5hbWUiOiJBZG1pbiBcIlJvb3RcIiAgLyA8Yj4iLCJyb2xlIjoiU1VQRVJfQURNSU4ifSwiZXhwaXJlcyI6IjIwMjYtMTAtMDhUMTA6MjA6MDAuMTIzWiIsImlhdCI6MTc5MDg1MDAwMCwiZXhwIjoxNzkxNDU0ODAwfQ.vNULp9wHmBpctf-Pj38PXQEoUt35CC0itJCA2SWphIA"
+  },
+  {
+   "secret": "sécrét-🔑",
+   "user": {
+    "id": "ckkkkkkkkkkkkkkkkkkkkkkkk",
+    "email": "ravi@x.in",
+    "name": "रवि कुमार 😀",
+    "role": "PARTNER"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiY2tra2tra2tra2tra2tra2tra2tra2trayIsImVtYWlsIjoicmF2aUB4LmluIiwibmFtZSI6IuCksOCkteCkvyDgpJXgpYHgpK7gpL7gpLAg8J-YgCIsInJvbGUiOiJQQVJUTkVSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjEyM1oiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.6kcT_izPRsrdYGrjoyCLQ6TU3e-EJWVre8Li1z26rAc"
+  },
+  {
+   "secret": "temporary_dev_key_change_me_in_production",
+   "user": {
+    "id": "u-1",
+    "email": "alice@example.com",
+    "name": "Alice",
+    "role": "USER"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjEyM1oiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.d8rDt8_Rwd_oVRWPrDXClYtJ8gGmFGRmD4MPeTkFEfs"
+  },
+  {
+   "secret": "temporary_dev_key_change_me_in_production",
+   "user": {
+    "id": "6f1c2b7a-0000-4000-8000-000000000001",
+    "email": "admin@fonzkart.in",
+    "name": "Admin \"Root\"  / <b>",
+    "role": "SUPER_ADMIN"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiNmYxYzJiN2EtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxIiwiZW1haWwiOiJhZG1pbkBmb256a2FydC5pbiIsIm5hbWUiOiJBZG1pbiBcIlJvb3RcIiAgLyA8Yj4iLCJyb2xlIjoiU1VQRVJfQURNSU4ifSwiZXhwaXJlcyI6IjIwMjYtMTAtMDhUMTA6MjA6MDAuMTIzWiIsImlhdCI6MTc5MDg1MDAwMCwiZXhwIjoxNzkxNDU0ODAwfQ.g_8qdb39KL4MF-v5CFWcNjDBtcza3UCXTJzWac7P1Bs"
+  },
+  {
+   "secret": "temporary_dev_key_change_me_in_production",
+   "user": {
+    "id": "ckkkkkkkkkkkkkkkkkkkkkkkk",
+    "email": "ravi@x.in",
+    "name": "रवि कुमार 😀",
+    "role": "PARTNER"
+   },
+   "expiresIso": "2026-10-08T10:20:00.123Z",
+   "iat": 1790850000,
+   "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoiY2tra2tra2tra2tra2tra2tra2tra2trayIsImVtYWlsIjoicmF2aUB4LmluIiwibmFtZSI6IuCksOCkteCkvyDgpJXgpYHgpK7gpL7gpLAg8J-YgCIsInJvbGUiOiJQQVJUTkVSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjEyM1oiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.qyOS6WUwheJIguV6yx3YCNHckIdsSTz02ymlljMnkrk"
+  }
+ ],
+ "verify": {
+  "secret": "verify-secret",
+  "nowEpochSeconds": 1790850060,
+  "cases": [
+   {
+    "name": "valid",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.Gr1TjlO6ru2w3ahy_AsIFcNpoLhFsttVeegN9Bg0e7M",
+    "accepted": true
+   },
+   {
+    "name": "tampered-payload",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJTVVBFUl9BRE1JTiJ9LCJleHBpcmVzIjoiMjAyNi0xMC0wOFQxMDoyMDowMC4wMDBaIiwiaWF0IjoxNzkwODUwMDAwLCJleHAiOjE3OTE0NTQ4MDB9.Gr1TjlO6ru2w3ahy_AsIFcNpoLhFsttVeegN9Bg0e7M",
+    "accepted": false
+   },
+   {
+    "name": "tampered-signature",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.Gr1TjlO6ru2w3ahy_AsIFcNpoLhFsttVeegN9Bg0eAA",
+    "accepted": false
+   },
+   {
+    "name": "wrong-secret",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.xonsnu6k-xX4rDwtsdE0diDrJpcN33JzY9mbAWYX3LQ",
+    "accepted": false
+   },
+   {
+    "name": "alg-none",
+    "token": "eyJhbGciOiJub25lIn0.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.",
+    "accepted": false
+   },
+   {
+    "name": "alg-HS512",
+    "token": "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0.7ihWZM7aDKenOdXhpHKLRPGhM0E32vXrMhE7X08jGRV3obuMbXMe5deMxPcun26SuxiJed1vmWzKHYsrF0IOkA",
+    "accepted": false
+   },
+   {
+    "name": "expired",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTAxNTAwMDAsImV4cCI6MTc5MDg0OTk5OX0.fmURtZ4qajCSOlNqCs7FoXuHgvOHZt9dGCd_1pq1Xaw",
+    "accepted": false
+   },
+   {
+    "name": "exp-equals-now",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MDg1MDA2MH0.YcSREpHe4tbAwO5SvpvBgReh7TmTJcWsYz299iGeAvA",
+    "accepted": false
+   },
+   {
+    "name": "no-exp",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDB9.7OTWzjLRTPoLgHTrsOlCSAmHa7bF2HGCgUi9zXXKQe0",
+    "accepted": true
+   },
+   {
+    "name": "exp-string",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6IjE3OTE0NTQ4MDAifQ.ImNkx-Q1HcoDQtC5NMJ2yQ_2e37l0Am4tcGOW_FHtO0",
+    "accepted": false
+   },
+   {
+    "name": "nbf-future",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMCwibmJmIjoxNzkwODUzNjAwfQ.A7NiSaV2wR5zt0Z-60ziRPbj4eQrAb2yJ6s1F92PGGs",
+    "accepted": false
+   },
+   {
+    "name": "crit-header",
+    "token": "invalid-to-create",
+    "accepted": false
+   },
+   {
+    "name": "payload-array",
+    "token": "eyJhbGciOiJIUzI1NiJ9.WzEsMl0.Vi91DOa2PEo4WWHOYivSEltmMnjRA-GT8FjYFokWjVs",
+    "accepted": false
+   },
+   {
+    "name": "two-parts",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjp7ImlkIjoidS0xIiwiZW1haWwiOiJhbGljZUBleGFtcGxlLmNvbSIsIm5hbWUiOiJBbGljZSIsInJvbGUiOiJVU0VSIn0sImV4cGlyZXMiOiIyMDI2LTEwLTA4VDEwOjIwOjAwLjAwMFoiLCJpYXQiOjE3OTA4NTAwMDAsImV4cCI6MTc5MTQ1NDgwMH0",
+    "accepted": false
+   },
+   {
+    "name": "garbage",
+    "token": "not-a-token",
+    "accepted": false
+   }
+  ]
+ }
+}

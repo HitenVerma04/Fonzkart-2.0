@@ -1,0 +1,5593 @@
+{
+ "steps": [
+  {
+   "step": "super:signin",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "admin:signin",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:ops@example.test>",
+     "email": "ops@example.test",
+     "name": "Ops Admin",
+     "role": "ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:signin",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:signin",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "fe:signin",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:fe@example.test>",
+     "email": "fe@example.test",
+     "name": "Field Exec",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "fe2:signin",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "jar": {
+    "session": {
+     "id": "<rider:+917000000006>",
+     "email": "fe2@example.test",
+     "name": "Fe Two",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "user:signin",
+   "outcome": {
+    "redirect": "/"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:page:rm-dashboard",
+   "outcome": {
+    "returned": {
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "email": "p1@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000001",
+       "cityId": "<city:Chennai>",
+       "pincodes": [
+        "600001",
+        "600002"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": "<user:rm@example.test>",
+       "riders": [
+        {
+         "id": "<rider:+917000000001>",
+         "name": "Ravi",
+         "phone": "+917000000001",
+         "email": "ravi@example.test",
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000004>",
+         "name": "Kumar",
+         "phone": "+917000000004",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        }
+       ],
+       "manager": {
+        "id": "<user:zh1@example.test>",
+        "name": "Zara Head",
+        "email": "zh1@example.test",
+        "role": "ZONAL_HEAD",
+        "phone": null,
+        "cityId": "<city:Chennai>",
+        "pincodes": [],
+        "managerId": null,
+        "relationshipManagerId": null
+       },
+       "city": {
+        "id": "<city:Chennai>",
+        "name": "Chennai",
+        "isActive": true,
+        "pincodes": [
+         "600001",
+         "600002",
+         "600003"
+        ],
+        "displayOrder": 2,
+        "isFeatured": false,
+        "managerId": "<user:zh1@example.test>"
+       },
+       "orders": [
+        {
+         "id": "o2",
+         "orderNumber": 102,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "date": "2099-01-01T10:00:00.000Z",
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "pincode": "600002",
+         "location": null,
+         "riderId": "<rider:+917000000001>",
+         "partnerId": null,
+         "answers": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        },
+        {
+         "id": "o1",
+         "orderNumber": 101,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "iPhone 13 (128GB)",
+         "price": 30000,
+         "date": "2026-01-01T10:00:00.000Z",
+         "status": "Pending Pickup",
+         "address": "1 Anna Salai, Chennai",
+         "pincode": "600001",
+         "location": {
+          "lat": 12.9716,
+          "lng": 77.5946
+         },
+         "riderId": null,
+         "partnerId": null,
+         "answers": {
+          "hubStatus": "handed_over",
+          "hubHandoverAt": "2026-01-02T00:00:00.000Z",
+          "hubReceivedBy": "Hub A"
+         },
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": "handed_over",
+         "hubHandoverAt": "2026-01-02T00:00:00.000Z",
+         "hubReceivedBy": "Hub A"
+        }
+       ],
+       "unassignedOrders": [
+        {
+         "id": "o1",
+         "orderNumber": 101,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "iPhone 13 (128GB)",
+         "price": 30000,
+         "date": "2026-01-01T10:00:00.000Z",
+         "status": "Pending Pickup",
+         "address": "1 Anna Salai, Chennai",
+         "pincode": "600001",
+         "location": {
+          "lat": 12.9716,
+          "lng": 77.5946
+         },
+         "riderId": null,
+         "partnerId": null,
+         "answers": {
+          "hubStatus": "handed_over",
+          "hubHandoverAt": "2026-01-02T00:00:00.000Z",
+          "hubReceivedBy": "Hub A"
+         },
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": "handed_over",
+         "hubHandoverAt": "2026-01-02T00:00:00.000Z",
+         "hubReceivedBy": "Hub A"
+        }
+       ],
+       "assignedOrders": [
+        {
+         "id": "o2",
+         "orderNumber": 102,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "date": "2099-01-01T10:00:00.000Z",
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "pincode": "600002",
+         "location": null,
+         "riderId": "<rider:+917000000001>",
+         "partnerId": null,
+         "answers": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ],
+       "delayedOrders": [
+        {
+         "id": "o1",
+         "orderNumber": 101,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "iPhone 13 (128GB)",
+         "price": 30000,
+         "date": "2026-01-01T10:00:00.000Z",
+         "status": "Pending Pickup",
+         "address": "1 Anna Salai, Chennai",
+         "pincode": "600001",
+         "location": {
+          "lat": 12.9716,
+          "lng": 77.5946
+         },
+         "riderId": null,
+         "partnerId": null,
+         "answers": {
+          "hubStatus": "handed_over",
+          "hubHandoverAt": "2026-01-02T00:00:00.000Z",
+          "hubReceivedBy": "Hub A"
+         },
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": "handed_over",
+         "hubHandoverAt": "2026-01-02T00:00:00.000Z",
+         "hubReceivedBy": "Hub A"
+        }
+       ]
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "email": "p2@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000002",
+       "cityId": "<city:Madurai>",
+       "pincodes": [
+        "625001"
+       ],
+       "managerId": null,
+       "relationshipManagerId": "<user:rm@example.test>",
+       "riders": [
+        {
+         "id": "<rider:+917000000002>",
+         "name": "Suresh",
+         "phone": "+917000000002",
+         "email": null,
+         "status": "busy",
+         "partnerId": "<user:p2@example.test>"
+        }
+       ],
+       "manager": null,
+       "city": {
+        "id": "<city:Madurai>",
+        "name": "Madurai",
+        "isActive": true,
+        "pincodes": [],
+        "displayOrder": 1,
+        "isFeatured": false,
+        "managerId": null
+       },
+       "orders": [
+        {
+         "id": "o5",
+         "orderNumber": 105,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "OnePlus 12 (12GB + 256GB)",
+         "price": 35000,
+         "date": "2026-01-05T10:00:00.000Z",
+         "status": "completed",
+         "address": "5 Market St, Madurai",
+         "pincode": "625001",
+         "location": null,
+         "riderId": null,
+         "partnerId": null,
+         "answers": {
+          "hubStatus": ""
+         },
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": "pending",
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        },
+        {
+         "id": "o3",
+         "orderNumber": 103,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Pixel 8 (128GB)",
+         "price": 25000,
+         "date": "2026-01-03T10:00:00.000Z",
+         "status": "completed",
+         "address": "3 Temple St, Madurai",
+         "pincode": "625001",
+         "location": {
+          "lat": 9.9252,
+          "lng": 78.1198
+         },
+         "riderId": "<rider:+917000000002>",
+         "partnerId": null,
+         "answers": null,
+         "riderAnswers": {
+          "answers": {
+           "physical_condition": "good"
+          },
+          "notes": "ok"
+         },
+         "verificationImages": [
+          "a.jpg",
+          "b.jpg"
+         ],
+         "offeredPrice": 24000,
+         "hubStatus": "pending",
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ],
+       "unassignedOrders": [
+        {
+         "id": "o5",
+         "orderNumber": 105,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "OnePlus 12 (12GB + 256GB)",
+         "price": 35000,
+         "date": "2026-01-05T10:00:00.000Z",
+         "status": "completed",
+         "address": "5 Market St, Madurai",
+         "pincode": "625001",
+         "location": null,
+         "riderId": null,
+         "partnerId": null,
+         "answers": {
+          "hubStatus": ""
+         },
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": "pending",
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ],
+       "assignedOrders": [
+        {
+         "id": "o3",
+         "orderNumber": 103,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Pixel 8 (128GB)",
+         "price": 25000,
+         "date": "2026-01-03T10:00:00.000Z",
+         "status": "completed",
+         "address": "3 Temple St, Madurai",
+         "pincode": "625001",
+         "location": {
+          "lat": 9.9252,
+          "lng": 78.1198
+         },
+         "riderId": "<rider:+917000000002>",
+         "partnerId": null,
+         "answers": null,
+         "riderAnswers": {
+          "answers": {
+           "physical_condition": "good"
+          },
+          "notes": "ok"
+         },
+         "verificationImages": [
+          "a.jpg",
+          "b.jpg"
+         ],
+         "offeredPrice": 24000,
+         "hubStatus": "pending",
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ],
+       "delayedOrders": [
+        {
+         "id": "o5",
+         "orderNumber": 105,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "OnePlus 12 (12GB + 256GB)",
+         "price": 35000,
+         "date": "2026-01-05T10:00:00.000Z",
+         "status": "completed",
+         "address": "5 Market St, Madurai",
+         "pincode": "625001",
+         "location": null,
+         "riderId": null,
+         "partnerId": null,
+         "answers": {
+          "hubStatus": ""
+         },
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": "pending",
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ]
+      }
+     ],
+     "totalDelayed": 2
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:page:cities",
+   "outcome": {
+    "returned": {
+     "cities": [
+      {
+       "id": "<city:Bangalore>",
+       "name": "Bangalore",
+       "isActive": true,
+       "pincodes": [
+        "560001",
+        "560002",
+        "560003",
+        "560004",
+        "560005",
+        "560006",
+        "560007",
+        "560008",
+        "560009",
+        "560010",
+        "560011",
+        "560012",
+        "560013",
+        "560014",
+        "560015",
+        "560016",
+        "560017",
+        "560018",
+        "560019",
+        "560020",
+        "560021",
+        "560022",
+        "560023",
+        "560024",
+        "560025",
+        "560026",
+        "560027",
+        "560028",
+        "560029",
+        "560030",
+        "560031",
+        "560032",
+        "560033",
+        "560034",
+        "560035",
+        "560036",
+        "560037",
+        "560038",
+        "560039",
+        "560040",
+        "560041",
+        "560042",
+        "560043",
+        "560044",
+        "560045",
+        "560046",
+        "560047",
+        "560048",
+        "560049",
+        "560050",
+        "560051",
+        "560052",
+        "560053",
+        "560054",
+        "560055",
+        "560056",
+        "560057",
+        "560058",
+        "560059",
+        "560060",
+        "560061",
+        "560062",
+        "560063",
+        "560064",
+        "560065",
+        "560066",
+        "560067",
+        "560068",
+        "560069",
+        "560070",
+        "560071",
+        "560072",
+        "560073",
+        "560074",
+        "560075",
+        "560076",
+        "560077",
+        "560078",
+        "560079",
+        "560080",
+        "560081",
+        "560082",
+        "560083",
+        "560084",
+        "560085",
+        "560086",
+        "560087",
+        "560088",
+        "560089",
+        "560090",
+        "560091",
+        "560092",
+        "560093",
+        "560094",
+        "560095",
+        "560096",
+        "560097",
+        "560098",
+        "560099",
+        "560100",
+        "560101",
+        "560102",
+        "560103",
+        "560104",
+        "560105",
+        "560106",
+        "560107",
+        "560108",
+        "560109",
+        "560110"
+       ],
+       "displayOrder": 0,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [],
+       "zonalHeads": [],
+       "partners": []
+      },
+      {
+       "id": "<city:Chennai>",
+       "name": "Chennai",
+       "isActive": true,
+       "pincodes": [
+        "600001",
+        "600002",
+        "600003"
+       ],
+       "displayOrder": 2,
+       "isFeatured": false,
+       "managerId": "<user:zh1@example.test>",
+       "users": [
+        {
+         "id": "<user:zh1@example.test>",
+         "name": "Zara Head",
+         "email": "zh1@example.test",
+         "role": "ZONAL_HEAD",
+         "phone": null,
+         "cityId": "<city:Chennai>",
+         "pincodes": [],
+         "managerId": null,
+         "relationshipManagerId": null
+        },
+        {
+         "id": "<user:p1@example.test>",
+         "name": "Partner One",
+         "email": "p1@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000001",
+         "cityId": "<city:Chennai>",
+         "pincodes": [
+          "600001",
+          "600002"
+         ],
+         "managerId": "<user:zh1@example.test>",
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ],
+       "zonalHeads": [
+        {
+         "id": "<user:zh1@example.test>",
+         "name": "Zara Head",
+         "email": "zh1@example.test",
+         "role": "ZONAL_HEAD",
+         "phone": null,
+         "cityId": "<city:Chennai>",
+         "pincodes": [],
+         "managerId": null,
+         "relationshipManagerId": null
+        }
+       ],
+       "partners": [
+        {
+         "id": "<user:p1@example.test>",
+         "name": "Partner One",
+         "email": "p1@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000001",
+         "cityId": "<city:Chennai>",
+         "pincodes": [
+          "600001",
+          "600002"
+         ],
+         "managerId": "<user:zh1@example.test>",
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ]
+      },
+      {
+       "id": "<city:Coimbatore>",
+       "name": "Coimbatore",
+       "isActive": true,
+       "pincodes": [
+        "641001",
+        "641002",
+        "641003",
+        "641004",
+        "641005",
+        "641006",
+        "641007",
+        "641008",
+        "641009",
+        "641010",
+        "641011",
+        "641012",
+        "641013",
+        "641014",
+        "641015",
+        "641016",
+        "641017",
+        "641018",
+        "641019",
+        "641020",
+        "641021",
+        "641022",
+        "641023",
+        "641024",
+        "641025",
+        "641026",
+        "641027",
+        "641028",
+        "641029",
+        "641030",
+        "641031",
+        "641032",
+        "641033",
+        "641034",
+        "641035",
+        "641036",
+        "641037",
+        "641038",
+        "641039",
+        "641040",
+        "641041",
+        "641042",
+        "641043",
+        "641044",
+        "641045",
+        "641046",
+        "641047",
+        "641048",
+        "641049",
+        "641050",
+        "641051",
+        "641052",
+        "641053",
+        "641054",
+        "641055",
+        "641056",
+        "641057",
+        "641058",
+        "641059",
+        "641060"
+       ],
+       "displayOrder": 0,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [],
+       "zonalHeads": [],
+       "partners": []
+      },
+      {
+       "id": "<city:Madurai>",
+       "name": "Madurai",
+       "isActive": true,
+       "pincodes": [
+        "625001",
+        "625002",
+        "625003",
+        "625004",
+        "625005",
+        "625006",
+        "625007",
+        "625008",
+        "625009",
+        "625010",
+        "625011",
+        "625012",
+        "625013",
+        "625014",
+        "625015",
+        "625016",
+        "625017",
+        "625018",
+        "625019",
+        "625020",
+        "625021",
+        "625022",
+        "625023",
+        "625024",
+        "625025"
+       ],
+       "displayOrder": 1,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [
+        {
+         "id": "<user:p2@example.test>",
+         "name": "Partner Two",
+         "email": "p2@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000002",
+         "cityId": "<city:Madurai>",
+         "pincodes": [
+          "625001"
+         ],
+         "managerId": null,
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ],
+       "zonalHeads": [],
+       "partners": [
+        {
+         "id": "<user:p2@example.test>",
+         "name": "Partner Two",
+         "email": "p2@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000002",
+         "cityId": "<city:Madurai>",
+         "pincodes": [
+          "625001"
+         ],
+         "managerId": null,
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ]
+      },
+      {
+       "id": "<city:Salem>",
+       "name": "Salem",
+       "isActive": false,
+       "pincodes": [
+        "636001"
+       ],
+       "displayOrder": 0,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [],
+       "zonalHeads": [],
+       "partners": []
+      }
+     ],
+     "isZonalHead": false
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:page:cities",
+   "outcome": {
+    "returned": {
+     "cities": [
+      {
+       "id": "<city:Chennai>",
+       "name": "Chennai",
+       "isActive": true,
+       "pincodes": [
+        "600001",
+        "600002",
+        "600003"
+       ],
+       "displayOrder": 2,
+       "isFeatured": false,
+       "managerId": "<user:zh1@example.test>",
+       "users": [
+        {
+         "id": "<user:zh1@example.test>",
+         "name": "Zara Head",
+         "email": "zh1@example.test",
+         "role": "ZONAL_HEAD",
+         "phone": null,
+         "cityId": "<city:Chennai>",
+         "pincodes": [],
+         "managerId": null,
+         "relationshipManagerId": null
+        },
+        {
+         "id": "<user:p1@example.test>",
+         "name": "Partner One",
+         "email": "p1@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000001",
+         "cityId": "<city:Chennai>",
+         "pincodes": [
+          "600001",
+          "600002"
+         ],
+         "managerId": "<user:zh1@example.test>",
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ],
+       "zonalHeads": [
+        {
+         "id": "<user:zh1@example.test>",
+         "name": "Zara Head",
+         "email": "zh1@example.test",
+         "role": "ZONAL_HEAD",
+         "phone": null,
+         "cityId": "<city:Chennai>",
+         "pincodes": [],
+         "managerId": null,
+         "relationshipManagerId": null
+        }
+       ],
+       "partners": [
+        {
+         "id": "<user:p1@example.test>",
+         "name": "Partner One",
+         "email": "p1@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000001",
+         "cityId": "<city:Chennai>",
+         "pincodes": [
+          "600001",
+          "600002"
+         ],
+         "managerId": "<user:zh1@example.test>",
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ]
+      }
+     ],
+     "isZonalHead": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "user:page:cities",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:registerHub",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:registerHub",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:registerHub",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "admin:page:cities",
+   "outcome": {
+    "returned": {
+     "cities": [
+      {
+       "id": "<city:Bangalore>",
+       "name": "Bangalore",
+       "isActive": true,
+       "pincodes": [
+        "560001",
+        "560002",
+        "560003",
+        "560004",
+        "560005",
+        "560006",
+        "560007",
+        "560008",
+        "560009",
+        "560010",
+        "560011",
+        "560012",
+        "560013",
+        "560014",
+        "560015",
+        "560016",
+        "560017",
+        "560018",
+        "560019",
+        "560020",
+        "560021",
+        "560022",
+        "560023",
+        "560024",
+        "560025",
+        "560026",
+        "560027",
+        "560028",
+        "560029",
+        "560030",
+        "560031",
+        "560032",
+        "560033",
+        "560034",
+        "560035",
+        "560036",
+        "560037",
+        "560038",
+        "560039",
+        "560040",
+        "560041",
+        "560042",
+        "560043",
+        "560044",
+        "560045",
+        "560046",
+        "560047",
+        "560048",
+        "560049",
+        "560050",
+        "560051",
+        "560052",
+        "560053",
+        "560054",
+        "560055",
+        "560056",
+        "560057",
+        "560058",
+        "560059",
+        "560060",
+        "560061",
+        "560062",
+        "560063",
+        "560064",
+        "560065",
+        "560066",
+        "560067",
+        "560068",
+        "560069",
+        "560070",
+        "560071",
+        "560072",
+        "560073",
+        "560074",
+        "560075",
+        "560076",
+        "560077",
+        "560078",
+        "560079",
+        "560080",
+        "560081",
+        "560082",
+        "560083",
+        "560084",
+        "560085",
+        "560086",
+        "560087",
+        "560088",
+        "560089",
+        "560090",
+        "560091",
+        "560092",
+        "560093",
+        "560094",
+        "560095",
+        "560096",
+        "560097",
+        "560098",
+        "560099",
+        "560100",
+        "560101",
+        "560102",
+        "560103",
+        "560104",
+        "560105",
+        "560106",
+        "560107",
+        "560108",
+        "560109",
+        "560110"
+       ],
+       "displayOrder": 0,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [],
+       "zonalHeads": [],
+       "partners": []
+      },
+      {
+       "id": "<city:Chennai>",
+       "name": "Chennai",
+       "isActive": true,
+       "pincodes": [
+        "600001",
+        "600002",
+        "600003"
+       ],
+       "displayOrder": 2,
+       "isFeatured": false,
+       "managerId": "<user:zh1@example.test>",
+       "users": [
+        {
+         "id": "<user:zh1@example.test>",
+         "name": "Zara Head",
+         "email": "zh1@example.test",
+         "role": "ZONAL_HEAD",
+         "phone": null,
+         "cityId": "<city:Chennai>",
+         "pincodes": [],
+         "managerId": null,
+         "relationshipManagerId": null
+        },
+        {
+         "id": "<user:p1@example.test>",
+         "name": "Partner One",
+         "email": "p1@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000001",
+         "cityId": "<city:Chennai>",
+         "pincodes": [
+          "600001",
+          "600002"
+         ],
+         "managerId": "<user:zh1@example.test>",
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ],
+       "zonalHeads": [
+        {
+         "id": "<user:zh1@example.test>",
+         "name": "Zara Head",
+         "email": "zh1@example.test",
+         "role": "ZONAL_HEAD",
+         "phone": null,
+         "cityId": "<city:Chennai>",
+         "pincodes": [],
+         "managerId": null,
+         "relationshipManagerId": null
+        }
+       ],
+       "partners": [
+        {
+         "id": "<user:p1@example.test>",
+         "name": "Partner One",
+         "email": "p1@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000001",
+         "cityId": "<city:Chennai>",
+         "pincodes": [
+          "600001",
+          "600002"
+         ],
+         "managerId": "<user:zh1@example.test>",
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ]
+      },
+      {
+       "id": "<city:Coimbatore>",
+       "name": "Coimbatore",
+       "isActive": true,
+       "pincodes": [
+        "641001",
+        "641002",
+        "641003",
+        "641004",
+        "641005",
+        "641006",
+        "641007",
+        "641008",
+        "641009",
+        "641010",
+        "641011",
+        "641012",
+        "641013",
+        "641014",
+        "641015",
+        "641016",
+        "641017",
+        "641018",
+        "641019",
+        "641020",
+        "641021",
+        "641022",
+        "641023",
+        "641024",
+        "641025",
+        "641026",
+        "641027",
+        "641028",
+        "641029",
+        "641030",
+        "641031",
+        "641032",
+        "641033",
+        "641034",
+        "641035",
+        "641036",
+        "641037",
+        "641038",
+        "641039",
+        "641040",
+        "641041",
+        "641042",
+        "641043",
+        "641044",
+        "641045",
+        "641046",
+        "641047",
+        "641048",
+        "641049",
+        "641050",
+        "641051",
+        "641052",
+        "641053",
+        "641054",
+        "641055",
+        "641056",
+        "641057",
+        "641058",
+        "641059",
+        "641060"
+       ],
+       "displayOrder": 0,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [],
+       "zonalHeads": [],
+       "partners": []
+      },
+      {
+       "id": "<city:Madurai>",
+       "name": "Madurai",
+       "isActive": true,
+       "pincodes": [
+        "625001",
+        "625002",
+        "625003",
+        "625004",
+        "625005",
+        "625006",
+        "625007",
+        "625008",
+        "625009",
+        "625010",
+        "625011",
+        "625012",
+        "625013",
+        "625014",
+        "625015",
+        "625016",
+        "625017",
+        "625018",
+        "625019",
+        "625020",
+        "625021",
+        "625022",
+        "625023",
+        "625024",
+        "625025"
+       ],
+       "displayOrder": 1,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [
+        {
+         "id": "<user:p2@example.test>",
+         "name": "Partner Two",
+         "email": "p2@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000002",
+         "cityId": "<city:Madurai>",
+         "pincodes": [
+          "625001"
+         ],
+         "managerId": null,
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ],
+       "zonalHeads": [],
+       "partners": [
+        {
+         "id": "<user:p2@example.test>",
+         "name": "Partner Two",
+         "email": "p2@example.test",
+         "role": "PARTNER",
+         "phone": "+918000000002",
+         "cityId": "<city:Madurai>",
+         "pincodes": [
+          "625001"
+         ],
+         "managerId": null,
+         "relationshipManagerId": "<user:rm@example.test>"
+        }
+       ]
+      },
+      {
+       "id": "<city:Salem>",
+       "name": "Salem",
+       "isActive": true,
+       "pincodes": [
+        "636001"
+       ],
+       "displayOrder": 0,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [],
+       "zonalHeads": [],
+       "partners": []
+      },
+      {
+       "id": "<city:Trichy>",
+       "name": "Trichy",
+       "isActive": true,
+       "pincodes": [],
+       "displayOrder": 0,
+       "isFeatured": false,
+       "managerId": null,
+       "users": [],
+       "zonalHeads": [],
+       "partners": []
+      }
+     ],
+     "isZonalHead": false
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:ops@example.test>",
+     "email": "ops@example.test",
+     "name": "Ops Admin",
+     "role": "ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:updateCityPincodes",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:toggleCityActive",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:updatePartnerPincodes",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:removePartnerFromCity",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:updateCityPincodes",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "user:updateCityPincodes",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:updatePartnerPincodes",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:toggleCityActive",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "fe:removePartnerFromCity",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:fe@example.test>",
+     "email": "fe@example.test",
+     "name": "Field Exec",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:toggleCityActive",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:updateCityPincodes",
+   "outcome": {
+    "thrown": "Forbidden: Outside your assigned cities"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh2:signin",
+   "outcome": {
+    "redirect": "/admin"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh2@example.test>",
+     "email": "zh2@example.test",
+     "name": "Zubin Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh2:updateCityPincodes",
+   "outcome": {
+    "thrown": "Forbidden: Outside your assigned cities"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh2@example.test>",
+     "email": "zh2@example.test",
+     "name": "Zubin Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:updatePartnerPincodes",
+   "outcome": {
+    "thrown": "Forbidden: Outside your assigned cities"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:removePartnerFromCity",
+   "outcome": {
+    "thrown": "Forbidden: Outside your assigned cities"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:updatePartnerPincodes",
+   "outcome": {
+    "thrown": "Forbidden: Outside your assigned cities"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:updateCityPincodes",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:updatePartnerPincodes",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:updatePartnerPincodes",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "admin:toggleCityActive",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:ops@example.test>",
+     "email": "ops@example.test",
+     "name": "Ops Admin",
+     "role": "ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:removePartnerFromCity",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:updateCityPincodes",
+   "outcome": {
+    "thrown": "<server-error>"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:registerHub",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:registerHub",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:toggleFeaturedCity",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "user:toggleFeaturedCity",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:toggleFeaturedCity",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "super:updateCityDisplayOrder",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:updateCityDisplayOrder",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:page:homepage",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<city:Coimbatore>",
+      "name": "Coimbatore",
+      "isActive": true,
+      "pincodes": [
+       "641001",
+       "641002",
+       "641003",
+       "641004",
+       "641005",
+       "641006",
+       "641007",
+       "641008",
+       "641009",
+       "641010",
+       "641011",
+       "641012",
+       "641013",
+       "641014",
+       "641015",
+       "641016",
+       "641017",
+       "641018",
+       "641019",
+       "641020",
+       "641021",
+       "641022",
+       "641023",
+       "641024",
+       "641025",
+       "641026",
+       "641027",
+       "641028",
+       "641029",
+       "641030",
+       "641031",
+       "641032",
+       "641033",
+       "641034",
+       "641035",
+       "641036",
+       "641037",
+       "641038",
+       "641039",
+       "641040",
+       "641041",
+       "641042",
+       "641043",
+       "641044",
+       "641045",
+       "641046",
+       "641047",
+       "641048",
+       "641049",
+       "641050",
+       "641051",
+       "641052",
+       "641053",
+       "641054",
+       "641055",
+       "641056",
+       "641057",
+       "641058",
+       "641059",
+       "641060"
+      ],
+      "displayOrder": 0,
+      "isFeatured": true,
+      "managerId": null
+     },
+     {
+      "id": "<city:Salem>",
+      "name": "Salem",
+      "isActive": true,
+      "pincodes": [
+       "636001"
+      ],
+      "displayOrder": 0,
+      "isFeatured": false,
+      "managerId": null
+     },
+     {
+      "id": "<city:Trichy>",
+      "name": "Trichy",
+      "isActive": true,
+      "pincodes": [],
+      "displayOrder": 0,
+      "isFeatured": false,
+      "managerId": null
+     },
+     {
+      "id": "<city:Vellore>",
+      "name": "Vellore",
+      "isActive": true,
+      "pincodes": [],
+      "displayOrder": 0,
+      "isFeatured": false,
+      "managerId": null
+     },
+     {
+      "id": "<city:Bangalore>",
+      "name": "Bangalore",
+      "isActive": true,
+      "pincodes": [
+       "560001",
+       "560002",
+       "560003",
+       "560004",
+       "560005",
+       "560006",
+       "560007",
+       "560008",
+       "560009",
+       "560010",
+       "560011",
+       "560012",
+       "560013",
+       "560014",
+       "560015",
+       "560016",
+       "560017",
+       "560018",
+       "560019",
+       "560020",
+       "560021",
+       "560022",
+       "560023",
+       "560024",
+       "560025",
+       "560026",
+       "560027",
+       "560028",
+       "560029",
+       "560030",
+       "560031",
+       "560032",
+       "560033",
+       "560034",
+       "560035",
+       "560036",
+       "560037",
+       "560038",
+       "560039",
+       "560040",
+       "560041",
+       "560042",
+       "560043",
+       "560044",
+       "560045",
+       "560046",
+       "560047",
+       "560048",
+       "560049",
+       "560050",
+       "560051",
+       "560052",
+       "560053",
+       "560054",
+       "560055",
+       "560056",
+       "560057",
+       "560058",
+       "560059",
+       "560060",
+       "560061",
+       "560062",
+       "560063",
+       "560064",
+       "560065",
+       "560066",
+       "560067",
+       "560068",
+       "560069",
+       "560070",
+       "560071",
+       "560072",
+       "560073",
+       "560074",
+       "560075",
+       "560076",
+       "560077",
+       "560078",
+       "560079",
+       "560080",
+       "560081",
+       "560082",
+       "560083",
+       "560084",
+       "560085",
+       "560086",
+       "560087",
+       "560088",
+       "560089",
+       "560090",
+       "560091",
+       "560092",
+       "560093",
+       "560094",
+       "560095",
+       "560096",
+       "560097",
+       "560098",
+       "560099",
+       "560100",
+       "560101",
+       "560102",
+       "560103",
+       "560104",
+       "560105",
+       "560106",
+       "560107",
+       "560108",
+       "560109",
+       "560110"
+      ],
+      "displayOrder": 5,
+      "isFeatured": false,
+      "managerId": null
+     },
+     {
+      "id": "<city:Chennai>",
+      "name": "Chennai",
+      "isActive": true,
+      "pincodes": [
+       "600001",
+       "600002",
+       "600010"
+      ],
+      "displayOrder": 7,
+      "isFeatured": false,
+      "managerId": "<user:zh1@example.test>"
+     }
+    ]
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "user:page:homepage",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:page:home",
+   "outcome": {
+    "returned": [
+     "Coimbatore",
+     "Salem",
+     "Trichy",
+     "Vellore",
+     "Bangalore",
+     "Chennai"
+    ]
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:checkPincodeAvailability",
+   "outcome": {
+    "returned": true
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:checkPincodeAvailability",
+   "outcome": {
+    "returned": false
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:checkPincodeAvailability",
+   "outcome": {
+    "returned": true
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:checkPincodeAvailability",
+   "outcome": {
+    "returned": false
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "super:zhAssignCity",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:zhUnassignCity",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:zhAssignCity",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:page:riders",
+   "outcome": {
+    "returned": {
+     "riders": [
+      {
+       "id": "<rider:+917000000006>",
+       "name": "Fe Two Rider",
+       "phone": "+917000000006",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p3@example.test>",
+       "partner": {
+        "id": "<user:p3@example.test>",
+        "name": "Partner Three",
+        "email": "p3@example.test",
+        "role": "PARTNER",
+        "phone": null,
+        "cityId": null,
+        "pincodes": [
+         "600003"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": null
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": [
+        {
+         "id": "o2",
+         "userId": "<user:cust@example.test>",
+         "riderId": "<rider:+917000000001>",
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "locationLat": null,
+         "locationLng": null,
+         "answers": "not json",
+         "orderNumber": 102,
+         "pincode": "600002",
+         "offeredPrice": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "partnerId": null
+        }
+       ]
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "email": "p1@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000001",
+       "cityId": "<city:Chennai>",
+       "pincodes": [
+        "600010"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": "<user:rm@example.test>"
+      },
+      {
+       "id": "<user:p3@example.test>",
+       "name": "Partner Three",
+       "email": "p3@example.test",
+       "role": "PARTNER",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [
+        "600003"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": null
+      }
+     ],
+     "currentUserRole": "ZONAL_HEAD",
+     "currentUserId": "<user:zh1@example.test>"
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:page:riders",
+   "outcome": {
+    "returned": {
+     "riders": [
+      {
+       "id": "<rider:+917000000006>",
+       "name": "Fe Two Rider",
+       "phone": "+917000000006",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p3@example.test>",
+       "partner": {
+        "id": "<user:p3@example.test>",
+        "name": "Partner Three",
+        "email": "p3@example.test",
+        "role": "PARTNER",
+        "phone": null,
+        "cityId": null,
+        "pincodes": [
+         "600003"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": null
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000005>",
+       "name": "Mani",
+       "phone": "+917000000005",
+       "email": null,
+       "status": "available",
+       "partnerId": null,
+       "partner": null,
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000003>",
+       "name": "Arun",
+       "phone": "+917000000003",
+       "email": null,
+       "status": "available",
+       "partnerId": null,
+       "partner": null,
+       "orders": [
+        {
+         "id": "o6",
+         "userId": "<user:cust@example.test>",
+         "riderId": "<rider:+917000000003>",
+         "device": "Watch Series 8",
+         "price": 8000,
+         "status": "picked_up",
+         "address": "6 Lake Rd",
+         "locationLat": 0,
+         "locationLng": 77,
+         "answers": "\"just a string\"",
+         "orderNumber": 106,
+         "pincode": null,
+         "offeredPrice": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "partnerId": null
+        }
+       ]
+      },
+      {
+       "id": "<rider:+917000000002>",
+       "name": "Suresh",
+       "phone": "+917000000002",
+       "email": null,
+       "status": "busy",
+       "partnerId": "<user:p2@example.test>",
+       "partner": {
+        "id": "<user:p2@example.test>",
+        "name": "Partner Two",
+        "email": "p2@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000002",
+        "cityId": null,
+        "pincodes": [],
+        "managerId": null,
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": [
+        {
+         "id": "o3",
+         "userId": "<user:cust@example.test>",
+         "riderId": "<rider:+917000000002>",
+         "device": "Pixel 8 (128GB)",
+         "price": 25000,
+         "status": "completed",
+         "address": "3 Temple St, Madurai",
+         "locationLat": 9.9252,
+         "locationLng": 78.1198,
+         "answers": null,
+         "orderNumber": 103,
+         "pincode": "625001",
+         "offeredPrice": 24000,
+         "riderAnswers": "{\"answers\":{\"physical_condition\":\"good\"},\"notes\":\"ok\"}",
+         "verificationImages": [
+          "a.jpg",
+          "b.jpg"
+         ],
+         "partnerId": null
+        }
+       ]
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": [
+        {
+         "id": "o2",
+         "userId": "<user:cust@example.test>",
+         "riderId": "<rider:+917000000001>",
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "locationLat": null,
+         "locationLng": null,
+         "answers": "not json",
+         "orderNumber": 102,
+         "pincode": "600002",
+         "offeredPrice": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "partnerId": null
+        }
+       ]
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "email": "p1@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000001",
+       "cityId": "<city:Chennai>",
+       "pincodes": [
+        "600010"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": "<user:rm@example.test>"
+      },
+      {
+       "id": "<user:p3@example.test>",
+       "name": "Partner Three",
+       "email": "p3@example.test",
+       "role": "PARTNER",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [
+        "600003"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": null
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "email": "p2@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000002",
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": "<user:rm@example.test>"
+      }
+     ],
+     "currentUserRole": "SUPER_ADMIN",
+     "currentUserId": "<user:admin@fonzkart.in>"
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:page:riders",
+   "outcome": {
+    "returned": {
+     "riders": [
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": [
+        {
+         "id": "o2",
+         "userId": "<user:cust@example.test>",
+         "riderId": "<rider:+917000000001>",
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "locationLat": null,
+         "locationLng": null,
+         "answers": "not json",
+         "orderNumber": 102,
+         "pincode": "600002",
+         "offeredPrice": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "partnerId": null
+        }
+       ]
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "email": "p1@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000001",
+       "cityId": "<city:Chennai>",
+       "pincodes": [
+        "600010"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": "<user:rm@example.test>",
+       "managedCities": []
+      }
+     ],
+     "currentUserRole": "PARTNER",
+     "currentUserId": "<user:p1@example.test>"
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:page:riders",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "user:page:riders",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "user:addRider",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:addRider",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "super:updateRiderPartner",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:updateRiderPartner",
+   "outcome": {
+    "thrown": "<server-error>"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:addFieldExecutive",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addFieldExecutive",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:addFieldExecutive",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:addFieldExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "User not found. They must register first."
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "user:addFieldExecutive",
+   "outcome": {
+    "thrown": "Forbidden: Insufficient privileges to grant executive access"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:addFieldExecutive",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "super:deleteRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:deleteRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:deleteRider",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Record not found in Users or Riders"
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:page:admins",
+   "outcome": {
+    "returned": {
+     "superAdmins": [
+      {
+       "id": "<user:admin@fonzkart.in>",
+       "name": "Root",
+       "email": "admin@fonzkart.in",
+       "role": "SUPER_ADMIN",
+       "phone": "+919000000001",
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": null
+      },
+      {
+       "id": "superadmin-admin_fonzkart_com",
+       "name": "admin",
+       "email": "admin@fonzkart.com",
+       "role": "SUPER_ADMIN",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": null
+      },
+      {
+       "id": "superadmin-noumaanraihaan_gmail_com",
+       "name": "Noumaan Raihaan",
+       "email": "noumaanraihaan@gmail.com",
+       "role": "SUPER_ADMIN",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": null
+      }
+     ],
+     "admins": [
+      {
+       "id": "<user:ops@example.test>",
+       "name": "Ops Admin",
+       "email": "ops@example.test",
+       "role": "ADMIN",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": null
+      }
+     ],
+     "zonalHeads": [
+      {
+       "id": "<user:zh2@example.test>",
+       "name": "Zubin Head",
+       "email": "zh2@example.test",
+       "role": "ZONAL_HEAD",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": null
+      },
+      {
+       "id": "<user:zh1@example.test>",
+       "name": "Zara Head",
+       "email": "zh1@example.test",
+       "role": "ZONAL_HEAD",
+       "phone": null,
+       "cityId": "<city:Chennai>",
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": null
+      }
+     ],
+     "relationshipManagers": [
+      {
+       "id": "<user:rm@example.test>",
+       "name": "Rita Manager",
+       "email": "rm@example.test",
+       "role": "RELATIONSHIP_MANAGER",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": null
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p3@example.test>",
+       "name": "Partner Three",
+       "email": "p3@example.test",
+       "role": "PARTNER",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [
+        "600003"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": null
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "email": "p2@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000002",
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": "<user:rm@example.test>"
+      },
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "email": "p1@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000001",
+       "cityId": "<city:Chennai>",
+       "pincodes": [
+        "600010"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": "<user:rm@example.test>"
+      }
+     ],
+     "riders": [
+      {
+       "id": "<rider:+917000000009>",
+       "name": "Plain User",
+       "phone": "+917000000009",
+       "email": "user@example.test",
+       "status": "available",
+       "partnerId": null
+      },
+      {
+       "id": "<rider:+917000000010>",
+       "name": "New Rider",
+       "phone": "+917000000010",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>"
+      },
+      {
+       "id": "<rider:+917000000006>",
+       "name": "Fe Two Rider",
+       "phone": "+917000000006",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p3@example.test>"
+      },
+      {
+       "id": "<rider:+917000000005>",
+       "name": "Mani",
+       "phone": "+917000000005",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>"
+      },
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>"
+      },
+      {
+       "id": "<rider:+917000000003>",
+       "name": "Arun",
+       "phone": "+917000000003",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>"
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>"
+      },
+      {
+       "id": "<user:user3@example.test>",
+       "name": "User Three",
+       "phone": "+917000000005",
+       "status": "available",
+       "partnerId": null
+      },
+      {
+       "id": "<user:user@example.test>",
+       "name": "Plain User",
+       "phone": "+917000000009",
+       "status": "available",
+       "partnerId": null
+      },
+      {
+       "id": "<rider:+917000000006>",
+       "name": "Fe Two",
+       "phone": "fe2@example.test",
+       "status": "available",
+       "partnerId": null
+      },
+      {
+       "id": "<user:fe@example.test>",
+       "name": "Field Exec",
+       "phone": "+917000000004",
+       "status": "available",
+       "partnerId": null
+      }
+     ]
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:page:riders",
+   "outcome": {
+    "returned": {
+     "riders": [
+      {
+       "id": "<rider:+917000000009>",
+       "name": "Plain User",
+       "phone": "+917000000009",
+       "email": "user@example.test",
+       "status": "available",
+       "partnerId": null,
+       "partner": null,
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000010>",
+       "name": "New Rider",
+       "phone": "+917000000010",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000006>",
+       "name": "Fe Two Rider",
+       "phone": "+917000000006",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p3@example.test>",
+       "partner": {
+        "id": "<user:p3@example.test>",
+        "name": "Partner Three",
+        "email": "p3@example.test",
+        "role": "PARTNER",
+        "phone": null,
+        "cityId": null,
+        "pincodes": [
+         "600003"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": null
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000005>",
+       "name": "Mani",
+       "phone": "+917000000005",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": []
+      },
+      {
+       "id": "<rider:+917000000003>",
+       "name": "Arun",
+       "phone": "+917000000003",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": [
+        {
+         "id": "o6",
+         "userId": "<user:cust@example.test>",
+         "riderId": "<rider:+917000000003>",
+         "device": "Watch Series 8",
+         "price": 8000,
+         "status": "picked_up",
+         "address": "6 Lake Rd",
+         "locationLat": 0,
+         "locationLng": 77,
+         "answers": "\"just a string\"",
+         "orderNumber": 106,
+         "pincode": null,
+         "offeredPrice": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "partnerId": null
+        }
+       ]
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "id": "<user:p1@example.test>",
+        "name": "Partner One",
+        "email": "p1@example.test",
+        "role": "PARTNER",
+        "phone": "+918000000001",
+        "cityId": "<city:Chennai>",
+        "pincodes": [
+         "600010"
+        ],
+        "managerId": "<user:zh1@example.test>",
+        "relationshipManagerId": "<user:rm@example.test>"
+       },
+       "orders": [
+        {
+         "id": "o2",
+         "userId": "<user:cust@example.test>",
+         "riderId": "<rider:+917000000001>",
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "locationLat": null,
+         "locationLng": null,
+         "answers": "not json",
+         "orderNumber": 102,
+         "pincode": "600002",
+         "offeredPrice": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "partnerId": null
+        }
+       ]
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "email": "p1@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000001",
+       "cityId": "<city:Chennai>",
+       "pincodes": [
+        "600010"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": "<user:rm@example.test>"
+      },
+      {
+       "id": "<user:p3@example.test>",
+       "name": "Partner Three",
+       "email": "p3@example.test",
+       "role": "PARTNER",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [
+        "600003"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": null
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "email": "p2@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000002",
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": "<user:rm@example.test>"
+      }
+     ],
+     "currentUserRole": "SUPER_ADMIN",
+     "currentUserId": "<user:admin@fonzkart.in>"
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "exec:loginExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Phone number not found. Access denied."
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "exec:loginExecutive",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "needsOnboarding": true,
+     "id": "<rider:+917000000004>"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "exec:loginExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Password required"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "exec:loginExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Invalid password"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "exec:loginExecutive",
+   "outcome": {
+    "redirect": "/admin/orders"
+   },
+   "jar": {
+    "session": null,
+    "executive": "<rider:+917000000001>"
+   }
+  },
+  {
+   "step": "exec:getExecutiveSession",
+   "outcome": {
+    "returned": {
+     "id": "<rider:+917000000001>",
+     "name": "Ravi",
+     "phone": "+917000000001",
+     "email": "ravi@example.test",
+     "status": "available",
+     "partnerId": "<user:p1@example.test>"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": "<rider:+917000000001>"
+   }
+  },
+  {
+   "step": "exec4:loginExecutive",
+   "outcome": {
+    "redirect": "/admin/orders"
+   },
+   "jar": {
+    "session": null,
+    "executive": "<rider:+917000000001>"
+   }
+  },
+  {
+   "step": "exec4:loginExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Invalid password"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": "<rider:+917000000001>"
+   }
+  },
+  {
+   "step": "exec2:onboardExecutive",
+   "outcome": {
+    "redirect": "/admin/orders"
+   },
+   "jar": {
+    "session": null,
+    "executive": "<rider:+917000000004>"
+   }
+  },
+  {
+   "step": "exec2:getExecutiveSession",
+   "outcome": {
+    "returned": {
+     "id": "<rider:+917000000004>",
+     "name": "Kumar",
+     "phone": "+917000000004",
+     "email": null,
+     "status": "available",
+     "partnerId": "<user:p1@example.test>"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": "<rider:+917000000004>"
+   }
+  },
+  {
+   "step": "attacker:onboardExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Executive already onboarded"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "attacker:getExecutiveSession",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "attacker:loginExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Invalid password"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "attacker:onboardExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Password required"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "attacker:setCookie",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": null,
+    "executive": "INVALID"
+   }
+  },
+  {
+   "step": "attacker:getExecutiveSession",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": null,
+    "executive": "INVALID"
+   }
+  },
+  {
+   "step": "user:setCookie",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": "INVALID"
+   }
+  },
+  {
+   "step": "exec3:loginExecutive",
+   "outcome": {
+    "redirect": "/admin/orders"
+   },
+   "jar": {
+    "session": null,
+    "executive": "<rider:+917000000004>"
+   }
+  },
+  {
+   "step": "anon:onboardExecutive",
+   "outcome": {
+    "returned": {
+     "success": false,
+     "error": "Executive not found"
+    }
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "fe:getExecutiveSession",
+   "outcome": {
+    "returned": {
+     "id": "<rider:+917000000004>",
+     "name": "Kumar",
+     "phone": "+917000000004",
+     "email": null,
+     "status": "available",
+     "partnerId": "<user:p1@example.test>"
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:fe@example.test>",
+     "email": "fe@example.test",
+     "name": "Field Exec",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "fe:setCookie",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:fe@example.test>",
+     "email": "fe@example.test",
+     "name": "Field Exec",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": "INVALID"
+   }
+  },
+  {
+   "step": "fe:getExecutiveSession",
+   "outcome": {
+    "returned": {
+     "id": "<rider:+917000000004>",
+     "name": "Kumar",
+     "phone": "+917000000004",
+     "email": null,
+     "status": "available",
+     "partnerId": "<user:p1@example.test>"
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:fe@example.test>",
+     "email": "fe@example.test",
+     "name": "Field Exec",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": "INVALID"
+   }
+  },
+  {
+   "step": "fe2:getExecutiveSession",
+   "outcome": {
+    "returned": {
+     "id": "<rider:+917000000006>",
+     "name": "Fe Two Rider",
+     "phone": "+917000000006",
+     "email": null,
+     "status": "available",
+     "partnerId": "<user:p3@example.test>"
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<rider:+917000000006>",
+     "email": "fe2@example.test",
+     "name": "Fe Two",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "user:getExecutiveSession",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": {
+     "id": "<user:user@example.test>",
+     "email": "user@example.test",
+     "name": "Plain User",
+     "role": "USER"
+    },
+    "executive": "INVALID"
+   }
+  },
+  {
+   "step": "exec:logoutExecutive",
+   "outcome": {
+    "redirect": "/login"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "exec:getExecutiveSession",
+   "outcome": {
+    "returned": null
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:page:rm-dashboard",
+   "outcome": {
+    "returned": {
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "email": "p1@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000001",
+       "cityId": "<city:Chennai>",
+       "pincodes": [
+        "600010"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": "<user:rm@example.test>",
+       "riders": [
+        {
+         "id": "<rider:+917000000010>",
+         "name": "New Rider",
+         "phone": "+917000000010",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000003>",
+         "name": "Arun",
+         "phone": "+917000000003",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000005>",
+         "name": "Mani",
+         "phone": "+917000000005",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000001>",
+         "name": "Ravi",
+         "phone": "+917000000001",
+         "email": "ravi@example.test",
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000004>",
+         "name": "Kumar",
+         "phone": "+917000000004",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        }
+       ],
+       "manager": {
+        "id": "<user:zh1@example.test>",
+        "name": "Zara Head",
+        "email": "zh1@example.test",
+        "role": "ZONAL_HEAD",
+        "phone": null,
+        "cityId": "<city:Chennai>",
+        "pincodes": [],
+        "managerId": null,
+        "relationshipManagerId": null
+       },
+       "city": {
+        "id": "<city:Chennai>",
+        "name": "Chennai",
+        "isActive": true,
+        "pincodes": [
+         "600001",
+         "600002",
+         "600010"
+        ],
+        "displayOrder": 7,
+        "isFeatured": false,
+        "managerId": null
+       },
+       "orders": [
+        {
+         "id": "o2",
+         "orderNumber": 102,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "date": "2099-01-01T10:00:00.000Z",
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "pincode": "600002",
+         "location": null,
+         "riderId": "<rider:+917000000001>",
+         "partnerId": null,
+         "answers": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        },
+        {
+         "id": "o6",
+         "orderNumber": 106,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Watch Series 8",
+         "price": 8000,
+         "date": "2026-01-06T10:00:00.000Z",
+         "status": "picked_up",
+         "address": "6 Lake Rd",
+         "pincode": null,
+         "location": null,
+         "riderId": "<rider:+917000000003>",
+         "partnerId": null,
+         "answers": "just a string",
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ],
+       "unassignedOrders": [],
+       "assignedOrders": [
+        {
+         "id": "o2",
+         "orderNumber": 102,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "date": "2099-01-01T10:00:00.000Z",
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "pincode": "600002",
+         "location": null,
+         "riderId": "<rider:+917000000001>",
+         "partnerId": null,
+         "answers": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        },
+        {
+         "id": "o6",
+         "orderNumber": 106,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Watch Series 8",
+         "price": 8000,
+         "date": "2026-01-06T10:00:00.000Z",
+         "status": "picked_up",
+         "address": "6 Lake Rd",
+         "pincode": null,
+         "location": null,
+         "riderId": "<rider:+917000000003>",
+         "partnerId": null,
+         "answers": "just a string",
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ],
+       "delayedOrders": []
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "email": "p2@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000002",
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": "<user:rm@example.test>",
+       "riders": [],
+       "manager": null,
+       "city": null,
+       "orders": [],
+       "unassignedOrders": [],
+       "assignedOrders": [],
+       "delayedOrders": []
+      }
+     ],
+     "totalDelayed": 0
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:page:rm-dashboard",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:page:rm-dashboard",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addAdmin",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "fe:addAdmin",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:fe@example.test>",
+     "email": "fe@example.test",
+     "name": "Field Exec",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": "INVALID"
+   }
+  },
+  {
+   "step": "rm:addZonalHead",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:addRelationshipManager",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:getAdmins",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:removeUserRole",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:removeAdmin",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "admin:addRelationshipManager",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:ops@example.test>",
+     "email": "ops@example.test",
+     "name": "Ops Admin",
+     "role": "ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "admin:getAdmins",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<user:ops@example.test>",
+      "name": "Ops Admin",
+      "email": "ops@example.test",
+      "role": "ADMIN",
+      "phone": null,
+      "cityId": null,
+      "pincodes": [],
+      "managerId": null,
+      "relationshipManagerId": null
+     }
+    ]
+   },
+   "jar": {
+    "session": {
+     "id": "<user:ops@example.test>",
+     "email": "ops@example.test",
+     "name": "Ops Admin",
+     "role": "ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:removeUserRole",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:updatePartnerManager",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "admin:updatePartnerManager",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:ops@example.test>",
+     "email": "ops@example.test",
+     "name": "Ops Admin",
+     "role": "ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "anon:getPartnersManagedBy",
+   "outcome": {
+    "thrown": "Unauthorized"
+   },
+   "jar": {
+    "session": null,
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:getPartnersManagedBy",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<user:p1@example.test>",
+      "name": "Partner One",
+      "email": "p1@example.test",
+      "role": "PARTNER",
+      "phone": "+918000000001",
+      "cityId": "<city:Chennai>",
+      "pincodes": [
+       "600010"
+      ],
+      "managerId": "<user:zh1@example.test>",
+      "relationshipManagerId": "<user:rm@example.test>",
+      "city": {
+       "id": "<city:Chennai>",
+       "name": "Chennai",
+       "isActive": true,
+       "pincodes": [
+        "600001",
+        "600002",
+        "600010"
+       ],
+       "displayOrder": 7,
+       "isFeatured": false,
+       "managerId": null
+      }
+     }
+    ]
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:getPartnersManagedBy",
+   "outcome": {
+    "thrown": "Forbidden: Outside your assigned cities"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:getPartnersManagedBy",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "super:getPartnersManagedBy",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<user:p3@example.test>",
+      "name": "Partner Three",
+      "email": "p3@example.test",
+      "role": "PARTNER",
+      "phone": null,
+      "cityId": null,
+      "pincodes": [
+       "600003"
+      ],
+      "managerId": "<user:zh2@example.test>",
+      "relationshipManagerId": null,
+      "city": null
+     }
+    ]
+   },
+   "jar": {
+    "session": {
+     "id": "<user:admin@fonzkart.in>",
+     "email": "admin@fonzkart.in",
+     "name": "Root",
+     "role": "SUPER_ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addPartner",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:addPartner",
+   "outcome": {
+    "thrown": "Forbidden: Cannot change this user's role"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:addPartner",
+   "outcome": {
+    "thrown": "Forbidden: Outside your assigned cities"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh2:addPartner",
+   "outcome": {
+    "thrown": "Forbidden: Outside your assigned cities"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh2@example.test>",
+     "email": "zh2@example.test",
+     "name": "Zubin Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh2:addPartner",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh2@example.test>",
+     "email": "zh2@example.test",
+     "name": "Zubin Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:addPartner",
+   "outcome": {
+    "thrown": "Forbidden: Cannot change this user's role"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:addPartner",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "fe:addFieldExecutive",
+   "outcome": {
+    "thrown": "Forbidden: Insufficient privileges to grant executive access"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:fe@example.test>",
+     "email": "fe@example.test",
+     "name": "Field Exec",
+     "role": "FIELD_EXECUTIVE"
+    },
+    "executive": "INVALID"
+   }
+  },
+  {
+   "step": "rm:addFieldExecutive",
+   "outcome": {
+    "thrown": "Forbidden: Insufficient privileges to grant executive access"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addFieldExecutive",
+   "outcome": {
+    "thrown": "Forbidden: Cannot change this user's role"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addFieldExecutive",
+   "outcome": {
+    "thrown": "Forbidden: Cannot change this user's role"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addFieldExecutive",
+   "outcome": {
+    "thrown": "Forbidden: Cannot change this user's role"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addRider",
+   "outcome": {
+    "thrown": "Forbidden: Outside your team"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:addRider",
+   "outcome": {
+    "thrown": "Forbidden: Outside your team"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:addRider",
+   "outcome": {
+    "thrown": "Forbidden: Outside your team"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:addRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:deleteRider",
+   "outcome": {
+    "thrown": "Forbidden: Outside your team"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:deleteRider",
+   "outcome": {
+    "thrown": "Forbidden: Outside your team"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:updateRiderPartner",
+   "outcome": {
+    "thrown": "Forbidden: Outside your team"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:updateRiderPartner",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:deleteRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:deleteRider",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:page:admins",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:page:admins",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:page:homepage",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:page:cities",
+   "outcome": {
+    "denied": true
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "p1:zhAssignCity",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:p1@example.test>",
+     "email": "p1@example.test",
+     "name": "Partner One",
+     "role": "PARTNER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:zhUnassignCity",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:toggleFeaturedCity",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:updateCityDisplayOrder",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "zh1:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:zh1@example.test>",
+     "email": "zh1@example.test",
+     "name": "Zara Head",
+     "role": "ZONAL_HEAD"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "admin:upsertEvaluationRule",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:ops@example.test>",
+     "email": "ops@example.test",
+     "name": "Ops Admin",
+     "role": "ADMIN"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:addPartner",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  },
+  {
+   "step": "rm:page:rm-dashboard",
+   "outcome": {
+    "returned": {
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "email": "p1@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000001",
+       "cityId": "<city:Chennai>",
+       "pincodes": [
+        "600010"
+       ],
+       "managerId": "<user:zh1@example.test>",
+       "relationshipManagerId": "<user:rm@example.test>",
+       "riders": [
+        {
+         "id": "<rider:+917000000010>",
+         "name": "New Rider",
+         "phone": "+917000000010",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000003>",
+         "name": "Arun",
+         "phone": "+917000000003",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000005>",
+         "name": "Mani",
+         "phone": "+917000000005",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000001>",
+         "name": "Ravi",
+         "phone": "+917000000001",
+         "email": "ravi@example.test",
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        },
+        {
+         "id": "<rider:+917000000004>",
+         "name": "Kumar",
+         "phone": "+917000000004",
+         "email": null,
+         "status": "available",
+         "partnerId": "<user:p1@example.test>"
+        }
+       ],
+       "manager": {
+        "id": "<user:zh1@example.test>",
+        "name": "Zara Head",
+        "email": "zh1@example.test",
+        "role": "ZONAL_HEAD",
+        "phone": null,
+        "cityId": "<city:Chennai>",
+        "pincodes": [],
+        "managerId": null,
+        "relationshipManagerId": null
+       },
+       "city": {
+        "id": "<city:Chennai>",
+        "name": "Chennai",
+        "isActive": true,
+        "pincodes": [
+         "600001",
+         "600002",
+         "600010"
+        ],
+        "displayOrder": 7,
+        "isFeatured": false,
+        "managerId": null
+       },
+       "orders": [
+        {
+         "id": "o2",
+         "orderNumber": 102,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "date": "2099-01-01T10:00:00.000Z",
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "pincode": "600002",
+         "location": null,
+         "riderId": "<rider:+917000000001>",
+         "partnerId": null,
+         "answers": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        },
+        {
+         "id": "o6",
+         "orderNumber": 106,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Watch Series 8",
+         "price": 8000,
+         "date": "2026-01-06T10:00:00.000Z",
+         "status": "picked_up",
+         "address": "6 Lake Rd",
+         "pincode": null,
+         "location": null,
+         "riderId": "<rider:+917000000003>",
+         "partnerId": null,
+         "answers": "just a string",
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ],
+       "unassignedOrders": [],
+       "assignedOrders": [
+        {
+         "id": "o2",
+         "orderNumber": 102,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Galaxy S21 (8GB + 128GB)",
+         "price": 20000,
+         "date": "2099-01-01T10:00:00.000Z",
+         "status": "assigned",
+         "address": "2 Mount Road, Chennai",
+         "pincode": "600002",
+         "location": null,
+         "riderId": "<rider:+917000000001>",
+         "partnerId": null,
+         "answers": null,
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        },
+        {
+         "id": "o6",
+         "orderNumber": 106,
+         "userId": "<user:cust@example.test>",
+         "user": {
+          "id": "<user:cust@example.test>",
+          "name": "Customer",
+          "email": "cust@example.test",
+          "phone": "+916000000001"
+         },
+         "device": "Watch Series 8",
+         "price": 8000,
+         "date": "2026-01-06T10:00:00.000Z",
+         "status": "picked_up",
+         "address": "6 Lake Rd",
+         "pincode": null,
+         "location": null,
+         "riderId": "<rider:+917000000003>",
+         "partnerId": null,
+         "answers": "just a string",
+         "riderAnswers": null,
+         "verificationImages": [],
+         "offeredPrice": null,
+         "hubStatus": null,
+         "hubHandoverAt": null,
+         "hubReceivedBy": null
+        }
+       ],
+       "delayedOrders": []
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "email": "p2@example.test",
+       "role": "PARTNER",
+       "phone": "+918000000002",
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": "<user:rm@example.test>",
+       "riders": [],
+       "manager": null,
+       "city": null,
+       "orders": [],
+       "unassignedOrders": [],
+       "assignedOrders": [],
+       "delayedOrders": []
+      },
+      {
+       "id": "<user:user4@example.test>",
+       "name": "User Four",
+       "email": "user4@example.test",
+       "role": "PARTNER",
+       "phone": null,
+       "cityId": null,
+       "pincodes": [],
+       "managerId": null,
+       "relationshipManagerId": "<user:rm@example.test>",
+       "riders": [],
+       "manager": null,
+       "city": null,
+       "orders": [],
+       "unassignedOrders": [],
+       "assignedOrders": [],
+       "delayedOrders": []
+      }
+     ],
+     "totalDelayed": 0
+    }
+   },
+   "jar": {
+    "session": {
+     "id": "<user:rm@example.test>",
+     "email": "rm@example.test",
+     "name": "Rita Manager",
+     "role": "RELATIONSHIP_MANAGER"
+    },
+    "executive": null
+   }
+  }
+ ],
+ "snapshot": {
+  "users": [
+   {
+    "email": "admin@fonzkart.in",
+    "role": "SUPER_ADMIN",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "cust@example.test",
+    "role": "PARTNER",
+    "cityId": "<city:Trichy>",
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "fe2@example.test",
+    "role": "FIELD_EXECUTIVE",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "fe@example.test",
+    "role": "FIELD_EXECUTIVE",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "ops@example.test",
+    "role": "ADMIN",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "p1@example.test",
+    "role": "PARTNER",
+    "cityId": "<city:Chennai>",
+    "pincodes": [
+     "600010"
+    ],
+    "managerId": "<user:zh1@example.test>",
+    "relationshipManagerId": "<user:rm@example.test>"
+   },
+   {
+    "email": "p2@example.test",
+    "role": "PARTNER",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": "<user:rm@example.test>"
+   },
+   {
+    "email": "p3@example.test",
+    "role": "PARTNER",
+    "cityId": null,
+    "pincodes": [
+     "600003"
+    ],
+    "managerId": "<user:zh2@example.test>",
+    "relationshipManagerId": null
+   },
+   {
+    "email": "rm@example.test",
+    "role": "RELATIONSHIP_MANAGER",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "user3@example.test",
+    "role": "FIELD_EXECUTIVE",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "user4@example.test",
+    "role": "PARTNER",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": "<user:rm@example.test>"
+   },
+   {
+    "email": "user@example.test",
+    "role": "FIELD_EXECUTIVE",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "zh1@example.test",
+    "role": "ZONAL_HEAD",
+    "cityId": "<city:Chennai>",
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   },
+   {
+    "email": "zh2@example.test",
+    "role": "ZONAL_HEAD",
+    "cityId": null,
+    "pincodes": [],
+    "managerId": null,
+    "relationshipManagerId": null
+   }
+  ],
+  "riders": [
+   {
+    "name": "Ravi",
+    "phone": "+917000000001",
+    "email": "ravi@example.test",
+    "status": "available",
+    "passwordState": "hashed",
+    "partnerId": "<user:p1@example.test>"
+   },
+   {
+    "name": "Arun",
+    "phone": "+917000000003",
+    "email": null,
+    "status": "available",
+    "passwordState": null,
+    "partnerId": "<user:p1@example.test>"
+   },
+   {
+    "name": "Kumar",
+    "phone": "+917000000004",
+    "email": null,
+    "status": "available",
+    "passwordState": "hashed",
+    "partnerId": "<user:p1@example.test>"
+   },
+   {
+    "name": "Mani",
+    "phone": "+917000000005",
+    "email": null,
+    "status": "available",
+    "passwordState": null,
+    "partnerId": "<user:p1@example.test>"
+   },
+   {
+    "name": "Fe Two Rider",
+    "phone": "+917000000006",
+    "email": null,
+    "status": "available",
+    "passwordState": null,
+    "partnerId": "<user:p3@example.test>"
+   },
+   {
+    "name": "Plain User",
+    "phone": "+917000000009",
+    "email": "user@example.test",
+    "status": "available",
+    "passwordState": null,
+    "partnerId": null
+   },
+   {
+    "name": "New Rider",
+    "phone": "+917000000010",
+    "email": null,
+    "status": "available",
+    "passwordState": null,
+    "partnerId": "<user:p1@example.test>"
+   },
+   {
+    "name": "Unassigned",
+    "phone": "+917000000033",
+    "email": null,
+    "status": "available",
+    "passwordState": null,
+    "partnerId": null
+   }
+  ],
+  "cities": [
+   {
+    "name": "Bangalore",
+    "isActive": true,
+    "pincodes": [
+     "560001",
+     "560002",
+     "560003",
+     "560004",
+     "560005",
+     "560006",
+     "560007",
+     "560008",
+     "560009",
+     "560010",
+     "560011",
+     "560012",
+     "560013",
+     "560014",
+     "560015",
+     "560016",
+     "560017",
+     "560018",
+     "560019",
+     "560020",
+     "560021",
+     "560022",
+     "560023",
+     "560024",
+     "560025",
+     "560026",
+     "560027",
+     "560028",
+     "560029",
+     "560030",
+     "560031",
+     "560032",
+     "560033",
+     "560034",
+     "560035",
+     "560036",
+     "560037",
+     "560038",
+     "560039",
+     "560040",
+     "560041",
+     "560042",
+     "560043",
+     "560044",
+     "560045",
+     "560046",
+     "560047",
+     "560048",
+     "560049",
+     "560050",
+     "560051",
+     "560052",
+     "560053",
+     "560054",
+     "560055",
+     "560056",
+     "560057",
+     "560058",
+     "560059",
+     "560060",
+     "560061",
+     "560062",
+     "560063",
+     "560064",
+     "560065",
+     "560066",
+     "560067",
+     "560068",
+     "560069",
+     "560070",
+     "560071",
+     "560072",
+     "560073",
+     "560074",
+     "560075",
+     "560076",
+     "560077",
+     "560078",
+     "560079",
+     "560080",
+     "560081",
+     "560082",
+     "560083",
+     "560084",
+     "560085",
+     "560086",
+     "560087",
+     "560088",
+     "560089",
+     "560090",
+     "560091",
+     "560092",
+     "560093",
+     "560094",
+     "560095",
+     "560096",
+     "560097",
+     "560098",
+     "560099",
+     "560100",
+     "560101",
+     "560102",
+     "560103",
+     "560104",
+     "560105",
+     "560106",
+     "560107",
+     "560108",
+     "560109",
+     "560110"
+    ],
+    "displayOrder": 5,
+    "isFeatured": false,
+    "managerId": null
+   },
+   {
+    "name": "Chennai",
+    "isActive": true,
+    "pincodes": [
+     "600001",
+     "600002",
+     "600010"
+    ],
+    "displayOrder": 7,
+    "isFeatured": false,
+    "managerId": null
+   },
+   {
+    "name": "Coimbatore",
+    "isActive": true,
+    "pincodes": [
+     "641001",
+     "641002",
+     "641003",
+     "641004",
+     "641005",
+     "641006",
+     "641007",
+     "641008",
+     "641009",
+     "641010",
+     "641011",
+     "641012",
+     "641013",
+     "641014",
+     "641015",
+     "641016",
+     "641017",
+     "641018",
+     "641019",
+     "641020",
+     "641021",
+     "641022",
+     "641023",
+     "641024",
+     "641025",
+     "641026",
+     "641027",
+     "641028",
+     "641029",
+     "641030",
+     "641031",
+     "641032",
+     "641033",
+     "641034",
+     "641035",
+     "641036",
+     "641037",
+     "641038",
+     "641039",
+     "641040",
+     "641041",
+     "641042",
+     "641043",
+     "641044",
+     "641045",
+     "641046",
+     "641047",
+     "641048",
+     "641049",
+     "641050",
+     "641051",
+     "641052",
+     "641053",
+     "641054",
+     "641055",
+     "641056",
+     "641057",
+     "641058",
+     "641059",
+     "641060"
+    ],
+    "displayOrder": 0,
+    "isFeatured": true,
+    "managerId": null
+   },
+   {
+    "name": "Madurai",
+    "isActive": false,
+    "pincodes": [
+     "625001",
+     "625002",
+     "625003",
+     "625004",
+     "625005",
+     "625006",
+     "625007",
+     "625008",
+     "625009",
+     "625010",
+     "625011",
+     "625012",
+     "625013",
+     "625014",
+     "625015",
+     "625016",
+     "625017",
+     "625018",
+     "625019",
+     "625020",
+     "625021",
+     "625022",
+     "625023",
+     "625024",
+     "625025"
+    ],
+    "displayOrder": 1,
+    "isFeatured": false,
+    "managerId": null
+   },
+   {
+    "name": "Salem",
+    "isActive": true,
+    "pincodes": [
+     "636001"
+    ],
+    "displayOrder": 0,
+    "isFeatured": false,
+    "managerId": null
+   },
+   {
+    "name": "Trichy",
+    "isActive": true,
+    "pincodes": [],
+    "displayOrder": 0,
+    "isFeatured": false,
+    "managerId": "<user:zh2@example.test>"
+   },
+   {
+    "name": "Vellore",
+    "isActive": true,
+    "pincodes": [],
+    "displayOrder": 0,
+    "isFeatured": false,
+    "managerId": null
+   }
+  ],
+  "orders": [
+   {
+    "id": "o1",
+    "riderId": null,
+    "partnerId": null
+   },
+   {
+    "id": "o2",
+    "riderId": "<rider:+917000000001>",
+    "partnerId": null
+   },
+   {
+    "id": "o3",
+    "riderId": null,
+    "partnerId": null
+   },
+   {
+    "id": "o4",
+    "riderId": null,
+    "partnerId": null
+   },
+   {
+    "id": "o5",
+    "riderId": null,
+    "partnerId": null
+   },
+   {
+    "id": "o6",
+    "riderId": "<rider:+917000000003>",
+    "partnerId": null
+   }
+  ]
+ }
+}

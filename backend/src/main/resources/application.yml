@@ -1,0 +1,83 @@
+spring:
+  application:
+    name: fonzkart-backend
+
+  # Connection to the EXISTING PostgreSQL database (the same one Prisma uses).
+  # DB_URL must be a JDBC URL, e.g. jdbc:postgresql://localhost:5432/postgres
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+      data-source-properties:
+        # Read-only transactions (all catalog repositories) are enforced by PostgreSQL itself.
+        readOnlyMode: always
+        ApplicationName: fonzkart-backend
+        # Keep PostgreSQL's error "Detail" (e.g. "Failing row contains (...)", which would include a user's password
+        # hash and reset code) out of exception messages, and therefore out of the logs. The main error line stays.
+        logServerErrorDetail: false
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Never create/alter/drop schema objects. 'validate' only checks entity mappings against
+      # the existing tables and fails startup on mismatch. Do not change this value.
+      ddl-auto: validate
+      naming:
+        # Keep Prisma's exact identifiers ("Brand", "brandId", "passwordHash", ...).
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        jdbc:
+          time_zone: UTC
+
+  sql:
+    init:
+      mode: never
+
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+fonzkart:
+  auth:
+    # Same secret as the Next.js app (lib/session.ts) so session cookies are interchangeable.
+    secret: ${AUTH_SECRET:}
+    # lib/auth-utils.ts → SUPER_ADMIN_EMAILS (always elevated to SUPER_ADMIN; also ADMIN_EMAILS).
+    super-admin-emails:
+      - admin@fonzkart.in
+      - admin@fonzkart.com
+      - noumaanraihaan@gmail.com
+    # Display names used for configured super admins not yet in the database (app/admin/admins/page.tsx).
+    super-admin-display-names:
+      "[noumaanraihaan@gmail.com]": Noumaan Raihaan
+    # Emails forced to role USER and never treated as admin (lib/session.ts, lib/auth-utils.ts).
+    forced-user-emails:
+      - mobilesouls.in@gmail.com
+    # Used in the welcome email (actions/auth.ts → verifyEmailSignup).
+    app-url: ${NEXT_PUBLIC_APP_URL:https://www.fonzkart.in}
+
+  mail:
+    # Same environment variables as the Next.js app. Unlike the original, there is no hard-coded
+    # host fallback: set SMTP_HOST (or fonzkart.mail.fallback-host) for mail to be sent.
+    host: ${SMTP_HOST:}
+    fallback-host: ${SMTP_FALLBACK_HOST:}
+    port: ${SMTP_PORT:}
+    secure: ${SMTP_SECURE:false}
+    user: ${SMTP_USER:}
+    # SMTP_PASSWORD takes precedence over SMTP_PASS; empty values are ignored (like JavaScript "||").
+    password: ${SMTP_PASSWORD:}
+    pass: ${SMTP_PASS:}
+    from: ${SMTP_FROM:}

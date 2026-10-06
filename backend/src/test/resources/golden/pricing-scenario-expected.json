@@ -1,0 +1,1096 @@
+{
+ "steps": [
+  {
+   "step": "super:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "user:signin",
+   "outcome": {
+    "redirect": "/"
+   }
+  },
+  {
+   "step": "p1:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "admin:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "zh1:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "rm:signin",
+   "outcome": {
+    "redirect": "/"
+   }
+  },
+  {
+   "step": "fe:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "anon:getEvaluationRules",
+   "outcome": {
+    "returned": [
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "flawless",
+      "label": "Flawless",
+      "deductionAmount": 0,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "good",
+      "label": "Good",
+      "deductionAmount": 0,
+      "deductionPercent": 15
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "average",
+      "label": "Average",
+      "deductionAmount": 0,
+      "deductionPercent": 30
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "below_average",
+      "label": "Below Average",
+      "deductionAmount": 0,
+      "deductionPercent": 50
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "good",
+      "label": "Good",
+      "deductionAmount": 0,
+      "deductionPercent": 5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "average",
+      "label": "Average",
+      "deductionAmount": 250,
+      "deductionPercent": 10
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "below_average",
+      "label": "Below Average",
+      "deductionAmount": 0,
+      "deductionPercent": 22.5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "wifi",
+      "label": "WiFi",
+      "deductionAmount": 1000,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "front_camera",
+      "label": "Front Camera",
+      "deductionAmount": 1500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "battery",
+      "label": "Battery",
+      "deductionAmount": 1200,
+      "deductionPercent": 2.5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "display",
+      "label": "Display",
+      "deductionAmount": 3000,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!charger",
+      "label": "No charger",
+      "deductionAmount": 800,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!box",
+      "label": "No box",
+      "deductionAmount": 300,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!bill",
+      "label": "No bill",
+      "deductionAmount": 0,
+      "deductionPercent": 15
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "0_3_months",
+      "label": "0-3 months",
+      "deductionAmount": -500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "3_6_months",
+      "label": "3-6 months",
+      "deductionAmount": 0,
+      "deductionPercent": -7
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "no",
+      "label": "No warranty",
+      "deductionAmount": 0,
+      "deductionPercent": 10
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "calls",
+      "answerKey": "false",
+      "label": "Calls not working",
+      "deductionAmount": 0,
+      "deductionPercent": 20
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "touch",
+      "answerKey": "false",
+      "label": "Touch faulty",
+      "deductionAmount": 2500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "touch",
+      "answerKey": "true",
+      "label": "Touch fine",
+      "deductionAmount": 0,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "purchase_location",
+      "answerKey": "global",
+      "label": "Bought abroad",
+      "deductionAmount": 0,
+      "deductionPercent": 12.75
+     }
+    ]
+   }
+  },
+  {
+   "step": "anon:getEvaluationRules",
+   "outcome": {
+    "returned": [
+     {
+      "category": "watch",
+      "questionKey": "power",
+      "answerKey": "false",
+      "label": "Does not switch on",
+      "deductionAmount": 0,
+      "deductionPercent": 50
+     },
+     {
+      "category": "watch",
+      "questionKey": "accessories",
+      "answerKey": "!strap",
+      "label": "No strap",
+      "deductionAmount": 300,
+      "deductionPercent": 0
+     }
+    ]
+   }
+  },
+  {
+   "step": "anon:getEvaluationRules",
+   "outcome": {
+    "returned": []
+   }
+  },
+  {
+   "step": "anon:getEvaluationRules",
+   "outcome": {
+    "returned": [
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "flawless",
+      "label": "Flawless",
+      "deductionAmount": 0,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "good",
+      "label": "Good",
+      "deductionAmount": 0,
+      "deductionPercent": 15
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "average",
+      "label": "Average",
+      "deductionAmount": 0,
+      "deductionPercent": 30
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "below_average",
+      "label": "Below Average",
+      "deductionAmount": 0,
+      "deductionPercent": 50
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "good",
+      "label": "Good",
+      "deductionAmount": 0,
+      "deductionPercent": 5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "average",
+      "label": "Average",
+      "deductionAmount": 250,
+      "deductionPercent": 10
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "below_average",
+      "label": "Below Average",
+      "deductionAmount": 0,
+      "deductionPercent": 22.5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "wifi",
+      "label": "WiFi",
+      "deductionAmount": 1000,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "front_camera",
+      "label": "Front Camera",
+      "deductionAmount": 1500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "battery",
+      "label": "Battery",
+      "deductionAmount": 1200,
+      "deductionPercent": 2.5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "display",
+      "label": "Display",
+      "deductionAmount": 3000,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!charger",
+      "label": "No charger",
+      "deductionAmount": 800,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!box",
+      "label": "No box",
+      "deductionAmount": 300,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!bill",
+      "label": "No bill",
+      "deductionAmount": 0,
+      "deductionPercent": 15
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "0_3_months",
+      "label": "0-3 months",
+      "deductionAmount": -500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "3_6_months",
+      "label": "3-6 months",
+      "deductionAmount": 0,
+      "deductionPercent": -7
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "no",
+      "label": "No warranty",
+      "deductionAmount": 0,
+      "deductionPercent": 10
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "calls",
+      "answerKey": "false",
+      "label": "Calls not working",
+      "deductionAmount": 0,
+      "deductionPercent": 20
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "touch",
+      "answerKey": "false",
+      "label": "Touch faulty",
+      "deductionAmount": 2500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "touch",
+      "answerKey": "true",
+      "label": "Touch fine",
+      "deductionAmount": 0,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "purchase_location",
+      "answerKey": "global",
+      "label": "Bought abroad",
+      "deductionAmount": 0,
+      "deductionPercent": 12.75
+     },
+     {
+      "category": "tablet",
+      "questionKey": "physical_condition",
+      "answerKey": "good",
+      "label": "Good",
+      "deductionAmount": 0,
+      "deductionPercent": 33.333
+     },
+     {
+      "category": "tablet",
+      "questionKey": "power",
+      "answerKey": "false",
+      "label": "Does not power on",
+      "deductionAmount": 100000,
+      "deductionPercent": 0
+     },
+     {
+      "category": "tablet",
+      "questionKey": "functional_issues",
+      "answerKey": "wifi",
+      "label": "WiFi",
+      "deductionAmount": 999,
+      "deductionPercent": 0.1
+     },
+     {
+      "category": "tablet",
+      "questionKey": "accessories",
+      "answerKey": "!charger",
+      "label": "No charger",
+      "deductionAmount": 650,
+      "deductionPercent": 0
+     },
+     {
+      "category": "watch",
+      "questionKey": "power",
+      "answerKey": "false",
+      "label": "Does not switch on",
+      "deductionAmount": 0,
+      "deductionPercent": 50
+     },
+     {
+      "category": "watch",
+      "questionKey": "accessories",
+      "answerKey": "!strap",
+      "label": "No strap",
+      "deductionAmount": 300,
+      "deductionPercent": 0
+     }
+    ]
+   }
+  },
+  {
+   "step": "anon:calculatePrice",
+   "outcome": {
+    "returned": 18985
+   }
+  },
+  {
+   "step": "anon:calculatePrice",
+   "outcome": {
+    "returned": 24700
+   }
+  },
+  {
+   "step": "anon:calculatePrice",
+   "outcome": {
+    "returned": 8000
+   }
+  },
+  {
+   "step": "anon:calculatePrice",
+   "outcome": {
+    "returned": 3700
+   }
+  },
+  {
+   "step": "user:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "anon:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "Unauthorized"
+   }
+  },
+  {
+   "step": "super:upsertEvaluationRule",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "super:upsertEvaluationRule",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "p1:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "zh1:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "rm:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "fe:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "admin:upsertEvaluationRule",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "super:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "<server-error>"
+   }
+  },
+  {
+   "step": "super:upsertEvaluationRule",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "super:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "<server-error>"
+   }
+  },
+  {
+   "step": "super:upsertEvaluationRule",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "super:upsertEvaluationRule",
+   "outcome": {
+    "thrown": "<server-error>"
+   }
+  },
+  {
+   "step": "anon:getEvaluationRules",
+   "outcome": {
+    "returned": [
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "flawless",
+      "label": "Flawless",
+      "deductionAmount": 0,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "good",
+      "label": "Good (updated)",
+      "deductionAmount": 100,
+      "deductionPercent": 20
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "average",
+      "label": "Average",
+      "deductionAmount": 0,
+      "deductionPercent": 30
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "physical_condition",
+      "answerKey": "below_average",
+      "label": "Below Average",
+      "deductionAmount": 0,
+      "deductionPercent": 50
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "good",
+      "label": "Good",
+      "deductionAmount": 0,
+      "deductionPercent": 5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "average",
+      "label": "Average",
+      "deductionAmount": 250,
+      "deductionPercent": 10
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "body_condition",
+      "answerKey": "below_average",
+      "label": "Below Average",
+      "deductionAmount": 0,
+      "deductionPercent": 22.5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "wifi",
+      "label": "WiFi",
+      "deductionAmount": 1000,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "front_camera",
+      "label": "Front Camera",
+      "deductionAmount": 1500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "battery",
+      "label": "Battery",
+      "deductionAmount": 1200,
+      "deductionPercent": 2.5
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "display",
+      "label": "Display",
+      "deductionAmount": 3000,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!charger",
+      "label": "No charger",
+      "deductionAmount": 800,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!box",
+      "label": "No box",
+      "deductionAmount": 300,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "accessories",
+      "answerKey": "!bill",
+      "label": "No bill",
+      "deductionAmount": 0,
+      "deductionPercent": 15
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "0_3_months",
+      "label": "0-3 months",
+      "deductionAmount": -500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "3_6_months",
+      "label": "3-6 months",
+      "deductionAmount": 0,
+      "deductionPercent": -7
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "warranty",
+      "answerKey": "no",
+      "label": "No warranty",
+      "deductionAmount": 2,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "calls",
+      "answerKey": "false",
+      "label": "Calls not working",
+      "deductionAmount": 0,
+      "deductionPercent": 20
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "touch",
+      "answerKey": "false",
+      "label": "Touch faulty",
+      "deductionAmount": 2500,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "touch",
+      "answerKey": "true",
+      "label": "Touch fine",
+      "deductionAmount": 0,
+      "deductionPercent": 0
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "purchase_location",
+      "answerKey": "global",
+      "label": "Bought abroad",
+      "deductionAmount": 0,
+      "deductionPercent": 12.75
+     },
+     {
+      "category": "smartphone",
+      "questionKey": "functional_issues",
+      "answerKey": "speaker",
+      "label": "Speaker",
+      "deductionAmount": 700,
+      "deductionPercent": 0
+     }
+    ]
+   }
+  },
+  {
+   "step": "anon:getEvaluationRules",
+   "outcome": {
+    "returned": [
+     {
+      "category": "laptop",
+      "questionKey": "ports",
+      "answerKey": "false",
+      "label": "Ports faulty",
+      "deductionAmount": 1200,
+      "deductionPercent": 2.5
+     }
+    ]
+   }
+  },
+  {
+   "step": "anon:getEvaluationRules",
+   "outcome": {
+    "returned": [
+     {
+      "category": "tablet",
+      "questionKey": "physical_condition",
+      "answerKey": "good",
+      "label": "Good",
+      "deductionAmount": 0,
+      "deductionPercent": 33.333
+     },
+     {
+      "category": "tablet",
+      "questionKey": "power",
+      "answerKey": "false",
+      "label": "Does not power on",
+      "deductionAmount": 100000,
+      "deductionPercent": 0
+     },
+     {
+      "category": "tablet",
+      "questionKey": "functional_issues",
+      "answerKey": "wifi",
+      "label": "WiFi",
+      "deductionAmount": 999,
+      "deductionPercent": 0.1
+     },
+     {
+      "category": "tablet",
+      "questionKey": "accessories",
+      "answerKey": "!charger",
+      "label": "No charger",
+      "deductionAmount": 650,
+      "deductionPercent": 0
+     },
+     {
+      "category": "tablet",
+      "questionKey": "body_condition",
+      "answerKey": "average",
+      "label": "Average body",
+      "deductionAmount": 0,
+      "deductionPercent": 0
+     }
+    ]
+   }
+  },
+  {
+   "step": "anon:calculatePrice",
+   "outcome": {
+    "returned": 16085
+   }
+  },
+  {
+   "step": "anon:calculatePrice",
+   "outcome": {
+    "returned": 39750
+   }
+  },
+  {
+   "step": "anon:calculatePrice",
+   "outcome": {
+    "returned": 36016
+   }
+  }
+ ],
+ "rules": [
+  {
+   "category": "laptop",
+   "questionKey": "ports",
+   "answerKey": "false",
+   "label": "Ports faulty",
+   "deductionAmount": 1200,
+   "deductionPercent": 2.5
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "accessories",
+   "answerKey": "!bill",
+   "label": "No bill",
+   "deductionAmount": 0,
+   "deductionPercent": 15
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "accessories",
+   "answerKey": "!box",
+   "label": "No box",
+   "deductionAmount": 300,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "accessories",
+   "answerKey": "!charger",
+   "label": "No charger",
+   "deductionAmount": 800,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "body_condition",
+   "answerKey": "average",
+   "label": "Average",
+   "deductionAmount": 250,
+   "deductionPercent": 10
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "body_condition",
+   "answerKey": "below_average",
+   "label": "Below Average",
+   "deductionAmount": 0,
+   "deductionPercent": 22.5
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "body_condition",
+   "answerKey": "good",
+   "label": "Good",
+   "deductionAmount": 0,
+   "deductionPercent": 5
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "calls",
+   "answerKey": "false",
+   "label": "Calls not working",
+   "deductionAmount": 0,
+   "deductionPercent": 20
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "functional_issues",
+   "answerKey": "battery",
+   "label": "Battery",
+   "deductionAmount": 1200,
+   "deductionPercent": 2.5
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "functional_issues",
+   "answerKey": "display",
+   "label": "Display",
+   "deductionAmount": 3000,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "functional_issues",
+   "answerKey": "front_camera",
+   "label": "Front Camera",
+   "deductionAmount": 1500,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "functional_issues",
+   "answerKey": "speaker",
+   "label": "Speaker",
+   "deductionAmount": 700,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "functional_issues",
+   "answerKey": "wifi",
+   "label": "WiFi",
+   "deductionAmount": 1000,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "physical_condition",
+   "answerKey": "average",
+   "label": "Average",
+   "deductionAmount": 0,
+   "deductionPercent": 30
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "physical_condition",
+   "answerKey": "below_average",
+   "label": "Below Average",
+   "deductionAmount": 0,
+   "deductionPercent": 50
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "physical_condition",
+   "answerKey": "flawless",
+   "label": "Flawless",
+   "deductionAmount": 0,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "physical_condition",
+   "answerKey": "good",
+   "label": "Good (updated)",
+   "deductionAmount": 100,
+   "deductionPercent": 20
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "purchase_location",
+   "answerKey": "global",
+   "label": "Bought abroad",
+   "deductionAmount": 0,
+   "deductionPercent": 12.75
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "touch",
+   "answerKey": "false",
+   "label": "Touch faulty",
+   "deductionAmount": 2500,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "touch",
+   "answerKey": "true",
+   "label": "Touch fine",
+   "deductionAmount": 0,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "warranty",
+   "answerKey": "0_3_months",
+   "label": "0-3 months",
+   "deductionAmount": -500,
+   "deductionPercent": 0
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "warranty",
+   "answerKey": "3_6_months",
+   "label": "3-6 months",
+   "deductionAmount": 0,
+   "deductionPercent": -7
+  },
+  {
+   "category": "smartphone",
+   "questionKey": "warranty",
+   "answerKey": "no",
+   "label": "No warranty",
+   "deductionAmount": 2,
+   "deductionPercent": 0
+  },
+  {
+   "category": "tablet",
+   "questionKey": "accessories",
+   "answerKey": "!charger",
+   "label": "No charger",
+   "deductionAmount": 650,
+   "deductionPercent": 0
+  },
+  {
+   "category": "tablet",
+   "questionKey": "body_condition",
+   "answerKey": "average",
+   "label": "Average body",
+   "deductionAmount": 0,
+   "deductionPercent": 0
+  },
+  {
+   "category": "tablet",
+   "questionKey": "functional_issues",
+   "answerKey": "wifi",
+   "label": "WiFi",
+   "deductionAmount": 999,
+   "deductionPercent": 0.1
+  },
+  {
+   "category": "tablet",
+   "questionKey": "physical_condition",
+   "answerKey": "good",
+   "label": "Good",
+   "deductionAmount": 0,
+   "deductionPercent": 33.333
+  },
+  {
+   "category": "tablet",
+   "questionKey": "power",
+   "answerKey": "false",
+   "label": "Does not power on",
+   "deductionAmount": 100000,
+   "deductionPercent": 0
+  },
+  {
+   "category": "watch",
+   "questionKey": "accessories",
+   "answerKey": "!strap",
+   "label": "No strap",
+   "deductionAmount": 300,
+   "deductionPercent": 0
+  },
+  {
+   "category": "watch",
+   "questionKey": "power",
+   "answerKey": "false",
+   "label": "Does not switch on",
+   "deductionAmount": 0,
+   "deductionPercent": 50
+  }
+ ]
+}

@@ -1,0 +1,14 @@
+[
+  { "id": "apple", "name": "Apple", "logo": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg", "categories": ["smartphone", "tablet", "watch"], "priority": 1 },
+  { "id": "samsung", "name": "Samsung", "logo": "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg", "categories": ["smartphone", "tablet", "watch", "tv"], "priority": 2 },
+  { "id": "xiaomi", "name": "Xiaomi", "logo": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Xiaomi_logo_%282021-%29.svg", "categories": ["smartphone", "tablet", "tv"], "priority": 3 },
+  { "id": "vivo", "name": "Vivo", "logo": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Vivo_logo_2019.svg", "categories": ["smartphone"], "priority": 4 },
+  { "id": "oneplus", "name": "OnePlus", "logo": "https://cdn.simpleicons.org/oneplus/F5010C", "categories": ["smartphone", "tablet"], "priority": 5 },
+  { "id": "realme", "name": "Realme", "logo": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Realme-realme-_logo_box_RGB_01.svg", "categories": ["smartphone", "tablet"], "priority": 6 },
+  { "id": "poco", "name": "Poco", "logo": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Poco_Logo.svg", "categories": ["smartphone", "tablet"], "priority": 7 },
+  { "id": "oppo", "name": "Oppo", "logo": "https://upload.wikimedia.org/wikipedia/commons/0/09/OPPO_LOGO_2019.svg", "categories": ["smartphone", "tablet"], "priority": 8 },
+  { "id": "google", "name": "Google", "logo": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg", "categories": ["smartphone"], "priority": 9 },
+  { "id": "motorola", "name": "Motorola", "logo": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Motorola_new_logo.svg", "categories": ["smartphone", "tablet"], "priority": 10 },
+  { "id": "nothing", "name": "Nothing", "logo": "https://upload.wikimedia.org/wikipedia/commons/5/52/Nothing_logo.svg", "categories": ["smartphone"], "priority": 11 },
+  { "id": "iqoo", "name": "iQOO", "logo": "https://upload.wikimedia.org/wikipedia/commons/4/4b/IQOO_logo.svg", "categories": ["smartphone"], "priority": 12 }
+]
