@@ -51,6 +51,15 @@ java -jar target/fonzkart-backend-0.1.0-SNAPSHOT.jar
 
 Health check: `GET http://localhost:8080/actuator/health`
 
+## Deploy (Docker / Coolify)
+
+`backend/Dockerfile` builds a runnable image (Maven build stage, JRE 17 runtime, non-root user, port 8080). In
+Coolify: build pack "Dockerfile", Base Directory `/backend`, port 8080, health check path
+`/actuator/health/liveness`. Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `AUTH_SECRET` (the website's value) and the
+`SMTP_*` variables as Coolify environment variables. Tests are not run inside the image build; run `mvn verify` before
+deploying. Verified 2026-10-06: image builds, starts in ~9 s against the schema, `/actuator/health/liveness` is UP and
+the catalog API answers.
+
 ## Safety guarantees
 
 - **No schema changes:** `spring.jpa.hibernate.ddl-auto=validate` (startup fails if entities don't match the existing tables; nothing is created/altered/dropped). No Flyway/Liquibase yet.
