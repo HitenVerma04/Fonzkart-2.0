@@ -8,6 +8,7 @@ import {
     deduplicateModels,
     BRAND_DEFAULT_IMAGES,
 } from '/src/lib/catalog2026.ts';
+import { questionnaireSteps } from '/src/lib/data.ts';
 
 // /out is mounted to backend/src (see backend/README.md).
 const staticDir = '/out/main/resources/catalog';
@@ -16,6 +17,8 @@ const goldenDir = '/out/test/resources/golden';
 // ---- 1. Static data -------------------------------------------------------
 writeFileSync(`${staticDir}/catalog-2026.json`, JSON.stringify(CATALOG_2026_MODELS, null, 2) + '\n');
 writeFileSync(`${staticDir}/brand-default-images.json`, JSON.stringify(BRAND_DEFAULT_IMAGES, null, 2) + '\n');
+// The device questionnaire (lib/data.ts), served to the apps by GET /api/catalog/questionnaire.
+writeFileSync(`${staticDir}/questionnaire.json`, JSON.stringify(questionnaireSteps, null, 2) + '\n');
 
 // ---- 2. Golden fixtures ---------------------------------------------------
 const tricky = [

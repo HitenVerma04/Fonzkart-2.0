@@ -1,0 +1,1421 @@
+{
+  "smartphone": [
+    {
+      "id": "physical_condition",
+      "title": "Tell us more about your device questions",
+      "subtitle": "Select screen's physical condition",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "No signs of usage",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Major scratches",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "below_average",
+          "label": "Below Average",
+          "description": "Screen crack, Dead pixel, Lines on screen",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "body_condition",
+      "title": "Body Condition",
+      "subtitle": "Select the condition of the device body (back panel/frame)",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "No scratches or dents",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches, no dents",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Visible scratches and minor dents",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "below_average",
+          "label": "Below Average",
+          "description": "Heavy dents, cracks, or bent frame",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "functional_issues",
+      "title": "Functional Problems",
+      "subtitle": "Select any issues your device has (Check if applicable)",
+      "type": "multi-select-grid",
+      "options": [
+        {
+          "id": "wifi",
+          "label": "WiFi",
+          "icon": "Wifi"
+        },
+        {
+          "id": "sim1",
+          "label": "Sim 1",
+          "icon": "Smartphone"
+        },
+        {
+          "id": "sim2",
+          "label": "Sim 2",
+          "icon": "Smartphone"
+        },
+        {
+          "id": "bluetooth",
+          "label": "Bluetooth",
+          "icon": "Bluetooth"
+        },
+        {
+          "id": "front_camera",
+          "label": "Front Camera",
+          "icon": "Camera"
+        },
+        {
+          "id": "back_camera",
+          "label": "Back Camera",
+          "icon": "Camera"
+        },
+        {
+          "id": "camera_glass",
+          "label": "Camera Glass Broken",
+          "icon": "CameraOff"
+        },
+        {
+          "id": "finger_sensor",
+          "label": "Finger Touch Sensor",
+          "icon": "Fingerprint"
+        },
+        {
+          "id": "face_sensor",
+          "label": "Face Sensor",
+          "icon": "User"
+        },
+        {
+          "id": "power_button",
+          "label": "Power Button",
+          "icon": "Power"
+        },
+        {
+          "id": "volume_button",
+          "label": "Volume Button",
+          "icon": "Volume2"
+        },
+        {
+          "id": "silent_button",
+          "label": "Silent Button",
+          "icon": "BellOff"
+        },
+        {
+          "id": "speaker",
+          "label": "Speaker",
+          "icon": "Speaker"
+        },
+        {
+          "id": "earpiece",
+          "label": "Ear Piece",
+          "icon": "Phone"
+        },
+        {
+          "id": "microphone",
+          "label": "Microphone",
+          "icon": "Mic"
+        },
+        {
+          "id": "audio_ic",
+          "label": "Audio IC",
+          "icon": "Music"
+        },
+        {
+          "id": "charging_port",
+          "label": "Charging Port",
+          "icon": "Plug"
+        },
+        {
+          "id": "proximity",
+          "label": "Proximity Sensor",
+          "icon": "Move"
+        },
+        {
+          "id": "vibrator",
+          "label": "Vibrator",
+          "icon": "Vibrate"
+        },
+        {
+          "id": "battery",
+          "label": "Battery",
+          "icon": "Battery"
+        },
+        {
+          "id": "front_camera_blur",
+          "label": "Front Camera Image Blur",
+          "icon": "Image"
+        },
+        {
+          "id": "back_camera_blur",
+          "label": "Back Camera Image Blur",
+          "icon": "Image"
+        }
+      ]
+    },
+    {
+      "id": "device_details",
+      "title": "Device Details",
+      "subtitle": "Please confirm accessories and warranty details",
+      "type": "combined-step",
+      "sections": [
+        {
+          "id": "purchase_location",
+          "title": "Where was the device purchased?",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "india",
+              "label": "Purchased in India",
+              "icon": "MapPin"
+            },
+            {
+              "id": "global",
+              "label": "Purchased Globally",
+              "icon": "Globe"
+            }
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Do you have the following?",
+          "type": "multi-select",
+          "options": [
+            {
+              "id": "charger",
+              "label": "Original Charger",
+              "icon": "Plug"
+            },
+            {
+              "id": "box",
+              "label": "Original Box",
+              "icon": "Box"
+            },
+            {
+              "id": "bill",
+              "label": "Original Bill with GST",
+              "icon": "FileText"
+            }
+          ]
+        },
+        {
+          "id": "warranty",
+          "title": "Warranty Period",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "0_3_months",
+              "label": "0 - 3 Months",
+              "description": "Valid for 0 to 3 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "3_6_months",
+              "label": "3 - 6 Months",
+              "description": "Valid for 3 to 6 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "6_11_months",
+              "label": "6 - 11 Months",
+              "description": "Valid for 6 to 11 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "no",
+              "label": "No Warranty",
+              "description": "Above 11 months or expired",
+              "icon": "XCircle"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tablet": [
+    {
+      "id": "core_functionality",
+      "title": "Tablet Condition Check",
+      "subtitle": "Answer these to get the best price.",
+      "questions": [
+        {
+          "id": "power",
+          "text": "Does the device turn on?",
+          "subtext": "Ensure the tablet powers up and boots completely.",
+          "type": "boolean"
+        },
+        {
+          "id": "touch",
+          "text": "Is the touch working seamlessly?",
+          "subtext": "No dead zones or ghost touches.",
+          "type": "boolean"
+        },
+        {
+          "id": "wifi",
+          "text": "Is WiFi working?",
+          "subtext": "Can it connect to networks?",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "physical_condition",
+      "title": "Physical Condition",
+      "subtitle": "Select the screen's physical condition",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "No signs of usage",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Major scratches",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "below_average",
+          "label": "Below Average",
+          "description": "Screen crack, Dead pixel, Lines on screen",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "body_condition",
+      "title": "Body Condition",
+      "subtitle": "Select the condition of the device body (back panel/frame)",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "No scratches or dents",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches, no dents",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Visible scratches and minor dents",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "below_average",
+          "label": "Below Average",
+          "description": "Heavy dents, cracks, or bent frame",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "functional_issues",
+      "title": "Functional Problems",
+      "subtitle": "Select any issues your device has (Check if applicable)",
+      "type": "multi-select-grid",
+      "options": [
+        {
+          "id": "bluetooth",
+          "label": "Bluetooth",
+          "icon": "Bluetooth"
+        },
+        {
+          "id": "front_camera",
+          "label": "Front Camera",
+          "icon": "Camera"
+        },
+        {
+          "id": "back_camera",
+          "label": "Back Camera",
+          "icon": "Camera"
+        },
+        {
+          "id": "camera_glass",
+          "label": "Camera Glass Broken",
+          "icon": "CameraOff"
+        },
+        {
+          "id": "power_button",
+          "label": "Power Button",
+          "icon": "Power"
+        },
+        {
+          "id": "volume_button",
+          "label": "Volume Button",
+          "icon": "Volume2"
+        },
+        {
+          "id": "speaker",
+          "label": "Speaker",
+          "icon": "Speaker"
+        },
+        {
+          "id": "microphone",
+          "label": "Microphone",
+          "icon": "Mic"
+        },
+        {
+          "id": "charging_port",
+          "label": "Charging Port",
+          "icon": "Plug"
+        },
+        {
+          "id": "battery",
+          "label": "Battery",
+          "icon": "Battery"
+        }
+      ]
+    },
+    {
+      "id": "device_details",
+      "title": "Device Details",
+      "subtitle": "Please confirm accessories and warranty details",
+      "type": "combined-step",
+      "sections": [
+        {
+          "id": "purchase_location",
+          "title": "Where was the device purchased?",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "india",
+              "label": "Purchased in India",
+              "icon": "MapPin"
+            },
+            {
+              "id": "global",
+              "label": "Purchased Globally",
+              "icon": "Globe"
+            }
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Do you have the following?",
+          "type": "multi-select",
+          "options": [
+            {
+              "id": "charger",
+              "label": "Original Charger",
+              "icon": "Plug"
+            },
+            {
+              "id": "box",
+              "label": "Original Box",
+              "icon": "Box"
+            },
+            {
+              "id": "bill",
+              "label": "Original Bill with GST",
+              "icon": "FileText"
+            }
+          ]
+        },
+        {
+          "id": "warranty",
+          "title": "Warranty Period",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "0_3_months",
+              "label": "0 - 3 Months",
+              "description": "Valid for 0 to 3 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "3_6_months",
+              "label": "3 - 6 Months",
+              "description": "Valid for 3 to 6 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "6_11_months",
+              "label": "6 - 11 Months",
+              "description": "Valid for 6 to 11 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "no",
+              "label": "No Warranty",
+              "description": "Above 11 months or expired",
+              "icon": "XCircle"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "watch": [
+    {
+      "id": "core_functionality",
+      "title": "Smartwatch Condition Check",
+      "subtitle": "Answer these to get the best price.",
+      "questions": [
+        {
+          "id": "power",
+          "text": "Does the watch Switch On?",
+          "subtext": "Cashify currently only accepts devices that switch on.",
+          "type": "boolean"
+        },
+        {
+          "id": "touch",
+          "text": "Is the touch working seamlessly?",
+          "subtext": "No dead zones or ghost touches.",
+          "type": "boolean"
+        },
+        {
+          "id": "charging",
+          "text": "Does it charge correctly?",
+          "subtext": "Charging sensor/magnetic port working.",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "physical_condition",
+      "title": "Screen Condition",
+      "subtitle": "Select the screen's physical condition",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "No signs of usage, no scratches",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches (1-2 light)",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Major scratches or slight wear",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "damaged",
+          "label": "Damaged/Cracked",
+          "description": "Cracks, spots, or lines on screen",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "body_condition",
+      "title": "Body Condition",
+      "subtitle": "Select the condition of the watch body",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "Brand new look, no imperfections",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches, no dents",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Moderate scratches or minor dents",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "below_average",
+          "label": "Below Average",
+          "description": "Deep scratches, major dents, or glass broken",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "functional_issues",
+      "title": "Functional Problems",
+      "subtitle": "Select if applicable (Check if applicable)",
+      "type": "multi-select-grid",
+      "options": [
+        {
+          "id": "battery_low",
+          "label": "Battery Health < 85%",
+          "icon": "Battery"
+        },
+        {
+          "id": "wifi",
+          "label": "WiFi/GPS Faulty",
+          "icon": "Wifi"
+        },
+        {
+          "id": "speaker",
+          "label": "Speakers Faulty",
+          "icon": "Speaker"
+        },
+        {
+          "id": "crown",
+          "label": "Digital Crown Issues",
+          "icon": "Settings"
+        },
+        {
+          "id": "buttons",
+          "label": "Side Buttons Faulty",
+          "icon": "Power"
+        },
+        {
+          "id": "heart_sensor",
+          "label": "Heart Sensor Faulty",
+          "icon": "Activity"
+        },
+        {
+          "id": "bluetooth",
+          "label": "Bluetooth Faulty",
+          "icon": "Bluetooth"
+        }
+      ]
+    },
+    {
+      "id": "device_details",
+      "title": "Device Details",
+      "subtitle": "Please confirm accessories and warranty",
+      "type": "combined-step",
+      "sections": [
+        {
+          "id": "purchase_location",
+          "title": "Where was the device purchased?",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "india",
+              "label": "Purchased in India",
+              "icon": "MapPin"
+            },
+            {
+              "id": "global",
+              "label": "Purchased Globally",
+              "icon": "Globe"
+            }
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Do you have the following?",
+          "type": "multi-select",
+          "options": [
+            {
+              "id": "charger",
+              "label": "Original Charger",
+              "icon": "Plug"
+            },
+            {
+              "id": "strap",
+              "label": "Original Strap",
+              "icon": "Watch"
+            },
+            {
+              "id": "box",
+              "label": "Original Box",
+              "icon": "Box"
+            },
+            {
+              "id": "bill",
+              "label": "Original Bill with GST",
+              "icon": "FileText"
+            }
+          ]
+        },
+        {
+          "id": "warranty",
+          "title": "Warranty Period",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "0_3_months",
+              "label": "0 - 3 Months",
+              "description": "Valid for 0 to 3 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "3_6_months",
+              "label": "3 - 6 Months",
+              "description": "Valid for 3 to 6 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "6_11_months",
+              "label": "6 - 11 Months",
+              "description": "Valid for 6 to 11 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "no",
+              "label": "No Warranty",
+              "description": "Above 11 months or expired",
+              "icon": "XCircle"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "console": [
+    {
+      "id": "core_functionality",
+      "title": "Console Check",
+      "subtitle": "Let's check your gaming gear.",
+      "questions": [
+        {
+          "id": "power",
+          "text": "Does it power on correctly?",
+          "subtext": "No overheating or auto-shutdowns.",
+          "type": "boolean"
+        },
+        {
+          "id": "drive",
+          "text": "Does the disc drive work?",
+          "subtext": "Reads games without issues (if applicable).",
+          "type": "boolean"
+        },
+        {
+          "id": "controller",
+          "text": "Is the controller included & working?",
+          "subtext": "No drift issues.",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "cosmetic",
+      "title": "Cosmetic Condition",
+      "subtitle": "Any physical issues?",
+      "type": "multi-select",
+      "options": [
+        {
+          "id": "body_cracks",
+          "label": "Cracks on Console Body",
+          "icon": "Box"
+        },
+        {
+          "id": "ports_damaged",
+          "label": "HDMI/USB Ports Damaged",
+          "icon": "Plug"
+        }
+      ]
+    }
+  ],
+  "tv": [
+    {
+      "id": "physical_condition",
+      "title": "Screen / Display Condition",
+      "subtitle": "Select the screen's physical and display condition",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "Perfect screen, no scratches or lines",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor hairline scratches on screen",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Visible deep scratches on screen",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "damaged",
+          "label": "Damaged Screen",
+          "description": "Screen crack, dead pixels, horizontal/vertical lines, color patches",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "body_condition",
+      "title": "Body & Frame Condition",
+      "subtitle": "Select the condition of the TV frame, bezel, and back panel",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "No scratches, dents, or scuffs",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches or scuffs, no dents/cracks",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Visible major scratches, scuffs or minor dents",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "below_average",
+          "label": "Below Average",
+          "description": "Heavy dents, deep cracks, or broken frame/bezel",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "functional_issues",
+      "title": "Functional Problems",
+      "subtitle": "Select any issues your TV has (Check if applicable)",
+      "type": "multi-select-grid",
+      "options": [
+        {
+          "id": "wifi",
+          "label": "WiFi / Smart features Faulty",
+          "icon": "Wifi"
+        },
+        {
+          "id": "bluetooth",
+          "label": "Bluetooth Faulty",
+          "icon": "Bluetooth"
+        },
+        {
+          "id": "ports",
+          "label": "HDMI / USB Ports Faulty",
+          "icon": "Plug"
+        },
+        {
+          "id": "sound",
+          "label": "Speakers / Sound Faulty",
+          "icon": "VolumeX"
+        },
+        {
+          "id": "remote_sensor",
+          "label": "Remote Sensor Not Responding",
+          "icon": "Tv"
+        },
+        {
+          "id": "power_fault",
+          "label": "Power Supply / Auto Shutdown Issues",
+          "icon": "PowerOff"
+        },
+        {
+          "id": "display_flicker",
+          "label": "Screen Flicker / Dim Display",
+          "icon": "SunDim"
+        }
+      ]
+    },
+    {
+      "id": "device_details",
+      "title": "Device Details",
+      "subtitle": "Please confirm accessories and warranty details",
+      "type": "combined-step",
+      "sections": [
+        {
+          "id": "purchase_location",
+          "title": "Where was the TV purchased?",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "india",
+              "label": "Purchased in India",
+              "icon": "MapPin"
+            },
+            {
+              "id": "global",
+              "label": "Purchased Globally",
+              "icon": "Globe"
+            }
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Do you have the following accessories?",
+          "type": "multi-select",
+          "options": [
+            {
+              "id": "remote",
+              "label": "Original Remote",
+              "icon": "Tv"
+            },
+            {
+              "id": "stand",
+              "label": "Table Top Stand",
+              "icon": "Box"
+            },
+            {
+              "id": "wall_mount",
+              "label": "Wall Mount",
+              "icon": "Grid"
+            },
+            {
+              "id": "bill",
+              "label": "Original Bill with GST",
+              "icon": "FileText"
+            },
+            {
+              "id": "box",
+              "label": "Original Box",
+              "icon": "Box"
+            }
+          ]
+        },
+        {
+          "id": "warranty",
+          "title": "Warranty Period",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "0_3_months",
+              "label": "0 - 3 Months",
+              "description": "Valid for 0 to 3 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "3_6_months",
+              "label": "3 - 6 Months",
+              "description": "Valid for 3 to 6 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "6_11_months",
+              "label": "6 - 11 Months",
+              "description": "Valid for 6 to 11 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "no",
+              "label": "No Warranty",
+              "description": "Above 11 months or expired",
+              "icon": "XCircle"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "laptop": [
+    {
+      "id": "core_functionality",
+      "title": "Laptop Basics",
+      "subtitle": "Quick health check.",
+      "questions": [
+        {
+          "id": "power",
+          "text": "Does it power on & boot?",
+          "subtext": "",
+          "type": "boolean"
+        },
+        {
+          "id": "ports",
+          "text": "Do all USB/Charging ports work?",
+          "subtext": "",
+          "type": "boolean"
+        },
+        {
+          "id": "screen_working",
+          "text": "Is the Display functioning?",
+          "subtext": "No flicker or dead pixels.",
+          "type": "boolean"
+        },
+        {
+          "id": "keyboard",
+          "text": "Keyboard & Trackpad working?",
+          "subtext": "",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "physical_condition",
+      "title": "Physical Condition",
+      "subtitle": "Any damage?",
+      "type": "multi-select",
+      "options": [
+        {
+          "id": "screen_damage",
+          "label": "Broken Screen/Hinges",
+          "icon": "Laptop"
+        },
+        {
+          "id": "body_damage",
+          "label": "Heavy Dents/Cracks on Body",
+          "icon": "ShieldAlert"
+        },
+        {
+          "id": "battery_dead",
+          "label": "Battery Dead/Not Charging",
+          "icon": "Battery"
+        },
+        {
+          "id": "keys_missing",
+          "label": "Keys Missing/Broken",
+          "icon": "Keyboard"
+        }
+      ]
+    },
+    {
+      "id": "specs",
+      "title": "System Specs",
+      "subtitle": "Confirm configuration",
+      "type": "multi-select",
+      "options": [
+        {
+          "id": "charger_missing",
+          "label": "Original Charger Missing",
+          "icon": "Plug"
+        },
+        {
+          "id": "box_missing",
+          "label": "Original Box Missing",
+          "icon": "Box"
+        }
+      ]
+    }
+  ],
+  "camera": [
+    {
+      "id": "core_functionality",
+      "title": "Camera Condition Check",
+      "subtitle": "Let's check the basic functionality of your camera.",
+      "questions": [
+        {
+          "id": "power",
+          "text": "Does the camera turn on?",
+          "subtext": "Ensure the camera powers up and display is active.",
+          "type": "boolean"
+        },
+        {
+          "id": "lens_focus",
+          "text": "Does the lens autofocus work?",
+          "subtext": "Ensure the lens can focus on subjects correctly.",
+          "type": "boolean"
+        },
+        {
+          "id": "sensor_spots",
+          "text": "Are there any spots on the sensor?",
+          "subtext": "Spots visible in images at high aperture.",
+          "type": "boolean"
+        },
+        {
+          "id": "flash",
+          "text": "Is the built-in flash working?",
+          "subtext": "If applicable to your model.",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "physical_condition",
+      "title": "Physical Condition",
+      "subtitle": "Select the body's physical condition",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "No signs of usage, like new",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches, well maintained",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Visible scratches and minor dents",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "below_average",
+          "label": "Below Average",
+          "description": "Heavy dents, cracks, or missing rubber grips",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "screen_condition",
+      "title": "Screen/Viewfinder",
+      "subtitle": "Select the condition of the display/viewfinder",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "Clear display, no issues",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "cracked",
+          "label": "Cracked/Damaged",
+          "description": "Screen or viewfinder glass broken",
+          "icon": "AlertTriangle"
+        },
+        {
+          "id": "dead_pixels",
+          "label": "Dead Pixels/Lines",
+          "icon": "Grid"
+        }
+      ]
+    },
+    {
+      "id": "functional_issues",
+      "title": "Functional Problems",
+      "subtitle": "Select any issues your camera has (Check if applicable)",
+      "type": "multi-select-grid",
+      "options": [
+        {
+          "id": "buttons",
+          "label": "Buttons/Dial Not Working",
+          "icon": "MousePointer2"
+        },
+        {
+          "id": "card_slot",
+          "label": "Memory Card Slot Issue",
+          "icon": "CreditCard"
+        },
+        {
+          "id": "hdmi_usb",
+          "label": "HDMI/USB Port Damaged",
+          "icon": "Plug"
+        },
+        {
+          "id": "battery_door",
+          "label": "Battery Door Broken/Loose",
+          "icon": "Battery"
+        },
+        {
+          "id": "mode_dial",
+          "label": "Mode Dial Faulty",
+          "icon": "Settings"
+        },
+        {
+          "id": "mic_jack",
+          "label": "Mic/Audio Jack Not Working",
+          "icon": "Mic"
+        }
+      ]
+    },
+    {
+      "id": "device_details",
+      "title": "Accessories & Warranty",
+      "subtitle": "Please confirm what's included",
+      "type": "combined-step",
+      "sections": [
+        {
+          "id": "purchase_location",
+          "title": "Where was the device purchased?",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "india",
+              "label": "Purchased in India",
+              "icon": "MapPin"
+            },
+            {
+              "id": "global",
+              "label": "Purchased Globally",
+              "icon": "Globe"
+            }
+          ]
+        },
+        {
+          "id": "accessories",
+          "title": "Do you have the following?",
+          "type": "multi-select",
+          "options": [
+            {
+              "id": "battery",
+              "label": "Original Battery",
+              "icon": "Battery"
+            },
+            {
+              "id": "charger",
+              "label": "Original Charger",
+              "icon": "Plug"
+            },
+            {
+              "id": "lens_cap",
+              "label": "Lens Cap / Body Cap",
+              "icon": "Circle"
+            },
+            {
+              "id": "strap",
+              "label": "Neck/Shoulder Strap",
+              "icon": "Smartphone"
+            },
+            {
+              "id": "box",
+              "label": "Original Box",
+              "icon": "Box"
+            },
+            {
+              "id": "bill",
+              "label": "Original Bill with GST",
+              "icon": "FileText"
+            }
+          ]
+        },
+        {
+          "id": "warranty",
+          "title": "Warranty Period",
+          "type": "single-select",
+          "options": [
+            {
+              "id": "0_3_months",
+              "label": "0 - 3 Months",
+              "description": "Valid for 0 to 3 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "3_6_months",
+              "label": "3 - 6 Months",
+              "description": "Valid for 3 to 6 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "6_11_months",
+              "label": "6 - 11 Months",
+              "description": "Valid for 6 to 11 months",
+              "icon": "Clock"
+            },
+            {
+              "id": "no",
+              "label": "No Warranty",
+              "description": "Above 11 months or expired",
+              "icon": "XCircle"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "desktop": [
+    {
+      "id": "core_functionality",
+      "title": "Desktop Check",
+      "subtitle": "Functionality & Performance",
+      "questions": [
+        {
+          "id": "power",
+          "text": "Does it power on & boot?",
+          "subtext": "",
+          "type": "boolean"
+        },
+        {
+          "id": "display_output",
+          "text": "Video output working?",
+          "subtext": "HDMI/DP ports functioning.",
+          "type": "boolean"
+        },
+        {
+          "id": "ports",
+          "text": "All USB ports working?",
+          "subtext": "",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "physical_condition",
+      "title": "Physical Condition",
+      "subtitle": "Cabin / Body health",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "Like new cabinet",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Dents or major wear",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "below_average",
+          "label": "Damaged",
+          "description": "Cabinet broken or missing panels",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "device_details",
+      "title": "Accessories",
+      "subtitle": "Cables & Peripherals",
+      "type": "combined-step",
+      "sections": [
+        {
+          "id": "accessories",
+          "title": "Included Items",
+          "type": "multi-select",
+          "options": [
+            {
+              "id": "power_cable",
+              "label": "Power Cable",
+              "icon": "Plug"
+            },
+            {
+              "id": "keyboard_mouse",
+              "label": "Keyboard & Mouse",
+              "icon": "Keyboard"
+            },
+            {
+              "id": "bill",
+              "label": "Original Bill",
+              "icon": "FileText"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "earbuds": [
+    {
+      "id": "core_functionality",
+      "title": "Earbuds Check",
+      "subtitle": "Sound & Battery",
+      "questions": [
+        {
+          "id": "power",
+          "text": "Do both sides work?",
+          "subtext": "Left and Right audio clear.",
+          "type": "boolean"
+        },
+        {
+          "id": "charging",
+          "text": "Does case charge correctly?",
+          "subtext": "",
+          "type": "boolean"
+        },
+        {
+          "id": "anc",
+          "text": "Is ANC/Transparency working?",
+          "subtext": "If applicable.",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "physical_condition",
+      "title": "Physical Condition",
+      "subtitle": "Case & Buds health",
+      "type": "single-select",
+      "options": [
+        {
+          "id": "flawless",
+          "label": "Flawless",
+          "description": "No scratches",
+          "icon": "Sparkles"
+        },
+        {
+          "id": "good",
+          "label": "Good",
+          "description": "Minor scratches",
+          "icon": "Smile"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "description": "Visible dents/yellowing",
+          "icon": "MinusCircle"
+        },
+        {
+          "id": "damaged",
+          "label": "Damaged",
+          "description": "Buds or Case cracked",
+          "icon": "AlertTriangle"
+        }
+      ]
+    },
+    {
+      "id": "accessories",
+      "title": "What's included?",
+      "subtitle": "Original items",
+      "type": "multi-select",
+      "options": [
+        {
+          "id": "box",
+          "label": "Original Box",
+          "icon": "Box"
+        },
+        {
+          "id": "bill",
+          "label": "Original Bill",
+          "icon": "FileText"
+        },
+        {
+          "id": "charging_cable",
+          "label": "Original Cable",
+          "icon": "Plug"
+        }
+      ]
+    }
+  ]
+}

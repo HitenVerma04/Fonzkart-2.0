@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { backendGet, usesApi } from '@/lib/backend';
 import { Rider as PrismaRider, Brand as PrismaBrand, Model as PrismaModel, Variant as PrismaVariant, Order as PrismaOrder } from '@prisma/client';
 import { CATALOG_2026_MODELS, get2026ModelsForBrand, deduplicateModels, getModelIdentityKey } from '@/lib/catalog2026';
 
@@ -302,6 +303,7 @@ export const db = {
 
     // Brand Methods
     getBrands: async (category?: string) => {
+        if (usesApi('CATALOG')) return (await backendGet<Brand[]>('/api/catalog/brands', { category })) ?? [];
         let dbBrands: Brand[] = [];
         try {
             if (category) {
@@ -385,6 +387,7 @@ export const db = {
         }
     },
     getBrand: async (id: string) => {
+        if (usesApi('CATALOG')) return await backendGet<Brand>(`/api/catalog/brands/${encodeURIComponent(id)}`);
         return await prisma.brand.findUnique({ where: { id } });
     },
     removeCategoryFromBrand: async (id: string, category: string) => {
@@ -414,6 +417,7 @@ export const db = {
 
     // Model Methods
     getModels: async (brandId?: string, category?: string) => {
+        if (usesApi('CATALOG')) return (await backendGet<Model[]>('/api/catalog/models', { brandId, category })) ?? [];
         let dbModels: Model[] = [];
         try {
             const where: any = {};
@@ -528,6 +532,7 @@ export const db = {
         });
     },
     searchModels: async (query: string) => {
+        if (usesApi('CATALOG')) return (await backendGet<Model[]>('/api/catalog/models/search', { query })) ?? [];
         let dbResults: Model[] = [];
         try {
             dbResults = await prisma.model.findMany({
@@ -587,6 +592,7 @@ export const db = {
 
     // Variant Methods
     getVariants: async (modelId?: string) => {
+        if (usesApi('CATALOG')) return (await backendGet<Variant[]>('/api/catalog/variants', { modelId })) ?? [];
         let dbVariants: Variant[] = [];
         try {
             if (modelId) {

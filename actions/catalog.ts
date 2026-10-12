@@ -1,6 +1,7 @@
 'use server';
 
-import { db } from '@/lib/store';
+import { db, type Model, type Variant } from '@/lib/store';
+import { backendGet, usesApi } from '@/lib/backend';
 
 export async function fetchBrands(category?: string) {
     return await db.getBrands(category);
@@ -21,6 +22,7 @@ export async function fetchVariants(modelId: string, category: string = 'smartph
 }
 
 export async function findVariantByName(deviceName: string) {
+    if (usesApi('CATALOG')) return await backendGet<Variant & { model: Model }>('/api/catalog/variants/lookup', { deviceName });
     // deviceName is usually "Model Name (Variant Name)"
     const match = deviceName.match(/(.+)\s\((.+)\)/);
     if (!match) return null;

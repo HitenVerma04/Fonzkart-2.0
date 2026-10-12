@@ -5,3 +5,5 @@ import './logging.test';
 import './orders.test';
 import './notifications.test';
 import './catalog.test';
+import './questionnaire.test';
+import './backend-switch.test';
