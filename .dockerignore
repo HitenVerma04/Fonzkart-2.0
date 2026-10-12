@@ -28,6 +28,8 @@ imgs/
 coolify/
 # Spring Boot backend is built and deployed separately (see backend/README.md)
 backend/
+# The phone apps (Expo workspace) are built separately (see mobile/README.md)
+mobile/
 coolify_*.js
 ssh_*.js
 test-*.js

@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Fonzkart Admin",
+    "slug": "fonzkart-admin",
+    "scheme": "fonzkart-admin",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "in.fonzkart.admin",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#111827"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "in.fonzkart.admin",
+      "supportsTablet": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 240,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ]
+  }
+}

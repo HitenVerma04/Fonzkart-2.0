@@ -65,7 +65,10 @@ scripts/local/.local-secret
 /notifications-fix/
 /catalog-fix/
 /deploy/originals/
-/mobile/
+# mobile/: the app code is tracked; internal plans, quotes and client reports are not.
+/mobile/*.pdf
+/mobile/*.md
+!/mobile/README.md
 /.claude/
 /backend/target/
 *.mutbak
