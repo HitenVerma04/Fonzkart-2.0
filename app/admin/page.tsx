@@ -92,7 +92,7 @@ export default async function AdminDashboard() {
                         </div>
                         <p className="text-sm text-muted-foreground">Manage brands, models, and pricing for gaming consoles.</p>
                     </Link>
-                    <Link href="/admin/category/tv" className="p-6 bg-card dark:bg-white/[0.03] dark:backdrop-blur-xl border border-border dark:border-white/10 rounded-xl hover:bg-muted/50 dark:hover:bg-white/[0.06] hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(19,226,91,0.2)] transition-all duration-300 flex flex-col gap-2">
+                    <Link href="/admin/category/smarttv" className="p-6 bg-card dark:bg-white/[0.03] dark:backdrop-blur-xl border border-border dark:border-white/10 rounded-xl hover:bg-muted/50 dark:hover:bg-white/[0.06] hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(19,226,91,0.2)] transition-all duration-300 flex flex-col gap-2">
                         <div className="flex items-center gap-2 font-semibold">
                             <Tv className="w-5 h-5 text-emerald-600" />
                             Manage Smart TVs
