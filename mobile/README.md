@@ -4,12 +4,15 @@ Three Android/iOS apps built with React Native + Expo (SDK 57, TypeScript, Expo 
 
 | Folder | App | Android package | Status |
 |---|---|---|---|
-| `apps/customer` | Fonzkart | `in.fonzkart.customer` | Browse and search the catalog; device check (website questionnaire), final offer from the server price rules, pickup pincode check; sign up with email code, sign in (email or phone), password reset, account |
-| `apps/partner` | Fonzkart Partner | `in.fonzkart.partner` | Branded welcome screen with server status |
-| `apps/admin` | Fonzkart Admin | `in.fonzkart.admin` | Branded welcome screen with server status |
-| `packages/api` | `@fonzkart/api` | | Backend client (Bearer token), catalog, questionnaire, price, pincode and auth endpoints; TanStack Query hooks; `SessionProvider` (token storage is passed in by each app) |
-| `packages/core` | `@fonzkart/core` | | Server addresses, picture URLs, ₹ formatting, category list, questionnaire rules (as `components/sell/ChecklistWizard.tsx`), pincode input |
-| `packages/ui` | `@fonzkart/ui` | | Theme, logo (from `brand/`), tiles, search field, buttons, text fields, answer cards, notices, loading/error states |
+| `apps/customer` | Fonzkart | `in.fonzkart.customer` | Browse and search the catalog; device check (website questionnaire); final offer = the server's quote; pincode check and service-area request; booking (address, map pin, date and slot, payment method); my orders with the tracker; inbox; sign up with email code, sign in (email or phone), password reset; account with delete-my-account |
+| `apps/partner` | Fonzkart Partner | `in.fonzkart.partner` | Rider mode (phone login): jobs, re-check with photos and IMEI scan, revised price, pickup, mark paid, inbox. Partner mode: order queue, assign executives, team, hub handover, payouts, inbox |
+| `apps/admin` | Fonzkart Admin | `in.fonzkart.admin` | Menu by role (super admin, admin, zonal head, RM): orders and price approval, partners, executives, cities, zonal heads, users, RM dashboard, pricing rules, catalog editing with images, home page banner prices, email, inbox |
+| `packages/api` | `@fonzkart/api` | | Backend client (Bearer token, uploads), all endpoints the apps use; TanStack Query hooks; `SessionProvider` (token storage is passed in by each app) |
+| `packages/core` | `@fonzkart/core` | | Server addresses, picture URLs, ₹ formatting, categories, questionnaire rules, booking rules, order status (a copy of the website's `lib/order-status.ts`, checked by a test) |
+| `packages/ui` | `@fonzkart/ui` | | Theme, logo (from `brand/`), tiles, fields, answer cards, order cards and tracker, layout pieces, prompts, inbox |
+| `packages/staff` | `@fonzkart/staff` | | Screens shared by the Partner and Admin apps (order detail, team manager) |
+
+Every app refreshes open order screens every 20 seconds and when it comes back on screen, so a change made on the website or in another app shows up there.
 
 ## Server addresses
 
