@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import in.fonzkart.backend.order.dto.AppOrderDto;
 import in.fonzkart.backend.order.dto.AppOrderDto.Location;
 import in.fonzkart.backend.order.dto.AppOrderDto.UserSummary;
-import in.fonzkart.backend.order.entity.OrderRecord;
+import in.fonzkart.backend.order.entity.OrderColumns;
 import in.fonzkart.backend.shared.time.JsDates;
 import in.fonzkart.backend.shared.web.ActionException;
 import in.fonzkart.backend.user.entity.User;
@@ -25,7 +25,7 @@ public class AppOrderMapper {
         this.mapper = mapper;
     }
 
-    public AppOrderDto toAppOrder(OrderRecord o, User user) {
+    public AppOrderDto toAppOrder(OrderColumns o, User user) {
         // try { answersObj = o.answers ? JSON.parse(o.answers) : null } catch { answersObj = null }
         JsonNode answers = null;
         if (o.getAnswers() != null && !o.getAnswers().isEmpty()) {
@@ -55,7 +55,7 @@ public class AppOrderMapper {
                 && !o.getLocationLat().isNaN() && !o.getLocationLng().isNaN()
                 ? new Location(o.getLocationLat(), o.getLocationLng()) : null;
 
-        return new AppOrderDto(o.getId(), o.getOrderNumber(), o.getUserId(),
+        return new AppOrderDto(o.getId(), o.orderNumberValue(), o.getUserId(),
                 user == null ? null : new UserSummary(user.getId(), user.getName(), user.getEmail(), user.getPhone()),
                 o.getDevice(), o.getPrice(), JsDates.toIsoString(o.getCreatedAt()), o.getStatus(), o.getAddress(),
                 o.getPincode(), location, o.getRiderId(), o.getPartnerId(), answers, riderAnswers,

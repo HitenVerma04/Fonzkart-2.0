@@ -26,6 +26,11 @@ public interface RiderRepository extends JpaRepository<Rider, String> {
 
     List<Rider> findByPartnerId(String partnerId);
 
+    /** app/admin/orders/page.tsx: findMany({ (where: { partnerId: { in } },) orderBy: { name: 'asc' } }) */
+    List<Rider> findAllByOrderByNameAsc();
+
+    List<Rider> findByPartnerIdInOrderByNameAsc(Collection<String> partnerIds);
+
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Rider r SET r.partnerId = :partnerId, r.updatedAt = :now WHERE r.id = :id")

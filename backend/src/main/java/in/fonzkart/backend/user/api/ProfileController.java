@@ -2,9 +2,13 @@ package in.fonzkart.backend.user.api;
 
 import in.fonzkart.backend.auth.session.SessionService;
 import in.fonzkart.backend.user.dto.UserViews.Profile;
+import in.fonzkart.backend.user.service.AccountDeletionService;
 import in.fonzkart.backend.user.service.ProfileService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,10 +25,12 @@ public class ProfileController {
 
     private final ProfileService profiles;
     private final SessionService sessions;
+    private final AccountDeletionService deletion;
 
-    public ProfileController(ProfileService profiles, SessionService sessions) {
+    public ProfileController(ProfileService profiles, SessionService sessions, AccountDeletionService deletion) {
         this.profiles = profiles;
         this.sessions = sessions;
+        this.deletion = deletion;
     }
 
     /** Profile page data; 401 where the page redirects to /login. */
@@ -38,5 +44,15 @@ public class ProfileController {
     public Map<String, Object> update(HttpServletRequest request, @RequestBody(required = false) UpdateProfileRequest r) {
         r = r == null ? new UpdateProfileRequest(null, null) : r;
         return profiles.updateProfile(sessions.getSession(request), r.name(), r.phone());
+    }
+
+    /**
+     * Delete my account (store requirement): anonymises a customer account ({@link AccountDeletionService}) and clears
+     * the session cookie. Staff accounts: 403.
+     */
+    @DeleteMapping
+    public ResponseEntity<Map<String, Object>> delete(HttpServletRequest request) {
+        Map<String, Object> body = deletion.deleteMyAccount(sessions.getSession(request));
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, sessions.logout().toString()).body(body);
     }
 }

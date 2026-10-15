@@ -37,6 +37,12 @@ spring:
     init:
       mode: never
 
+  # Image uploads (UploadController): 10 MB per file.
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+
 server:
   port: ${PORT:8080}
   shutdown: graceful
@@ -52,6 +58,10 @@ management:
         enabled: true
 
 fonzkart:
+  # Where uploaded images are kept; in Coolify a persistent volume (see README "Deploy").
+  uploads:
+    dir: ${UPLOAD_DIR:uploads}
+
   auth:
     # Same secret as the Next.js app (lib/session.ts) so session cookies are interchangeable.
     secret: ${AUTH_SECRET:}

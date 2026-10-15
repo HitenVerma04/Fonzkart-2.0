@@ -135,6 +135,14 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("UPDATE User u SET u.pincodes = :pincodes, u.updatedAt = :now WHERE u.id = :id")
     int updatePincodesById(@Param("id") String id, @Param("pincodes") String[] pincodes, @Param("now") LocalDateTime now);
 
+    /** Account deletion: the person's details are replaced; the row stays so their orders stay. */
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE User u SET u.name = :name, u.email = :email, u.phone = NULL, u.passwordHash = :hash, "
+            + "u.resetToken = NULL, u.resetTokenExpiry = NULL, u.updatedAt = :now WHERE u.id = :id")
+    int anonymiseById(@Param("id") String id, @Param("name") String name, @Param("email") String email,
+                      @Param("hash") String passwordHash, @Param("now") LocalDateTime now);
+
     /** app/admin/cities/actions.ts → removePartnerFromCity: { cityId: null, pincodes: [] } */
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)

@@ -1,0 +1,4853 @@
+{
+ "steps": [
+  {
+   "step": "super:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "admin:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "zh1:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "rm:signin",
+   "outcome": {
+    "redirect": "/"
+   }
+  },
+  {
+   "step": "p1:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "p2:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "cust:signin",
+   "outcome": {
+    "redirect": "/"
+   }
+  },
+  {
+   "step": "user:signin",
+   "outcome": {
+    "redirect": "/"
+   }
+  },
+  {
+   "step": "r1:loginExecutive",
+   "outcome": {
+    "redirect": "/admin/orders"
+   }
+  },
+  {
+   "step": "r2:loginExecutive",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "needsOnboarding": true,
+     "id": "<rider:+917000000002>"
+    }
+   }
+  },
+  {
+   "step": "r2:onboardExecutive",
+   "outcome": {
+    "redirect": "/admin/orders"
+   }
+  },
+  {
+   "step": "anon:placeOrder",
+   "outcome": {
+    "thrown": "Unauthorized"
+   }
+  },
+  {
+   "step": "cust:placeOrder",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "cust:placeOrder",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "user:placeOrder",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "cust:getUserOrders",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<order:#102>",
+      "orderNumber": 102,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Galaxy S21 (8GB + 128GB)",
+      "price": 20000,
+      "date": "<date>",
+      "status": "assigned",
+      "address": "2 Mount Road, Chennai",
+      "pincode": "600002",
+      "location": null,
+      "riderId": "<rider:+917000000001>",
+      "partnerId": null,
+      "answers": null,
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": {
+       "name": "Ravi",
+       "phone": "+917000000001"
+      }
+     },
+     {
+      "id": "<order:#2>",
+      "orderNumber": 2,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Galaxy S21 (8GB + 128GB)",
+      "price": 11750,
+      "date": "<date>",
+      "status": "Pending Pickup",
+      "address": "4 Temple St, Madurai",
+      "pincode": "625001",
+      "location": null,
+      "riderId": null,
+      "partnerId": "<user:p2@example.test>",
+      "answers": {
+       "physical_condition": "average",
+       "body_condition": "good",
+       "functional_issues": [
+        "wifi",
+        "battery"
+       ],
+       "accessories": [
+        "charger"
+       ],
+       "phone": "9000000001",
+       "paymentMethod": "amazon_voucher"
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": null
+     },
+     {
+      "id": "<order:#1>",
+      "orderNumber": 1,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "iPhone 13 (128GB)",
+      "price": 25966,
+      "date": "<date>",
+      "status": "Pending Pickup",
+      "address": "9 Beach Rd, Chennai",
+      "pincode": "600001",
+      "location": {
+       "lat": 13.05,
+       "lng": 80.27
+      },
+      "riderId": null,
+      "partnerId": "<user:p1@example.test>",
+      "answers": {
+       "physical_condition": "good",
+       "body_condition": "flawless",
+       "functional_issues": [],
+       "accessories": [
+        "charger",
+        "box",
+        "bill"
+       ],
+       "warranty": "0_3_months",
+       "phone": "9000000001",
+       "scheduledSlot": "10:00 AM - 02:00 PM",
+       "isExpress": false,
+       "paymentMethod": "upi",
+       "upiId": "cust@upi"
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": null
+     },
+     {
+      "id": "<order:#106>",
+      "orderNumber": 106,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Watch Series 8",
+      "price": 8000,
+      "date": "<date>",
+      "status": "picked_up",
+      "address": "6 Lake Rd",
+      "pincode": null,
+      "location": null,
+      "riderId": "<rider:+917000000003>",
+      "partnerId": null,
+      "answers": "just a string",
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": {
+       "name": "Arun",
+       "phone": "+917000000003"
+      }
+     },
+     {
+      "id": "<order:#105>",
+      "orderNumber": 105,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "OnePlus 12 (12GB + 256GB)",
+      "price": 35000,
+      "date": "<date>",
+      "status": "completed",
+      "address": "5 Market St, Madurai",
+      "pincode": "625001",
+      "location": null,
+      "riderId": null,
+      "partnerId": null,
+      "answers": {
+       "hubStatus": ""
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": "pending",
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": null
+     },
+     {
+      "id": "<order:#104>",
+      "orderNumber": 104,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Mi 11X (8GB + 128GB)",
+      "price": 9000,
+      "date": "<date>",
+      "status": "Completed",
+      "address": "4 Nowhere",
+      "pincode": "999999",
+      "location": null,
+      "riderId": null,
+      "partnerId": null,
+      "answers": {
+       "failLog": []
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": null
+     },
+     {
+      "id": "<order:#103>",
+      "orderNumber": 103,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Pixel 8 (128GB)",
+      "price": 25000,
+      "date": "<date>",
+      "status": "completed",
+      "address": "3 Temple St, Madurai",
+      "pincode": "625001",
+      "location": {
+       "lat": 9.9252,
+       "lng": 78.1198
+      },
+      "riderId": "<rider:+917000000002>",
+      "partnerId": null,
+      "answers": null,
+      "riderAnswers": {
+       "answers": {
+        "physical_condition": "good"
+       },
+       "notes": "ok"
+      },
+      "verificationImages": [
+       "a.jpg",
+       "b.jpg"
+      ],
+      "offeredPrice": 24000,
+      "hubStatus": "pending",
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": {
+       "name": "Suresh",
+       "phone": "+917000000002"
+      }
+     },
+     {
+      "id": "<order:#101>",
+      "orderNumber": 101,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "iPhone 13 (128GB)",
+      "price": 30000,
+      "date": "<date>",
+      "status": "Pending Pickup",
+      "address": "1 Anna Salai, Chennai",
+      "pincode": "600001",
+      "location": {
+       "lat": 12.9716,
+       "lng": 77.5946
+      },
+      "riderId": null,
+      "partnerId": null,
+      "answers": {
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Hub A"
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": "handed_over",
+      "hubHandoverAt": "<date>",
+      "hubReceivedBy": "Hub A",
+      "executive": null
+     }
+    ]
+   }
+  },
+  {
+   "step": "anon:getUserOrders",
+   "outcome": {
+    "returned": []
+   }
+  },
+  {
+   "step": "super:page:orders",
+   "outcome": {
+    "returned": {
+     "initialOrders": [
+      {
+       "id": "<order:#102>",
+       "orderNumber": 102,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 20000,
+       "date": "<date>",
+       "status": "assigned",
+       "address": "2 Mount Road, Chennai",
+       "pincode": "600002",
+       "location": null,
+       "riderId": "<rider:+917000000001>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#3>",
+       "orderNumber": 3,
+       "userId": "<user:user@example.test>",
+       "user": {
+        "id": "<user:user@example.test>",
+        "name": "Plain User",
+        "email": "user@example.test",
+        "phone": "+917000000009"
+       },
+       "device": "Galaxy S21 (8GB + 256GB)",
+       "price": 6650,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "Far away",
+       "pincode": "111111",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "physical_condition": "below_average",
+        "body_condition": "average",
+        "accessories": [],
+        "phone": "9000000002"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#2>",
+       "orderNumber": 2,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 11750,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "4 Temple St, Madurai",
+       "pincode": "625001",
+       "location": null,
+       "riderId": null,
+       "partnerId": "<user:p2@example.test>",
+       "answers": {
+        "physical_condition": "average",
+        "body_condition": "good",
+        "functional_issues": [
+         "wifi",
+         "battery"
+        ],
+        "accessories": [
+         "charger"
+        ],
+        "phone": "9000000001",
+        "paymentMethod": "amazon_voucher"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#1>",
+       "orderNumber": 1,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 25966,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "9 Beach Rd, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 13.05,
+        "lng": 80.27
+       },
+       "riderId": null,
+       "partnerId": "<user:p1@example.test>",
+       "answers": {
+        "physical_condition": "good",
+        "body_condition": "flawless",
+        "functional_issues": [],
+        "accessories": [
+         "charger",
+         "box",
+         "bill"
+        ],
+        "warranty": "0_3_months",
+        "phone": "9000000001",
+        "scheduledSlot": "10:00 AM - 02:00 PM",
+        "isExpress": false,
+        "paymentMethod": "upi",
+        "upiId": "cust@upi"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#106>",
+       "orderNumber": 106,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Watch Series 8",
+       "price": 8000,
+       "date": "<date>",
+       "status": "picked_up",
+       "address": "6 Lake Rd",
+       "pincode": null,
+       "location": null,
+       "riderId": "<rider:+917000000003>",
+       "partnerId": null,
+       "answers": "just a string",
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#105>",
+       "orderNumber": 105,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "OnePlus 12 (12GB + 256GB)",
+       "price": 35000,
+       "date": "<date>",
+       "status": "completed",
+       "address": "5 Market St, Madurai",
+       "pincode": "625001",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": ""
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "pending",
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#104>",
+       "orderNumber": 104,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Mi 11X (8GB + 128GB)",
+       "price": 9000,
+       "date": "<date>",
+       "status": "Completed",
+       "address": "4 Nowhere",
+       "pincode": "999999",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "failLog": []
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#103>",
+       "orderNumber": 103,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Pixel 8 (128GB)",
+       "price": 25000,
+       "date": "<date>",
+       "status": "completed",
+       "address": "3 Temple St, Madurai",
+       "pincode": "625001",
+       "location": {
+        "lat": 9.9252,
+        "lng": 78.1198
+       },
+       "riderId": "<rider:+917000000002>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": {
+        "answers": {
+         "physical_condition": "good"
+        },
+        "notes": "ok"
+       },
+       "verificationImages": [
+        "a.jpg",
+        "b.jpg"
+       ],
+       "offeredPrice": 24000,
+       "hubStatus": "pending",
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#101>",
+       "orderNumber": 101,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 30000,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "1 Anna Salai, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+       },
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": "handed_over",
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Hub A"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Hub A"
+      }
+     ],
+     "riders": [
+      {
+       "id": "<rider:+917000000003>",
+       "name": "Arun",
+       "phone": "+917000000003",
+       "email": null,
+       "status": "available",
+       "partnerId": null,
+       "partner": null
+      },
+      {
+       "id": "<rider:+917000000006>",
+       "name": "Fe Two Rider",
+       "phone": "+917000000006",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p3@example.test>",
+       "partner": {
+        "name": "Partner Three",
+        "pincodes": []
+       }
+      },
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000005>",
+       "name": "Mani",
+       "phone": "+917000000005",
+       "email": null,
+       "status": "available",
+       "partnerId": null,
+       "partner": null
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000002>",
+       "name": "Suresh",
+       "phone": "+917000000002",
+       "email": null,
+       "status": "busy",
+       "partnerId": "<user:p2@example.test>",
+       "partner": {
+        "name": "Partner Two",
+        "pincodes": [
+         "625001"
+        ]
+       }
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "phone": "+918000000001",
+       "email": "p1@example.test",
+       "pincodes": [
+        "600001",
+        "600002"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": true
+      },
+      {
+       "id": "<user:p3@example.test>",
+       "name": "Partner Three",
+       "phone": null,
+       "email": "p3@example.test",
+       "pincodes": [],
+       "relationshipManager": null,
+       "routable": true
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "phone": "+918000000002",
+       "email": "p2@example.test",
+       "pincodes": [
+        "625001"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": true
+      }
+     ],
+     "permissions": {
+      "assignPartner": true,
+      "assignRider": true,
+      "approvePrice": true,
+      "manage": true,
+      "bulk": true,
+      "delete": true
+     },
+     "userRole": "SUPER_ADMIN"
+    }
+   }
+  },
+  {
+   "step": "rm:page:orders",
+   "outcome": {
+    "returned": {
+     "initialOrders": [
+      {
+       "id": "<order:#102>",
+       "orderNumber": 102,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 20000,
+       "date": "<date>",
+       "status": "assigned",
+       "address": "2 Mount Road, Chennai",
+       "pincode": "600002",
+       "location": null,
+       "riderId": "<rider:+917000000001>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#3>",
+       "orderNumber": 3,
+       "userId": "<user:user@example.test>",
+       "user": {
+        "id": "<user:user@example.test>",
+        "name": "Plain User",
+        "email": "user@example.test",
+        "phone": "+917000000009"
+       },
+       "device": "Galaxy S21 (8GB + 256GB)",
+       "price": 6650,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "Far away",
+       "pincode": "111111",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "physical_condition": "below_average",
+        "body_condition": "average",
+        "accessories": [],
+        "phone": "9000000002"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#2>",
+       "orderNumber": 2,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 11750,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "4 Temple St, Madurai",
+       "pincode": "625001",
+       "location": null,
+       "riderId": null,
+       "partnerId": "<user:p2@example.test>",
+       "answers": {
+        "physical_condition": "average",
+        "body_condition": "good",
+        "functional_issues": [
+         "wifi",
+         "battery"
+        ],
+        "accessories": [
+         "charger"
+        ],
+        "phone": "9000000001",
+        "paymentMethod": "amazon_voucher"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#1>",
+       "orderNumber": 1,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 25966,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "9 Beach Rd, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 13.05,
+        "lng": 80.27
+       },
+       "riderId": null,
+       "partnerId": "<user:p1@example.test>",
+       "answers": {
+        "physical_condition": "good",
+        "body_condition": "flawless",
+        "functional_issues": [],
+        "accessories": [
+         "charger",
+         "box",
+         "bill"
+        ],
+        "warranty": "0_3_months",
+        "phone": "9000000001",
+        "scheduledSlot": "10:00 AM - 02:00 PM",
+        "isExpress": false,
+        "paymentMethod": "upi",
+        "upiId": "cust@upi"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#106>",
+       "orderNumber": 106,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Watch Series 8",
+       "price": 8000,
+       "date": "<date>",
+       "status": "picked_up",
+       "address": "6 Lake Rd",
+       "pincode": null,
+       "location": null,
+       "riderId": "<rider:+917000000003>",
+       "partnerId": null,
+       "answers": "just a string",
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#105>",
+       "orderNumber": 105,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "OnePlus 12 (12GB + 256GB)",
+       "price": 35000,
+       "date": "<date>",
+       "status": "completed",
+       "address": "5 Market St, Madurai",
+       "pincode": "625001",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": ""
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "pending",
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#104>",
+       "orderNumber": 104,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Mi 11X (8GB + 128GB)",
+       "price": 9000,
+       "date": "<date>",
+       "status": "Completed",
+       "address": "4 Nowhere",
+       "pincode": "999999",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "failLog": []
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#103>",
+       "orderNumber": 103,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Pixel 8 (128GB)",
+       "price": 25000,
+       "date": "<date>",
+       "status": "completed",
+       "address": "3 Temple St, Madurai",
+       "pincode": "625001",
+       "location": {
+        "lat": 9.9252,
+        "lng": 78.1198
+       },
+       "riderId": "<rider:+917000000002>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": {
+        "answers": {
+         "physical_condition": "good"
+        },
+        "notes": "ok"
+       },
+       "verificationImages": [
+        "a.jpg",
+        "b.jpg"
+       ],
+       "offeredPrice": 24000,
+       "hubStatus": "pending",
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#101>",
+       "orderNumber": 101,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 30000,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "1 Anna Salai, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+       },
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": "handed_over",
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Hub A"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Hub A"
+      }
+     ],
+     "riders": [
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000002>",
+       "name": "Suresh",
+       "phone": "+917000000002",
+       "email": null,
+       "status": "busy",
+       "partnerId": "<user:p2@example.test>",
+       "partner": {
+        "name": "Partner Two",
+        "pincodes": [
+         "625001"
+        ]
+       }
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "phone": "+918000000001",
+       "email": "p1@example.test",
+       "pincodes": [
+        "600001",
+        "600002"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": true
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "phone": "+918000000002",
+       "email": "p2@example.test",
+       "pincodes": [
+        "625001"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": true
+      }
+     ],
+     "permissions": {
+      "assignPartner": true,
+      "assignRider": true,
+      "approvePrice": true,
+      "manage": true,
+      "bulk": true,
+      "delete": false
+     },
+     "userRole": "RELATIONSHIP_MANAGER"
+    }
+   }
+  },
+  {
+   "step": "p1:page:orders",
+   "outcome": {
+    "returned": {
+     "initialOrders": [
+      {
+       "id": "<order:#102>",
+       "orderNumber": 102,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 20000,
+       "date": "<date>",
+       "status": "assigned",
+       "address": "2 Mount Road, Chennai",
+       "pincode": "600002",
+       "location": null,
+       "riderId": "<rider:+917000000001>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#1>",
+       "orderNumber": 1,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 25966,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "9 Beach Rd, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 13.05,
+        "lng": 80.27
+       },
+       "riderId": null,
+       "partnerId": "<user:p1@example.test>",
+       "answers": {
+        "physical_condition": "good",
+        "body_condition": "flawless",
+        "functional_issues": [],
+        "accessories": [
+         "charger",
+         "box",
+         "bill"
+        ],
+        "warranty": "0_3_months",
+        "phone": "9000000001",
+        "scheduledSlot": "10:00 AM - 02:00 PM",
+        "isExpress": false,
+        "paymentMethod": "upi",
+        "upiId": "cust@upi"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#101>",
+       "orderNumber": 101,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 30000,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "1 Anna Salai, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+       },
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": "handed_over",
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Hub A"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Hub A"
+      }
+     ],
+     "riders": [
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "phone": "+918000000001",
+       "email": "p1@example.test",
+       "pincodes": [
+        "600001",
+        "600002"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": false
+      }
+     ],
+     "permissions": {
+      "assignPartner": false,
+      "assignRider": true,
+      "approvePrice": true,
+      "manage": true,
+      "bulk": false,
+      "delete": false
+     },
+     "userRole": "PARTNER"
+    }
+   }
+  },
+  {
+   "step": "p2:page:orders",
+   "outcome": {
+    "returned": {
+     "initialOrders": [
+      {
+       "id": "<order:#2>",
+       "orderNumber": 2,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 11750,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "4 Temple St, Madurai",
+       "pincode": "625001",
+       "location": null,
+       "riderId": null,
+       "partnerId": "<user:p2@example.test>",
+       "answers": {
+        "physical_condition": "average",
+        "body_condition": "good",
+        "functional_issues": [
+         "wifi",
+         "battery"
+        ],
+        "accessories": [
+         "charger"
+        ],
+        "phone": "9000000001",
+        "paymentMethod": "amazon_voucher"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#105>",
+       "orderNumber": 105,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "OnePlus 12 (12GB + 256GB)",
+       "price": 35000,
+       "date": "<date>",
+       "status": "completed",
+       "address": "5 Market St, Madurai",
+       "pincode": "625001",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": ""
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "pending",
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#103>",
+       "orderNumber": 103,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Pixel 8 (128GB)",
+       "price": 25000,
+       "date": "<date>",
+       "status": "completed",
+       "address": "3 Temple St, Madurai",
+       "pincode": "625001",
+       "location": {
+        "lat": 9.9252,
+        "lng": 78.1198
+       },
+       "riderId": "<rider:+917000000002>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": {
+        "answers": {
+         "physical_condition": "good"
+        },
+        "notes": "ok"
+       },
+       "verificationImages": [
+        "a.jpg",
+        "b.jpg"
+       ],
+       "offeredPrice": 24000,
+       "hubStatus": "pending",
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      }
+     ],
+     "riders": [
+      {
+       "id": "<rider:+917000000002>",
+       "name": "Suresh",
+       "phone": "+917000000002",
+       "email": null,
+       "status": "busy",
+       "partnerId": "<user:p2@example.test>",
+       "partner": {
+        "name": "Partner Two",
+        "pincodes": [
+         "625001"
+        ]
+       }
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "phone": "+918000000002",
+       "email": "p2@example.test",
+       "pincodes": [
+        "625001"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": false
+      }
+     ],
+     "permissions": {
+      "assignPartner": false,
+      "assignRider": true,
+      "approvePrice": true,
+      "manage": true,
+      "bulk": false,
+      "delete": false
+     },
+     "userRole": "PARTNER"
+    }
+   }
+  },
+  {
+   "step": "zh1:page:orders",
+   "outcome": {
+    "returned": {
+     "initialOrders": [
+      {
+       "id": "<order:#102>",
+       "orderNumber": 102,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 20000,
+       "date": "<date>",
+       "status": "assigned",
+       "address": "2 Mount Road, Chennai",
+       "pincode": "600002",
+       "location": null,
+       "riderId": "<rider:+917000000001>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#1>",
+       "orderNumber": 1,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 25966,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "9 Beach Rd, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 13.05,
+        "lng": 80.27
+       },
+       "riderId": null,
+       "partnerId": "<user:p1@example.test>",
+       "answers": {
+        "physical_condition": "good",
+        "body_condition": "flawless",
+        "functional_issues": [],
+        "accessories": [
+         "charger",
+         "box",
+         "bill"
+        ],
+        "warranty": "0_3_months",
+        "phone": "9000000001",
+        "scheduledSlot": "10:00 AM - 02:00 PM",
+        "isExpress": false,
+        "paymentMethod": "upi",
+        "upiId": "cust@upi"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#101>",
+       "orderNumber": 101,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 30000,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "1 Anna Salai, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+       },
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": "handed_over",
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Hub A"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Hub A"
+      }
+     ],
+     "riders": [
+      {
+       "id": "<rider:+917000000006>",
+       "name": "Fe Two Rider",
+       "phone": "+917000000006",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p3@example.test>",
+       "partner": {
+        "name": "Partner Three",
+        "pincodes": []
+       }
+      },
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "phone": "+918000000001",
+       "email": "p1@example.test",
+       "pincodes": [
+        "600001",
+        "600002"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": true
+      },
+      {
+       "id": "<user:p3@example.test>",
+       "name": "Partner Three",
+       "phone": null,
+       "email": "p3@example.test",
+       "pincodes": [],
+       "relationshipManager": null,
+       "routable": true
+      }
+     ],
+     "permissions": {
+      "assignPartner": true,
+      "assignRider": true,
+      "approvePrice": true,
+      "manage": true,
+      "bulk": true,
+      "delete": true
+     },
+     "userRole": "ZONAL_HEAD"
+    }
+   }
+  },
+  {
+   "step": "user:page:orders",
+   "outcome": {
+    "denied": true
+   }
+  },
+  {
+   "step": "rm:route:unassignedCount",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "count": 5
+     }
+    }
+   }
+  },
+  {
+   "step": "p1:route:unassignedCount",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "count": 2
+     }
+    }
+   }
+  },
+  {
+   "step": "cust:route:unassignedCount",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "count": 0
+     }
+    }
+   }
+  },
+  {
+   "step": "anon:route:unassignedCount",
+   "outcome": {
+    "returned": {
+     "status": 401,
+     "body": {
+      "error": "Unauthorized"
+     }
+    }
+   }
+  },
+  {
+   "step": "p2:assignPartner",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "rm:assignPartner",
+   "outcome": {
+    "thrown": "Invalid: Not a partner"
+   }
+  },
+  {
+   "step": "rm:assignPartner",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "changed": true
+    }
+   }
+  },
+  {
+   "step": "rm:assignPartner",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "changed": false
+    }
+   }
+  },
+  {
+   "step": "p1:assignRider",
+   "outcome": {
+    "thrown": "Forbidden: Outside your partners and executives"
+   }
+  },
+  {
+   "step": "p2:assignRider",
+   "outcome": {
+    "thrown": "Forbidden: Outside your orders"
+   }
+  },
+  {
+   "step": "p1:assignRider",
+   "outcome": {
+    "thrown": "Invalid: Executive not found"
+   }
+  },
+  {
+   "step": "p1:assignRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "p1:assignRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "p2:assignRider",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "p1:assignRider",
+   "outcome": {
+    "thrown": "Order not found"
+   }
+  },
+  {
+   "step": "r1:getExecutiveOrders",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<order:#102>",
+      "orderNumber": 102,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Galaxy S21 (8GB + 128GB)",
+      "price": 20000,
+      "date": "<date>",
+      "status": "assigned",
+      "address": "2 Mount Road, Chennai",
+      "pincode": "600002",
+      "location": null,
+      "riderId": "<rider:+917000000001>",
+      "partnerId": null,
+      "answers": null,
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null
+     },
+     {
+      "id": "<order:#3>",
+      "orderNumber": 3,
+      "userId": "<user:user@example.test>",
+      "user": {
+       "id": "<user:user@example.test>",
+       "name": "Plain User",
+       "email": "user@example.test",
+       "phone": "+917000000009"
+      },
+      "device": "Galaxy S21 (8GB + 256GB)",
+      "price": 6650,
+      "date": "<date>",
+      "status": "assigned",
+      "address": "Far away",
+      "pincode": "111111",
+      "location": null,
+      "riderId": "<rider:+917000000001>",
+      "partnerId": "<user:p1@example.test>",
+      "answers": {
+       "physical_condition": "below_average",
+       "body_condition": "average",
+       "accessories": [],
+       "phone": "9000000002",
+       "routingLog": [
+        {
+         "date": "<date>",
+         "partnerId": "<user:p1@example.test>",
+         "previousPartnerId": null,
+         "byRole": "RELATIONSHIP_MANAGER",
+         "byId": "<user:rm@example.test>"
+        }
+       ]
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null
+     },
+     {
+      "id": "<order:#1>",
+      "orderNumber": 1,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "iPhone 13 (128GB)",
+      "price": 25966,
+      "date": "<date>",
+      "status": "assigned",
+      "address": "9 Beach Rd, Chennai",
+      "pincode": "600001",
+      "location": {
+       "lat": 13.05,
+       "lng": 80.27
+      },
+      "riderId": "<rider:+917000000001>",
+      "partnerId": "<user:p1@example.test>",
+      "answers": {
+       "physical_condition": "good",
+       "body_condition": "flawless",
+       "functional_issues": [],
+       "accessories": [
+        "charger",
+        "box",
+        "bill"
+       ],
+       "warranty": "0_3_months",
+       "phone": "9000000001",
+       "scheduledSlot": "10:00 AM - 02:00 PM",
+       "isExpress": false,
+       "paymentMethod": "upi",
+       "upiId": "cust@upi"
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null
+     }
+    ]
+   }
+  },
+  {
+   "step": "r2:getExecutiveOrders",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<order:#2>",
+      "orderNumber": 2,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Galaxy S21 (8GB + 128GB)",
+      "price": 11750,
+      "date": "<date>",
+      "status": "assigned",
+      "address": "4 Temple St, Madurai",
+      "pincode": "625001",
+      "location": null,
+      "riderId": "<rider:+917000000002>",
+      "partnerId": "<user:p2@example.test>",
+      "answers": {
+       "physical_condition": "average",
+       "body_condition": "good",
+       "functional_issues": [
+        "wifi",
+        "battery"
+       ],
+       "accessories": [
+        "charger"
+       ],
+       "phone": "9000000001",
+       "paymentMethod": "amazon_voucher"
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null
+     },
+     {
+      "id": "<order:#103>",
+      "orderNumber": 103,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Pixel 8 (128GB)",
+      "price": 25000,
+      "date": "<date>",
+      "status": "completed",
+      "address": "3 Temple St, Madurai",
+      "pincode": "625001",
+      "location": {
+       "lat": 9.9252,
+       "lng": 78.1198
+      },
+      "riderId": "<rider:+917000000002>",
+      "partnerId": null,
+      "answers": null,
+      "riderAnswers": {
+       "answers": {
+        "physical_condition": "good"
+       },
+       "notes": "ok"
+      },
+      "verificationImages": [
+       "a.jpg",
+       "b.jpg"
+      ],
+      "offeredPrice": 24000,
+      "hubStatus": "pending",
+      "hubHandoverAt": null,
+      "hubReceivedBy": null
+     }
+    ]
+   }
+  },
+  {
+   "step": "anon:getExecutiveOrders",
+   "outcome": {
+    "returned": []
+   }
+  },
+  {
+   "step": "r2:updateOrderStatus",
+   "outcome": {
+    "thrown": "Forbidden: Not your order"
+   }
+  },
+  {
+   "step": "r1:updateOrderStatus",
+   "outcome": {
+    "thrown": "Invalid: Not possible in the order's current status"
+   }
+  },
+  {
+   "step": "r1:updateOrderStatus",
+   "outcome": {
+    "thrown": "Invalid: Status"
+   }
+  },
+  {
+   "step": "r1:submitVerification",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "status": "pending_verification"
+    }
+   }
+  },
+  {
+   "step": "r1:updateOrderStatus",
+   "outcome": {
+    "thrown": "Invalid: Not possible in the order's current status"
+   }
+  },
+  {
+   "step": "p2:route:order",
+   "outcome": {
+    "returned": {
+     "status": 403,
+     "body": "Forbidden: Outside your orders"
+    }
+   }
+  },
+  {
+   "step": "cust:route:order",
+   "outcome": {
+    "returned": {
+     "status": 403,
+     "body": "Forbidden: Admin access required"
+    }
+   }
+  },
+  {
+   "step": "rm:route:order",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "Invalid: Price"
+    }
+   }
+  },
+  {
+   "step": "rm:route:order",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true,
+      "price": 1500
+     }
+    }
+   }
+  },
+  {
+   "step": "rm:route:order",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "Invalid: Not possible in the order's current status"
+    }
+   }
+  },
+  {
+   "step": "r1:markPayoutPaidByExecutive",
+   "outcome": {
+    "thrown": "Invalid: Not possible in the order's current status"
+   }
+  },
+  {
+   "step": "r1:updateOrderStatus",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "r1:markPayoutPaidByExecutive",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "payout": {
+      "status": "paid",
+      "method": "upi",
+      "amount": 1500,
+      "reference": "UPI-REF-0001",
+      "paidAt": "<date>",
+      "paidBy": "Ravi",
+      "byRole": "FIELD_EXECUTIVE",
+      "byId": "<rider:+917000000001>"
+     }
+    }
+   }
+  },
+  {
+   "step": "r1:markPayoutPaidByExecutive",
+   "outcome": {
+    "thrown": "Invalid: Payout already recorded"
+   }
+  },
+  {
+   "step": "p1:markPayoutPaid",
+   "outcome": {
+    "thrown": "Invalid: Payout already recorded"
+   }
+  },
+  {
+   "step": "super:route:order",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "Invalid: Not possible in the order's current status"
+    }
+   }
+  },
+  {
+   "step": "r1:updateOrderStatus",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "p1:route:order",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "Invalid: Hub status"
+    }
+   }
+  },
+  {
+   "step": "p1:route:order",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true,
+      "hubStatus": "handed_over"
+     }
+    }
+   }
+  },
+  {
+   "step": "super:route:order",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true,
+      "hubStatus": "pending"
+     }
+    }
+   }
+  },
+  {
+   "step": "r1:submitVerification",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "status": "pending_verification"
+    }
+   }
+  },
+  {
+   "step": "p1:route:order",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true,
+      "price": 6650
+     }
+    }
+   }
+  },
+  {
+   "step": "r1:submitVerification",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "status": "failed"
+    }
+   }
+  },
+  {
+   "step": "r1:submitVerification",
+   "outcome": {
+    "thrown": "Invalid: Not possible in the order's current status"
+   }
+  },
+  {
+   "step": "p1:route:order",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true,
+      "status": "assigned"
+     }
+    }
+   }
+  },
+  {
+   "step": "p1:route:order",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "Invalid: Not possible in the order's current status"
+    }
+   }
+  },
+  {
+   "step": "r1:updateOrderStatus",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "zh1:route:order",
+   "outcome": {
+    "returned": {
+     "status": 403,
+     "body": "Forbidden: Outside your orders"
+    }
+   }
+  },
+  {
+   "step": "admin:route:order",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true
+     }
+    }
+   }
+  },
+  {
+   "step": "admin:route:order",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "Invalid: Not possible in the order's current status"
+    }
+   }
+  },
+  {
+   "step": "admin:route:bulk",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true,
+      "count": 2
+     }
+    }
+   }
+  },
+  {
+   "step": "rm:route:bulk",
+   "outcome": {
+    "returned": {
+     "status": 403,
+     "body": "Forbidden: Admin access required"
+    }
+   }
+  },
+  {
+   "step": "p1:route:bulk",
+   "outcome": {
+    "returned": {
+     "status": 403,
+     "body": "Forbidden: Admin access required"
+    }
+   }
+  },
+  {
+   "step": "rm:route:bulk",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true,
+      "count": 1
+     }
+    }
+   }
+  },
+  {
+   "step": "admin:route:bulk",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "No IDs provided"
+    }
+   }
+  },
+  {
+   "step": "admin:route:bulk",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true,
+      "count": 3
+     }
+    }
+   }
+  },
+  {
+   "step": "admin:route:bulk",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "Invalid action"
+    }
+   }
+  },
+  {
+   "step": "super:route:order",
+   "outcome": {
+    "returned": {
+     "status": 400,
+     "body": "Invalid action"
+    }
+   }
+  },
+  {
+   "step": "rm:route:delete",
+   "outcome": {
+    "returned": {
+     "status": 403,
+     "body": "Forbidden: Admin access required"
+    }
+   }
+  },
+  {
+   "step": "super:route:delete",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "success": true
+     }
+    }
+   }
+  },
+  {
+   "step": "super:route:order",
+   "outcome": {
+    "returned": {
+     "status": 404,
+     "body": "Order not found"
+    }
+   }
+  },
+  {
+   "step": "p1:getNotifications",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "notifications": [
+      {
+       "userId": "<user:p1@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+       "type": "order_new",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:p1@example.test>",
+       "role": null,
+       "title": "Order routed to you",
+       "message": "Order #3 (Galaxy S21 (8GB + 256GB)) is now yours to assign.",
+       "type": "order_new",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:p1@example.test>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:p1@example.test>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": "p2:getNotifications",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "notifications": [
+      {
+       "userId": "<user:p2@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+       "type": "order_new",
+       "orderId": "<deleted-order>",
+       "riderId": null,
+       "isRead": false
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": "rm:getNotifications",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "notifications": [
+      {
+       "userId": "<user:rm@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+       "type": "order_new",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:rm@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+       "type": "order_new",
+       "orderId": "<deleted-order>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:rm@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #3 for Galaxy S21 (8GB + 256GB) placed in 111111.",
+       "type": "order_new",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:rm@example.test>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:rm@example.test>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": "super:getNotifications",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "notifications": [
+      {
+       "userId": "<user:admin@fonzkart.in>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+       "type": "order_new",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:admin@fonzkart.in>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+       "type": "order_new",
+       "orderId": "<deleted-order>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:admin@fonzkart.in>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #3 for Galaxy S21 (8GB + 256GB) placed in 111111.",
+       "type": "order_new",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:admin@fonzkart.in>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:admin@fonzkart.in>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": "admin:getNotifications",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "notifications": [
+      {
+       "userId": null,
+       "role": "ADMIN",
+       "title": "New Order Placed",
+       "message": "New global order #1 needs assignment.",
+       "type": "order_new",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": null,
+       "role": "ADMIN",
+       "title": "New Order Placed",
+       "message": "New global order #2 needs assignment.",
+       "type": "order_new",
+       "orderId": "<deleted-order>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": null,
+       "role": "ADMIN",
+       "title": "New Order Placed",
+       "message": "New global order #3 needs assignment.",
+       "type": "order_new",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:ops@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+       "type": "order_new",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:ops@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+       "type": "order_new",
+       "orderId": "<deleted-order>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:ops@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #3 for Galaxy S21 (8GB + 256GB) placed in 111111.",
+       "type": "order_new",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:ops@example.test>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": false
+      },
+      {
+       "userId": "<user:ops@example.test>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": false
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": "p1:markAllAsRead",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "p1:getNotifications",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "notifications": [
+      {
+       "userId": "<user:p1@example.test>",
+       "role": null,
+       "title": "New Order: Action Required",
+       "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+       "type": "order_new",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": true
+      },
+      {
+       "userId": "<user:p1@example.test>",
+       "role": null,
+       "title": "Order routed to you",
+       "message": "Order #3 (Galaxy S21 (8GB + 256GB)) is now yours to assign.",
+       "type": "order_new",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": true
+      },
+      {
+       "userId": "<user:p1@example.test>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#1>",
+       "riderId": null,
+       "isRead": true
+      },
+      {
+       "userId": "<user:p1@example.test>",
+       "role": null,
+       "title": "Price approval needed",
+       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "type": "order_price_review",
+       "orderId": "<order:#3>",
+       "riderId": null,
+       "isRead": true
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": "anon:markAllAsRead",
+   "outcome": {
+    "returned": {
+     "success": false
+    }
+   }
+  },
+  {
+   "step": "cust:getUserOrders",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<order:#102>",
+      "orderNumber": 102,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Galaxy S21 (8GB + 128GB)",
+      "price": 20000,
+      "date": "<date>",
+      "status": "assigned",
+      "address": "2 Mount Road, Chennai",
+      "pincode": "600002",
+      "location": null,
+      "riderId": "<rider:+917000000001>",
+      "partnerId": null,
+      "answers": null,
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": {
+       "name": "Ravi",
+       "phone": "+917000000001"
+      }
+     },
+     {
+      "id": "<order:#1>",
+      "orderNumber": 1,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "iPhone 13 (128GB)",
+      "price": 1500,
+      "date": "<date>",
+      "status": "completed",
+      "address": "9 Beach Rd, Chennai",
+      "pincode": "600001",
+      "location": {
+       "lat": 13.05,
+       "lng": 80.27
+      },
+      "riderId": "<rider:+917000000001>",
+      "partnerId": "<user:p1@example.test>",
+      "answers": {
+       "physical_condition": "average",
+       "body_condition": "flawless",
+       "functional_issues": [],
+       "accessories": [
+        "charger",
+        "box",
+        "bill"
+       ],
+       "warranty": "0_3_months",
+       "phone": "9000000001",
+       "scheduledSlot": "10:00 AM - 02:00 PM",
+       "isExpress": false,
+       "paymentMethod": "upi",
+       "upiId": "cust@upi",
+       "imei": "356789012345678",
+       "priceReview": {
+        "quotedPrice": 25966,
+        "requestedPrice": 1234,
+        "requestedAt": "<date>",
+        "decision": "approved",
+        "decidedAt": "<date>",
+        "decidedBy": "RELATIONSHIP_MANAGER",
+        "approvedPrice": 1500
+       },
+       "quotedPrice": 25966,
+       "hubStatus": "handed_over",
+       "payout": {
+        "status": "paid",
+        "method": "upi",
+        "amount": 1500,
+        "reference": "UPI-REF-0001",
+        "paidAt": "<date>",
+        "paidBy": "Ravi",
+        "byRole": "FIELD_EXECUTIVE",
+        "byId": "<rider:+917000000001>"
+       },
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Ops Admin"
+      },
+      "riderAnswers": {
+       "notes": "Scratches on the back",
+       "answers": {
+        "physical_condition": "average",
+        "imei": "356789012345678"
+       }
+      },
+      "verificationImages": [
+       "/uploads/front.jpg",
+       "/uploads/back.jpg"
+      ],
+      "offeredPrice": 1500,
+      "hubStatus": "handed_over",
+      "hubHandoverAt": "<date>",
+      "hubReceivedBy": "Ops Admin",
+      "executive": {
+       "name": "Ravi",
+       "phone": "+917000000001"
+      }
+     },
+     {
+      "id": "<order:#106>",
+      "orderNumber": 106,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Watch Series 8",
+      "price": 8000,
+      "date": "<date>",
+      "status": "picked_up",
+      "address": "6 Lake Rd",
+      "pincode": null,
+      "location": null,
+      "riderId": "<rider:+917000000003>",
+      "partnerId": null,
+      "answers": "just a string",
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": {
+       "name": "Arun",
+       "phone": "+917000000003"
+      }
+     },
+     {
+      "id": "<order:#105>",
+      "orderNumber": 105,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "OnePlus 12 (12GB + 256GB)",
+      "price": 35000,
+      "date": "<date>",
+      "status": "completed",
+      "address": "5 Market St, Madurai",
+      "pincode": "625001",
+      "location": null,
+      "riderId": null,
+      "partnerId": null,
+      "answers": {
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Ops Admin"
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": "handed_over",
+      "hubHandoverAt": "<date>",
+      "hubReceivedBy": "Ops Admin",
+      "executive": null
+     },
+     {
+      "id": "<order:#104>",
+      "orderNumber": 104,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Mi 11X (8GB + 128GB)",
+      "price": 9000,
+      "date": "<date>",
+      "status": "Completed",
+      "address": "4 Nowhere",
+      "pincode": "999999",
+      "location": null,
+      "riderId": null,
+      "partnerId": null,
+      "answers": {
+       "failLog": []
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": null
+     },
+     {
+      "id": "<order:#103>",
+      "orderNumber": 103,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Pixel 8 (128GB)",
+      "price": 25000,
+      "date": "<date>",
+      "status": "completed",
+      "address": "3 Temple St, Madurai",
+      "pincode": "625001",
+      "location": {
+       "lat": 9.9252,
+       "lng": 78.1198
+      },
+      "riderId": "<rider:+917000000002>",
+      "partnerId": null,
+      "answers": {
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Ops Admin"
+      },
+      "riderAnswers": {
+       "answers": {
+        "physical_condition": "good"
+       },
+       "notes": "ok"
+      },
+      "verificationImages": [
+       "a.jpg",
+       "b.jpg"
+      ],
+      "offeredPrice": 24000,
+      "hubStatus": "handed_over",
+      "hubHandoverAt": "<date>",
+      "hubReceivedBy": "Ops Admin",
+      "executive": {
+       "name": "Suresh",
+       "phone": "+917000000002"
+      }
+     },
+     {
+      "id": "<order:#101>",
+      "orderNumber": 101,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "iPhone 13 (128GB)",
+      "price": 30000,
+      "date": "<date>",
+      "status": "Pending Pickup",
+      "address": "1 Anna Salai, Chennai",
+      "pincode": "600001",
+      "location": {
+       "lat": 12.9716,
+       "lng": 77.5946
+      },
+      "riderId": null,
+      "partnerId": null,
+      "answers": {
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Hub A"
+      },
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": "handed_over",
+      "hubHandoverAt": "<date>",
+      "hubReceivedBy": "Hub A",
+      "executive": null
+     }
+    ]
+   }
+  },
+  {
+   "step": "user:getUserOrders",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<order:#3>",
+      "orderNumber": 3,
+      "userId": "<user:user@example.test>",
+      "user": {
+       "id": "<user:user@example.test>",
+       "name": "Plain User",
+       "email": "user@example.test",
+       "phone": "+917000000009"
+      },
+      "device": "Galaxy S21 (8GB + 256GB)",
+      "price": 6650,
+      "date": "<date>",
+      "status": "failed",
+      "address": "Far away",
+      "pincode": "111111",
+      "location": null,
+      "riderId": "<rider:+917000000001>",
+      "partnerId": "<user:p1@example.test>",
+      "answers": {
+       "physical_condition": "below_average",
+       "body_condition": "below_average",
+       "accessories": [],
+       "phone": "9000000002",
+       "routingLog": [
+        {
+         "date": "<date>",
+         "partnerId": "<user:p1@example.test>",
+         "previousPartnerId": null,
+         "byRole": "RELATIONSHIP_MANAGER",
+         "byId": "<user:rm@example.test>"
+        }
+       ],
+       "priceReview": {
+        "quotedPrice": 6650,
+        "requestedPrice": 999,
+        "requestedAt": "<date>",
+        "decision": "rejected",
+        "decidedAt": "<date>",
+        "decidedBy": "PARTNER",
+        "reason": "Too low for this condition"
+       },
+       "adminRejectionLog": [
+        {
+         "date": "<date>",
+         "reason": "Too low for this condition"
+        }
+       ],
+       "failLog": [
+        {
+         "date": "<date>",
+         "reason": "Customer declined",
+         "by": "executive"
+        },
+        {
+         "date": "<date>",
+         "reason": "Marked as failed",
+         "by": "executive"
+        },
+        {
+         "date": "<date>",
+         "reason": "Bulk failure",
+         "by": "RELATIONSHIP_MANAGER"
+        }
+       ],
+       "restoreLog": [
+        {
+         "date": "<date>",
+         "previousStatus": "failed",
+         "byRole": "PARTNER",
+         "byId": "<user:p1@example.test>"
+        },
+        {
+         "date": "<date>",
+         "previousStatus": "failed",
+         "byRole": "ADMIN",
+         "byId": "<user:ops@example.test>"
+        }
+       ]
+      },
+      "riderAnswers": {
+       "notes": "Customer declined"
+      },
+      "verificationImages": [
+       "/uploads/x.jpg"
+      ],
+      "offeredPrice": 13,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null,
+      "executive": {
+       "name": "Ravi",
+       "phone": "+917000000001"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "step": "r1:getExecutiveOrders",
+   "outcome": {
+    "returned": [
+     {
+      "id": "<order:#102>",
+      "orderNumber": 102,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "Galaxy S21 (8GB + 128GB)",
+      "price": 20000,
+      "date": "<date>",
+      "status": "assigned",
+      "address": "2 Mount Road, Chennai",
+      "pincode": "600002",
+      "location": null,
+      "riderId": "<rider:+917000000001>",
+      "partnerId": null,
+      "answers": null,
+      "riderAnswers": null,
+      "verificationImages": [],
+      "offeredPrice": null,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null
+     },
+     {
+      "id": "<order:#3>",
+      "orderNumber": 3,
+      "userId": "<user:user@example.test>",
+      "user": {
+       "id": "<user:user@example.test>",
+       "name": "Plain User",
+       "email": "user@example.test",
+       "phone": "+917000000009"
+      },
+      "device": "Galaxy S21 (8GB + 256GB)",
+      "price": 6650,
+      "date": "<date>",
+      "status": "failed",
+      "address": "Far away",
+      "pincode": "111111",
+      "location": null,
+      "riderId": "<rider:+917000000001>",
+      "partnerId": "<user:p1@example.test>",
+      "answers": {
+       "physical_condition": "below_average",
+       "body_condition": "below_average",
+       "accessories": [],
+       "phone": "9000000002",
+       "routingLog": [
+        {
+         "date": "<date>",
+         "partnerId": "<user:p1@example.test>",
+         "previousPartnerId": null,
+         "byRole": "RELATIONSHIP_MANAGER",
+         "byId": "<user:rm@example.test>"
+        }
+       ],
+       "priceReview": {
+        "quotedPrice": 6650,
+        "requestedPrice": 999,
+        "requestedAt": "<date>",
+        "decision": "rejected",
+        "decidedAt": "<date>",
+        "decidedBy": "PARTNER",
+        "reason": "Too low for this condition"
+       },
+       "adminRejectionLog": [
+        {
+         "date": "<date>",
+         "reason": "Too low for this condition"
+        }
+       ],
+       "failLog": [
+        {
+         "date": "<date>",
+         "reason": "Customer declined",
+         "by": "executive"
+        },
+        {
+         "date": "<date>",
+         "reason": "Marked as failed",
+         "by": "executive"
+        },
+        {
+         "date": "<date>",
+         "reason": "Bulk failure",
+         "by": "RELATIONSHIP_MANAGER"
+        }
+       ],
+       "restoreLog": [
+        {
+         "date": "<date>",
+         "previousStatus": "failed",
+         "byRole": "PARTNER",
+         "byId": "<user:p1@example.test>"
+        },
+        {
+         "date": "<date>",
+         "previousStatus": "failed",
+         "byRole": "ADMIN",
+         "byId": "<user:ops@example.test>"
+        }
+       ]
+      },
+      "riderAnswers": {
+       "notes": "Customer declined"
+      },
+      "verificationImages": [
+       "/uploads/x.jpg"
+      ],
+      "offeredPrice": 13,
+      "hubStatus": null,
+      "hubHandoverAt": null,
+      "hubReceivedBy": null
+     },
+     {
+      "id": "<order:#1>",
+      "orderNumber": 1,
+      "userId": "<user:cust@example.test>",
+      "user": {
+       "id": "<user:cust@example.test>",
+       "name": "Customer",
+       "email": "cust@example.test",
+       "phone": "+916000000001"
+      },
+      "device": "iPhone 13 (128GB)",
+      "price": 1500,
+      "date": "<date>",
+      "status": "completed",
+      "address": "9 Beach Rd, Chennai",
+      "pincode": "600001",
+      "location": {
+       "lat": 13.05,
+       "lng": 80.27
+      },
+      "riderId": "<rider:+917000000001>",
+      "partnerId": "<user:p1@example.test>",
+      "answers": {
+       "physical_condition": "average",
+       "body_condition": "flawless",
+       "functional_issues": [],
+       "accessories": [
+        "charger",
+        "box",
+        "bill"
+       ],
+       "warranty": "0_3_months",
+       "phone": "9000000001",
+       "scheduledSlot": "10:00 AM - 02:00 PM",
+       "isExpress": false,
+       "paymentMethod": "upi",
+       "upiId": "cust@upi",
+       "imei": "356789012345678",
+       "priceReview": {
+        "quotedPrice": 25966,
+        "requestedPrice": 1234,
+        "requestedAt": "<date>",
+        "decision": "approved",
+        "decidedAt": "<date>",
+        "decidedBy": "RELATIONSHIP_MANAGER",
+        "approvedPrice": 1500
+       },
+       "quotedPrice": 25966,
+       "hubStatus": "handed_over",
+       "payout": {
+        "status": "paid",
+        "method": "upi",
+        "amount": 1500,
+        "reference": "UPI-REF-0001",
+        "paidAt": "<date>",
+        "paidBy": "Ravi",
+        "byRole": "FIELD_EXECUTIVE",
+        "byId": "<rider:+917000000001>"
+       },
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Ops Admin"
+      },
+      "riderAnswers": {
+       "notes": "Scratches on the back",
+       "answers": {
+        "physical_condition": "average",
+        "imei": "356789012345678"
+       }
+      },
+      "verificationImages": [
+       "/uploads/front.jpg",
+       "/uploads/back.jpg"
+      ],
+      "offeredPrice": 1500,
+      "hubStatus": "handed_over",
+      "hubHandoverAt": "<date>",
+      "hubReceivedBy": "Ops Admin"
+     }
+    ]
+   }
+  },
+  {
+   "step": "super:page:orders",
+   "outcome": {
+    "returned": {
+     "initialOrders": [
+      {
+       "id": "<order:#102>",
+       "orderNumber": 102,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 20000,
+       "date": "<date>",
+       "status": "assigned",
+       "address": "2 Mount Road, Chennai",
+       "pincode": "600002",
+       "location": null,
+       "riderId": "<rider:+917000000001>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#3>",
+       "orderNumber": 3,
+       "userId": "<user:user@example.test>",
+       "user": {
+        "id": "<user:user@example.test>",
+        "name": "Plain User",
+        "email": "user@example.test",
+        "phone": "+917000000009"
+       },
+       "device": "Galaxy S21 (8GB + 256GB)",
+       "price": 6650,
+       "date": "<date>",
+       "status": "failed",
+       "address": "Far away",
+       "pincode": "111111",
+       "location": null,
+       "riderId": "<rider:+917000000001>",
+       "partnerId": "<user:p1@example.test>",
+       "answers": {
+        "physical_condition": "below_average",
+        "body_condition": "below_average",
+        "accessories": [],
+        "phone": "9000000002",
+        "routingLog": [
+         {
+          "date": "<date>",
+          "partnerId": "<user:p1@example.test>",
+          "previousPartnerId": null,
+          "byRole": "RELATIONSHIP_MANAGER",
+          "byId": "<user:rm@example.test>"
+         }
+        ],
+        "priceReview": {
+         "quotedPrice": 6650,
+         "requestedPrice": 999,
+         "requestedAt": "<date>",
+         "decision": "rejected",
+         "decidedAt": "<date>",
+         "decidedBy": "PARTNER",
+         "reason": "Too low for this condition"
+        },
+        "adminRejectionLog": [
+         {
+          "date": "<date>",
+          "reason": "Too low for this condition"
+         }
+        ],
+        "failLog": [
+         {
+          "date": "<date>",
+          "reason": "Customer declined",
+          "by": "executive"
+         },
+         {
+          "date": "<date>",
+          "reason": "Marked as failed",
+          "by": "executive"
+         },
+         {
+          "date": "<date>",
+          "reason": "Bulk failure",
+          "by": "RELATIONSHIP_MANAGER"
+         }
+        ],
+        "restoreLog": [
+         {
+          "date": "<date>",
+          "previousStatus": "failed",
+          "byRole": "PARTNER",
+          "byId": "<user:p1@example.test>"
+         },
+         {
+          "date": "<date>",
+          "previousStatus": "failed",
+          "byRole": "ADMIN",
+          "byId": "<user:ops@example.test>"
+         }
+        ]
+       },
+       "riderAnswers": {
+        "notes": "Customer declined"
+       },
+       "verificationImages": [
+        "/uploads/x.jpg"
+       ],
+       "offeredPrice": 13,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#1>",
+       "orderNumber": 1,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 1500,
+       "date": "<date>",
+       "status": "completed",
+       "address": "9 Beach Rd, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 13.05,
+        "lng": 80.27
+       },
+       "riderId": "<rider:+917000000001>",
+       "partnerId": "<user:p1@example.test>",
+       "answers": {
+        "physical_condition": "average",
+        "body_condition": "flawless",
+        "functional_issues": [],
+        "accessories": [
+         "charger",
+         "box",
+         "bill"
+        ],
+        "warranty": "0_3_months",
+        "phone": "9000000001",
+        "scheduledSlot": "10:00 AM - 02:00 PM",
+        "isExpress": false,
+        "paymentMethod": "upi",
+        "upiId": "cust@upi",
+        "imei": "356789012345678",
+        "priceReview": {
+         "quotedPrice": 25966,
+         "requestedPrice": 1234,
+         "requestedAt": "<date>",
+         "decision": "approved",
+         "decidedAt": "<date>",
+         "decidedBy": "RELATIONSHIP_MANAGER",
+         "approvedPrice": 1500
+        },
+        "quotedPrice": 25966,
+        "hubStatus": "handed_over",
+        "payout": {
+         "status": "paid",
+         "method": "upi",
+         "amount": 1500,
+         "reference": "UPI-REF-0001",
+         "paidAt": "<date>",
+         "paidBy": "Ravi",
+         "byRole": "FIELD_EXECUTIVE",
+         "byId": "<rider:+917000000001>"
+        },
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Ops Admin"
+       },
+       "riderAnswers": {
+        "notes": "Scratches on the back",
+        "answers": {
+         "physical_condition": "average",
+         "imei": "356789012345678"
+        }
+       },
+       "verificationImages": [
+        "/uploads/front.jpg",
+        "/uploads/back.jpg"
+       ],
+       "offeredPrice": 1500,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Ops Admin"
+      },
+      {
+       "id": "<order:#106>",
+       "orderNumber": 106,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Watch Series 8",
+       "price": 8000,
+       "date": "<date>",
+       "status": "picked_up",
+       "address": "6 Lake Rd",
+       "pincode": null,
+       "location": null,
+       "riderId": "<rider:+917000000003>",
+       "partnerId": null,
+       "answers": "just a string",
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#105>",
+       "orderNumber": 105,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "OnePlus 12 (12GB + 256GB)",
+       "price": 35000,
+       "date": "<date>",
+       "status": "completed",
+       "address": "5 Market St, Madurai",
+       "pincode": "625001",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": "handed_over",
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Ops Admin"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Ops Admin"
+      },
+      {
+       "id": "<order:#104>",
+       "orderNumber": 104,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Mi 11X (8GB + 128GB)",
+       "price": 9000,
+       "date": "<date>",
+       "status": "Completed",
+       "address": "4 Nowhere",
+       "pincode": "999999",
+       "location": null,
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "failLog": []
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#103>",
+       "orderNumber": 103,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Pixel 8 (128GB)",
+       "price": 25000,
+       "date": "<date>",
+       "status": "completed",
+       "address": "3 Temple St, Madurai",
+       "pincode": "625001",
+       "location": {
+        "lat": 9.9252,
+        "lng": 78.1198
+       },
+       "riderId": "<rider:+917000000002>",
+       "partnerId": null,
+       "answers": {
+        "hubStatus": "handed_over",
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Ops Admin"
+       },
+       "riderAnswers": {
+        "answers": {
+         "physical_condition": "good"
+        },
+        "notes": "ok"
+       },
+       "verificationImages": [
+        "a.jpg",
+        "b.jpg"
+       ],
+       "offeredPrice": 24000,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Ops Admin"
+      },
+      {
+       "id": "<order:#101>",
+       "orderNumber": 101,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 30000,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "1 Anna Salai, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+       },
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": "handed_over",
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Hub A"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Hub A"
+      }
+     ],
+     "riders": [
+      {
+       "id": "<rider:+917000000003>",
+       "name": "Arun",
+       "phone": "+917000000003",
+       "email": null,
+       "status": "available",
+       "partnerId": null,
+       "partner": null
+      },
+      {
+       "id": "<rider:+917000000006>",
+       "name": "Fe Two Rider",
+       "phone": "+917000000006",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p3@example.test>",
+       "partner": {
+        "name": "Partner Three",
+        "pincodes": []
+       }
+      },
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000005>",
+       "name": "Mani",
+       "phone": "+917000000005",
+       "email": null,
+       "status": "available",
+       "partnerId": null,
+       "partner": null
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000002>",
+       "name": "Suresh",
+       "phone": "+917000000002",
+       "email": null,
+       "status": "busy",
+       "partnerId": "<user:p2@example.test>",
+       "partner": {
+        "name": "Partner Two",
+        "pincodes": [
+         "625001"
+        ]
+       }
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "phone": "+918000000001",
+       "email": "p1@example.test",
+       "pincodes": [
+        "600001",
+        "600002"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": true
+      },
+      {
+       "id": "<user:p3@example.test>",
+       "name": "Partner Three",
+       "phone": null,
+       "email": "p3@example.test",
+       "pincodes": [],
+       "relationshipManager": null,
+       "routable": true
+      },
+      {
+       "id": "<user:p2@example.test>",
+       "name": "Partner Two",
+       "phone": "+918000000002",
+       "email": "p2@example.test",
+       "pincodes": [
+        "625001"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": true
+      }
+     ],
+     "permissions": {
+      "assignPartner": true,
+      "assignRider": true,
+      "approvePrice": true,
+      "manage": true,
+      "bulk": true,
+      "delete": true
+     },
+     "userRole": "SUPER_ADMIN"
+    }
+   }
+  },
+  {
+   "step": "p1:page:orders",
+   "outcome": {
+    "returned": {
+     "initialOrders": [
+      {
+       "id": "<order:#102>",
+       "orderNumber": 102,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "Galaxy S21 (8GB + 128GB)",
+       "price": 20000,
+       "date": "<date>",
+       "status": "assigned",
+       "address": "2 Mount Road, Chennai",
+       "pincode": "600002",
+       "location": null,
+       "riderId": "<rider:+917000000001>",
+       "partnerId": null,
+       "answers": null,
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#3>",
+       "orderNumber": 3,
+       "userId": "<user:user@example.test>",
+       "user": {
+        "id": "<user:user@example.test>",
+        "name": "Plain User",
+        "email": "user@example.test",
+        "phone": "+917000000009"
+       },
+       "device": "Galaxy S21 (8GB + 256GB)",
+       "price": 6650,
+       "date": "<date>",
+       "status": "failed",
+       "address": "Far away",
+       "pincode": "111111",
+       "location": null,
+       "riderId": "<rider:+917000000001>",
+       "partnerId": "<user:p1@example.test>",
+       "answers": {
+        "physical_condition": "below_average",
+        "body_condition": "below_average",
+        "accessories": [],
+        "phone": "9000000002",
+        "routingLog": [
+         {
+          "date": "<date>",
+          "partnerId": "<user:p1@example.test>",
+          "previousPartnerId": null,
+          "byRole": "RELATIONSHIP_MANAGER",
+          "byId": "<user:rm@example.test>"
+         }
+        ],
+        "priceReview": {
+         "quotedPrice": 6650,
+         "requestedPrice": 999,
+         "requestedAt": "<date>",
+         "decision": "rejected",
+         "decidedAt": "<date>",
+         "decidedBy": "PARTNER",
+         "reason": "Too low for this condition"
+        },
+        "adminRejectionLog": [
+         {
+          "date": "<date>",
+          "reason": "Too low for this condition"
+         }
+        ],
+        "failLog": [
+         {
+          "date": "<date>",
+          "reason": "Customer declined",
+          "by": "executive"
+         },
+         {
+          "date": "<date>",
+          "reason": "Marked as failed",
+          "by": "executive"
+         },
+         {
+          "date": "<date>",
+          "reason": "Bulk failure",
+          "by": "RELATIONSHIP_MANAGER"
+         }
+        ],
+        "restoreLog": [
+         {
+          "date": "<date>",
+          "previousStatus": "failed",
+          "byRole": "PARTNER",
+          "byId": "<user:p1@example.test>"
+         },
+         {
+          "date": "<date>",
+          "previousStatus": "failed",
+          "byRole": "ADMIN",
+          "byId": "<user:ops@example.test>"
+         }
+        ]
+       },
+       "riderAnswers": {
+        "notes": "Customer declined"
+       },
+       "verificationImages": [
+        "/uploads/x.jpg"
+       ],
+       "offeredPrice": 13,
+       "hubStatus": null,
+       "hubHandoverAt": null,
+       "hubReceivedBy": null
+      },
+      {
+       "id": "<order:#1>",
+       "orderNumber": 1,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 1500,
+       "date": "<date>",
+       "status": "completed",
+       "address": "9 Beach Rd, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 13.05,
+        "lng": 80.27
+       },
+       "riderId": "<rider:+917000000001>",
+       "partnerId": "<user:p1@example.test>",
+       "answers": {
+        "physical_condition": "average",
+        "body_condition": "flawless",
+        "functional_issues": [],
+        "accessories": [
+         "charger",
+         "box",
+         "bill"
+        ],
+        "warranty": "0_3_months",
+        "phone": "9000000001",
+        "scheduledSlot": "10:00 AM - 02:00 PM",
+        "isExpress": false,
+        "paymentMethod": "upi",
+        "upiId": "cust@upi",
+        "imei": "356789012345678",
+        "priceReview": {
+         "quotedPrice": 25966,
+         "requestedPrice": 1234,
+         "requestedAt": "<date>",
+         "decision": "approved",
+         "decidedAt": "<date>",
+         "decidedBy": "RELATIONSHIP_MANAGER",
+         "approvedPrice": 1500
+        },
+        "quotedPrice": 25966,
+        "hubStatus": "handed_over",
+        "payout": {
+         "status": "paid",
+         "method": "upi",
+         "amount": 1500,
+         "reference": "UPI-REF-0001",
+         "paidAt": "<date>",
+         "paidBy": "Ravi",
+         "byRole": "FIELD_EXECUTIVE",
+         "byId": "<rider:+917000000001>"
+        },
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Ops Admin"
+       },
+       "riderAnswers": {
+        "notes": "Scratches on the back",
+        "answers": {
+         "physical_condition": "average",
+         "imei": "356789012345678"
+        }
+       },
+       "verificationImages": [
+        "/uploads/front.jpg",
+        "/uploads/back.jpg"
+       ],
+       "offeredPrice": 1500,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Ops Admin"
+      },
+      {
+       "id": "<order:#101>",
+       "orderNumber": 101,
+       "userId": "<user:cust@example.test>",
+       "user": {
+        "id": "<user:cust@example.test>",
+        "name": "Customer",
+        "email": "cust@example.test",
+        "phone": "+916000000001"
+       },
+       "device": "iPhone 13 (128GB)",
+       "price": 30000,
+       "date": "<date>",
+       "status": "Pending Pickup",
+       "address": "1 Anna Salai, Chennai",
+       "pincode": "600001",
+       "location": {
+        "lat": 12.9716,
+        "lng": 77.5946
+       },
+       "riderId": null,
+       "partnerId": null,
+       "answers": {
+        "hubStatus": "handed_over",
+        "hubHandoverAt": "<date>",
+        "hubReceivedBy": "Hub A"
+       },
+       "riderAnswers": null,
+       "verificationImages": [],
+       "offeredPrice": null,
+       "hubStatus": "handed_over",
+       "hubHandoverAt": "<date>",
+       "hubReceivedBy": "Hub A"
+      }
+     ],
+     "riders": [
+      {
+       "id": "<rider:+917000000004>",
+       "name": "Kumar",
+       "phone": "+917000000004",
+       "email": null,
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      },
+      {
+       "id": "<rider:+917000000001>",
+       "name": "Ravi",
+       "phone": "+917000000001",
+       "email": "ravi@example.test",
+       "status": "available",
+       "partnerId": "<user:p1@example.test>",
+       "partner": {
+        "name": "Partner One",
+        "pincodes": [
+         "600001",
+         "600002"
+        ]
+       }
+      }
+     ],
+     "partners": [
+      {
+       "id": "<user:p1@example.test>",
+       "name": "Partner One",
+       "phone": "+918000000001",
+       "email": "p1@example.test",
+       "pincodes": [
+        "600001",
+        "600002"
+       ],
+       "relationshipManager": {
+        "name": "Rita Manager",
+        "phone": null
+       },
+       "routable": false
+      }
+     ],
+     "permissions": {
+      "assignPartner": false,
+      "assignRider": true,
+      "approvePrice": true,
+      "manage": true,
+      "bulk": false,
+      "delete": false
+     },
+     "userRole": "PARTNER"
+    }
+   }
+  },
+  {
+   "step": "rm:route:unassignedCount",
+   "outcome": {
+    "returned": {
+     "status": 200,
+     "body": {
+      "count": 2
+     }
+    }
+   }
+  }
+ ],
+ "snapshot": {
+  "orders": [
+   {
+    "orderNumber": 1,
+    "userId": "<user:cust@example.test>",
+    "riderId": "<rider:+917000000001>",
+    "partnerId": "<user:p1@example.test>",
+    "device": "iPhone 13 (128GB)",
+    "price": 1500,
+    "status": "completed",
+    "pincode": "600001",
+    "address": "9 Beach Rd, Chennai",
+    "locationLat": 13.05,
+    "locationLng": 80.27,
+    "offeredPrice": 1500,
+    "answers": {
+     "physical_condition": "average",
+     "body_condition": "flawless",
+     "functional_issues": [],
+     "accessories": [
+      "charger",
+      "box",
+      "bill"
+     ],
+     "warranty": "0_3_months",
+     "phone": "9000000001",
+     "scheduledSlot": "10:00 AM - 02:00 PM",
+     "isExpress": false,
+     "paymentMethod": "upi",
+     "upiId": "cust@upi",
+     "imei": "356789012345678",
+     "priceReview": {
+      "quotedPrice": 25966,
+      "requestedPrice": 1234,
+      "requestedAt": "<date>",
+      "decision": "approved",
+      "decidedAt": "<date>",
+      "decidedBy": "RELATIONSHIP_MANAGER",
+      "approvedPrice": 1500
+     },
+     "quotedPrice": 25966,
+     "hubStatus": "handed_over",
+     "payout": {
+      "status": "paid",
+      "method": "upi",
+      "amount": 1500,
+      "reference": "UPI-REF-0001",
+      "paidAt": "<date>",
+      "paidBy": "Ravi",
+      "byRole": "FIELD_EXECUTIVE",
+      "byId": "<rider:+917000000001>"
+     },
+     "hubHandoverAt": "<date>",
+     "hubReceivedBy": "Ops Admin"
+    },
+    "riderAnswers": {
+     "notes": "Scratches on the back",
+     "answers": {
+      "physical_condition": "average",
+      "imei": "356789012345678"
+     }
+    },
+    "verificationImages": [
+     "/uploads/front.jpg",
+     "/uploads/back.jpg"
+    ]
+   },
+   {
+    "orderNumber": 3,
+    "userId": "<user:user@example.test>",
+    "riderId": "<rider:+917000000001>",
+    "partnerId": "<user:p1@example.test>",
+    "device": "Galaxy S21 (8GB + 256GB)",
+    "price": 6650,
+    "status": "failed",
+    "pincode": "111111",
+    "address": "Far away",
+    "locationLat": null,
+    "locationLng": null,
+    "offeredPrice": 13,
+    "answers": {
+     "physical_condition": "below_average",
+     "body_condition": "below_average",
+     "accessories": [],
+     "phone": "9000000002",
+     "routingLog": [
+      {
+       "date": "<date>",
+       "partnerId": "<user:p1@example.test>",
+       "previousPartnerId": null,
+       "byRole": "RELATIONSHIP_MANAGER",
+       "byId": "<user:rm@example.test>"
+      }
+     ],
+     "priceReview": {
+      "quotedPrice": 6650,
+      "requestedPrice": 999,
+      "requestedAt": "<date>",
+      "decision": "rejected",
+      "decidedAt": "<date>",
+      "decidedBy": "PARTNER",
+      "reason": "Too low for this condition"
+     },
+     "adminRejectionLog": [
+      {
+       "date": "<date>",
+       "reason": "Too low for this condition"
+      }
+     ],
+     "failLog": [
+      {
+       "date": "<date>",
+       "reason": "Customer declined",
+       "by": "executive"
+      },
+      {
+       "date": "<date>",
+       "reason": "Marked as failed",
+       "by": "executive"
+      },
+      {
+       "date": "<date>",
+       "reason": "Bulk failure",
+       "by": "RELATIONSHIP_MANAGER"
+      }
+     ],
+     "restoreLog": [
+      {
+       "date": "<date>",
+       "previousStatus": "failed",
+       "byRole": "PARTNER",
+       "byId": "<user:p1@example.test>"
+      },
+      {
+       "date": "<date>",
+       "previousStatus": "failed",
+       "byRole": "ADMIN",
+       "byId": "<user:ops@example.test>"
+      }
+     ]
+    },
+    "riderAnswers": {
+     "notes": "Customer declined"
+    },
+    "verificationImages": [
+     "/uploads/x.jpg"
+    ]
+   },
+   {
+    "orderNumber": 101,
+    "userId": "<user:cust@example.test>",
+    "riderId": null,
+    "partnerId": null,
+    "device": "iPhone 13 (128GB)",
+    "price": 30000,
+    "status": "Pending Pickup",
+    "pincode": "600001",
+    "address": "1 Anna Salai, Chennai",
+    "locationLat": 12.9716,
+    "locationLng": 77.5946,
+    "offeredPrice": null,
+    "answers": {
+     "hubStatus": "handed_over",
+     "hubHandoverAt": "<date>",
+     "hubReceivedBy": "Hub A"
+    },
+    "riderAnswers": null,
+    "verificationImages": []
+   },
+   {
+    "orderNumber": 102,
+    "userId": "<user:cust@example.test>",
+    "riderId": "<rider:+917000000001>",
+    "partnerId": null,
+    "device": "Galaxy S21 (8GB + 128GB)",
+    "price": 20000,
+    "status": "assigned",
+    "pincode": "600002",
+    "address": "2 Mount Road, Chennai",
+    "locationLat": null,
+    "locationLng": null,
+    "offeredPrice": null,
+    "answers": "not json",
+    "riderAnswers": null,
+    "verificationImages": []
+   },
+   {
+    "orderNumber": 103,
+    "userId": "<user:cust@example.test>",
+    "riderId": "<rider:+917000000002>",
+    "partnerId": null,
+    "device": "Pixel 8 (128GB)",
+    "price": 25000,
+    "status": "completed",
+    "pincode": "625001",
+    "address": "3 Temple St, Madurai",
+    "locationLat": 9.9252,
+    "locationLng": 78.1198,
+    "offeredPrice": 24000,
+    "answers": {
+     "hubStatus": "handed_over",
+     "hubHandoverAt": "<date>",
+     "hubReceivedBy": "Ops Admin"
+    },
+    "riderAnswers": {
+     "answers": {
+      "physical_condition": "good"
+     },
+     "notes": "ok"
+    },
+    "verificationImages": [
+     "a.jpg",
+     "b.jpg"
+    ]
+   },
+   {
+    "orderNumber": 104,
+    "userId": "<user:cust@example.test>",
+    "riderId": null,
+    "partnerId": null,
+    "device": "Mi 11X (8GB + 128GB)",
+    "price": 9000,
+    "status": "Completed",
+    "pincode": "999999",
+    "address": "4 Nowhere",
+    "locationLat": null,
+    "locationLng": null,
+    "offeredPrice": null,
+    "answers": {
+     "failLog": []
+    },
+    "riderAnswers": null,
+    "verificationImages": []
+   },
+   {
+    "orderNumber": 105,
+    "userId": "<user:cust@example.test>",
+    "riderId": null,
+    "partnerId": null,
+    "device": "OnePlus 12 (12GB + 256GB)",
+    "price": 35000,
+    "status": "completed",
+    "pincode": "625001",
+    "address": "5 Market St, Madurai",
+    "locationLat": null,
+    "locationLng": null,
+    "offeredPrice": null,
+    "answers": {
+     "hubStatus": "handed_over",
+     "hubHandoverAt": "<date>",
+     "hubReceivedBy": "Ops Admin"
+    },
+    "riderAnswers": null,
+    "verificationImages": []
+   },
+   {
+    "orderNumber": 106,
+    "userId": "<user:cust@example.test>",
+    "riderId": "<rider:+917000000003>",
+    "partnerId": null,
+    "device": "Watch Series 8",
+    "price": 8000,
+    "status": "picked_up",
+    "pincode": null,
+    "address": "6 Lake Rd",
+    "locationLat": 0,
+    "locationLng": 77,
+    "offeredPrice": null,
+    "answers": "just a string",
+    "riderAnswers": null,
+    "verificationImages": []
+   }
+  ],
+  "notifications": [
+   {
+    "userId": null,
+    "role": "ADMIN",
+    "riderId": null,
+    "title": "New Order Placed",
+    "message": "New global order #1 needs assignment.",
+    "type": "order_new",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": null,
+    "role": "ADMIN",
+    "riderId": null,
+    "title": "New Order Placed",
+    "message": "New global order #2 needs assignment.",
+    "type": "order_new",
+    "orderId": "<deleted-order>",
+    "isRead": false
+   },
+   {
+    "userId": null,
+    "role": "ADMIN",
+    "riderId": null,
+    "title": "New Order Placed",
+    "message": "New global order #3 needs assignment.",
+    "type": "order_new",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:admin@fonzkart.in>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+    "type": "order_new",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:ops@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+    "type": "order_new",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:p1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+    "type": "order_new",
+    "orderId": "<order:#1>",
+    "isRead": true
+   },
+   {
+    "userId": "<user:rm@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+    "type": "order_new",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:zh1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+    "type": "order_new",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:zh2@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #1 for iPhone 13 (128GB) placed in 600001.",
+    "type": "order_new",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:admin@fonzkart.in>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+    "type": "order_new",
+    "orderId": "<deleted-order>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:ops@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+    "type": "order_new",
+    "orderId": "<deleted-order>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:p2@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+    "type": "order_new",
+    "orderId": "<deleted-order>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:rm@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+    "type": "order_new",
+    "orderId": "<deleted-order>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:zh1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+    "type": "order_new",
+    "orderId": "<deleted-order>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:zh2@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #2 for Galaxy S21 (8GB + 128GB) placed in 625001.",
+    "type": "order_new",
+    "orderId": "<deleted-order>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:admin@fonzkart.in>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #3 for Galaxy S21 (8GB + 256GB) placed in 111111.",
+    "type": "order_new",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:ops@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #3 for Galaxy S21 (8GB + 256GB) placed in 111111.",
+    "type": "order_new",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:rm@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #3 for Galaxy S21 (8GB + 256GB) placed in 111111.",
+    "type": "order_new",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:zh1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #3 for Galaxy S21 (8GB + 256GB) placed in 111111.",
+    "type": "order_new",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:zh2@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "New Order: Action Required",
+    "message": "Order #3 for Galaxy S21 (8GB + 256GB) placed in 111111.",
+    "type": "order_new",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": null,
+    "role": null,
+    "riderId": "<rider:+917000000001>",
+    "title": "New Task Assigned",
+    "message": "You have been assigned order #1 for pickup.",
+    "type": "order_assigned",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": null,
+    "role": null,
+    "riderId": "<rider:+917000000002>",
+    "title": "New Task Assigned",
+    "message": "You have been assigned order #2 for pickup.",
+    "type": "order_assigned",
+    "orderId": "<deleted-order>",
+    "isRead": false
+   },
+   {
+    "userId": null,
+    "role": null,
+    "riderId": "<rider:+917000000001>",
+    "title": "New Task Assigned",
+    "message": "You have been assigned order #3 for pickup.",
+    "type": "order_assigned",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:p1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Order routed to you",
+    "message": "Order #3 (Galaxy S21 (8GB + 256GB)) is now yours to assign.",
+    "type": "order_new",
+    "orderId": "<order:#3>",
+    "isRead": true
+   },
+   {
+    "userId": "<user:admin@fonzkart.in>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:ops@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:p1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#1>",
+    "isRead": true
+   },
+   {
+    "userId": "<user:rm@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:zh1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:admin@fonzkart.in>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:ops@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:p1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#3>",
+    "isRead": true
+   },
+   {
+    "userId": "<user:rm@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": "<user:zh1@example.test>",
+    "role": null,
+    "riderId": null,
+    "title": "Price approval needed",
+    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "type": "order_price_review",
+    "orderId": "<order:#3>",
+    "isRead": false
+   },
+   {
+    "userId": null,
+    "role": null,
+    "riderId": "<rider:+917000000001>",
+    "title": "Price approved",
+    "message": "Order #1: ₹1500 approved. Pay the customer and confirm the pickup.",
+    "type": "order_assigned",
+    "orderId": "<order:#1>",
+    "isRead": false
+   },
+   {
+    "userId": null,
+    "role": null,
+    "riderId": "<rider:+917000000001>",
+    "title": "Revised price rejected",
+    "message": "Order #3: the revised price was not approved. Too low for this condition",
+    "type": "order_assigned",
+    "orderId": "<order:#3>",
+    "isRead": false
+   }
+  ]
+ }
+}

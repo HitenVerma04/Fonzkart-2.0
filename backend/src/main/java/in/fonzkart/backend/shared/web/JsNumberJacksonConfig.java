@@ -37,7 +37,7 @@ public class JsNumberJacksonConfig {
     }
 
     /** Number.prototype.toString() for finite doubles. */
-    static String toJavaScriptString(double v) {
+    public static String toJavaScriptString(double v) {
         if (v == 0) {
             return "0";
         }

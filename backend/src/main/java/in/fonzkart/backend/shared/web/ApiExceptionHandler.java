@@ -28,6 +28,11 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(e.status()).body(Map.of("error", e.getMessage()));
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, String>> tooLarge(org.springframework.web.multipart.MaxUploadSizeExceededException e) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(Map.of("error", "File too large (max 10 MB)"));
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> integrity(DataIntegrityViolationException e) {
         log.warn("Constraint violation: {}", e.getMostSpecificCause().getMessage());

@@ -15,7 +15,7 @@ import org.hibernate.type.SqlTypes;
 @Entity(name = "OrderRecord")
 @Immutable
 @Table(name = "Order")
-public class OrderRecord {
+public class OrderRecord implements OrderColumns {
 
     @Id
     private String id;
@@ -108,6 +108,11 @@ public class OrderRecord {
     }
 
     public int getOrderNumber() {
+        return orderNumber;
+    }
+
+    @Override
+    public Integer orderNumberValue() {
         return orderNumber;
     }
 

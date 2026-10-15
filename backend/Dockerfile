@@ -11,8 +11,12 @@ COPY src ./src
 RUN mvn -q -B -DskipTests package && cp target/fonzkart-backend-*.jar /app.jar
 
 FROM eclipse-temurin:17-jre
-RUN useradd --system --uid 10001 fonzkart
+RUN useradd --system --uid 10001 fonzkart \
+    && mkdir -p /app/uploads && chown fonzkart /app/uploads
 COPY --from=build /app.jar /app/app.jar
+WORKDIR /app
+# Uploaded images; mount a persistent volume here (Coolify: Persistent Storage '/app/uploads') so redeploys keep them.
+ENV UPLOAD_DIR=/app/uploads
 USER fonzkart
 EXPOSE 8080
 # Health check for Coolify: GET /actuator/health/liveness on port 8080.
