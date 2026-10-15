@@ -44,3 +44,15 @@ docker run --rm -v fz-mobile:/work -v fz-android-sdk:/opt/android-sdk -v fz-grad
 If the container can't download Gradle (on this PC, Docker reaches GitHub's download host slowly or not at all), download the zip named in `apps/<app>/android/gradle/wrapper/gradle-wrapper.properties` from services.gradle.org on the host, check its `.sha256`, and add `-v <folder with the zip>:/gradle-dist:ro` to the `docker run`.
 
 The APK lands in `mobile/builds/fonzkart-<app>-<version>.apk` (arm64-v8a, which covers current Android phones; pass more ABIs after the app name if needed). It is signed with the Expo template's debug key, which is fine for installing directly on a phone. Google Play needs an upload key and an `.aab`; that comes with Play Console setup (P7).
+
+## Store builds (EAS, Android and iPhone)
+
+Each app has an `eas.json` with three profiles:
+
+| Profile | Builds | Server |
+|---|---|---|
+| `preview` | Android APK and iPhone build for testers (internal distribution) | 2.0 staging (the defaults in `packages/core/src/config.ts`) |
+| `simulator` | iPhone simulator build (no Apple account needed to run it) | 2.0 staging |
+| `production` | Play `.aab` and App Store build | `https://api-v2.fonzkart.in` / `https://v2.fonzkart.in` (needs the DNS records first) |
+
+Needs the Expo account (and for store builds the Play Console and Apple Developer accounts). Once per app, signed in as that account: `cd mobile/apps/<app> && npx eas-cli init` (adds the project id to `app.json`), then `npx eas-cli build --platform all --profile preview`. EAS creates and keeps the Android upload key and the Apple certificates; nobody needs to handle them by hand. `npx eas-cli submit --profile production` sends a build to Play internal testing / TestFlight.
