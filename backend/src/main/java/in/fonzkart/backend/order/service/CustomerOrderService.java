@@ -142,8 +142,7 @@ public class CustomerOrderService {
         if (!JsText.truthy(device) || !JsText.truthy(variantName)) {
             throw OrderAccess.invalid("Invalid: Order details");
         }
-        VariantWithModelDto variant = variants.findVariantByName(device + " (" + variantName + ")")
-                .filter(v -> v.basePrice() != null)
+        VariantWithModelDto variant = findDevice(device, variantName)
                 .orElseThrow(() -> OrderAccess.invalid("Invalid: Device not found"));
         String category = sellCategory(variant.model() == null ? null : variant.model().category());
         JsonNode pricingAnswers = answers != null && answers.isObject() ? answers : F.objectNode();
@@ -153,6 +152,32 @@ public class CustomerOrderService {
         m.put("basePrice", variant.basePrice());
         m.put("category", category);
         return m;
+    }
+
+    /**
+     * The priced catalog variant for a device as the apps name it ("iPhone 13") or as the website's sell flow does,
+     * with the brand in front ("Apple iPhone 13"). A leading brand is accepted only when it is the found model's brand
+     * (its id is the brand name in lower case with dashes, as addBrand makes it).
+     */
+    Optional<VariantWithModelDto> findDevice(String device, String variantName) {
+        String name = JsText.trim(device);
+        Optional<VariantWithModelDto> exact = priced(variants.findVariantByName(name + " (" + variantName + ")"));
+        if (exact.isPresent()) {
+            return exact;
+        }
+        for (int space = name.indexOf(' '); space > 0; space = name.indexOf(' ', space + 1)) {
+            String brand = JsText.lower(name.substring(0, space)).replaceAll("\\s+", "-");
+            Optional<VariantWithModelDto> found = priced(variants.findVariantByName(name.substring(space + 1).trim() + " (" + variantName + ")"))
+                    .filter(v -> v.model() != null && brand.equals(v.model().brandId()));
+            if (found.isPresent()) {
+                return found;
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<VariantWithModelDto> priced(Optional<VariantWithModelDto> variant) {
+        return variant.filter(v -> v.basePrice() != null);
     }
 
     /**

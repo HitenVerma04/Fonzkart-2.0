@@ -115,6 +115,27 @@ class AppOrderFeaturesIntegrationTest {
         assertThat(unknown.body().get("error").asText()).isEqualTo("Invalid: Device not found");
     }
 
+    @Test
+    void theWebsitesBrandAndModelNameFindsTheSameDevice() throws Exception {
+        // The website's sell flow names the device "<brand> <model>"; the apps send the model name alone.
+        Map<String, Object> answers = Map.of("physical_condition", "good");
+        int byModel = call("POST", "/api/orders/quote", null,
+                Map.of("device", "iPhone 13", "variant", "128GB", "answers", answers)).body().get("price").asInt();
+        Res byBrandAndModel = call("POST", "/api/orders/quote", null,
+                Map.of("device", "Apple iPhone 13", "variant", "128GB", "answers", answers));
+        assertThat(byBrandAndModel.status()).isEqualTo(200);
+        assertThat(byBrandAndModel.body().get("price").asInt()).isEqualTo(byModel);
+        // A prefix that is not the model's brand is not stripped.
+        assertThat(call("POST", "/api/orders/quote", null,
+                Map.of("device", "Samsung iPhone 13", "variant", "128GB", "answers", answers)).status()).isEqualTo(400);
+
+        JsonNode placed = call("POST", "/api/orders", cust, Map.of("device", "Apple iPhone 13", "variant", "128GB",
+                "address", "7 Brand St", "pincode", "600001", "answers", answers)).body();
+        assertThat(placed.get("price").asInt()).isEqualTo(byModel);
+        assertThat(jdbc.queryForObject("SELECT device FROM \"Order\" WHERE id = ?", String.class, placed.get("id").asText()))
+                .isEqualTo("Apple iPhone 13 (128GB)");
+    }
+
     // ------------------------------------------------------------------------------------------------ tracker + inbox
 
     @Test
