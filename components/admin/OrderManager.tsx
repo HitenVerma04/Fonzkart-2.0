@@ -600,7 +600,7 @@ export default function OrderManager({
                                                 <div className="mt-1 text-xs text-muted-foreground flex items-center gap-3 bg-muted/50 w-fit px-2 py-1 rounded">
                                                     <span suppressHydrationWarning className="flex items-center gap-1 font-medium text-foreground">
                                                         <Calendar className="w-3 h-3" />
-                                                        {scheduledDate.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                                        {scheduledDate.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' })}
                                                     </span>
                                                     <span className="flex items-center gap-1">
                                                         <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
