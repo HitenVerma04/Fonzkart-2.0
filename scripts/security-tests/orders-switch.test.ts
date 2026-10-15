@@ -4,8 +4,7 @@
 // before. That the real backend behaves like the website's own order code is proven by OrderScenarioParityTest.
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createServer } from 'node:http';
-import type { AddressInfo } from 'node:net';
+import { calls, withBackend as withApi, type Reply, type Seen } from './fake-backend';
 import * as orders from '@/actions/orders';
 import * as executive from '@/actions/executive';
 import * as admin from '@/actions/admin';
@@ -19,35 +18,7 @@ import OrderManager from '@/components/admin/OrderManager';
 import RiderOrderList from '@/components/admin/RiderOrderList';
 import { as, attempt, cookie, propsOf, setCookie, signIn } from './harness';
 
-type Seen = { method: string; url: string; cookie: string; body: any };
-type Reply = { status?: number; body?: unknown };
-
-/** Runs `fn` with USE_API_ORDERS on (unless `on` is false) against a stand-in backend answering `replies`. */
-async function withBackend(replies: Record<string, Reply>, fn: (seen: Seen[]) => Promise<void>, on = true) {
-    const seen: Seen[] = [];
-    const server = createServer(async (req, res) => {
-        let raw = '';
-        for await (const chunk of req) raw += chunk;
-        seen.push({ method: req.method!, url: req.url!, cookie: req.headers.cookie ?? '', body: raw ? JSON.parse(raw) : undefined });
-        const reply = replies[`${req.method} ${req.url!.split('?')[0]}`] ?? { body: { success: true } };
-        res.statusCode = reply.status ?? 200;
-        res.setHeader('content-type', 'application/json');
-        res.end(JSON.stringify(reply.body ?? null));
-    });
-    await new Promise<void>(r => server.listen(0, '127.0.0.1', r));
-    const saved = { use: process.env.USE_API_ORDERS, url: process.env.BACKEND_URL };
-    process.env.BACKEND_URL = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-    if (on) process.env.USE_API_ORDERS = '1'; else delete process.env.USE_API_ORDERS;
-    try {
-        await fn(seen);
-    } finally {
-        if (saved.use === undefined) delete process.env.USE_API_ORDERS; else process.env.USE_API_ORDERS = saved.use;
-        if (saved.url === undefined) delete process.env.BACKEND_URL; else process.env.BACKEND_URL = saved.url;
-        await new Promise(r => server.close(r));
-    }
-}
-
-const calls = (seen: Seen[]) => seen.map(s => `${s.method} ${s.url}`);
+const withBackend = (replies: Record<string, Reply>, fn: (seen: Seen[]) => Promise<void>, on = true) => withApi(['ORDERS'], replies, fn, on);
 const text = async (res: Response) => ({ status: res.status, body: await res.text() });
 const orderPost = (id: string, body: unknown) =>
     orderApi(new Request('http://test/api/admin/orders/' + id, { method: 'POST', body: JSON.stringify(body) }), { params: Promise.resolve({ id }) });

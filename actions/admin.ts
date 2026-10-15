@@ -247,28 +247,39 @@ export async function removeUserRole(email: string) {
 }
 
 // --- Brands ---
+// With USE_API_CONTENT=1 catalog editing and the banner prices go to the backend (as the Admin app); the backend
+// checks that the caller is an administrator.
+const enc = encodeURIComponent;
+async function content<T = { success: boolean }>(method: 'POST' | 'PUT' | 'DELETE', path: string, body?: unknown, query?: Record<string, string | undefined>) {
+    return (await backendRequest<T>(method, path, { body, query })).data!;
+}
 
 export async function getBrands() {
     return await db.getBrands();
 }
 
 export async function addBrand(name: string, logo: string, category?: string, priority: number = 100) {
-    await requireAdmin();
-    const id = name.toLowerCase().replace(/\s+/g, '-');
-    const existing = await db.getBrand(id);
-
-    if (existing) {
-        if (category) {
-            await db.addCategoryToBrand(id, category);
-        }
-        await db.updateBrand(id, name, logo, priority);
+    let id: string;
+    if (usesApi('CONTENT')) {
+        id = (await content<{ success: boolean; id: string }>('POST', '/api/catalog/admin/brands', { name, logo, category, priority })).id;
     } else {
-        await db.addBrand({
-            id,
-            name,
-            logo,
-            categories: category ? [category] : []
-        } as any);
+        await requireAdmin();
+        id = name.toLowerCase().replace(/\s+/g, '-');
+        const existing = await db.getBrand(id);
+
+        if (existing) {
+            if (category) {
+                await db.addCategoryToBrand(id, category);
+            }
+            await db.updateBrand(id, name, logo, priority);
+        } else {
+            await db.addBrand({
+                id,
+                name,
+                logo,
+                categories: category ? [category] : []
+            } as any);
+        }
     }
 
     revalidatePath(`/admin/category/${category}`);
@@ -278,17 +289,21 @@ export async function addBrand(name: string, logo: string, category?: string, pr
 }
 
 export async function deleteBrand(id: string, category?: string) {
-    await requireAdmin();
+    if (usesApi('CONTENT')) {
+        await content('DELETE', `/api/catalog/admin/brands/${enc(id)}`, undefined, { category });
+    } else {
+        await requireAdmin();
 
-    if (category) {
-        const brand = await db.getBrand(id) as any;
-        if (brand && brand.categories && brand.categories.includes(category)) {
-            await db.removeCategoryFromBrand(id, category);
-        } else if (brand && (!brand.categories || brand.categories.length === 0)) {
+        if (category) {
+            const brand = await db.getBrand(id) as any;
+            if (brand && brand.categories && brand.categories.includes(category)) {
+                await db.removeCategoryFromBrand(id, category);
+            } else if (brand && (!brand.categories || brand.categories.length === 0)) {
+                await db.deleteBrand(id);
+            }
+        } else {
             await db.deleteBrand(id);
         }
-    } else {
-        await db.deleteBrand(id);
     }
 
     if (category) revalidatePath(`/admin/category/${category}`);
@@ -299,8 +314,11 @@ export async function deleteBrand(id: string, category?: string) {
 }
 
 export async function updateBrand(id: string, name: string, logo: string, priority?: number) {
-    await requireAdmin();
-    await db.updateBrand(id, name, logo, priority);
+    if (usesApi('CONTENT')) await content('PUT', `/api/catalog/admin/brands/${enc(id)}`, { name, logo, priority });
+    else {
+        await requireAdmin();
+        await db.updateBrand(id, name, logo, priority);
+    }
     revalidatePath('/admin/brands');
     revalidatePath('/sell');
     revalidatePath('/');
@@ -314,32 +332,43 @@ export async function getModels(brandId?: string) {
 }
 
 export async function addModel(brandId: string, name: string, img: string, category: string = 'smartphone', priority: number = 100) {
-    await requireAdmin();
-    const id = randomUUID();
-    await db.addModel({
-        id,
-        brandId,
-        name,
-        img,
-        category,
-        priority
-    } as any);
+    let id: string;
+    if (usesApi('CONTENT')) {
+        id = (await content<{ success: boolean; id: string }>('POST', '/api/catalog/admin/models', { brandId, name, img, category, priority })).id;
+    } else {
+        await requireAdmin();
+        id = randomUUID();
+        await db.addModel({
+            id,
+            brandId,
+            name,
+            img,
+            category,
+            priority
+        } as any);
+    }
     revalidatePath('/admin/models');
     revalidatePath('/');
     return { success: true, id };
 }
 
 export async function updateModel(id: string, brandId: string, name: string, img: string, category: string = 'smartphone', priority: number = 100) {
-    await requireAdmin();
-    await db.updateModel(id, brandId, name, img, category, priority);
+    if (usesApi('CONTENT')) await content('PUT', `/api/catalog/admin/models/${enc(id)}`, { brandId, name, img, category, priority });
+    else {
+        await requireAdmin();
+        await db.updateModel(id, brandId, name, img, category, priority);
+    }
     revalidatePath('/admin/models');
     revalidatePath('/');
     return { success: true };
 }
 
 export async function reorderModels(items: { id: string, priority: number }[]) {
-    await requireAdmin();
-    await db.updateModelPriorities(items);
+    if (usesApi('CONTENT')) await content('PUT', '/api/catalog/admin/models/order', items);
+    else {
+        await requireAdmin();
+        await db.updateModelPriorities(items);
+    }
     revalidatePath('/admin/models');
     revalidatePath('/sell');
     revalidatePath('/');
@@ -347,8 +376,11 @@ export async function reorderModels(items: { id: string, priority: number }[]) {
 }
 
 export async function deleteModel(id: string) {
-    await requireAdmin();
-    await db.deleteModel(id);
+    if (usesApi('CONTENT')) await content('DELETE', `/api/catalog/admin/models/${enc(id)}`);
+    else {
+        await requireAdmin();
+        await db.deleteModel(id);
+    }
     revalidatePath('/admin/models');
     return { success: true };
 }
@@ -360,28 +392,39 @@ export async function getVariants(modelId?: string) {
 }
 
 export async function addVariant(modelId: string, name: string, basePrice: number) {
-    await requireAdmin();
-    const id = randomUUID();
-    await db.addVariant({
-        id,
-        modelId,
-        name,
-        basePrice
-    });
+    let id: string;
+    if (usesApi('CONTENT')) {
+        id = (await content<{ success: boolean; id: string }>('POST', '/api/catalog/admin/variants', { modelId, name, basePrice })).id;
+    } else {
+        await requireAdmin();
+        id = randomUUID();
+        await db.addVariant({
+            id,
+            modelId,
+            name,
+            basePrice
+        });
+    }
     revalidatePath('/admin/variants');
     return { success: true, id };
 }
 
 export async function updateVariant(id: string, modelId: string, name: string, basePrice: number) {
-    await requireAdmin();
-    await db.updateVariant(id, modelId, name, basePrice);
+    if (usesApi('CONTENT')) await content('PUT', `/api/catalog/admin/variants/${enc(id)}`, { modelId, name, basePrice });
+    else {
+        await requireAdmin();
+        await db.updateVariant(id, modelId, name, basePrice);
+    }
     revalidatePath('/admin/variants');
     return { success: true };
 }
 
 export async function deleteVariant(id: string) {
-    await requireAdmin();
-    await db.deleteVariant(id);
+    if (usesApi('CONTENT')) await content('DELETE', `/api/catalog/admin/variants/${enc(id)}`);
+    else {
+        await requireAdmin();
+        await db.deleteVariant(id);
+    }
     revalidatePath('/admin/variants');
     return { success: true };
 }
@@ -600,6 +643,7 @@ import { fetchAllBannerPrices, saveBannerPriceItem } from '@/lib/banner-prices';
 // --- Device Display Prices ---
 
 export async function getDeviceDisplayPrices() {
+    if (usesApi('CONTENT')) return (await backendRequest<any[]>('GET', '/api/content/banner-prices/admin')).data ?? [];
     await requireAdmin();
     return await fetchAllBannerPrices();
 }
@@ -610,8 +654,13 @@ export async function updateDeviceDisplayPrice(
     categoryKey?: string,
     categoryName?: string
 ) {
-    await requireAdmin();
-    const result = await saveBannerPriceItem(id, displayPrice, categoryKey, categoryName);
+    let result;
+    if (usesApi('CONTENT')) {
+        result = await content<any>('PUT', `/api/content/banner-prices/${enc(id)}`, { displayPrice, categoryKey, categoryName });
+    } else {
+        await requireAdmin();
+        result = await saveBannerPriceItem(id, displayPrice, categoryKey, categoryName);
+    }
     revalidatePath('/');
     revalidatePath('/admin/homepage');
     return result;
