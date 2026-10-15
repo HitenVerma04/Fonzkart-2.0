@@ -12,6 +12,7 @@ import { PrismaClient } from '@prisma/client';
 import { sendSystemEmail } from '@/lib/email';
 import { SUPER_ADMIN_EMAILS } from '@/lib/auth-utils';
 import { backendAction, usesApi } from '@/lib/backend';
+import * as attempts from '@/lib/attempt-limits';
 const prisma = new PrismaClient();
 
 // With USE_API_AUTH=1 sign-up, sign-in, email verification and password reset are done by the backend (the same
@@ -76,6 +77,7 @@ export async function signup(prevState: { error?: string } | null, formData: For
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 15 * 60 * 1000);
     await db.setResetToken(email, otp, expiry);
+    attempts.reset('CODE', email); // a new code gets its own attempts
 
     try {
         const systemAccount = await prisma.emailAccount.findFirst();
@@ -134,7 +136,7 @@ export async function verifyEmailSignup(prevState: { error?: string, success?: s
     }
 
     if (user.resetToken !== otp) {
-        return { error: 'Invalid OTP provided.' };
+        return wrongCode(email);
     }
     
     if (!user.resetTokenExpiry || new Date() > user.resetTokenExpiry) {
@@ -145,6 +147,7 @@ export async function verifyEmailSignup(prevState: { error?: string, success?: s
     const isSuperAdminEmail = SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
     await db.updateUserRole(email, isSuperAdminEmail ? 'SUPER_ADMIN' : 'USER');
     await db.clearResetToken(email);
+    attempts.reset('CODE', email);
 
     // Send Welcome Email
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.fonzkart.in';
@@ -196,14 +199,22 @@ export async function signin(prevState: { error?: string } | null, formData: For
         }
     }
 
+    // Guessing limit per account (lib/attempt-limits.ts), as the backend.
+    const account = user?.id ?? email;
+    if (attempts.blocked('SIGNIN', account)) {
+        return { error: attempts.TOO_MANY_SIGNINS };
+    }
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+        attempts.failed('SIGNIN', account);
         return { error: 'Invalid email/phone or password' };
     }
+    attempts.reset('SIGNIN', account);
 
     if (user.role === 'UNVERIFIED') {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiry = new Date(Date.now() + 15 * 60 * 1000);
         await db.setResetToken(email, otp, expiry);
+        attempts.reset('CODE', email); // a new code gets its own attempts
 
         try {
             const systemAccount = await prisma.emailAccount.findFirst();
@@ -262,6 +273,16 @@ export async function signin(prevState: { error?: string } | null, formData: For
     redirect('/');
 }
 
+/** A wrong one-time code. The 5th cancels the code: a new one must be requested (lib/attempt-limits.ts). */
+async function wrongCode(email: string) {
+    if (attempts.failed('CODE', email)) {
+        await db.clearResetToken(email);
+        attempts.reset('CODE', email);
+        return { error: attempts.TOO_MANY_CODES };
+    }
+    return { error: 'Invalid OTP provided.' };
+}
+
 export async function createOrderAction(_device: string, _variant: string, _price: number) {
     // This action will be called from client side
 }
@@ -284,6 +305,7 @@ export async function requestPasswordReset(prevState: { error?: string, success?
         const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 mins expiry
         
         await db.setResetToken(email, otp, expiry);
+        attempts.reset('CODE', email); // a new code gets its own attempts
 
         const systemAccount = await prisma.emailAccount.findFirst();
         const smtpUser = process.env.SMTP_USER || systemAccount?.email;
@@ -347,7 +369,7 @@ export async function verifyAndResetPassword(prevState: { error?: string, succes
     }
 
     if (user.resetToken !== otp) {
-        return { error: 'Invalid OTP provided.' };
+        return wrongCode(email);
     }
     
     if (!user.resetTokenExpiry || new Date() > user.resetTokenExpiry) {
@@ -357,6 +379,7 @@ export async function verifyAndResetPassword(prevState: { error?: string, succes
     const passwordHash = await bcrypt.hash(password, 10);
     await db.updateUserPassword(email, passwordHash);
     await db.clearResetToken(email);
+    attempts.reset('CODE', email);
 
     return { success: 'Password reset successfully! You can now login.' };
 }

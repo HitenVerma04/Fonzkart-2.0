@@ -6,6 +6,7 @@ import { login } from '@/lib/session';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db';
 import { backendAction, usesApi } from '@/lib/backend';
+import * as attempts from '@/lib/attempt-limits';
 
 // With USE_API_AUTH=1 these are done by the backend (as the apps), which sets the session cookie.
 const fields = (formData: FormData, ...names: string[]) => Object.fromEntries(names.map(n => [n, formData.get(n)]));
@@ -70,9 +71,16 @@ export async function quickLogin(formData: FormData) {
     }
 
     const user = await db.findUserByEmail(email);
+    // Guessing limit per account, shared with the sign-in page (lib/attempt-limits.ts).
+    const account = user?.id ?? email;
+    if (attempts.blocked('SIGNIN', account)) {
+        return { error: attempts.TOO_MANY_SIGNINS };
+    }
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+        attempts.failed('SIGNIN', account);
         return { error: 'Invalid email or password' };
     }
+    attempts.reset('SIGNIN', account);
 
     await login({ id: user.id, email: user.email, name: user.name, role: user.role });
 

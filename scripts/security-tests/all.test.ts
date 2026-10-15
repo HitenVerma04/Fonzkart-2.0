@@ -12,5 +12,6 @@ import './uploads.test';
 import './content-switch.test';
 import './auth-switch.test';
 import './staff-switch.test';
+import './attempt-limits.test';
 import './shared-code.test';
 import './email.test';

@@ -2,6 +2,8 @@ package in.fonzkart.backend.rider.service;
 
 import static in.fonzkart.backend.shared.text.JsText.truthy;
 
+import in.fonzkart.backend.auth.rules.AttemptLimiter;
+import in.fonzkart.backend.auth.rules.AttemptLimiter.Kind;
 import in.fonzkart.backend.auth.rules.Roles;
 import in.fonzkart.backend.auth.session.ExecutiveSessions;
 import in.fonzkart.backend.auth.session.SessionPayload;
@@ -36,9 +38,11 @@ public class ExecutiveAuthService {
     private final SessionService sessions;
     private final ExecutiveSessions executiveSessions;
     private final RiderPasswords passwords;
+    private final AttemptLimiter limiter;
 
     public ExecutiveAuthService(RiderRepository riders, UserRepository users, SessionService sessions,
-                                ExecutiveSessions executiveSessions, RiderPasswords passwords) {
+                                ExecutiveSessions executiveSessions, RiderPasswords passwords, AttemptLimiter limiter) {
+        this.limiter = limiter;
         this.riders = riders;
         this.users = users;
         this.sessions = sessions;
@@ -64,10 +68,15 @@ public class ExecutiveAuthService {
         if (!truthy(password)) {
             return ActionResponse.returned(failure("Password required"));
         }
+        if (limiter.blocked(Kind.EXECUTIVE_SIGNIN, executive.getId())) {
+            return ActionResponse.returned(failure(AttemptLimiter.TOO_MANY_SIGNINS));
+        }
         RiderPasswords.Check check = passwords.verify(executive.getPassword(), password);
         if (!check.ok()) {
+            limiter.failed(Kind.EXECUTIVE_SIGNIN, executive.getId());
             return ActionResponse.returned(failure("Invalid password"));
         }
+        limiter.reset(Kind.EXECUTIVE_SIGNIN, executive.getId());
         // A legacy plain-text password was correct: store it as a hash from now on.
         if (check.needsRehash()) {
             riders.updatePassword(executive.getId(), passwords.hash(password), JsDates.nowUtc());

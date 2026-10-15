@@ -9,6 +9,7 @@ import { hashRiderPassword, verifyRiderPassword } from '@/lib/rider-password';
 import { EXECUTIVE_COOKIE, executiveCookieOptions, signExecutiveToken, verifyExecutiveToken } from '@/lib/executive-session';
 import { Actor, completeAtHub, confirmPickup, failOrder, markPayoutPaid, submitPickup } from '@/lib/order-workflow';
 import { backendAction, backendRequest, usesApi } from '@/lib/backend';
+import * as attempts from '@/lib/attempt-limits';
 
 // With USE_API_ORDERS=1 the executive's order actions go to the Spring Boot backend (as the Partner app's rider mode).
 const executiveOrderPath = (orderId: string, action: string) => `/api/executive/orders/${encodeURIComponent(orderId)}/${action}`;
@@ -38,10 +39,16 @@ export async function loginExecutive(phone: string, password?: string) {
         return { success: false, error: 'Password required' };
     }
 
+    // Guessing limit per executive (lib/attempt-limits.ts), as the backend.
+    if (attempts.blocked('EXECUTIVE_SIGNIN', executive.id)) {
+        return { success: false, error: attempts.TOO_MANY_SIGNINS };
+    }
     const check = await verifyRiderPassword(executive.password, password);
     if (!check.ok) {
+        attempts.failed('EXECUTIVE_SIGNIN', executive.id);
         return { success: false, error: 'Invalid password' };
     }
+    attempts.reset('EXECUTIVE_SIGNIN', executive.id);
 
     // A legacy plain-text password was correct: store it as a hash from now on.
     if (check.needsRehash) {

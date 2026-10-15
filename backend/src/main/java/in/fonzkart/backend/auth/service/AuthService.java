@@ -6,6 +6,8 @@ import static in.fonzkart.backend.shared.text.JsText.truthy;
 import in.fonzkart.backend.auth.config.AuthProperties;
 import in.fonzkart.backend.auth.password.PasswordHasher;
 import in.fonzkart.backend.auth.rules.AccessRules;
+import in.fonzkart.backend.auth.rules.AttemptLimiter;
+import in.fonzkart.backend.auth.rules.AttemptLimiter.Kind;
 import in.fonzkart.backend.auth.rules.OneTimePasswords;
 import in.fonzkart.backend.auth.rules.PhoneNumbers;
 import in.fonzkart.backend.auth.rules.Roles;
@@ -49,9 +51,11 @@ public class AuthService {
     private final AccessRules access;
     private final MailService mail;
     private final AuthProperties properties;
+    private final AttemptLimiter limiter;
 
     public AuthService(UserRepository users, PasswordHasher passwords, SessionService sessions, AccessRules access,
-                       MailService mail, AuthProperties properties) {
+                       MailService mail, AuthProperties properties, AttemptLimiter limiter) {
+        this.limiter = limiter;
         this.users = users;
         this.passwords = passwords;
         this.sessions = sessions;
@@ -119,7 +123,7 @@ public class AuthService {
         }
         User user = found.get();
         if (!Objects.equals(user.getResetToken(), otp)) {
-            return error("Invalid OTP provided.");
+            return wrongCode(email);
         }
         if (isExpired(user.getResetTokenExpiry())) {
             return error("Your OTP has expired. Please sign up again or request a new one.");
@@ -128,6 +132,7 @@ public class AuthService {
         LocalDateTime now = JsDates.nowUtc();
         requireUpdated(users.updateRoleByEmail(email, access.isSuperAdminEmail(email) ? Roles.SUPER_ADMIN : Roles.USER, now));
         requireUpdated(users.clearResetTokenByEmail(email, now));
+        limiter.reset(Kind.CODE, email);
 
         mail.sendSystemEmailAsync(email, AuthEmails.WELCOME_SUBJECT, AuthEmails.welcome(user.getName(), properties.appUrl()));
 
@@ -147,9 +152,15 @@ public class AuthService {
         if (found.isEmpty()) {
             found = PhoneNumbers.signinPhoneCandidate(email).flatMap(users::findFirstByPhone);
         }
+        String account = found.map(User::getId).orElse(email);
+        if (limiter.blocked(Kind.SIGNIN, account)) {
+            return error(AttemptLimiter.TOO_MANY_SIGNINS);
+        }
         if (found.isEmpty() || !passwords.matches(password, found.get().getPasswordHash())) {
+            limiter.failed(Kind.SIGNIN, account);
             return error("Invalid email/phone or password");
         }
+        limiter.reset(Kind.SIGNIN, account);
         User user = found.get();
 
         if (Roles.UNVERIFIED.equals(user.getRole())) {
@@ -224,7 +235,7 @@ public class AuthService {
             return error("Invalid user.");
         }
         if (!Objects.equals(found.get().getResetToken(), otp)) {
-            return error("Invalid OTP provided.");
+            return wrongCode(email);
         }
         if (isExpired(found.get().getResetTokenExpiry())) {
             return error("Your OTP has expired. Please request a new one.");
@@ -234,6 +245,7 @@ public class AuthService {
         LocalDateTime now = JsDates.nowUtc();
         requireUpdated(users.updatePasswordByEmail(email, passwordHash, now));
         requireUpdated(users.clearResetTokenByEmail(email, now));
+        limiter.reset(Kind.CODE, email);
 
         return ActionResponse.returned(Map.of("success", "Password reset successfully! You can now login."));
     }
@@ -272,9 +284,15 @@ public class AuthService {
             return error("Please fill email and password");
         }
         Optional<User> found = users.findUserByEmail(email);
+        String account = found.map(User::getId).orElse(email);
+        if (limiter.blocked(Kind.SIGNIN, account)) {
+            return error(AttemptLimiter.TOO_MANY_SIGNINS);
+        }
         if (found.isEmpty() || !passwords.matches(password, found.get().getPasswordHash())) {
+            limiter.failed(Kind.SIGNIN, account);
             return error("Invalid email or password");
         }
+        limiter.reset(Kind.SIGNIN, account);
         User user = found.get();
         ResponseCookie cookie = sessions.login(
                 new SessionUser(user.getId(), user.getEmail(), user.getName(), user.getRole()));
@@ -303,6 +321,17 @@ public class AuthService {
     private void storeOtp(String email, String otp) {
         LocalDateTime now = JsDates.nowUtc();
         requireUpdated(users.setResetTokenByEmail(email, otp, now.plus(OneTimePasswords.VALIDITY), now));
+        limiter.reset(Kind.CODE, email); // a new code gets its own attempts
+    }
+
+    /** A wrong one-time code. The {@value AttemptLimiter#MAX_CODE_FAILURES}th cancels the code: a new one must be requested. */
+    private ActionResponse wrongCode(String email) {
+        if (limiter.failed(Kind.CODE, email)) {
+            users.clearResetTokenByEmail(email, JsDates.nowUtc());
+            limiter.reset(Kind.CODE, email);
+            return error(AttemptLimiter.TOO_MANY_CODES);
+        }
+        return error("Invalid OTP provided.");
     }
 
     private void syncRole(String userId, String role, String failureMessage) {
