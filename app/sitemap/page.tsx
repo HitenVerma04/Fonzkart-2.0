@@ -13,9 +13,9 @@ export default function SitemapPage() {
                         <li><Link href="/sell?category=smartphone" className="hover:text-green-600">Sell Mobile Phone</Link></li>
                         <li><Link href="/sell?category=tablet" className="hover:text-green-600">Sell Tablet</Link></li>
                         <li><Link href="/sell?category=laptop" className="hover:text-green-600">Sell Laptop</Link></li>
-                        <li><Link href="/sell?category=smartwatch" className="hover:text-green-600">Sell Smartwatch</Link></li>
+                        <li><Link href="/sell?category=watch" className="hover:text-green-600">Sell Smartwatch</Link></li>
                         <li><Link href="/sell?category=console" className="hover:text-green-600">Sell Gaming Console</Link></li>
-                        <li><Link href="/sell?category=tv" className="hover:text-green-600">Sell Smart TV</Link></li>
+                        <li><Link href="/sell?category=smarttv" className="hover:text-green-600">Sell Smart TV</Link></li>
                     </ul>
                 </div>
 

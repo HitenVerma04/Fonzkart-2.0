@@ -38,7 +38,7 @@ export default function Footer() {
                             <li><Link href="/sell?category=tablet" className="hover:text-primary transition-colors">Sell Tablet</Link></li>
                             <li><Link href="/sell?category=laptop" className="hover:text-primary transition-colors">Sell Laptop</Link></li>
                             <li><Link href="/sell?category=console" className="hover:text-primary transition-colors">Sell Console</Link></li>
-                            <li><Link href="/sell?category=tv" className="hover:text-primary transition-colors">Sell Smart TV</Link></li>
+                            <li><Link href="/sell?category=smarttv" className="hover:text-primary transition-colors">Sell Smart TV</Link></li>
                         </ul>
                     </div>
 
