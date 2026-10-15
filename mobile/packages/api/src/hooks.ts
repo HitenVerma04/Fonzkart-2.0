@@ -5,6 +5,7 @@ import { MIN_SEARCH_LENGTH, catalogApi, healthApi } from './catalog';
 import { quoteApi } from './quote';
 import { customerOrdersApi, executiveApi, notificationsApi, staffOrdersApi, type PlaceOrderInput } from './orders';
 import { ridersApi } from './riders';
+import { adminApi } from './admin';
 
 export function createQueryClient() {
   return new QueryClient({
@@ -257,3 +258,24 @@ export function useStaffInbox(enabled: boolean) {
     refetchInterval: 60_000,
   });
 }
+
+// ------------------------------------------------------------------------------------------------ administration
+
+export const adminKeys = {
+  directory: ['staff', 'directory'] as const,
+  partners: ['staff', 'partners'] as const,
+  zonalHeads: ['staff', 'zonal-heads'] as const,
+  cities: ['staff', 'cities'] as const,
+  rmDashboard: ['staff', 'rm-dashboard'] as const,
+  rules: (category: string) => ['staff', 'rules', category] as const,
+};
+
+export const useStaffDirectory = () => useQuery({ queryKey: adminKeys.directory, queryFn: ({ signal }) => adminApi.directory(signal), staleTime: 0 });
+export const usePartnersOverview = () => useQuery({ queryKey: adminKeys.partners, queryFn: ({ signal }) => adminApi.partners(signal), staleTime: 0 });
+export const useZonalHeads = () => useQuery({ queryKey: adminKeys.zonalHeads, queryFn: ({ signal }) => adminApi.zonalHeads(signal), staleTime: 0 });
+export const useCitiesOverview = () => useQuery({ queryKey: adminKeys.cities, queryFn: ({ signal }) => adminApi.cities(signal), staleTime: 0 });
+export const useRmDashboard = () => useQuery({
+  queryKey: adminKeys.rmDashboard, queryFn: ({ signal }) => adminApi.rmDashboard(signal), staleTime: 0, refetchInterval: LIVE_ORDER_REFRESH_MS,
+});
+export const usePricingRules = (category: string) =>
+  useQuery({ queryKey: adminKeys.rules(category), queryFn: ({ signal }) => adminApi.pricingRules(category, signal), staleTime: 0 });

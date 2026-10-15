@@ -26,6 +26,13 @@ export {
 export {
   ACCOUNT_KEY,
   LIVE_ORDER_REFRESH_MS,
+  adminKeys,
+  useCitiesOverview,
+  usePartnersOverview,
+  usePricingRules,
+  useRmDashboard,
+  useStaffDirectory,
+  useZonalHeads,
   catalogKeys,
   createQueryClient,
   orderKeys,
@@ -56,3 +63,16 @@ export {
 } from './hooks';
 export { SessionProvider, tokenUser, useSession, type SessionState, type TokenStorage } from './session';
 export { ridersApi, type RidersOverview, type TeamRider } from './riders';
+export {
+  adminApi,
+  type ActionResult,
+  type City,
+  type CityWithUsers,
+  type EvaluationRule,
+  type PartnerOverviewItem,
+  type PartnersOverview,
+  type RmPartner,
+  type StaffDirectory,
+  type StaffUser,
+  type ZonalHead,
+} from './admin';
