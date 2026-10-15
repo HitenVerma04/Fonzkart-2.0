@@ -6,6 +6,7 @@ import { quoteApi } from './quote';
 import { customerOrdersApi, executiveApi, notificationsApi, staffOrdersApi, type PlaceOrderInput } from './orders';
 import { ridersApi } from './riders';
 import { adminApi } from './admin';
+import { catalogAdminApi, emailApi } from './content';
 
 export function createQueryClient() {
   return new QueryClient({
@@ -279,3 +280,20 @@ export const useRmDashboard = () => useQuery({
 });
 export const usePricingRules = (category: string) =>
   useQuery({ queryKey: adminKeys.rules(category), queryFn: ({ signal }) => adminApi.pricingRules(category, signal), staleTime: 0 });
+
+// ------------------------------------------------------------------------------------------------ content and email
+
+export const contentKeys = {
+  bannerPrices: ['staff', 'banner-prices'] as const,
+  email: (account?: string) => ['staff', 'email', account ?? null] as const,
+  emailMessage: (id: string) => ['staff', 'email-message', id] as const,
+};
+
+export const useBannerPrices = () =>
+  useQuery({ queryKey: contentKeys.bannerPrices, queryFn: ({ signal }) => catalogAdminApi.bannerPrices(signal), staleTime: 0 });
+export const useHomepageCities = () =>
+  useQuery({ queryKey: ['staff', 'homepage-cities'], queryFn: ({ signal }) => adminApi.homepageCities(signal), staleTime: 0 });
+export const useEmailMessages = (account?: string) =>
+  useQuery({ queryKey: contentKeys.email(account), queryFn: ({ signal }) => emailApi.messages(account, signal), staleTime: 0, refetchInterval: 60_000 });
+export const useEmailMessage = (id: string | undefined) =>
+  useQuery({ queryKey: contentKeys.emailMessage(id ?? ''), queryFn: ({ signal }) => emailApi.message(id!, signal), enabled: !!id });

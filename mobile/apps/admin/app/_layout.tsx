@@ -25,6 +25,13 @@ export default function RootLayout() {
           <Stack.Screen name="rm" options={{ title: 'RM dashboard' }} />
           <Stack.Screen name="pricing" options={{ title: 'Pricing rules' }} />
           <Stack.Screen name="inbox" options={{ title: 'Notifications' }} />
+          <Stack.Screen name="catalog/index" options={{ title: 'Catalog' }} />
+          <Stack.Screen name="catalog/brand/[id]" options={{ title: 'Models' }} />
+          <Stack.Screen name="catalog/model/[id]" options={{ title: 'Variants' }} />
+          <Stack.Screen name="homepage" options={{ title: 'Landing page' }} />
+          <Stack.Screen name="email/index" options={{ title: 'Email' }} />
+          <Stack.Screen name="email/[id]" options={{ title: 'Message' }} />
+          <Stack.Screen name="email/compose" options={{ title: 'New email' }} />
         </Stack>
       </SessionProvider>
     </QueryClientProvider>
