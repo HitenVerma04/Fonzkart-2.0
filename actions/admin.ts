@@ -13,6 +13,13 @@ import {
 } from '@/lib/staff-access';
 import { ORDER_DELETERS, ORDER_STAFF, PARTNER_ROUTERS, requireOrderAccess } from '@/lib/order-access';
 import * as orderWorkflow from '@/lib/order-workflow';
+import { backendRequest, usesApi } from '@/lib/backend';
+
+// With USE_API_ORDERS=1 the order actions below go to the Spring Boot backend (as the Partner and Admin apps).
+const staffOrderPath = (orderId: string, suffix = '') => `/api/staff/orders/${encodeURIComponent(orderId)}${suffix}`;
+async function staffOrderAction<T>(orderId: string, body: Record<string, unknown>): Promise<T> {
+    return (await backendRequest<T>('POST', staffOrderPath(orderId), { body })).data!;
+}
 
 // Auth check helper: SUPER_ADMIN or ADMIN only (database role). Partners, field executives, zonal heads and
 // relationship managers may enter the admin panel, but that does not make them administrators.
@@ -468,6 +475,12 @@ export async function updateRiderPartner(riderId: string, partnerId: string | nu
 
 // Route (or re-route) an order to a partner: admins any partner, zonal heads their team, RMs their own partners.
 export async function assignPartner(orderId: string, partnerId: string) {
+    if (usesApi('ORDERS')) {
+        const { data } = await backendRequest<{ success: boolean; changed: boolean }>('POST', staffOrderPath(orderId, '/partner'), { body: { partnerId } });
+        revalidatePath('/admin/orders');
+        revalidatePath('/admin/rm-dashboard');
+        return data!;
+    }
     const ctx = await requireOrderAccess(orderId, PARTNER_ROUTERS);
     const result = await orderWorkflow.assignPartner(ctx, partnerId);
     revalidatePath('/admin/orders');
@@ -477,6 +490,13 @@ export async function assignPartner(orderId: string, partnerId: string) {
 
 // Give an order to an executive: admins any; zonal heads, RMs and partners only executives of their partners.
 export async function assignRider(orderId: string, riderId: string) {
+    if (usesApi('ORDERS')) {
+        // The backend also emails the customer who is coming.
+        await backendRequest('POST', staffOrderPath(orderId, '/rider'), { body: { riderId } });
+        revalidatePath('/admin');
+        revalidatePath('/admin/orders');
+        return { success: true };
+    }
     const ctx = await requireOrderAccess(orderId, ORDER_STAFF);
     const rider = await orderWorkflow.assignRider(ctx, riderId);
 
@@ -508,6 +528,11 @@ export async function assignRider(orderId: string, riderId: string) {
 }
 
 export async function restoreOrder(orderId: string) {
+    if (usesApi('ORDERS')) {
+        const result = await staffOrderAction<{ success: boolean; status: string }>(orderId, { action: 'restore_order' });
+        revalidatePath('/admin/orders');
+        return result;
+    }
     const { order, staff } = await requireOrderAccess(orderId, ORDER_STAFF);
     const restoredStatus = await orderWorkflow.restoreOrder(order, await orderWorkflow.staffActor(staff));
     revalidatePath('/admin/orders');
@@ -516,6 +541,11 @@ export async function restoreOrder(orderId: string) {
 
 // Permanent deletion: admins and zonal heads (their orders) only, as the order API's DELETE.
 export async function deleteOrder(orderId: string) {
+    if (usesApi('ORDERS')) {
+        await backendRequest('DELETE', staffOrderPath(orderId));
+        revalidatePath('/admin/orders');
+        return { success: true };
+    }
     await requireOrderAccess(orderId, ORDER_DELETERS);
     await prisma.order.delete({ where: { id: orderId } });
     revalidatePath('/admin/orders');
@@ -523,6 +553,12 @@ export async function deleteOrder(orderId: string) {
 }
 
 export async function updateOrderHubStatus(orderId: string, hubStatus: 'handed_over' | 'pending') {
+    if (usesApi('ORDERS')) {
+        const result = await staffOrderAction<{ success: boolean; hubStatus: string }>(orderId, { action: 'update_hub_status', hubStatus });
+        revalidatePath('/admin/orders');
+        revalidatePath('/admin/riders');
+        return result;
+    }
     const { order, staff } = await requireOrderAccess(orderId, ORDER_STAFF);
     await orderWorkflow.setHubStatus(order, await orderWorkflow.staffActor(staff), hubStatus);
     revalidatePath('/admin/orders');
@@ -532,6 +568,12 @@ export async function updateOrderHubStatus(orderId: string, hubStatus: 'handed_o
 
 // Record that the customer was paid (once the device is collected).
 export async function markPayoutPaid(orderId: string, reference?: string) {
+    if (usesApi('ORDERS')) {
+        const result = await staffOrderAction<{ success: boolean; payout: unknown }>(orderId, { action: 'mark_payout_paid', reference });
+        revalidatePath('/admin/orders');
+        revalidatePath('/orders');
+        return result;
+    }
     const { order, staff } = await requireOrderAccess(orderId, ORDER_STAFF);
     const payout = await orderWorkflow.markPayoutPaid(order, await orderWorkflow.staffActor(staff), reference);
     revalidatePath('/admin/orders');

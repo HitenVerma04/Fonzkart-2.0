@@ -1,6 +1,7 @@
 "use server";
 import { prisma } from "@/lib/db";
 import { getCurrentStaff, type StaffUser } from "@/lib/staff-access";
+import { backendRequest, usesApi } from "@/lib/backend";
 
 // In-app notifications for the admin panel bell. Who the caller is comes from the signed-in session and the
 // database (getCurrentStaff), never from arguments sent by the browser: the old (role, userId) parameters are still
@@ -33,6 +34,14 @@ async function currentPanelUser(): Promise<StaffUser | null> {
 }
 
 export async function getNotifications(_userRole?: string, _userId?: string) {
+    if (usesApi('ORDERS')) {
+        try {
+            return (await backendRequest<{ success: boolean; notifications?: unknown[] }>('GET', '/api/notifications')).data!;
+        } catch (error) {
+            console.error("Failed to load notifications:", error instanceof Error ? error.message : error);
+            return { success: false };
+        }
+    }
     try {
         const staff = await currentPanelUser();
         if (!staff) return { success: true, notifications: [] };
@@ -49,6 +58,10 @@ export async function getNotifications(_userRole?: string, _userId?: string) {
 }
 
 export async function markAsRead(id: string) {
+    if (usesApi('ORDERS')) {
+        if (typeof id !== 'string' || !id) return { success: false };
+        return (await backendRequest<{ success: boolean }>('POST', `/api/notifications/${encodeURIComponent(id)}/read`)).data!;
+    }
     try {
         const staff = await currentPanelUser();
         if (!staff || typeof id !== 'string' || !id) return { success: false };
@@ -64,6 +77,9 @@ export async function markAsRead(id: string) {
 }
 
 export async function markAllAsRead(_userRole?: string, _userId?: string) {
+    if (usesApi('ORDERS')) {
+        return (await backendRequest<{ success: boolean }>('POST', '/api/notifications/read-all')).data!;
+    }
     try {
         const staff = await currentPanelUser();
         if (!staff) return { success: false };
@@ -81,6 +97,9 @@ export async function markAllAsRead(_userRole?: string, _userId?: string) {
 
 /** The header's "Pulse Test" button: a test notification for the person who pressed it (not for everyone). */
 export async function sendPulseTest() {
+    if (usesApi('ORDERS')) {
+        return (await backendRequest<{ success: boolean }>('POST', '/api/notifications/pulse-test')).data!;
+    }
     const staff = await currentPanelUser();
     if (!staff) return { success: false };
     await prisma.notification.create({

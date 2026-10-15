@@ -6,6 +6,7 @@ import OrderManager, { type OrderPermissions } from "@/components/admin/OrderMan
 import RiderOrderList from "@/components/admin/RiderOrderList";
 import { withoutSecrets } from '@/lib/safe-records';
 import { getCurrentStaff } from '@/lib/staff-access';
+import { backendRequest, usesApi } from '@/lib/backend';
 import {
     BULK_ORDER_STAFF, ORDER_DELETERS, ORDER_STAFF, PARTNER_ROUTERS, PRICE_APPROVERS, canRouteTo, orderInScope, orderScopeFor,
 } from '@/lib/order-access';
@@ -18,6 +19,27 @@ export default async function OrdersPage(props: { searchParams?: Promise<{ rider
 
     const session = await getSession();
     if (!session || !session.user) redirect('/login');
+
+    // With USE_API_ORDERS=1 the backend decides what this person sees (GET /api/staff/orders), as for the Admin app.
+    if (usesApi('ORDERS')) {
+        const { status, data: page } = await backendRequest<any>('GET', '/api/staff/orders', { query: { riderId: filterRiderId }, keepErrors: true });
+        if (status === 401 || status === 403) redirect('/login');
+        if (status >= 400 || !page) throw new Error('Internal error');
+        if (page.view === 'executive') {
+            return <RiderOrderList orders={page.orders} executiveName={session.user.name} isEmbedded={true} />;
+        }
+        return (
+            <OrdersView
+                filtered={!!filterRiderId}
+                role={page.role}
+                territory={page.territory.join(', ')}
+                routablePartners={page.partners.filter((p: any) => p.routable).map((p: any) => p.name).join(', ')}
+                pincodes={page.pincodes.join(', ')}
+            >
+                <OrderManager initialOrders={page.orders} riders={page.riders} partners={page.partners} permissions={page.permissions} userRole={page.role} />
+            </OrdersView>
+        );
+    }
 
     const currentUser: any = await prisma.user.findUnique({
         where: { id: session.user.id },
@@ -70,24 +92,13 @@ export default async function OrdersPage(props: { searchParams?: Promise<{ rider
     };
 
     return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent uppercase">
-                {filterRiderId ? `Orders for Field Executive` : `Manage Orders`}
-            </h1>
-            {staff.role === 'ZONAL_HEAD' && (
-                <p className="text-muted-foreground text-sm font-medium text-primary">
-                    Territory Overview: {currentUser.managedCities.map((c: any) => c.name).join(', ') || 'Unassigned'}
-                </p>
-            )}
-            {staff.role === 'RELATIONSHIP_MANAGER' && (
-                <p className="text-muted-foreground text-sm font-medium text-primary">
-                    Your partners: {partners.filter(p => p.routable).map(p => p.name).join(', ') || 'None assigned yet'} — plus new orders not yet routed to a partner.
-                </p>
-            )}
-            {staff.role === 'PARTNER' && <p className="text-muted-foreground text-sm font-medium text-emerald-600">Assigned Pincodes: {currentUser.pincodes?.join(', ') || 'None'}</p>}
-            <p className="text-muted-foreground">
-                View incoming sell requests, route them to partners and assign field executives for pickup.
-            </p>
+        <OrdersView
+            filtered={!!filterRiderId}
+            role={staff.role}
+            territory={currentUser.managedCities.map((c: any) => c.name).join(', ')}
+            routablePartners={partners.filter(p => p.routable).map(p => p.name).join(', ')}
+            pincodes={currentUser.pincodes?.join(', ') || ''}
+        >
             <OrderManager
                 initialOrders={orders}
                 riders={withoutSecrets(riders)}
@@ -95,6 +106,33 @@ export default async function OrdersPage(props: { searchParams?: Promise<{ rider
                 permissions={permissions}
                 userRole={staff.role}
             />
+        </OrdersView>
+    );
+}
+
+function OrdersView({ filtered, role, territory, routablePartners, pincodes, children }: {
+    filtered: boolean; role: string; territory: string; routablePartners: string; pincodes: string; children: React.ReactNode;
+}) {
+    return (
+        <div className="space-y-6">
+            <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent uppercase">
+                {filtered ? `Orders for Field Executive` : `Manage Orders`}
+            </h1>
+            {role === 'ZONAL_HEAD' && (
+                <p className="text-muted-foreground text-sm font-medium text-primary">
+                    Territory Overview: {territory || 'Unassigned'}
+                </p>
+            )}
+            {role === 'RELATIONSHIP_MANAGER' && (
+                <p className="text-muted-foreground text-sm font-medium text-primary">
+                    Your partners: {routablePartners || 'None assigned yet'} — plus new orders not yet routed to a partner.
+                </p>
+            )}
+            {role === 'PARTNER' && <p className="text-muted-foreground text-sm font-medium text-emerald-600">Assigned Pincodes: {pincodes || 'None'}</p>}
+            <p className="text-muted-foreground">
+                View incoming sell requests, route them to partners and assign field executives for pickup.
+            </p>
+            {children}
         </div>
     );
 }

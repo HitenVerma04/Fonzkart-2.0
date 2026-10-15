@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { ORDER_DELETERS, ORDER_STAFF, PRICE_APPROVERS, httpStatusFor, requireOrderAccess } from '@/lib/order-access';
 import * as orderWorkflow from '@/lib/order-workflow';
+import { backendRoute, usesApi } from '@/lib/backend';
 
 // Single-order actions from the admin panel. Who may act on which order: lib/order-access.ts (the order must be one
 // the caller sees on the Orders page); what each action does: lib/order-workflow.ts.
@@ -9,6 +10,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     try {
         const { id } = await context.params;
         const body = await request.json().catch(() => ({}));
+        // With USE_API_ORDERS=1 the backend does the same (lib/backend.ts), as for the Partner and Admin apps.
+        if (usesApi('ORDERS')) return await backendRoute('POST', `/api/staff/orders/${encodeURIComponent(id)}`, body);
         const { action } = body ?? {};
 
         if (action === 'approve_verification' || action === 'reject_verification') {
@@ -52,6 +55,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await context.params;
+        if (usesApi('ORDERS')) return await backendRoute('DELETE', `/api/staff/orders/${encodeURIComponent(id)}`);
         await requireOrderAccess(id, ORDER_DELETERS);
         await prisma.order.delete({ where: { id } });
         return NextResponse.json({ success: true });

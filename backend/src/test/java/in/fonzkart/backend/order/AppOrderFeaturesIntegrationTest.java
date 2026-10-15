@@ -153,6 +153,18 @@ class AppOrderFeaturesIntegrationTest {
         assertThat(call("GET", "/api/executive/orders/" + id, rider, null).status()).isEqualTo(200);
     }
 
+    @Test
+    void thePulseTestNotifiesOnlyTheStaffMemberWhoPressedIt() throws Exception {
+        assertThat(call("POST", "/api/notifications/pulse-test", cust, null).body().get("success").asBoolean()).isFalse();
+        assertThat(call("POST", "/api/notifications/pulse-test", null, null).body().get("success").asBoolean()).isFalse();
+        assertThat(call("POST", "/api/notifications/pulse-test", admin, null).body().get("success").asBoolean()).isTrue();
+        String adminId = jdbc.queryForObject("SELECT id FROM \"User\" WHERE email = 'ops@example.test'", String.class);
+        assertThat(jdbc.queryForList("SELECT \"userId\" FROM \"Notification\" WHERE title = 'DB Heartbeat Pulse'", String.class))
+                .containsExactly(adminId);
+        JsonNode bell = call("GET", "/api/notifications", admin, null).body().get("notifications");
+        assertThat(bell.findValuesAsText("title")).contains("DB Heartbeat Pulse");
+    }
+
     // ------------------------------------------------------------------------------------------------ deletion
 
     @Test

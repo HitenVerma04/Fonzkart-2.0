@@ -1,9 +1,9 @@
 
 import { CheckCircle, Truck, Wallet, Loader2, MapPin, Calendar, Clock, Zap, ArrowRight, ArrowLeft, X } from "lucide-react";
 import { useState, useEffect } from 'react';
-import { placeOrder, checkPincodeAvailability, requestServiceArea } from '@/actions/orders';
+import { placeOrder, checkPincodeAvailability, quotePrice, requestServiceArea } from '@/actions/orders';
 import { quickRegister, quickLogin } from '@/actions/inlineAuth';
-import { calculatePrice } from '@/actions/priceCalculation';
+// The offer comes from quotePrice: with USE_API_ORDERS it is the server's price for this device, the price the order is booked at.
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -83,7 +83,7 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
 
     useEffect(() => {
         setIsCalculating(true);
-        calculatePrice(basePrice, answers, category || 'smartphone')
+        quotePrice(deviceInfo.name, deviceInfo.variant, basePrice, answers, category || 'smartphone')
             .then(price => {
                 setFinalPrice(price);
                 setIsCalculating(false);
@@ -92,7 +92,7 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
                 console.error(err);
                 setIsCalculating(false);
             });
-    }, [basePrice, answers, category]);
+    }, [basePrice, answers, category, deviceInfo.name, deviceInfo.variant]);
 
     // -------------------------------------------------------------------------
     // DATE GENERATION (Dynamic based on time)

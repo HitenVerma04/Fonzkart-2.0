@@ -7,5 +7,6 @@ import './notifications.test';
 import './catalog.test';
 import './questionnaire.test';
 import './backend-switch.test';
+import './orders-switch.test';
 import './shared-code.test';
 import './email.test';

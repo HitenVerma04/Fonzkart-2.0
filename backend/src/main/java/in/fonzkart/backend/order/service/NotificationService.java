@@ -7,6 +7,7 @@ import in.fonzkart.backend.auth.session.SessionPayload;
 import in.fonzkart.backend.order.entity.Notification;
 import in.fonzkart.backend.order.repository.NotificationRepository;
 import in.fonzkart.backend.rider.entity.Rider;
+import in.fonzkart.backend.shared.id.Cuid;
 import in.fonzkart.backend.shared.text.JsText;
 import in.fonzkart.backend.shared.time.JsDates;
 import java.util.LinkedHashMap;
@@ -89,6 +90,17 @@ public class NotificationService {
         } else {
             notifications.markAllReadForUser(staff.id());
         }
+        return Map.of("success", true);
+    }
+
+    /** sendPulseTest(): the header's "Pulse Test" button, a test notification for the staff member who pressed it. */
+    public Map<String, Object> pulseTest(Optional<SessionPayload> session) {
+        Optional<Staff> me = staffAccess.current(session).filter(s -> PANEL_ROLES.contains(s.role()));
+        if (me.isEmpty()) {
+            return Map.of("success", false);
+        }
+        notifications.save(Notification.create(Cuid.next(), me.get().id(), null, null, "DB Heartbeat Pulse",
+                "Synchronized with FonzKart server.", "info", null, JsDates.nowUtc()));
         return Map.of("success", true);
     }
 

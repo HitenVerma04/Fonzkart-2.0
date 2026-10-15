@@ -8,6 +8,10 @@ import { getSession } from '@/lib/session';
 import { hashRiderPassword, verifyRiderPassword } from '@/lib/rider-password';
 import { EXECUTIVE_COOKIE, executiveCookieOptions, signExecutiveToken, verifyExecutiveToken } from '@/lib/executive-session';
 import { Actor, completeAtHub, confirmPickup, failOrder, markPayoutPaid, submitPickup } from '@/lib/order-workflow';
+import { backendRequest, usesApi } from '@/lib/backend';
+
+// With USE_API_ORDERS=1 the executive's order actions go to the Spring Boot backend (as the Partner app's rider mode).
+const executiveOrderPath = (orderId: string, action: string) => `/api/executive/orders/${encodeURIComponent(orderId)}/${action}`;
 
 async function startExecutiveSession(riderId: string) {
     const cookieStore = await cookies();
@@ -108,6 +112,7 @@ function withoutPassword<T extends { password?: string | null }>(rider: T | null
 }
 
 export async function getExecutiveOrders() {
+    if (usesApi('ORDERS')) return (await backendRequest<any[]>('GET', '/api/executive/orders')).data ?? [];
     const executive = await getExecutiveSession();
     if (!executive) return [];
 
@@ -136,6 +141,11 @@ function revalidateOrderPages() {
 // The executive's own status changes: fail an open pickup, confirm a pickup at the current (quoted or approved)
 // price, or report the device delivered to the hub. A changed price goes through submitVerification instead.
 export async function updateOrderStatus(orderId: string, status: string, reason?: string) {
+    if (usesApi('ORDERS')) {
+        await backendRequest('POST', executiveOrderPath(orderId, 'status'), { body: { status, reason } });
+        revalidateOrderPages();
+        return { success: true };
+    }
     const { order, actor } = await requireOwnOrder(orderId);
 
     if (status === 'failed') await failOrder(order, actor, reason || 'Handled by executive');
@@ -150,6 +160,11 @@ export async function updateOrderStatus(orderId: string, status: string, reason?
 // Verification result. Decline: the order fails. Pickup at the quoted price: picked up. Pickup at another price:
 // the order waits for approval (status pending_verification) — the device may not be collected until it is approved.
 export async function submitVerification(orderId: string, payload: { riderAnswers: any, verificationImages: string[], offeredPrice: number, status?: string }) {
+    if (usesApi('ORDERS')) {
+        const { data } = await backendRequest<{ success: boolean; status: string }>('POST', executiveOrderPath(orderId, 'verification'), { body: payload });
+        revalidateOrderPages();
+        return data!;
+    }
     const { order, actor } = await requireOwnOrder(orderId);
 
     if (payload?.status === 'failed') {
@@ -179,6 +194,11 @@ export async function submitVerification(orderId: string, payload: { riderAnswer
 
 // The executive paid the customer (cash at the door, or a gift card / UPI / bank transfer they sent).
 export async function markPayoutPaidByExecutive(orderId: string, reference?: string) {
+    if (usesApi('ORDERS')) {
+        const { data } = await backendRequest<{ success: boolean; payout: unknown }>('POST', executiveOrderPath(orderId, 'payout'), { body: { reference } });
+        revalidateOrderPages();
+        return data!;
+    }
     const { order, actor } = await requireOwnOrder(orderId);
     const payout = await markPayoutPaid(order, actor, reference);
     revalidateOrderPages();

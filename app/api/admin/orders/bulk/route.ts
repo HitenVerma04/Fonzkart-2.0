@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { requireStaffRole } from '@/lib/staff-access';
 import { BULK_ORDER_STAFF, FORBIDDEN_ORDER, ORDER_DELETERS, httpStatusFor, orderInScope, orderScopeFor } from '@/lib/order-access';
 import * as orderWorkflow from '@/lib/order-workflow';
+import { backendRoute, usesApi } from '@/lib/backend';
 
 // Bulk actions from the admin panel's order lists. Every selected order must be one the caller may act on, or
 // nothing is changed. Orders whose status does not allow the action (e.g. restoring an order that is not failed)
@@ -10,6 +11,7 @@ import * as orderWorkflow from '@/lib/order-workflow';
 export async function POST(request: Request) {
     try {
         const body = await request.json().catch(() => ({}));
+        if (usesApi('ORDERS')) return await backendRoute('POST', '/api/staff/orders/bulk', body);
         const { action, ids, reason } = body ?? {};
 
         if (!ids || !Array.isArray(ids) || ids.length === 0 || !ids.every((i: unknown) => typeof i === 'string')) {

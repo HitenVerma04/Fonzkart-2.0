@@ -4,6 +4,22 @@
 import { db } from '@/lib/store';
 import { getSession } from '@/lib/session';
 import { sendSystemEmail } from '@/lib/email';
+import { backendRequest, usesApi } from '@/lib/backend';
+import { calculatePrice } from '@/actions/priceCalculation';
+
+// With USE_API_ORDERS=1 these go to the Spring Boot backend (lib/backend.ts), which the apps use too.
+
+/**
+ * The final offer shown before booking. Through the backend it is the price the order will be booked at (the server
+ * prices the device and answers itself); otherwise the website's own calculation, as before.
+ */
+export async function quotePrice(device: string, variant: string, basePrice: number, answers: Record<string, unknown>, category: string) {
+    if (usesApi('ORDERS')) {
+        const { data } = await backendRequest<{ price: number }>('POST', '/api/orders/quote', { body: { device, variant, answers } });
+        return data!.price;
+    }
+    return calculatePrice(basePrice, answers, category);
+}
 // import { redirect } from 'next/navigation';
 
 export async function placeOrder(
@@ -15,6 +31,11 @@ export async function placeOrder(
     location: { lat: number; lng: number } | null,
     answers: unknown
 ) {
+    if (usesApi('ORDERS')) {
+        // The backend prices the order itself (the price argument is not trusted) and notifies staff and the customer.
+        await backendRequest('POST', '/api/orders', { body: { device, variant, address, pincode, location, answers } });
+        return { success: true };
+    }
     const session = await getSession();
     if (!session || !session.user) {
         throw new Error('Unauthorized');
@@ -56,6 +77,9 @@ export async function placeOrder(
 }
 
 export async function getUserOrders() {
+    if (usesApi('ORDERS')) {
+        return (await backendRequest<any[]>('GET', '/api/orders')).data ?? [];
+    }
     const session = await getSession();
     if (!session || !session.user) return [];
 
@@ -73,6 +97,9 @@ export async function getUserOrders() {
 }
 
 export async function checkPincodeAvailability(pincode: string) {
+    if (usesApi('ORDERS')) {
+        return (await backendRequest<boolean>('GET', '/api/cities/pincode-availability', { query: { pincode } })).data === true;
+    }
     const { prisma } = await import('@/lib/db');
     const city = await prisma.city.findFirst({
         where: {
@@ -84,6 +111,10 @@ export async function checkPincodeAvailability(pincode: string) {
 }
 
 export async function requestServiceArea(pincode: string, phone: string, address: string) {
+    if (usesApi('ORDERS')) {
+        await backendRequest('POST', '/api/orders/service-area-requests', { body: { pincode, phone, address } });
+        return { success: true };
+    }
     // Send an email to the admin about the new service area request
     const adminEmail = process.env.SUPERADMIN_EMAIL || 'admin@fonzkart.in';
     const html = `

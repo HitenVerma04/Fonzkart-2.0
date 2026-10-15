@@ -89,4 +89,10 @@ public class CustomerOrderController {
     public Map<String, Object> markAllAsRead(HttpServletRequest request) {
         return notifications.markAllAsRead(sessions.getSession(request));
     }
+
+    /** The admin header's "Pulse Test": a test notification for the staff member who pressed it. */
+    @PostMapping("/notifications/pulse-test")
+    public Map<String, Object> pulseTest(HttpServletRequest request) {
+        return notifications.pulseTest(sessions.getSession(request));
+    }
 }

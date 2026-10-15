@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { getCurrentStaff } from "@/lib/staff-access";
+import { backendRoute, usesApi } from "@/lib/backend";
 import { ORDER_STAFF, orderInScope, orderScopeFor } from "@/lib/order-access";
 
 // Open orders without an executive, for the admin panel's "new order waiting" buzzer: counted among the orders the
 // caller sees on the Orders page (lib/order-access.ts), so a zonal head is buzzed for their own territory only.
 export async function GET() {
     try {
+        if (usesApi('ORDERS')) return await backendRoute('GET', '/api/staff/orders/unassigned-count', undefined, true);
         const staff = await getCurrentStaff();
         if (!staff) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
