@@ -8,7 +8,7 @@ import { getSession } from '@/lib/session';
 import { hashRiderPassword, verifyRiderPassword } from '@/lib/rider-password';
 import { EXECUTIVE_COOKIE, executiveCookieOptions, signExecutiveToken, verifyExecutiveToken } from '@/lib/executive-session';
 import { Actor, completeAtHub, confirmPickup, failOrder, markPayoutPaid, submitPickup } from '@/lib/order-workflow';
-import { backendRequest, usesApi } from '@/lib/backend';
+import { backendAction, backendRequest, usesApi } from '@/lib/backend';
 
 // With USE_API_ORDERS=1 the executive's order actions go to the Spring Boot backend (as the Partner app's rider mode).
 const executiveOrderPath = (orderId: string, action: string) => `/api/executive/orders/${encodeURIComponent(orderId)}/${action}`;
@@ -19,6 +19,8 @@ async function startExecutiveSession(riderId: string) {
 }
 
 export async function loginExecutive(phone: string, password?: string) {
+    // With USE_API_AUTH=1 the backend checks the password and sets the executive cookie (as the Partner app's rider mode).
+    if (usesApi('AUTH')) return backendAction('/api/executive/login', { phone, password });
     const riders = await db.getRiders();
     const executive = riders.find(r => r.phone === phone);
 
@@ -52,6 +54,7 @@ export async function loginExecutive(phone: string, password?: string) {
 }
 
 export async function onboardExecutive(id: string, password: string) {
+    if (usesApi('AUTH')) return backendAction('/api/executive/onboard', { id, password });
     const riders = await db.getRiders();
     const executive = riders.find(r => r.id === id);
 

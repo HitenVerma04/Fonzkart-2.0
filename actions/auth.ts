@@ -11,7 +11,12 @@ import nodemailer from 'nodemailer';
 import { PrismaClient } from '@prisma/client';
 import { sendSystemEmail } from '@/lib/email';
 import { SUPER_ADMIN_EMAILS } from '@/lib/auth-utils';
+import { backendAction, usesApi } from '@/lib/backend';
 const prisma = new PrismaClient();
+
+// With USE_API_AUTH=1 sign-up, sign-in, email verification and password reset are done by the backend (the same
+// endpoints the apps use); its session cookie is set on the website (lib/backend.ts → backendAction).
+const fields = (formData: FormData, ...names: string[]) => Object.fromEntries(names.map(n => [n, formData.get(n)]));
 
 const getSMTPHost = () => {
     const host = process.env.SMTP_HOST;
@@ -22,6 +27,7 @@ const getSMTPHost = () => {
 };
 
 export async function signup(prevState: { error?: string } | null, formData: FormData) {
+    if (usesApi('AUTH')) return backendAction('/api/auth/signup', fields(formData, 'name', 'email', 'phone', 'password'));
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     let phone = formData.get('phone') as string;
@@ -114,6 +120,7 @@ export async function signup(prevState: { error?: string } | null, formData: For
 }
 
 export async function verifyEmailSignup(prevState: { error?: string, success?: string } | null, formData: FormData) {
+    if (usesApi('AUTH')) return backendAction('/api/auth/verify-email', fields(formData, 'email', 'otp'));
     const email = formData.get('email') as string;
     const otp = formData.get('otp') as string;
 
@@ -163,6 +170,7 @@ export async function verifyEmailSignup(prevState: { error?: string, success?: s
 }
 
 export async function signin(prevState: { error?: string } | null, formData: FormData) {
+    if (usesApi('AUTH')) return backendAction('/api/auth/signin', fields(formData, 'email', 'password'));
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
@@ -259,6 +267,7 @@ export async function createOrderAction(_device: string, _variant: string, _pric
 }
 
 export async function requestPasswordReset(prevState: { error?: string, success?: string, email?: string, step?: string } | null, formData: FormData) {
+    if (usesApi('AUTH')) return backendAction('/api/auth/password-reset/request', fields(formData, 'email'));
     const email = formData.get('email') as string;
 
     if (!email) {
@@ -323,6 +332,7 @@ export async function requestPasswordReset(prevState: { error?: string, success?
 }
 
 export async function verifyAndResetPassword(prevState: { error?: string, success?: string } | null, formData: FormData) {
+    if (usesApi('AUTH')) return backendAction('/api/auth/password-reset/confirm', fields(formData, 'email', 'otp', 'password'));
     const email = formData.get('email') as string;
     const otp = formData.get('otp') as string;
     const password = formData.get('password') as string;

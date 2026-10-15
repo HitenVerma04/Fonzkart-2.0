@@ -5,8 +5,9 @@
 //
 //   CATALOG  catalog reads                      ORDERS   orders, executive pickups, staff order actions, notifications
 //   CONTENT  catalog editing, banner prices     UPLOADS  image uploads
-//   AUTH     sign-in, sign-up, password reset, executive phone login
+//   AUTH     sign-in, sign-up, password reset, profile, executive phone login
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const TIMEOUT_MS = 10_000;
 
@@ -102,6 +103,18 @@ export async function relayCookies(setCookies: string[]) {
         }
         jar.set(name, value, options as any);
     }
+}
+
+/**
+ * A sign-in style action answered by the backend (/api/auth/*, /api/executive/login|onboard): the backend's
+ * Set-Cookie headers become the website's cookies, {"redirectTo": url} becomes redirect(url), and any other body
+ * (e.g. {"error": "Invalid email/phone or password"}) is returned as the action's result, as before.
+ */
+export async function backendAction<T = any>(path: string, body: unknown): Promise<T> {
+    const r = await backendRequest<any>('POST', path, { body });
+    await relayCookies(r.setCookies);
+    if (r.data && typeof r.data === 'object' && typeof r.data.redirectTo === 'string') redirect(r.data.redirectTo);
+    return r.data as T;
 }
 
 /**

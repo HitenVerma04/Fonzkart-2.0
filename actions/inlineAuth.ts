@@ -5,8 +5,13 @@ import { db } from '@/lib/store';
 import { login } from '@/lib/session';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db';
+import { backendAction, usesApi } from '@/lib/backend';
+
+// With USE_API_AUTH=1 these are done by the backend (as the apps), which sets the session cookie.
+const fields = (formData: FormData, ...names: string[]) => Object.fromEntries(names.map(n => [n, formData.get(n)]));
 
 export async function quickRegister(formData: FormData) {
+    if (usesApi('AUTH')) return backendAction('/api/auth/quick-register', fields(formData, 'name', 'email', 'phone', 'password'));
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const phone = formData.get('phone') as string; // Optional in schema but we want to save it
@@ -56,6 +61,7 @@ export async function quickRegister(formData: FormData) {
 }
 
 export async function quickLogin(formData: FormData) {
+    if (usesApi('AUTH')) return backendAction('/api/auth/quick-login', fields(formData, 'email', 'password'));
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
