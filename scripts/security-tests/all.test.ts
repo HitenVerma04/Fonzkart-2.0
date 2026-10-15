@@ -8,3 +8,4 @@ import './catalog.test';
 import './questionnaire.test';
 import './backend-switch.test';
 import './shared-code.test';
+import './email.test';

@@ -1,6 +1,8 @@
 import { Client } from 'ssh2';
 
-export async function execSSH(cmd: string): Promise<string> {
+// Runs one command on the mail server over SSH. Only called with commands built by lib/mail-admin.ts
+// (mailserverCommand: validated mailbox, base64 password) and only when MAILSERVER_SSH_HOST is set.
+export async function execSSH(host: string, cmd: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const conn = new Client();
     conn.on('ready', () => {
@@ -10,7 +12,7 @@ export async function execSSH(cmd: string): Promise<string> {
           return reject(err);
         }
         let out = '';
-        stream.on('close', (code: any, signal: any) => {
+        stream.on('close', () => {
           conn.end();
           resolve(out);
         }).on('data', (data: any) => {
@@ -22,10 +24,10 @@ export async function execSSH(cmd: string): Promise<string> {
     }).on('error', (err) => {
       reject(err);
     }).connect({
-      host: '89.116.27.217',
+      host,
       port: 22,
-      username: 'root',
-      password: process.env.SMTP_PASSWORD || ''
+      username: process.env.MAILSERVER_SSH_USER || 'root',
+      password: process.env.SSH_PASSWORD || process.env.SMTP_PASSWORD || ''
     });
   });
 }

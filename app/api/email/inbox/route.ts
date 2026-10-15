@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
+import { prisma } from '@/lib/db';
+import { mailHttpStatus, requireMailbox } from '@/lib/mail-admin';
 
-const prisma = new PrismaClient();
-
+// Reads a mailbox live over IMAP: only one the signed-in staff member may use (lib/mail-admin.ts).
 export async function GET(req: NextRequest) {
   const accountEmail = req.nextUrl.searchParams.get('account');
   if (!accountEmail) return NextResponse.json({ message: 'Account required' }, { status: 400 });
+
+  try {
+    await requireMailbox(accountEmail);
+  } catch (e) {
+    const status = mailHttpStatus(e);
+    return NextResponse.json({ message: status === 500 ? 'Internal error' : (e as Error).message }, { status });
+  }
 
   try {
     const account = await prisma.emailAccount.findUnique({ where: { email: accountEmail } });

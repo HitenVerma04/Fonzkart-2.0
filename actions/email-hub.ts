@@ -3,6 +3,7 @@
 import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
 import { execSSH } from '@/lib/ssh';
+import { mailboxAddress, mailserverCommand, mailserverSshHost, reachableMailboxes, requireMailAdmin, requireMailbox } from '@/lib/mail-admin';
 import { revalidatePath } from 'next/cache';
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
@@ -11,6 +12,9 @@ import { simpleParser } from 'mailparser';
  * Syncs IMAP emails to the database for all or a specific account
  */
 export async function syncImapEmails(targetAccount?: string) {
+    // A server action anyone could call: one mailbox the caller may use, or all of them for administrators.
+    if (targetAccount) await requireMailbox(targetAccount);
+    else await requireMailAdmin();
     const accounts = await prisma.emailAccount.findMany({
         where: targetAccount ? { email: targetAccount } : {}
     });
@@ -170,23 +174,19 @@ export async function fetchRoleBasedEmails(selectedAccount?: string, skipSync: b
 }
 
 export async function fetchEmailById(id: string) {
-    const session = await getSession();
-    if (!session || !session.user) throw new Error('Unauthorized');
-
-    return await prisma.emailMessage.findUnique({
-        where: { id }
-    });
+    const access = await reachableMailboxes(); // throws 'Unauthorized' without a session
+    const message = typeof id === 'string' && id ? await prisma.emailMessage.findUnique({ where: { id } }) : null;
+    // Only messages from or to a mailbox the caller may use (administrators: all).
+    if (!message || (!access.all && !access.emails.includes(message.from) && !access.emails.includes(message.to))) return null;
+    return message;
 }
 
 export async function deleteEmailAccountAction(email: string) {
     try {
-        const session = await getSession();
-        if (!session || !session.user) throw new Error('Unauthorized');
-        
-        const role = session.user.role;
-        if (!['SUPER_ADMIN', 'ADMIN'].includes(role)) {
-            throw new Error('Forbidden: Only administrators can delete accounts');
-        }
+        await requireMailAdmin(); // the role as stored now, not as remembered in the session cookie
+        const mailbox = mailboxAddress(email);
+        if (!mailbox) throw new Error('Invalid: Mailbox');
+        email = mailbox;
 
         // 1. Delete from LOCAL DB
         const deleted = await prisma.emailAccount.delete({
@@ -201,10 +201,13 @@ export async function deleteEmailAccountAction(email: string) {
         }
 
         // 2. SSH into VPS and remove account from mailserver
-        try {
-            await execSSH(`docker exec $(docker ps -q -f "ancestor=ghcr.io/docker-mailserver/docker-mailserver:latest") setup email del ${email}`);
-        } catch (e: any) {
-            console.warn("VPS removal failed, continuing...", e.message);
+        const host = mailserverSshHost();
+        if (host) {
+            try {
+                await execSSH(host, mailserverCommand('del', email));
+            } catch (e: any) {
+                console.warn("VPS removal failed, continuing...", e.message);
+            }
         }
 
         // 3. Clear associated messages

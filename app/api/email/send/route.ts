@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import nodemailer from 'nodemailer';
+import { mailHttpStatus, requireMailbox } from '@/lib/mail-admin';
 
+// Sends from a Fonzkart mailbox: only one the signed-in staff member may use (lib/mail-admin.ts).
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -12,6 +14,12 @@ export async function POST(req: NextRequest) {
 
     if (!fromAccount || !to || !subject || !text) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    }
+    try {
+      await requireMailbox(fromAccount);
+    } catch (e) {
+      const status = mailHttpStatus(e);
+      return NextResponse.json({ message: status === 500 ? 'Internal error' : (e as Error).message }, { status });
     }
 
     const attachments = [];
