@@ -20,7 +20,7 @@ import {
     MapPin
 } from 'lucide-react';
 import { Logo } from '@/components/Logo';
-import { logout } from '@/lib/session';
+import { logout } from '@/actions/session';
 
 interface SidebarSessionUser {
     id?: string | null;

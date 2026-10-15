@@ -22,7 +22,7 @@ import {
     LayoutDashboard
 } from 'lucide-react';
 import { useNotifications } from '../NotificationProvider';
-import { logout } from '@/lib/session';
+import { logout } from '@/actions/session';
 import { ThemeToggle } from '../theme-toggle';
 
 function AudioAlertToggle() {

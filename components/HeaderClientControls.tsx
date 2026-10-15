@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { NavLinks } from './NavLinks';
 import { SidebarDrawer } from './SidebarDrawer';
-import { logout } from '@/lib/session';
+import { logout } from '@/actions/session';
 
 interface HeaderSessionUser {
     id?: string | null;

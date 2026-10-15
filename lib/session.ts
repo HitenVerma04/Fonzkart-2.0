@@ -1,5 +1,5 @@
-'use server';
-
+// Server-only session code (signing, reading and clearing the session cookie). Not a 'use server' module: the browser
+// signs out through actions/session.ts and can call nothing here.
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { SessionPayload, SUPER_ADMIN_EMAILS } from './auth-utils';

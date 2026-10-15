@@ -8,6 +8,9 @@ import { NextRequest } from 'next/server';
 import { GET as accountsGet, POST as accountsPost, DELETE as accountsDelete } from '@/app/api/email/account/route';
 import { GET as inboxGet } from '@/app/api/email/inbox/route';
 import { POST as sendPost } from '@/app/api/email/send/route';
+import { POST as webhookPost } from '@/app/api/webhooks/email/route';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as hub from '@/actions/email-hub';
 import { mailboxAddress, mailserverCommand } from '@/lib/mail-admin';
 import { as, attempt, prisma, signIn } from './harness';
@@ -94,5 +97,38 @@ describe('email system: only the right people, and no shell injection', () => {
         assert.ok(!JSON.stringify(listed).includes('"password"'), 'passwords are never listed');
         const messageId = (await prisma.emailMessage.findUniqueOrThrow({ where: { messageId: 'm-1' } })).id;
         assert.equal((await attempt(() => hub.fetchEmailById(messageId))).returned?.subject, 'Private');
+    });
+});
+
+describe('inbound email cannot reach the admin as code', () => {
+    const inbound = (secret?: string) => webhookPost(new Request('http://t/api/webhooks/email', {
+        method: 'POST', headers: secret === undefined ? {} : { 'x-webhook-secret': secret },
+        body: JSON.stringify({ from: 'x@evil.test', to: 'support@fonzkart.in', subject: 'Webhook test', html: '<img src=x onerror=alert(1)>' }),
+    }));
+    const stored = () => prisma.emailMessage.count({ where: { subject: 'Webhook test' } });
+
+    test('the mail webhook needs the shared secret, and is off without one', async () => {
+        delete process.env.EMAIL_WEBHOOK_SECRET;
+        assert.equal((await inbound()).status, 401);
+        assert.equal((await inbound('')).status, 401);
+        process.env.EMAIL_WEBHOOK_SECRET = 'hook-secret';
+        try {
+            assert.equal((await inbound()).status, 401);
+            assert.equal((await inbound('wrong')).status, 401);
+            assert.equal(await stored(), 0);
+            assert.equal((await inbound('hook-secret')).status, 200);
+            assert.equal(await stored(), 1);
+        } finally {
+            delete process.env.EMAIL_WEBHOOK_SECRET;
+            await prisma.emailMessage.deleteMany({ where: { subject: 'Webhook test' } });
+        }
+    });
+
+    test('the admin email view shows email HTML only in a sandboxed frame without scripts', () => {
+        const source = readFileSync(join(process.cwd(), 'app/admin/email/EmailClient.tsx'), 'utf8');
+        assert.ok(!source.includes('dangerouslySetInnerHTML'), 'email HTML must not be inserted into the admin page');
+        const frame = source.match(/<iframe[^>]*srcDoc=\{[^}]*bodyHtml[^>]*>/)?.[0] ?? '';
+        assert.match(frame, /sandbox="[^"]*"/);
+        assert.doesNotMatch(frame, /allow-scripts|allow-same-origin/);
     });
 });

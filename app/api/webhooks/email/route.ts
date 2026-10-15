@@ -1,14 +1,27 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { prisma } from '@/lib/db';
 
-// This is the universal webhook endpoint for your self-hosted mail server (like Postal)
-// Point your custom mail server to POST inbound emails to:
-// https://www.fonzkart.in/api/webhooks/email
+// Inbound mail from a self-hosted mail server (Postal, Mailgun, ...), shown in the admin panel's email hub.
+// The mail server must send the shared secret EMAIL_WEBHOOK_SECRET in the X-Webhook-Secret header; without the
+// variable the endpoint is off. (Before, anyone could post "emails" into the admin inbox.)
+function authorised(req: Request) {
+    const secret = process.env.EMAIL_WEBHOOK_SECRET;
+    const sent = req.headers.get('x-webhook-secret');
+    if (!secret || !sent) return false;
+    const a = Buffer.from(sent);
+    const b = Buffer.from(secret);
+    return a.length === b.length && timingSafeEqual(a, b);
+}
+
 export async function POST(req: Request) {
+    if (!authorised(req)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     try {
         const payload = await req.json();
 
-        // Adjust these field mappings dynamically based on what your custom Mail Server 
+        // Adjust these field mappings dynamically based on what your custom Mail Server
         // formats inbound webhooks as (Postal, Mailgun, Sendgrid, etc. all serialize slightly differently)
         const from = payload.from || payload.mail_from || 'Unknown';
         const to = payload.to || payload.rcpt_to || 'Unknown';

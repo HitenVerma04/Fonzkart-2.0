@@ -330,7 +330,9 @@ export default function EmailClient({ role: initialRole, userEmail: initialUserE
                                 </div>
                             </div>
                             <div className="text-slate-700 dark:text-slate-300 text-sm lg:text-lg leading-relaxed lg:leading-[1.8] font-medium break-words">
-                                {fullEmail.bodyHtml ? <div dangerouslySetInnerHTML={{ __html: fullEmail.bodyHtml }} className="email-content-wrapper p-4 bg-white dark:bg-slate-900 rounded-3xl" /> : <p className="whitespace-pre-wrap">{fullEmail.bodyText || fullEmail.text}</p>}
+                                {/* Email HTML comes from anyone who can send mail: it is shown in a sandboxed frame (no scripts, no forms,
+                                    not this site's origin), so it can never act as the signed-in admin. Links open in a new tab. */}
+                                {fullEmail.bodyHtml ? <iframe title="Email content" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" srcDoc={`<base target="_blank">${fullEmail.bodyHtml}`} className="email-content-wrapper w-full h-[60vh] bg-white rounded-3xl border-0" /> :<p className="whitespace-pre-wrap">{fullEmail.bodyText || fullEmail.text}</p>}
                             </div>
                         </div>
                     </motion.div>
