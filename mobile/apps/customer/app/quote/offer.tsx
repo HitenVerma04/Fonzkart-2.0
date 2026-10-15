@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useOfferPrice, usePincodeAvailability, useQuestionnaire, useSession } from '@fonzkart/api';
+import { customerOrdersApi, usePincodeAvailability, useQuestionnaire, useQuote, useSession } from '@fonzkart/api';
 import { cleanPincode, describeAnswers, formatInr, isCompletePincode, stepsForDevice } from '@fonzkart/core';
 import { Button, EmptyState, ErrorState, Loading, Notice, RemoteImage, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
+import { networkMessage } from '../../src/authFlow';
 import { PAGE_PADDING } from '../../src/grid';
 import { useQuoteDraft } from '../../src/quoteDraft';
 
@@ -12,10 +13,12 @@ export default function Offer() {
   const draft = useQuoteDraft();
   const { session } = useSession();
   const questionnaire = useQuestionnaire();
-  const price = useOfferPrice(draft?.basePrice, draft?.answers, draft?.category ?? 'smartphone');
+  // The server's price for this device and these answers: exactly what the order will be booked at.
+  const quote = useQuote(draft?.modelName, draft?.variantName, draft?.answers);
   const [pincode, setPincode] = useState('');
   const pickup = usePincodeAvailability(pincode);
-  const [bookingNote, setBookingNote] = useState(false);
+  const [requestPhone, setRequestPhone] = useState('');
+  const [request, setRequest] = useState<{ sending: boolean; sent: boolean; error: string | null }>({ sending: false, sent: false, error: null });
 
   const summary = useMemo(() => {
     if (!draft?.answers || !questionnaire.data) return [];
@@ -28,7 +31,17 @@ export default function Offer() {
     if (session.status !== 'signedIn') {
       router.push({ pathname: '/account/sign-in', params: { returnTo: '/quote/offer' } });
     } else {
-      setBookingNote(true);
+      router.push({ pathname: '/book', params: { pincode } });
+    }
+  };
+
+  const askForArea = async () => {
+    setRequest({ sending: true, sent: false, error: null });
+    try {
+      await customerOrdersApi.requestServiceArea(pincode, requestPhone, '');
+      setRequest({ sending: false, sent: true, error: null });
+    } catch (error) {
+      setRequest({ sending: false, sent: false, error: networkMessage(error) });
     }
   };
 
@@ -39,12 +52,12 @@ export default function Offer() {
         <Text style={styles.device}>{draft.modelName}</Text>
         <Text style={styles.variant}>{draft.variantName}</Text>
         <Text style={styles.offerLabel}>Your final offer</Text>
-        {price.isPending ? (
+        {quote.isPending ? (
           <Loading label="Calculating your price…" />
-        ) : price.isError || typeof price.data !== 'number' ? (
-          <ErrorState message="Could not calculate the price. Check your internet connection." onRetry={() => price.refetch()} />
+        ) : quote.isError || typeof quote.data?.price !== 'number' ? (
+          <ErrorState message="Could not calculate the price. Check your internet connection." onRetry={() => quote.refetch()} />
         ) : (
-          <Text style={styles.price} accessibilityLabel={`Your final offer ${formatInr(price.data)}`}>{formatInr(price.data)}</Text>
+          <Text style={styles.price} accessibilityLabel={`Your final offer ${formatInr(quote.data.price)}`}>{formatInr(quote.data.price)}</Text>
         )}
         <Text style={styles.max}>Max value {formatInr(draft.basePrice)}</Text>
       </View>
@@ -54,7 +67,10 @@ export default function Offer() {
         <TextField
           label="Your pincode"
           value={pincode}
-          onChangeText={text => setPincode(cleanPincode(text))}
+          onChangeText={text => {
+            setPincode(cleanPincode(text));
+            setRequest({ sending: false, sent: false, error: null });
+          }}
           keyboardType="number-pad"
           maxLength={6}
           placeholder="6-digit pincode"
@@ -67,12 +83,31 @@ export default function Offer() {
           ) : pickup.data ? (
             <Notice tone="success" text={`Pickup is available at ${pincode}.`} />
           ) : (
-            <Notice tone="error" text={`We don't pick up from ${pincode} yet.`} />
+            <View style={styles.request}>
+              <Notice tone="error" text={`We don't pick up from ${pincode} yet.`} />
+              {request.sent ? (
+                <Notice tone="success" text="Thanks! We'll let you know when we start picking up in your area." />
+              ) : (
+                <>
+                  <TextField
+                    label="Your mobile number"
+                    value={requestPhone}
+                    onChangeText={text => setRequestPhone(text.replace(/\D/g, '').slice(0, 10))}
+                    keyboardType="phone-pad"
+                    prefix="+91"
+                    placeholder="10-digit number"
+                  />
+                  <Button title="Notify me when you come here" variant="secondary" loading={request.sending}
+                    disabled={requestPhone.length !== 10} onPress={() => void askForArea()} />
+                  {request.error ? <Notice tone="error" text={request.error} /> : null}
+                </>
+              )}
+            </View>
           )
         ) : null}
-        <Button title="Book free pickup" onPress={book} disabled={!pickup.data || !isCompletePincode(pincode)} />
+        <Button title="Book free pickup" onPress={book}
+          disabled={!pickup.data || !isCompletePincode(pincode) || typeof quote.data?.price !== 'number'} />
         {session.status !== 'signedIn' ? <Text style={styles.small}>You'll sign in or create an account to book.</Text> : null}
-        {bookingNote ? <Notice text="Pickup booking comes in the next app update. Your offer above is your price for this device." /> : null}
       </View>
 
       {summary.length ? (
@@ -102,6 +137,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: spacing.md },
   cardTitle: { fontSize: font.heading, fontWeight: '700', color: colors.text },
   checking: { fontSize: font.small, color: colors.muted },
+  request: { gap: spacing.md },
   small: { fontSize: font.small, color: colors.muted, textAlign: 'center' },
   answer: { gap: 2 },
   answerTitle: { fontSize: font.small, color: colors.muted },

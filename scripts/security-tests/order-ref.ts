@@ -29,11 +29,8 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 /** The category the sell flow prices a model with (same mapping as CustomerOrderService.sellCategory). */
 function sellCategory(c: string | null | undefined): string {
   const k = (c || '').trim().toLowerCase();
-  if (['', 'mobile', 'smartphone', 'phone'].includes(k)) return 'smartphone';
-  if (['ipad', 'tablet'].includes(k)) return 'tablet';
-  if (['watch', 'smartwatch'].includes(k)) return 'smartwatch';
-  if (['smarttv', 'tv'].includes(k)) return 'tv';
-  return k;
+  const aliases: Record<string, string> = { mobile: 'smartphone', ipad: 'tablet', smartwatch: 'watch', tv: 'smarttv' };
+  return aliases[k] ?? (k || 'smartphone');
 }
 
 async function labels() {

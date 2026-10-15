@@ -10,6 +10,11 @@
     "android": {
       "package": "in.fonzkart.customer",
       "versionCode": 2,
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -26,6 +31,12 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Fonzkart uses your location to fill in your pickup address and to guide the executive to your door."
+        }
+      ],
       [
         "expo-splash-screen",
         {

@@ -156,17 +156,19 @@ public class CustomerOrderService {
     }
 
     /**
-     * The category the website's sell flow (/sell?category=...) prices a model with: smartphone, tablet, smartwatch,
-     * laptop, console or tv, whatever alias the model is stored with. Never taken from the request, so a client cannot
-     * pick a category without deductions.
+     * The category the website's sell flow prices a model with: the category tiles of components/sell/CategorySelector.tsx
+     * (smartphone, tablet, camera, laptop, watch, smarttv, console, desktop, earbuds), whatever alias the model is stored
+     * with. The same mapping as the apps' sellCategoryOf (mobile/packages/core). Never taken from the request, so a
+     * client cannot pick a category without deductions.
      */
     public static String sellCategory(String modelCategory) {
         String c = modelCategory == null ? "" : JsText.lower(JsText.trim(modelCategory));
         return switch (c) {
-            case "", "mobile", "smartphone", "phone" -> "smartphone";
-            case "ipad", "tablet" -> "tablet";
-            case "watch", "smartwatch" -> "smartwatch";
-            case "smarttv", "tv" -> "tv";
+            case "" -> "smartphone";
+            case "mobile" -> "smartphone";
+            case "ipad" -> "tablet";
+            case "smartwatch" -> "watch";
+            case "tv" -> "smarttv";
             default -> c;
         };
     }

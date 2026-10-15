@@ -23,14 +23,26 @@ export default function Home() {
       <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Logo variant="horizontal" height={44} />
-          <Pressable
-            onPress={() => router.push('/account')}
-            accessibilityRole="button"
-            accessibilityLabel="Account"
-            style={({ pressed }) => [styles.account, pressed && styles.pressed]}
-          >
-            <Text style={styles.accountText} numberOfLines={1}>{accountLabel}</Text>
-          </Pressable>
+          <View style={styles.headerActions}>
+            {session.status === 'signedIn' ? (
+              <Pressable
+                onPress={() => router.push('/orders')}
+                accessibilityRole="button"
+                accessibilityLabel="My orders"
+                style={({ pressed }) => [styles.account, pressed && styles.pressed]}
+              >
+                <Text style={styles.accountText}>Orders</Text>
+              </Pressable>
+            ) : null}
+            <Pressable
+              onPress={() => router.push('/account')}
+              accessibilityRole="button"
+              accessibilityLabel="Account"
+              style={({ pressed }) => [styles.account, pressed && styles.pressed]}
+            >
+              <Text style={styles.accountText} numberOfLines={1}>{accountLabel}</Text>
+            </Pressable>
+          </View>
         </View>
 
         <Text style={styles.title}>Sell your old device</Text>
@@ -83,6 +95,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing.sm },
+  headerActions: { flexDirection: 'row', gap: spacing.sm },
   account: { maxWidth: 120, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
   accountText: { fontSize: font.small, fontWeight: '700', color: colors.navy },
   title: { fontSize: font.title, fontWeight: '800', color: colors.navy },

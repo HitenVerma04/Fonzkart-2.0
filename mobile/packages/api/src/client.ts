@@ -40,7 +40,7 @@ export function buildUrl(base: string, path: string, query?: Query): string {
 }
 
 /** Calls the backend. Fails with ApiError on HTTP errors and after 15 s without an answer. */
-export async function request<T>(method: 'GET' | 'POST' | 'PUT', path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+export async function request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
   const { query, body, signal, issuesToken } = options;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -77,4 +77,29 @@ export async function request<T>(method: 'GET' | 'POST' | 'PUT', path: string, o
 /** GET a JSON document from the backend. */
 export async function getJson<T>(path: string, query?: Query, signal?: AbortSignal): Promise<T> {
   return (await request<T>('GET', path, { query, signal })).data;
+}
+
+/** A photo to upload (expo-image-picker / expo-camera give a local file URI). */
+export interface UploadFile {
+  uri: string;
+  name: string;
+  type: string;
+}
+
+/**
+ * Uploads an image (POST /api/uploads, multipart field "file"); returns its URL path, e.g. /uploads/123-front.jpg.
+ * Needs a signed-in user or executive. Images only, up to 10 MB.
+ */
+export async function uploadImage(file: UploadFile, signal?: AbortSignal): Promise<string> {
+  const form = new FormData();
+  // React Native's FormData takes { uri, name, type } for a file on the device.
+  form.append('file', file as unknown as Blob);
+  const headers: Record<string, string> = { Accept: 'application/json' };
+  if (authToken) headers.Authorization = `Bearer ${authToken}`;
+  const response = await fetch(buildUrl(config.apiUrl, '/api/uploads'), { method: 'POST', headers, body: form, signal });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null) as { error?: unknown } | null;
+    throw new ApiError(typeof detail?.error === 'string' ? detail.error : `Upload failed (${response.status})`, response.status);
+  }
+  return ((await response.json()) as { url: string }).url;
 }

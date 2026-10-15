@@ -10,8 +10,10 @@ import { dirname, join, relative } from 'node:path';
 const [src, dest, flag] = process.argv.slice(2);
 mkdirSync(dest, { recursive: true });
 
-// backend/…/catalog: the static data Spring Boot serves, compared with its TypeScript source by questionnaire.test.ts.
-for (const entry of ['actions', 'app', 'components', 'lib', 'prisma', 'scripts', 'tsconfig.json', 'backend/src/main/resources/catalog']) {
+// backend/…/catalog and the apps' copy of lib/order-status.ts: compared with their website sources by
+// questionnaire.test.ts and shared-code.test.ts.
+for (const entry of ['actions', 'app', 'components', 'lib', 'prisma', 'scripts', 'tsconfig.json', 'backend/src/main/resources/catalog',
+    'mobile/packages/core/src/orderStatus.ts']) {
     cpSync(join(src, entry), join(dest, entry), {
         recursive: true,
         filter: p => !/[\\/](node_modules|\.next)([\\/]|$)/.test(p),
