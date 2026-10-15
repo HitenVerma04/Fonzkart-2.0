@@ -25,6 +25,7 @@ export {
   bookingProblems,
   expressAvailable,
   pickupDays,
+  splitDevice,
   type BookingDetails,
   type PaymentMethod,
   type PickupDay,

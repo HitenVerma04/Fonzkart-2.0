@@ -101,3 +101,12 @@ export function bookingAnswers(deviceAnswers: Record<string, unknown>, b: Bookin
     bankAccountName: b.paymentMethod === 'bank_transfer' ? b.bankAccountName.trim() : undefined,
   };
 }
+
+/**
+ * An order's device text ("iPhone 13 (128GB)") as model and variant names, split like the website's
+ * findVariantByName(): everything before the last " (…)" is the model.
+ */
+export function splitDevice(device: string): { model: string; variant: string } | null {
+  const match = /(.+)\s\((.+)\)/.exec(device);
+  return match ? { model: match[1]!.trim(), variant: match[2]!.trim() } : null;
+}

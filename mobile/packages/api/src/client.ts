@@ -92,8 +92,13 @@ export interface UploadFile {
  */
 export async function uploadImage(file: UploadFile, signal?: AbortSignal): Promise<string> {
   const form = new FormData();
-  // React Native's FormData takes { uri, name, type } for a file on the device.
-  form.append('file', file as unknown as Blob);
+  if ('document' in globalThis) {
+    // Web build (local checks): the picker gives a blob: URL; send its bytes.
+    form.append('file', await (await fetch(file.uri)).blob(), file.name);
+  } else {
+    // React Native's FormData takes { uri, name, type } for a file on the device.
+    form.append('file', file as unknown as Blob);
+  }
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (authToken) headers.Authorization = `Bearer ${authToken}`;
   const response = await fetch(buildUrl(config.apiUrl, '/api/uploads'), { method: 'POST', headers, body: form, signal });

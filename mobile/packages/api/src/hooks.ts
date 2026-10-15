@@ -3,7 +3,8 @@ import { isCompletePincode, type Answers } from '@fonzkart/core';
 import { authApi } from './auth';
 import { MIN_SEARCH_LENGTH, catalogApi, healthApi } from './catalog';
 import { quoteApi } from './quote';
-import { customerOrdersApi, notificationsApi, type PlaceOrderInput } from './orders';
+import { customerOrdersApi, executiveApi, notificationsApi, staffOrdersApi, type PlaceOrderInput } from './orders';
+import { ridersApi } from './riders';
 
 export function createQueryClient() {
   return new QueryClient({
@@ -167,5 +168,92 @@ export function usePlaceOrder() {
       void client.invalidateQueries({ queryKey: orderKeys.mine });
       void client.invalidateQueries({ queryKey: orderKeys.notifications });
     },
+  });
+}
+
+// ------------------------------------------------------------------------------------------------ executives
+
+export const executiveKeys = {
+  orders: ['executive', 'orders'] as const,
+  order: (id: string) => ['executive', 'orders', id] as const,
+  inbox: ['executive', 'inbox'] as const,
+};
+
+export function useExecutiveOrders(enabled: boolean) {
+  return useQuery({
+    queryKey: executiveKeys.orders,
+    queryFn: ({ signal }) => executiveApi.orders(signal),
+    enabled,
+    staleTime: 0,
+    refetchInterval: LIVE_ORDER_REFRESH_MS,
+  });
+}
+
+export function useExecutiveOrder(id: string | undefined) {
+  return useQuery({
+    queryKey: executiveKeys.order(id ?? ''),
+    queryFn: ({ signal }) => executiveApi.order(id!, signal),
+    enabled: !!id,
+    staleTime: 0,
+    refetchInterval: LIVE_ORDER_REFRESH_MS,
+  });
+}
+
+export function useExecutiveInbox(enabled: boolean) {
+  return useQuery({
+    queryKey: executiveKeys.inbox,
+    queryFn: ({ signal }) => executiveApi.notifications(signal),
+    enabled,
+    staleTime: 0,
+    refetchInterval: 60_000,
+  });
+}
+
+// ------------------------------------------------------------------------------------------------ staff
+
+export const staffKeys = {
+  orders: (riderId?: string) => ['staff', 'orders', riderId ?? null] as const,
+  riders: ['staff', 'riders'] as const,
+  inbox: ['staff', 'inbox'] as const,
+  unassigned: ['staff', 'unassigned'] as const,
+};
+
+/** The Orders page data for the signed-in staff member (orders in their scope, executives, partners, permissions). */
+export function useStaffOrders(enabled: boolean, riderId?: string) {
+  return useQuery({
+    queryKey: staffKeys.orders(riderId),
+    queryFn: ({ signal }) => staffOrdersApi.page(riderId, signal),
+    enabled,
+    staleTime: 0,
+    refetchInterval: LIVE_ORDER_REFRESH_MS,
+  });
+}
+
+export function useUnassignedCount(enabled: boolean) {
+  return useQuery({
+    queryKey: staffKeys.unassigned,
+    queryFn: ({ signal }) => staffOrdersApi.unassignedCount(signal),
+    enabled,
+    staleTime: 0,
+    refetchInterval: LIVE_ORDER_REFRESH_MS,
+  });
+}
+
+export function useRidersOverview(enabled: boolean) {
+  return useQuery({
+    queryKey: staffKeys.riders,
+    queryFn: ({ signal }) => ridersApi.overview(signal),
+    enabled,
+    staleTime: 0,
+  });
+}
+
+export function useStaffInbox(enabled: boolean) {
+  return useQuery({
+    queryKey: staffKeys.inbox,
+    queryFn: ({ signal }) => notificationsApi.list(signal),
+    enabled,
+    staleTime: 0,
+    refetchInterval: 60_000,
   });
 }

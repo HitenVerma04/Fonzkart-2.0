@@ -60,3 +60,10 @@ test('the shared order-status logic gives customers the website\'s tracker', () 
   assert.deepEqual(steps.map(s => s.state), ['done', 'done', 'done', 'current', 'upcoming', 'upcoming']);
   assert.equal(steps[2]!.detail, 'Ravi');
 });
+
+test('an order\'s device splits into model and variant like the website\'s lookup', async () => {
+  const { splitDevice } = await import('./booking');
+  assert.deepEqual(splitDevice('iPhone 13 (128GB)'), { model: 'iPhone 13', variant: '128GB' });
+  assert.deepEqual(splitDevice('Galaxy S21 (8GB + 128GB)'), { model: 'Galaxy S21', variant: '8GB + 128GB' });
+  assert.equal(splitDevice('Watch Series 8'), null);
+});

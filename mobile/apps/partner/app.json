@@ -32,6 +32,21 @@
     "plugins": [
       "expo-router",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Fonzkart Partner uses the camera to photograph devices at pickup and to scan IMEI barcodes.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Fonzkart Partner uses the camera to photograph devices at pickup.",
+          "photosPermission": "Fonzkart Partner attaches device photos you choose to the pickup."
+        }
+      ],
+      "expo-secure-store",
+      [
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
