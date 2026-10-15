@@ -6,12 +6,13 @@
 //   CATALOG  catalog reads                      ORDERS   orders, executive pickups, staff order actions, notifications
 //   CONTENT  catalog editing, banner prices     UPLOADS  image uploads
 //   AUTH     sign-in, sign-up, password reset, profile, executive phone login
+//   STAFF    staff roles, partners, zonal heads, executives, cities, pricing rules
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 const TIMEOUT_MS = 10_000;
 
-export type ApiPart = 'CATALOG' | 'ORDERS' | 'CONTENT' | 'UPLOADS' | 'AUTH';
+export type ApiPart = 'CATALOG' | 'ORDERS' | 'CONTENT' | 'UPLOADS' | 'AUTH' | 'STAFF';
 
 const announced = new Set<ApiPart>();
 
@@ -126,4 +127,9 @@ export async function backendRoute(method: 'GET' | 'POST' | 'DELETE', path: stri
     if (r.status < 400) return Response.json(r.data);
     const message = r.status >= 500 ? 'Internal error' : (r.data && typeof r.data.error === 'string' ? r.data.error : 'Internal error');
     return jsonErrors ? Response.json({ error: message }, { status: r.status }) : new Response(message, { status: r.status });
+}
+
+/** The named fields of a submitted form, as the backend's JSON body (null where a field is missing). */
+export function formFields(data: FormData, ...names: string[]): Record<string, FormDataEntryValue | null> {
+    return Object.fromEntries(names.map(name => [name, data.get(name)]));
 }

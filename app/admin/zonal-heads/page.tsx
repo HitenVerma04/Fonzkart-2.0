@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { addZonalHead } from '@/actions/admin';
 import ZonalHeadUpgradeForm from '@/components/admin/ZonalHeadUpgradeForm';
 import { ADMINS, hasStaffRole, requireStaffRole } from '@/lib/staff-access';
+import { backendRequest, formFields, usesApi } from '@/lib/backend';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,6 +53,11 @@ export default async function ZonalHeadsPage() {
                         <h2 className="text-xl font-bold mb-6">Register Zonal Head</h2>
                         <form action={async (data) => {
                             'use server';
+                            if (usesApi('STAFF')) {
+                                await backendRequest('POST', '/api/staff/zonal-heads', { body: formFields(data, 'name', 'email', 'phone', 'password') });
+                                revalidatePath('/admin/zonal-heads');
+                                return;
+                            }
                             await requireStaffRole(ADMINS);
                             const name = data.get('name') as string;
                             const email = data.get('email') as string;
@@ -147,6 +153,11 @@ export default async function ZonalHeadsPage() {
                                                     {city.name}
                                                     <form action={async () => {
                                                         'use server';
+                                                        if (usesApi('STAFF')) {
+                                                            await backendRequest('DELETE', `/api/staff/zonal-heads/${encodeURIComponent(zh.id)}/cities/${encodeURIComponent(city.id)}`);
+                                                            revalidatePath('/admin/zonal-heads');
+                                                            return;
+                                                        }
                                                         await requireStaffRole(ADMINS);
                                                         await prisma.city.update({
                                                             where: { id: city.id },
@@ -165,6 +176,13 @@ export default async function ZonalHeadsPage() {
 
                                     <form action={async (data) => {
                                         'use server';
+                                        if (usesApi('STAFF')) {
+                                            if (data.get('cityId')) {
+                                                await backendRequest('POST', `/api/staff/zonal-heads/${encodeURIComponent(zh.id)}/cities`, { body: { cityId: data.get('cityId') } });
+                                                revalidatePath('/admin/zonal-heads');
+                                            }
+                                            return;
+                                        }
                                         await requireStaffRole(ADMINS);
                                         const cityId = data.get('cityId') as string;
                                         if (cityId) {

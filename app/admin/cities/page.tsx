@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import CityCard from '@/components/admin/CityCard';
 import { CITY_ADMIN_ROLES, CITY_STAFF, hasStaffRole, requireStaffRole } from '@/lib/staff-access';
 import { withoutSecrets } from '@/lib/safe-records';
+import { backendRequest, usesApi } from '@/lib/backend';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,6 +76,11 @@ export default async function CitiesAdminPage() {
 
                     <form action={async (data) => {
                         'use server';
+                        if (usesApi('STAFF')) {
+                            await backendRequest('POST', '/api/cities/hubs', { body: { cityName: data.get('cityName') } });
+                            revalidatePath('/admin/cities');
+                            return;
+                        }
                         // Server actions can be called directly, so check access here, not only in the layout.
                         await requireStaffRole([...CITY_ADMIN_ROLES, 'ZONAL_HEAD']);
                         const name = data.get('cityName') as string;

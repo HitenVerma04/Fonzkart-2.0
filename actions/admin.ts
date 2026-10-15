@@ -21,6 +21,14 @@ async function staffOrderAction<T>(orderId: string, body: Record<string, unknown
     return (await backendRequest<T>('POST', staffOrderPath(orderId), { body })).data!;
 }
 
+// With USE_API_STAFF=1 role management, executives, cities and pricing rules go to the backend (as the Admin app);
+// the backend makes the same access checks and returns the same results.
+async function staffChange<T = any>(method: 'POST' | 'PUT' | 'DELETE', path: string, body: unknown, paths: string[]): Promise<T> {
+    const { data } = await backendRequest<T>(method, path, { body });
+    for (const p of paths) revalidatePath(p);
+    return data as T;
+}
+
 // Auth check helper: SUPER_ADMIN or ADMIN only (database role). Partners, field executives, zonal heads and
 // relationship managers may enter the admin panel, but that does not make them administrators.
 async function requireAdmin() {
@@ -35,6 +43,7 @@ export async function getAdmins() {
 }
 
 export async function addAdmin(email: string) {
+    if (usesApi('STAFF')) return staffChange('POST', '/api/staff/admins', { email }, ['/admin/admins']);
     await requireAdmin();
     const cleanEmail = email.trim().toLowerCase();
     const user = await db.findUserByEmail(cleanEmail);
@@ -49,6 +58,7 @@ export async function addAdmin(email: string) {
 }
 
 export async function addZonalHead(email: string) {
+    if (usesApi('STAFF')) return staffChange('POST', '/api/staff/zonal-heads/grant', { email }, ['/admin/admins', '/admin/zonal-heads']);
     await requireAdmin();
     const cleanEmail = email.trim().toLowerCase();
     const user = await db.findUserByEmail(cleanEmail);
@@ -64,6 +74,7 @@ export async function addZonalHead(email: string) {
 }
 
 export async function addRelationshipManager(email: string) {
+    if (usesApi('STAFF')) return staffChange('POST', '/api/staff/relationship-managers/grant', { email }, ['/admin/admins', '/admin/relationship-managers']);
     await requireAdmin();
     const cleanEmail = email.trim().toLowerCase();
     const user = await db.findUserByEmail(cleanEmail);
@@ -80,6 +91,7 @@ export async function addRelationshipManager(email: string) {
 
 // Used by the Users page (admins) and the Partners page (also zonal heads and relationship managers).
 export async function addPartner(email: string, cityId?: string, managerId?: string) {
+    if (usesApi('STAFF')) return staffChange('POST', '/api/staff/partners/grant', { email, cityId, managerId }, ['/admin/admins', '/admin/partners']);
     const staff = await requireStaffRole(PARTNER_MANAGERS);
     const cleanEmail = email.trim().toLowerCase();
     const user = await db.findUserByEmail(cleanEmail);
@@ -108,6 +120,7 @@ export async function addPartner(email: string, cityId?: string, managerId?: str
 }
 
 export async function updatePartnerManager(partnerId: string, managerId: string | null) {
+    if (usesApi('STAFF')) return staffChange('PUT', `/api/staff/partners/${enc(partnerId)}/manager`, { managerId }, ['/admin/partners']);
     await requireAdmin();
     await prisma.user.update({
         where: { id: partnerId },
@@ -118,6 +131,7 @@ export async function updatePartnerManager(partnerId: string, managerId: string 
 }
 
 export async function toggleFeaturedCity(id: string, isFeatured: boolean) {
+    if (usesApi('STAFF')) return staffChange('PUT', `/api/cities/${enc(id)}/featured`, { isFeatured }, ['/', '/admin/homepage']);
     await requireAdmin();
     await prisma.city.update({
         where: { id },
@@ -129,6 +143,7 @@ export async function toggleFeaturedCity(id: string, isFeatured: boolean) {
 }
 
 export async function updateCityDisplayOrder(id: string, order: number) {
+    if (usesApi('STAFF')) return staffChange('PUT', `/api/cities/${enc(id)}/display-order`, { order }, ['/', '/admin/homepage']);
     await requireAdmin();
     await prisma.city.update({
         where: { id },
@@ -163,6 +178,7 @@ export async function getPartnersManagedBy(managerId: string) {
 
 // Used by the Users page (admins) and the Field Executives page (also zonal heads and partners).
 export async function addFieldExecutive(email: string) {
+    if (usesApi('STAFF')) return staffChange('POST', '/api/riders/field-executives', { email }, ['/admin/admins', '/admin/riders', '/admin/orders']);
     const staff = await requireStaffRole(RIDER_MANAGERS, 'Forbidden: Insufficient privileges to grant executive access');
 
     const cleanEmail = email.trim().toLowerCase();
@@ -208,6 +224,7 @@ export async function addFieldExecutive(email: string) {
 }
 
 export async function removeAdmin(email: string) {
+    if (usesApi('STAFF')) return staffChange('POST', '/api/staff/admins/remove', { email }, ['/admin/admins']);
     await requireAdmin();
     const session = await getSession();
     if (session?.user?.email === email) {
@@ -223,6 +240,10 @@ export async function removeAdmin(email: string) {
 }
 
 export async function removeUserRole(email: string) {
+    if (usesApi('STAFF')) {
+        return staffChange('POST', '/api/staff/roles/remove', { email }, ['/admin', '/admin/admins', '/admin/zonal-heads',
+            '/admin/relationship-managers', '/admin/partners', '/admin/riders', '/admin/orders']);
+    }
     await requireAdmin();
     const session = await getSession();
     if (session?.user?.email === email) {
@@ -433,6 +454,7 @@ export async function deleteVariant(id: string) {
 
 // Field Executives page: admins (any partner), zonal heads (their partners or none), partners (themselves).
 export async function addRider(name: string, phone: string, email?: string | null, partnerId?: string | null) {
+    if (usesApi('STAFF')) return staffChange('POST', '/api/riders', { name, phone, email, partnerId }, ['/admin/riders']);
     const staff = await requireStaffRole(RIDER_MANAGERS);
     const team = await riderTeamPartnerIds(staff);
     if (team && !(partnerId ? team.includes(partnerId) : staff.role === 'ZONAL_HEAD')) throw new Error(FORBIDDEN_TEAM);
@@ -452,6 +474,7 @@ export async function addRider(name: string, phone: string, email?: string | nul
 // Admins: any rider or field-executive account. Zonal heads and partners: only riders of their own team, and only if
 // an account with the same id is an ordinary or field-executive account (its role is reset to USER).
 export async function deleteRider(id: string) {
+    if (usesApi('STAFF')) return staffChange('DELETE', `/api/riders/${enc(id)}`, undefined, ['/admin/admins', '/admin/riders', '/admin/orders']);
     const staff = await requireStaffRole(RIDER_MANAGERS);
     const team = await riderTeamPartnerIds(staff);
     if (team) {
@@ -500,6 +523,7 @@ export async function deleteRider(id: string) {
 // Admins: any rider. Zonal heads: a rider of their team, moved to another of their partners or to none.
 // (The page does not offer this to partners.)
 export async function updateRiderPartner(riderId: string, partnerId: string | null) {
+    if (usesApi('STAFF')) return staffChange('PUT', `/api/riders/${enc(riderId)}/partner`, { partnerId }, ['/admin/riders']);
     const staff = await requireStaffRole([...ADMINS, 'ZONAL_HEAD']);
     const team = await riderTeamPartnerIds(staff);
     if (team) {
@@ -631,6 +655,7 @@ export async function getEvaluationRules(category: string) {
 }
 
 export async function upsertEvaluationRule(data: { category: string, questionKey: string, answerKey: string, label: string, deductionAmount: number, deductionPercent: number }) {
+    if (usesApi('STAFF')) return staffChange('PUT', '/api/pricing/rules', data, [`/admin/category/${data.category}`, '/sell']);
     await requireAdmin();
     await db.upsertEvaluationRule(data);
     revalidatePath(`/admin/category/${data.category}`);

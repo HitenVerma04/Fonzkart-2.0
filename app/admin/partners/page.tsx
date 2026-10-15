@@ -8,6 +8,7 @@ import { addPartner } from '@/actions/admin';
 
 import PartnerUpgradeForm from '@/components/admin/PartnerUpgradeForm';
 import { PARTNER_MANAGERS, hasStaffRole, requireStaffRole } from '@/lib/staff-access';
+import { backendRequest, formFields, usesApi } from '@/lib/backend';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +84,13 @@ export default async function PartnersPage() {
                         <h2 className="text-xl font-bold mb-6">Register Partner</h2>
                         <form action={async (data) => {
                             'use server';
+                            if (usesApi('STAFF')) {
+                                await backendRequest('POST', '/api/staff/partners', { body: formFields(data,
+                                    'name', 'email', 'phone', 'password', 'cityId', 'managerId', 'relationshipManagerId') });
+                                revalidatePath('/admin/partners');
+                                revalidatePath('/admin/cities');
+                                return;
+                            }
                             const actor = await requireStaffRole(PARTNER_MANAGERS);
                             // Decided by who submits, not by who rendered the form.
                             const actorIsRm = actor.role === 'RELATIONSHIP_MANAGER';
@@ -220,6 +228,12 @@ export default async function PartnersPage() {
                                 <div className="w-full xl:w-auto flex-1 min-w-0">
                                     <form action={async (data) => {
                                         'use server';
+                                        if (usesApi('STAFF')) {
+                                            await backendRequest('PUT', `/api/staff/partners/${encodeURIComponent(p.id)}/assignment`, {
+                                                body: formFields(data, 'cityId', 'managerId', 'relationshipManagerId') });
+                                            revalidatePath('/admin/partners');
+                                            return;
+                                        }
                                         const actor = await requireStaffRole(PARTNER_MANAGERS);
                                         // Decided by who submits, not by who rendered the form.
                                         const actorIsRm = actor.role === 'RELATIONSHIP_MANAGER';
