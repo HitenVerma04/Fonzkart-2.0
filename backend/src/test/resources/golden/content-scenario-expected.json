@@ -1,0 +1,526 @@
+{
+ "steps": [
+  {
+   "step": "super:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "admin:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "zh1:signin",
+   "outcome": {
+    "redirect": "/admin"
+   }
+  },
+  {
+   "step": "cust:signin",
+   "outcome": {
+    "redirect": "/"
+   }
+  },
+  {
+   "step": "anon:addBrand",
+   "outcome": {
+    "thrown": "Unauthorized"
+   }
+  },
+  {
+   "step": "cust:addBrand",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "zh1:addBrand",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "admin:addBrand",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "acme-phones"
+    }
+   }
+  },
+  {
+   "step": "admin:addBrand",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "acme-phones"
+    }
+   }
+  },
+  {
+   "step": "admin:addBrand",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "acme-phones"
+    }
+   }
+  },
+  {
+   "step": "admin:addBrand",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "zeta"
+    }
+   }
+  },
+  {
+   "step": "admin:updateBrand",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "super:updateBrand",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:updateBrand",
+   "outcome": {
+    "thrown": "<server-error>"
+   }
+  },
+  {
+   "step": "cust:updateBrand",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "admin:addModel",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "<new-id>"
+    }
+   }
+  },
+  {
+   "step": "admin:addModel",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "<new-id>"
+    }
+   }
+  },
+  {
+   "step": "admin:addModel",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "<new-id>"
+    }
+   }
+  },
+  {
+   "step": "zh1:addModel",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "admin:updateModel",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:updateModel",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:reorderModels",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:reorderModels",
+   "outcome": {
+    "thrown": "<server-error>"
+   }
+  },
+  {
+   "step": "cust:reorderModels",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "admin:addVariant",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "<new-id>"
+    }
+   }
+  },
+  {
+   "step": "admin:addVariant",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "<new-id>"
+    }
+   }
+  },
+  {
+   "step": "admin:addVariant",
+   "outcome": {
+    "returned": {
+     "success": true,
+     "id": "<new-id>"
+    }
+   }
+  },
+  {
+   "step": "cust:addVariant",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "admin:updateVariant",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:deleteVariant",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:deleteVariant",
+   "outcome": {
+    "thrown": "<server-error>"
+   }
+  },
+  {
+   "step": "admin:deleteModel",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:deleteModel",
+   "outcome": {
+    "thrown": "<server-error>"
+   }
+  },
+  {
+   "step": "admin:deleteBrand",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:deleteBrand",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:deleteBrand",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "cust:deleteBrand",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "admin:deleteBrand",
+   "outcome": {
+    "thrown": "<server-error>"
+   }
+  },
+  {
+   "step": "cust:getDeviceDisplayPrices",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "admin:getDeviceDisplayPrices",
+   "outcome": {
+    "returned": [
+     {
+      "categoryKey": "cameras",
+      "categoryName": "Cameras",
+      "displayPrice": "₹1,85,000+"
+     },
+     {
+      "categoryKey": "laptops",
+      "categoryName": "Laptops",
+      "displayPrice": "₹1,49,000+"
+     },
+     {
+      "categoryKey": "phones",
+      "categoryName": "Smartphones",
+      "displayPrice": "₹1,29,000+"
+     },
+     {
+      "categoryKey": "watches",
+      "categoryName": "Smartwatches",
+      "displayPrice": "₹65,000+"
+     },
+     {
+      "categoryKey": "tablets",
+      "categoryName": "Tablets",
+      "displayPrice": "₹1,20,000+"
+     }
+    ]
+   }
+  },
+  {
+   "step": "admin:updateDeviceDisplayPrice",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:updateDeviceDisplayPrice",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "admin:updateDeviceDisplayPrice",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  },
+  {
+   "step": "zh1:updateDeviceDisplayPrice",
+   "outcome": {
+    "thrown": "Forbidden: Admin access required"
+   }
+  },
+  {
+   "step": "super:getDeviceDisplayPrices",
+   "outcome": {
+    "returned": [
+     {
+      "categoryKey": "cameras",
+      "categoryName": "Cameras",
+      "displayPrice": "₹2,00,000+"
+     },
+     {
+      "categoryKey": "drones",
+      "categoryName": "Drones",
+      "displayPrice": "₹50,000+"
+     },
+     {
+      "categoryKey": "laptops",
+      "categoryName": "Laptops",
+      "displayPrice": "₹1,49,000+"
+     },
+     {
+      "categoryKey": "phones",
+      "categoryName": "Smartphones",
+      "displayPrice": "₹1,50,000+"
+     },
+     {
+      "categoryKey": "watches",
+      "categoryName": "Smartwatches",
+      "displayPrice": "₹65,000+"
+     },
+     {
+      "categoryKey": "tablets",
+      "categoryName": "Tablets",
+      "displayPrice": "₹1,20,000+"
+     }
+    ]
+   }
+  },
+  {
+   "step": "super:snapshot",
+   "outcome": {
+    "returned": {
+     "brands": [
+      {
+       "id": "acme-phones",
+       "name": "Acme",
+       "logo": "/uploads/acme4.png",
+       "categories": [
+        "smartphone"
+       ],
+       "priority": 7
+      },
+      {
+       "id": "zeta",
+       "name": "Zeta",
+       "logo": "",
+       "categories": [
+        "ipad"
+       ],
+       "priority": 100
+      }
+     ],
+     "models": [
+      {
+       "brandId": "acme-phones",
+       "name": "Acme One Pro",
+       "img": "/uploads/one2.png",
+       "category": "smartphone",
+       "priority": 1
+      },
+      {
+       "brandId": "acme-phones",
+       "name": "Acme Tab",
+       "img": "/t.png",
+       "category": "smartphone",
+       "priority": 2
+      }
+     ],
+     "variants": [
+      {
+       "model": "Acme One Pro",
+       "name": "128 GB",
+       "basePrice": 15500
+      }
+     ],
+     "bannerPrices": [
+      {
+       "categoryKey": "cameras",
+       "categoryName": "Cameras",
+       "displayPrice": "₹2,00,000+"
+      },
+      {
+       "categoryKey": "drones",
+       "categoryName": "Drones",
+       "displayPrice": "₹50,000+"
+      },
+      {
+       "categoryKey": "laptops",
+       "categoryName": "Laptops",
+       "displayPrice": "₹1,49,000+"
+      },
+      {
+       "categoryKey": "phones",
+       "categoryName": "Smartphones",
+       "displayPrice": "₹1,50,000+"
+      },
+      {
+       "categoryKey": "tablets",
+       "categoryName": "Tablets",
+       "displayPrice": "₹1,20,000+"
+      },
+      {
+       "categoryKey": "watches",
+       "categoryName": "Smartwatches",
+       "displayPrice": "₹65,000+"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": "super:deleteBrand",
+   "outcome": {
+    "returned": {
+     "success": true
+    }
+   }
+  }
+ ],
+ "snapshot": {
+  "brands": [
+   {
+    "id": "zeta",
+    "name": "Zeta",
+    "logo": "",
+    "categories": [
+     "ipad"
+    ],
+    "priority": 100
+   }
+  ],
+  "models": [],
+  "variants": [],
+  "bannerPrices": [
+   {
+    "categoryKey": "cameras",
+    "categoryName": "Cameras",
+    "displayPrice": "₹2,00,000+"
+   },
+   {
+    "categoryKey": "drones",
+    "categoryName": "Drones",
+    "displayPrice": "₹50,000+"
+   },
+   {
+    "categoryKey": "laptops",
+    "categoryName": "Laptops",
+    "displayPrice": "₹1,49,000+"
+   },
+   {
+    "categoryKey": "phones",
+    "categoryName": "Smartphones",
+    "displayPrice": "₹1,50,000+"
+   },
+   {
+    "categoryKey": "tablets",
+    "categoryName": "Tablets",
+    "displayPrice": "₹1,20,000+"
+   },
+   {
+    "categoryKey": "watches",
+    "categoryName": "Smartwatches",
+    "displayPrice": "₹65,000+"
+   }
+  ]
+ }
+}

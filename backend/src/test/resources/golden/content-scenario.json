@@ -1,0 +1,58 @@
+{
+  "description": "Catalog and landing-page editing: brands (id from the name, categories added and removed, priority kept or reset), models (add, update, reorder in one transaction, delete), variants (add, update, delete), deleting a brand with its models and variants, and the banner's display prices (defaults added when missing, update by database id, upsert by category key). Each action is also tried by people who may not use it. Executed against the website code (actions/admin.ts with lib/store.ts and lib/banner-prices.ts) on db/01-prisma-schema.sql + 02-catalog-data.sql + 03-staff-seed.sql by scripts/security-tests/run.sh golden (content-ref.ts) to produce content-scenario-expected.json; replayed against Spring Boot by ContentScenarioParityTest. Placeholders: $model:<name>, $variant:<model name>/<variant name>, $banner:<categoryKey> resolve to ids at run time. The website's banner-price backup file is not part of the backend (the database is the one source), so updateDeviceDisplayPrice is compared by its success flag and the stored rows.",
+  "steps": [
+    { "actor": "super", "action": "signin", "input": { "email": "admin@fonzkart.in", "password": "pw" } },
+    { "actor": "admin", "action": "signin", "input": { "email": "ops@example.test", "password": "pw" } },
+    { "actor": "zh1", "action": "signin", "input": { "email": "zh1@example.test", "password": "pw" } },
+    { "actor": "cust", "action": "signin", "input": { "email": "cust@example.test", "password": "pw" } },
+
+    { "actor": "anon", "action": "addBrand", "input": { "name": "Acme Phones", "logo": "/uploads/acme.png", "category": "smartphone" } },
+    { "actor": "cust", "action": "addBrand", "input": { "name": "Acme Phones", "logo": "/uploads/acme.png", "category": "smartphone" } },
+    { "actor": "zh1", "action": "addBrand", "input": { "name": "Acme Phones", "logo": "/uploads/acme.png", "category": "smartphone" } },
+    { "actor": "admin", "action": "addBrand", "input": { "name": "Acme  Phones", "logo": "/uploads/acme.png", "category": "smartphone" } },
+    { "actor": "admin", "action": "addBrand", "input": { "name": "Acme  Phones", "logo": "/uploads/acme2.png", "category": "tablet", "priority": 5 } },
+    { "actor": "admin", "action": "addBrand", "input": { "name": "Acme  Phones", "logo": "/uploads/acme3.png", "category": "tablet" } },
+    { "actor": "admin", "action": "addBrand", "input": { "name": "Zeta", "logo": "", "category": "" } },
+    { "actor": "admin", "action": "updateBrand", "input": { "id": "acme-phones", "name": "Acme", "logo": "/uploads/acme4.png" } },
+    { "actor": "super", "action": "updateBrand", "input": { "id": "acme-phones", "name": "Acme", "logo": "/uploads/acme4.png", "priority": 7 } },
+    { "actor": "admin", "action": "updateBrand", "input": { "id": "no-such-brand", "name": "X", "logo": "" } },
+    { "actor": "cust", "action": "updateBrand", "input": { "id": "acme-phones", "name": "Hacked", "logo": "" } },
+
+    { "actor": "admin", "action": "addModel", "input": { "brandId": "acme-phones", "name": "Acme One", "img": "/uploads/one.png", "category": "smartphone", "priority": 10 } },
+    { "actor": "admin", "action": "addModel", "input": { "brandId": "acme-phones", "name": "Acme Tab", "img": "" } },
+    { "actor": "admin", "action": "addModel", "input": { "brandId": "acme-phones", "name": "Acme Watch", "img": "", "category": "watch" } },
+    { "actor": "zh1", "action": "addModel", "input": { "brandId": "acme-phones", "name": "Sneaky", "img": "" } },
+    { "actor": "admin", "action": "updateModel", "input": { "id": "$model:Acme One", "brandId": "acme-phones", "name": "Acme One Pro", "img": "/uploads/one2.png", "category": "smartphone", "priority": 20 } },
+    { "actor": "admin", "action": "updateModel", "input": { "id": "$model:Acme Tab", "brandId": "acme-phones", "name": "Acme Tab", "img": "/t.png" } },
+    { "actor": "admin", "action": "reorderModels", "input": { "items": [ { "id": "$model:Acme One Pro", "priority": 1 }, { "id": "$model:Acme Tab", "priority": 2 } ] } },
+    { "actor": "admin", "action": "reorderModels", "input": { "items": [ { "id": "$model:Acme Tab", "priority": 3 }, { "id": "no-such-model", "priority": 4 } ] } },
+    { "actor": "cust", "action": "reorderModels", "input": { "items": [ { "id": "$model:Acme Tab", "priority": 99 } ] } },
+
+    { "actor": "admin", "action": "addVariant", "input": { "modelId": "$model:Acme One Pro", "name": "128GB", "basePrice": 15000 } },
+    { "actor": "admin", "action": "addVariant", "input": { "modelId": "$model:Acme One Pro", "name": "256GB", "basePrice": 18000 } },
+    { "actor": "admin", "action": "addVariant", "input": { "modelId": "$model:Acme Watch", "name": "44mm", "basePrice": 9000 } },
+    { "actor": "cust", "action": "addVariant", "input": { "modelId": "$model:Acme One Pro", "name": "1TB", "basePrice": 99999 } },
+    { "actor": "admin", "action": "updateVariant", "input": { "id": "$variant:Acme One Pro/128GB", "modelId": "$model:Acme One Pro", "name": "128 GB", "basePrice": 15500 } },
+    { "actor": "admin", "action": "deleteVariant", "input": { "id": "$variant:Acme One Pro/256GB" } },
+    { "actor": "admin", "action": "deleteVariant", "input": { "id": "no-such-variant" } },
+    { "actor": "admin", "action": "deleteModel", "input": { "id": "$model:Acme Watch" } },
+    { "actor": "admin", "action": "deleteModel", "input": { "id": "no-such-model" } },
+
+    { "actor": "admin", "action": "deleteBrand", "input": { "id": "acme-phones", "category": "watch" } },
+    { "actor": "admin", "action": "deleteBrand", "input": { "id": "acme-phones", "category": "tablet" } },
+    { "actor": "admin", "action": "deleteBrand", "input": { "id": "zeta", "category": "smartphone" } },
+    { "actor": "cust", "action": "deleteBrand", "input": { "id": "acme-phones" } },
+    { "actor": "admin", "action": "deleteBrand", "input": { "id": "no-such-brand" } },
+
+    { "actor": "cust", "action": "getDeviceDisplayPrices", "input": {} },
+    { "actor": "admin", "action": "getDeviceDisplayPrices", "input": {} },
+    { "actor": "admin", "action": "updateDeviceDisplayPrice", "input": { "id": "$banner:phones", "displayPrice": "  ₹1,50,000+ " } },
+    { "actor": "admin", "action": "updateDeviceDisplayPrice", "input": { "id": "cameras", "displayPrice": "₹2,00,000+" } },
+    { "actor": "admin", "action": "updateDeviceDisplayPrice", "input": { "id": "drone", "displayPrice": "₹50,000+", "categoryKey": "drones", "categoryName": "Drones" } },
+    { "actor": "zh1", "action": "updateDeviceDisplayPrice", "input": { "id": "$banner:phones", "displayPrice": "₹1" } },
+    { "actor": "super", "action": "getDeviceDisplayPrices", "input": {} },
+
+    { "actor": "super", "action": "snapshot", "input": {} },
+    { "actor": "super", "action": "deleteBrand", "input": { "id": "acme-phones" } }
+  ]
+}

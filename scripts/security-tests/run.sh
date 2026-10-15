@@ -7,6 +7,7 @@
 #   scripts/security-tests/run.sh golden      regenerate the Spring Boot parity fixtures in
 #   scripts/security-tests/run.sh golden-catalog   regenerate only golden/catalog-api-expected.json
 #   scripts/security-tests/run.sh golden-orders    regenerate only golden/order-scenario-expected.json
+#   scripts/security-tests/run.sh golden-content   regenerate only golden/content-scenario-expected.json
 #                                             backend/src/test/resources/golden from the current website code:
 #                                             staff-, auth- and pricing-scenario-expected.json, executive-token-fixture.json
 set -euo pipefail
@@ -92,6 +93,10 @@ case "$MODE" in
     reset_db 02-catalog-data.sql 03-staff-seed.sql 04-pricing-rules-seed.sql
     run_node scripts/security-tests/order-ref.ts "$G/order-scenario.json" /golden/order-scenario-expected.json
     ;;
+  golden-content)
+    reset_db 02-catalog-data.sql 03-staff-seed.sql
+    run_node scripts/security-tests/content-ref.ts "$G/content-scenario.json" /golden/content-scenario-expected.json
+    ;;
   golden)
     reset_db 03-staff-seed.sql
     run_node scripts/security-tests/staff-ref.ts "$G/staff-scenario.json" /golden/staff-scenario-expected.json
@@ -99,6 +104,8 @@ case "$MODE" in
     run_node scripts/security-tests/pricing-ref.ts "$G/pricing-scenario.json" /golden/pricing-scenario-expected.json
     reset_db 02-catalog-data.sql 03-staff-seed.sql 04-pricing-rules-seed.sql
     run_node scripts/security-tests/order-ref.ts "$G/order-scenario.json" /golden/order-scenario-expected.json
+    reset_db 02-catalog-data.sql 03-staff-seed.sql
+    run_node scripts/security-tests/content-ref.ts "$G/content-scenario.json" /golden/content-scenario-expected.json
     reset_db 02-catalog-data.sql
     run_node scripts/security-tests/catalog-ref.ts "$G/catalog-api-expected.json" /golden/catalog-api-expected.json
     reset_db
@@ -108,7 +115,7 @@ case "$MODE" in
     run_node scripts/security-tests/token-fixture.ts /golden/executive-token-fixture.json
     ;;
   *)
-    echo "usage: $0 [test|originals|golden|golden-catalog|golden-orders]" >&2
+    echo "usage: $0 [test|originals|golden|golden-catalog|golden-orders|golden-content]" >&2
     exit 2
     ;;
 esac
