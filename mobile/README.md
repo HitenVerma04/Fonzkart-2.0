@@ -4,12 +4,12 @@ Three Android/iOS apps built with React Native + Expo (SDK 57, TypeScript, Expo 
 
 | Folder | App | Android package | Status |
 |---|---|---|---|
-| `apps/customer` | Fonzkart | `in.fonzkart.customer` | Home, 9 sell categories, brands, models, variants with max value, search |
+| `apps/customer` | Fonzkart | `in.fonzkart.customer` | Browse and search the catalog; device check (website questionnaire), final offer from the server price rules, pickup pincode check; sign up with email code, sign in (email or phone), password reset, account |
 | `apps/partner` | Fonzkart Partner | `in.fonzkart.partner` | Branded welcome screen with server status |
 | `apps/admin` | Fonzkart Admin | `in.fonzkart.admin` | Branded welcome screen with server status |
-| `packages/api` | `@fonzkart/api` | | Backend client, catalog endpoints, TanStack Query hooks |
-| `packages/core` | `@fonzkart/core` | | Server addresses, picture URLs, ₹ formatting, category list |
-| `packages/ui` | `@fonzkart/ui` | | Theme, logo (from `brand/`), tiles, search field, loading/error states |
+| `packages/api` | `@fonzkart/api` | | Backend client (Bearer token), catalog, questionnaire, price, pincode and auth endpoints; TanStack Query hooks; `SessionProvider` (token storage is passed in by each app) |
+| `packages/core` | `@fonzkart/core` | | Server addresses, picture URLs, ₹ formatting, category list, questionnaire rules (as `components/sell/ChecklistWizard.tsx`), pincode input |
+| `packages/ui` | `@fonzkart/ui` | | Theme, logo (from `brand/`), tiles, search field, buttons, text fields, answer cards, notices, loading/error states |
 
 ## Server addresses
 

@@ -1,5 +1,8 @@
 import { QueryClient, keepPreviousData, useQuery } from '@tanstack/react-query';
+import { isCompletePincode, type Answers } from '@fonzkart/core';
+import { authApi } from './auth';
 import { MIN_SEARCH_LENGTH, catalogApi, healthApi } from './catalog';
+import { quoteApi } from './quote';
 
 export function createQueryClient() {
   return new QueryClient({
@@ -16,6 +19,9 @@ export const catalogKeys = {
   search: (query: string) => ['catalog', 'search', query.trim().toLowerCase()] as const,
   variants: (modelId: string) => ['catalog', 'variants', modelId] as const,
 };
+
+/** Queries tied to the signed-in user; removed on sign-out. */
+export const ACCOUNT_KEY = ['account'] as const;
 
 export function useBrands(category?: string) {
   return useQuery({
@@ -63,5 +69,39 @@ export function useServerHealth() {
     queryFn: ({ signal }) => healthApi.status(signal),
     staleTime: 30_000,
     retry: 1,
+  });
+}
+
+export function useQuestionnaire() {
+  return useQuery({
+    queryKey: ['catalog', 'questionnaire'],
+    queryFn: ({ signal }) => quoteApi.questionnaire(signal),
+  });
+}
+
+/** The final offer. Always fresh: an admin's rule change must show on the next quote. */
+export function useOfferPrice(basePrice: number | undefined, answers: Answers | undefined, category: string) {
+  return useQuery({
+    queryKey: ['quote', 'price', basePrice ?? null, category, answers ?? null],
+    queryFn: ({ signal }) => quoteApi.price(basePrice!, answers!, category, signal),
+    enabled: basePrice !== undefined && answers !== undefined,
+    staleTime: 0,
+  });
+}
+
+export function usePincodeAvailability(pincode: string) {
+  return useQuery({
+    queryKey: ['quote', 'pincode', pincode],
+    queryFn: ({ signal }) => quoteApi.pincodeAvailable(pincode, signal),
+    enabled: isCompletePincode(pincode),
+    staleTime: 60_000,
+  });
+}
+
+export function useProfile(enabled: boolean) {
+  return useQuery({
+    queryKey: [...ACCOUNT_KEY, 'profile'],
+    queryFn: ({ signal }) => authApi.profile(signal),
+    enabled,
   });
 }

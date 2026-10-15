@@ -47,7 +47,7 @@ export default function BrandModels() {
             <Tile
               label={item.name}
               width={width}
-              onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: item.img ?? '' } })}
+              onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: item.img ?? '', category: category ?? item.category } })}
               image={<RemoteImage uri={item.img} label={item.name} size={width - 48} />}
             />
           )}

@@ -1,9 +1,9 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useBrands } from '@fonzkart/api';
+import { useBrands, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
-import { ErrorState, Loading, Logo, RemoteImage, SearchField, Tile, colors, font, spacing } from '@fonzkart/ui';
+import { ErrorState, Loading, Logo, RemoteImage, SearchField, Tile, colors, font, radius, spacing } from '@fonzkart/ui';
 import { CATEGORY_IMAGES } from '../src/categoryImages';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../src/grid';
 
@@ -15,12 +15,22 @@ export default function Home() {
   const categoryWidth = useTileWidth(3);
   const brandWidth = useTileWidth(4);
   const brands = useBrands('smartphone');
+  const { session } = useSession();
+  const accountLabel = session.status === 'signedIn' ? session.user.name.trim().split(/\s+/)[0] || 'Account' : 'Sign in';
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Logo variant="horizontal" height={44} />
+          <Pressable
+            onPress={() => router.push('/account')}
+            accessibilityRole="button"
+            accessibilityLabel="Account"
+            style={({ pressed }) => [styles.account, pressed && styles.pressed]}
+          >
+            <Text style={styles.accountText} numberOfLines={1}>{accountLabel}</Text>
+          </Pressable>
         </View>
 
         <Text style={styles.title}>Sell your old device</Text>
@@ -72,7 +82,9 @@ export default function Home() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing.sm },
+  account: { maxWidth: 120, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  accountText: { fontSize: font.small, fontWeight: '700', color: colors.navy },
   title: { fontSize: font.title, fontWeight: '800', color: colors.navy },
   section: { fontSize: font.heading, fontWeight: '700', color: colors.text, marginTop: spacing.md },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },

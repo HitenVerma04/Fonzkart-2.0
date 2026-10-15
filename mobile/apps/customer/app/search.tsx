@@ -39,7 +39,7 @@ export default function Search() {
           ListEmptyComponent={<EmptyState message="No device found. Try a shorter name." />}
           renderItem={({ item }) => (
             <Pressable
-              onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: item.img ?? '' } })}
+              onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: item.img ?? '', category: item.category } })}
               accessibilityRole="button"
               style={({ pressed }) => [styles.row, pressed && styles.pressed]}
             >
