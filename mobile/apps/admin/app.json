@@ -3,13 +3,13 @@
     "name": "Fonzkart Admin",
     "slug": "fonzkart-admin",
     "scheme": "fonzkart-admin",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "android": {
       "package": "in.fonzkart.admin",
-      "versionCode": 2,
+      "versionCode": 3,
       "blockedPermissions": [
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.READ_EXTERNAL_STORAGE",

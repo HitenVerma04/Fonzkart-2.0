@@ -17,8 +17,8 @@ Every app refreshes open order screens every 20 seconds and when it comes back o
 ## Server addresses
 
 The apps use the **Fonzkart 2.0 staging** servers by default (`packages/core/src/config.ts`):
-- API: `https://meahm1pikssqh1txhzbivvn0.89.116.27.217.sslip.io`
-- Pictures (website): `https://cxwpkuhlszvkq2olj2haiose.89.116.27.217.sslip.io`
+- API: `https://api-v2.fonzkart.in`
+- Pictures (website): `https://v2.fonzkart.in`
 
 Override per build with `EXPO_PUBLIC_API_URL` / `EXPO_PUBLIC_WEB_URL`. Never point the apps at the production website or database before the order cutover (one-writer rule). Android release builds only allow https.
 
