@@ -34,7 +34,7 @@ export default function Notifications() {
       ListHeaderComponent={unread ? (
         <Button title={`Mark all ${unread} as read`} variant="link"
           onPress={() => void notificationsApi.markAllRead().catch(() => undefined).then(refresh)} />
-      ) : null}
+      ) : undefined}
       ListEmptyComponent={<EmptyState message="No updates yet." />}
       renderItem={({ item }) => (
         <Pressable onPress={() => void open(item)} accessibilityRole="button"

@@ -81,7 +81,7 @@ export default function Catalog() {
           {brands.isPending ? <Loading /> : brands.isError ? <ErrorState onRetry={() => brands.refetch()} /> : null}
         </View>
       }
-      ListEmptyComponent={brands.isPending ? null : <EmptyState message="No brands in this category yet." />}
+      ListEmptyComponent={brands.isPending ? undefined : <EmptyState message="No brands in this category yet." />}
       renderItem={({ item }) => (
         <View style={styles.brand}>
           <RemoteImage uri={item.logo} label={item.name} size={44} />

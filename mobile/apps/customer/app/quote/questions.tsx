@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { BackHandler, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, Platform, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuestionnaire } from '@fonzkart/api';
@@ -14,7 +14,7 @@ export default function Questions() {
   const questionnaire = useQuestionnaire();
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>(() => draft?.answers ?? {});
-  const scroll = useRef<ScrollView>(null);
+  const scroll = useRef<ScrollViewInstance>(null);
   const insets = useSafeAreaInsets();
 
   const steps = useMemo(

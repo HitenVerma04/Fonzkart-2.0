@@ -29,7 +29,7 @@ export function InboxList({ items, refreshing, onRefresh, onOpen, onMarkAll, emp
       keyExtractor={n => n.id}
       contentContainerStyle={styles.list}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      ListHeaderComponent={unread ? <Button title={`Mark all ${unread} as read`} variant="link" onPress={onMarkAll} /> : null}
+      ListHeaderComponent={unread ? <Button title={`Mark all ${unread} as read`} variant="link" onPress={onMarkAll} /> : undefined}
       ListEmptyComponent={<EmptyState message={emptyText} />}
       renderItem={({ item }) => (
         <Pressable onPress={() => onOpen(item)} accessibilityRole="button"

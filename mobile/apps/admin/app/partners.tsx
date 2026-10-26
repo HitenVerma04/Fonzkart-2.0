@@ -89,7 +89,7 @@ export default function Partners() {
         keyboardShouldPersistTaps="handled"
         refreshControl={<RefreshControl refreshing={data.isRefetching} onRefresh={() => void data.refetch()} />}
         ListHeaderComponent={header}
-        ListEmptyComponent={mode === 'list' ? <EmptyState message="No partners yet." /> : null}
+        ListEmptyComponent={mode === 'list' ? <EmptyState message="No partners yet." /> : undefined}
         renderItem={({ item: p }) => (
           <Card title={p.name}>
             <InfoRow label="Contact" value={[p.email, p.phone ? displayPhone(p.phone) : null].filter(Boolean).join(' · ')} />

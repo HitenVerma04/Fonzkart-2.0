@@ -1,6 +1,6 @@
 # Fonzkart mobile apps
 
-Three Android/iOS apps built with React Native + Expo (SDK 57, TypeScript, Expo Router, TanStack Query), all calling the Spring Boot backend in `../backend`.
+Three Android/iOS apps built with React Native 0.88 + Expo (SDK 58, TypeScript, Expo Router, TanStack Query), all calling the Spring Boot backend in `../backend`.
 
 | Folder | App | Android package | Status |
 |---|---|---|---|
