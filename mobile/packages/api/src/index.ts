@@ -28,6 +28,8 @@ export {
   LIVE_ORDER_REFRESH_MS,
   contentKeys,
   useBannerPrices,
+  useCarousel,
+  useCarouselAdmin,
   useEmailMessage,
   useEmailMessages,
   useHomepageCities,
@@ -81,4 +83,13 @@ export {
   type StaffUser,
   type ZonalHead,
 } from './admin';
-export { catalogAdminApi, emailApi, type BannerPrice, type EmailList, type EmailSummary } from './content';
+export {
+  carouselApi,
+  catalogAdminApi,
+  emailApi,
+  type BannerPrice,
+  type CarouselSlide,
+  type CarouselSlideInput,
+  type EmailList,
+  type EmailSummary,
+} from './content';

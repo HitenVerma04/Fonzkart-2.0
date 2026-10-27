@@ -1,11 +1,14 @@
-import { colors } from './theme';
+import { colors, type Palette } from './theme';
 
-/** Shared header look for the expo-router Stack in every app. */
-export const stackScreenOptions = {
-  headerTintColor: colors.navy,
-  headerTitleStyle: { fontWeight: '700' as const },
+/** Header look for an expo-router Stack in the given palette. */
+export const screenOptionsFor = (palette: Palette) => ({
+  headerTintColor: palette.navy,
+  headerTitleStyle: { fontWeight: '700' as const, color: palette.navy },
   headerShadowVisible: false,
-  headerStyle: { backgroundColor: colors.white },
+  headerStyle: { backgroundColor: palette.surface },
   headerBackButtonDisplayMode: 'minimal' as const,
-  contentStyle: { backgroundColor: colors.background },
-};
+  contentStyle: { backgroundColor: palette.background },
+});
+
+/** Shared header look for the expo-router Stack in every app (light). */
+export const stackScreenOptions = screenOptionsFor(colors);

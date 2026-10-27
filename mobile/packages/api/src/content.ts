@@ -60,6 +60,38 @@ export const catalogAdminApi = {
     send('PUT', `/api/content/banner-prices/${enc(identifier)}`, { displayPrice }),
 };
 
+/** A card of the Customer app's home-page carousel (backend: CarouselController). */
+export interface CarouselSlide {
+  id: string;
+  /** Website path (/uploads/...) or https URL. */
+  imageUrl: string;
+  title: string;
+  subtitle: string;
+  /** Sell category the card opens, or null. */
+  category: string | null;
+  isActive: boolean;
+  displayOrder: number;
+}
+
+export type CarouselSlideInput = {
+  imageUrl: string;
+  title: string;
+  subtitle: string;
+  category: string | null;
+  isActive: boolean;
+  displayOrder?: number;
+};
+
+/** Everyone reads the visible cards; administrators read all of them and edit them ("Edit carousel view"). */
+export const carouselApi = {
+  visible: async (signal?: AbortSignal) => (await request<CarouselSlide[]>('GET', '/api/content/carousel', { signal })).data,
+  all: async (signal?: AbortSignal) => (await request<CarouselSlide[]>('GET', '/api/content/carousel/admin', { signal })).data,
+  add: (input: CarouselSlideInput) => send('POST', '/api/content/carousel', input),
+  update: (id: string, input: CarouselSlideInput) => send('PUT', `/api/content/carousel/${enc(id)}`, input),
+  reorder: (items: { id: string; displayOrder: number }[]) => send('PUT', '/api/content/carousel/order', items),
+  remove: (id: string) => send('DELETE', `/api/content/carousel/${enc(id)}`),
+};
+
 export const emailApi = {
   messages: async (account?: string, signal?: AbortSignal) =>
     (await request<EmailList>('GET', '/api/email/messages', { query: { account }, signal })).data,

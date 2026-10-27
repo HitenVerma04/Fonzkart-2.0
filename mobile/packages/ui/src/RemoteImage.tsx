@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Image, StyleSheet, Text, View, type ImageStyle, type StyleProp } from 'react-native';
+import { Image, Text, View, type ImageStyle, type StyleProp } from 'react-native';
 import { imageUrl } from '@fonzkart/core';
+import { makeStyles } from './ThemeContext';
 import { colors } from './theme';
 
 /** A catalog picture (website path or URL). Shows the item's initial while loading fails or when there is none. */
@@ -10,6 +11,7 @@ export function RemoteImage({ uri, label, size, style }: {
   size: number;
   style?: StyleProp<ImageStyle>;
 }) {
+  const styles = useStyles();
   const [failed, setFailed] = useState(false);
   const url = imageUrl(uri);
   if (!url || failed) {
@@ -30,7 +32,7 @@ export function RemoteImage({ uri, label, size, style }: {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   placeholder: { backgroundColor: colors.placeholder, alignItems: 'center', justifyContent: 'center' },
   initial: { color: colors.muted, fontWeight: '700' },
-});
+}));

@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Logo } from './Logo';
-import { colors, font, radius, spacing } from './theme';
+import { makeStyles, useColors } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 /** Welcome screen of an app whose features are still being built (Partner, Admin). Says only what is true today. */
 export function AppShell({ appName, comingNext, serverOnline }: {
@@ -8,6 +9,8 @@ export function AppShell({ appName, comingNext, serverOnline }: {
   comingNext: string[];
   serverOnline: boolean | undefined;
 }) {
+  const colors = useColors();
+  const styles = useStyles();
   const status = serverOnline === undefined ? 'Checking server…' : serverOnline ? 'Server online' : 'Server unreachable';
   return (
     <View style={styles.page}>
@@ -27,14 +30,14 @@ export function AppShell({ appName, comingNext, serverOnline }: {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl, backgroundColor: colors.background, gap: spacing.lg },
   appName: { fontSize: font.title, fontWeight: '800', color: colors.navy },
   badge: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: colors.greenSoft, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
-  badgeOff: { backgroundColor: '#fef2f2' },
+  badgeOff: { backgroundColor: colors.error.background },
   dot: { width: 8, height: 8, borderRadius: 4 },
   badgeText: { fontSize: font.small, color: colors.textSoft, fontWeight: '600' },
   card: { alignSelf: 'stretch', backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: spacing.sm },
   cardTitle: { fontSize: font.heading, fontWeight: '700', color: colors.text },
   item: { fontSize: font.body, color: colors.textSoft },
-});
+}));

@@ -1,15 +1,17 @@
 // One step of the website's device questionnaire, used by the customer's quote (Customer app) and the executive's
 // re-check at pickup (Partner app), so both ask exactly the same questions in the same way.
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { isMultiSelect, toggleOption, type Answers, type QuestionOption, type QuestionStep } from '@fonzkart/core';
 import { ChoiceCard, YesNo } from './ChoiceCard';
-import { colors, font, spacing } from './theme';
+import { makeStyles } from './ThemeContext';
+import { font, spacing } from './theme';
 
 export function QuestionStepView({ step, answers, onChange }: {
   step: QuestionStep;
   answers: Answers;
   onChange: (key: string, value: Answers[string]) => void;
 }) {
+  const styles = useStyles();
   const choices = (key: string, type: string | undefined, options: QuestionOption[] | undefined) => {
     const multi = isMultiSelect(type);
     return (options ?? []).map(option => {
@@ -56,7 +58,7 @@ export function QuestionStepView({ step, answers, onChange }: {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   step: { gap: spacing.sm },
   title: { fontSize: font.title, fontWeight: '800', color: colors.navy },
   subtitle: { fontSize: font.body, color: colors.muted },
@@ -64,4 +66,4 @@ const styles = StyleSheet.create({
   options: { gap: spacing.md, marginTop: spacing.md },
   section: { gap: spacing.sm, marginBottom: spacing.md },
   sectionTitle: { fontSize: font.heading, fontWeight: '700', color: colors.text },
-});
+}));

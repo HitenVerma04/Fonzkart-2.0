@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { authApi } from '@fonzkart/api';
-import { Button, Notice, TextField, colors, font, spacing } from '@fonzkart/ui';
+import { Button, font, makeStyles, Notice, spacing, TextField } from '@fonzkart/ui';
 import { networkMessage, useAuthOutcome } from '../../src/authFlow';
 import { PAGE_PADDING } from '../../src/grid';
 
 export default function SignIn() {
+  const styles = useStyles();
   const { returnTo, notice } = useLocalSearchParams<{ returnTo?: string; notice?: string }>();
   const router = useRouter();
   const handle = useAuthOutcome(returnTo);
@@ -64,8 +65,8 @@ export default function SignIn() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.lg, maxWidth: 640, width: '100%', alignSelf: 'center' },
   title: { fontSize: font.title, fontWeight: '800', color: colors.navy },
   links: { flexDirection: 'row', justifyContent: 'space-between' },
-});
+}));

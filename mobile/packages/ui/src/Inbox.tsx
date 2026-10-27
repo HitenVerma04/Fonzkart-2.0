@@ -1,9 +1,10 @@
 // A notification list (customer inbox, executive inbox, staff bell) with unread markers and "mark all as read".
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { Button } from './Button';
 import { formatDateTime } from './Orders';
 import { EmptyState } from './StateView';
-import { colors, font, radius, spacing } from './theme';
+import { makeStyles } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 export interface InboxItem {
   id: string;
@@ -22,6 +23,7 @@ export function InboxList({ items, refreshing, onRefresh, onOpen, onMarkAll, emp
   onMarkAll: () => void;
   emptyText?: string;
 }) {
+  const styles = useStyles();
   const unread = items.filter(n => !n.isRead).length;
   return (
     <FlatList
@@ -46,14 +48,14 @@ export function InboxList({ items, refreshing, onRefresh, onOpen, onMarkAll, emp
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   list: { padding: spacing.lg, gap: spacing.sm, maxWidth: 720, width: '100%', alignSelf: 'center', flexGrow: 1 },
   item: { backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.md, gap: 4 },
-  unread: { borderColor: '#bbf7d0', backgroundColor: colors.greenSoft },
+  unread: { borderColor: colors.greenBorder, backgroundColor: colors.greenSoft },
   pressed: { opacity: 0.7 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: font.body, fontWeight: '700', color: colors.text, flex: 1 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.green },
   message: { fontSize: font.small, color: colors.textSoft },
   date: { fontSize: font.tiny, color: colors.muted },
-});
+}));

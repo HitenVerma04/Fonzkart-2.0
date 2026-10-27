@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { customerOrdersApi, usePincodeAvailability, useQuestionnaire, useQuote, useSession } from '@fonzkart/api';
 import { cleanPincode, describeAnswers, formatInr, isCompletePincode, stepsForDevice } from '@fonzkart/core';
-import { Button, EmptyState, ErrorState, Loading, Notice, RemoteImage, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
+import { Button, EmptyState, ErrorState, font, Loading, makeStyles, Notice, radius, RemoteImage, spacing, TextField } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
 import { PAGE_PADDING } from '../../src/grid';
 import { useQuoteDraft } from '../../src/quoteDraft';
 
 export default function Offer() {
+  const styles = useStyles();
   const router = useRouter();
   const draft = useQuoteDraft();
   const { session } = useSession();
@@ -126,7 +127,7 @@ export default function Offer() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.lg, maxWidth: 640, width: '100%', alignSelf: 'center' },
   offer: { alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.xl, gap: spacing.xs },
   device: { fontSize: font.heading, fontWeight: '800', color: colors.navy, marginTop: spacing.sm, textAlign: 'center' },
@@ -142,4 +143,4 @@ const styles = StyleSheet.create({
   answer: { gap: 2 },
   answerTitle: { fontSize: font.small, color: colors.muted },
   answerValue: { fontSize: font.body, fontWeight: '600', color: colors.text },
-});
+}));

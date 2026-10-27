@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useBrand, useModels } from '@fonzkart/api';
 import { EmptyState, ErrorState, Loading, RemoteImage, SearchField, Tile, spacing } from '@fonzkart/ui';
+import { modelImage } from '@fonzkart/core';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 
 const COLUMNS = 2;
@@ -43,14 +44,17 @@ export default function BrandModels() {
             </View>
           }
           ListEmptyComponent={<EmptyState message={filter ? 'No model matches your search.' : 'No models listed for this brand yet.'} />}
-          renderItem={({ item }) => (
-            <Tile
-              label={item.name}
-              width={width}
-              onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: item.img ?? '', category: category ?? item.category } })}
-              image={<RemoteImage uri={item.img} label={item.name} size={width - 48} />}
-            />
-          )}
+          renderItem={({ item }) => {
+            const img = modelImage(item.img, category ?? item.category);
+            return (
+              <Tile
+                label={item.name}
+                width={width}
+                onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: img ?? '', category: category ?? item.category } })}
+                image={<RemoteImage uri={img} label={item.name} size={width - 48} />}
+              />
+            );
+          }}
         />
       )}
     </>

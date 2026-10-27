@@ -1,12 +1,13 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useVariants } from '@fonzkart/api';
 import { formatInr, sellCategoryOf } from '@fonzkart/core';
-import { EmptyState, ErrorState, Loading, RemoteImage, colors, font, radius, spacing } from '@fonzkart/ui';
+import { EmptyState, ErrorState, font, Loading, makeStyles, radius, RemoteImage, spacing } from '@fonzkart/ui';
 import { PAGE_PADDING } from '../../src/grid';
 import { startQuote } from '../../src/quoteDraft';
 
 export default function ModelVariants() {
+  const styles = useStyles();
   const { id, name, img, category } = useLocalSearchParams<{ id: string; name?: string; img?: string; category?: string }>();
   const router = useRouter();
   const variants = useVariants(id);
@@ -63,7 +64,7 @@ export default function ModelVariants() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center' },
   hero: { alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.xl, gap: spacing.md },
   name: { fontSize: font.title, fontWeight: '800', color: colors.navy, textAlign: 'center' },
@@ -76,4 +77,4 @@ const styles = StyleSheet.create({
   priceLabel: { fontSize: font.tiny, color: colors.muted },
   priceValue: { fontSize: font.heading, fontWeight: '800', color: colors.green },
   chevron: { fontSize: 24, color: colors.muted },
-});
+}));

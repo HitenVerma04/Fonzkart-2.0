@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, Text } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { authApi } from '@fonzkart/api';
-import { Button, Notice, TextField, colors, font, spacing } from '@fonzkart/ui';
+import { Button, font, makeStyles, Notice, spacing, TextField } from '@fonzkart/ui';
 import { networkMessage, useAuthOutcome } from '../../src/authFlow';
 import { PAGE_PADDING } from '../../src/grid';
 
 export default function Verify() {
+  const styles = useStyles();
   const { email = '', returnTo } = useLocalSearchParams<{ email?: string; returnTo?: string }>();
   const handle = useAuthOutcome(returnTo);
   const [otp, setOtp] = useState('');
@@ -47,10 +48,10 @@ export default function Verify() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.lg, maxWidth: 640, width: '100%', alignSelf: 'center' },
   title: { fontSize: font.title, fontWeight: '800', color: colors.navy },
   text: { fontSize: font.body, color: colors.textSoft },
   code: { fontSize: 24, letterSpacing: 8, fontWeight: '700' },
   hint: { fontSize: font.small, color: colors.muted, textAlign: 'center' },
-});
+}));

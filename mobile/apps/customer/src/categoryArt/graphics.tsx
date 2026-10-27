@@ -19,7 +19,10 @@ import Svg, {
   type GProps,
 } from 'react-native-svg';
 import type { SellCategoryId } from '@fonzkart/core';
-import { AnimatedCircle, AnimatedPath, AnimatedRect, AnimatedG as AnimatedGroup, lerp, moveDown, rotateAbout, useLoop, useSpin } from './motion';
+import { AnimatedCircle, AnimatedLine, AnimatedPath, AnimatedRect, AnimatedG as AnimatedGroup, lerp, moveDown, rotateAbout, useLoop, useSpin } from './motion';
+
+/** The home screen's cards: the sell categories plus the website's Repair, Screen Guard and Bulk Orders cards. */
+export type HomeTileId = SellCategoryId | 'repair' | 'screenguard' | 'bulk';
 
 // The native `matrix` prop is not in GProps (react-native-svg computes it from `transform` on the JS side).
 const AnimatedG = AnimatedGroup as unknown as ComponentType<GProps & { animatedProps?: unknown }>;
@@ -30,6 +33,7 @@ const tw = {
   black: '#000000',
   slate200: '#e2e8f0',
   slate300: '#cbd5e1',
+  slate400: '#94a3b8',
   slate500: '#64748b',
   slate600: '#475569',
   slate700: '#334155',
@@ -58,6 +62,7 @@ const tw = {
   red500: '#ef4444',
   orange500: '#f97316',
   orange600: '#ea580c',
+  orange700: '#c2410c',
   amber500: '#f59e0b',
 };
 
@@ -77,7 +82,7 @@ type ArtProps = { width: number; height: number };
 // smaller size shows more of the drawing, smaller (the sizes the team picked for each category).
 const VIEW_WIDTH = 150;
 const VIEW_HEIGHT = 132;
-const VIEW: Record<SellCategoryId, { x: number; y: number; size: number }> = {
+const VIEW: Record<HomeTileId, { x: number; y: number; size: number }> = {
   smartphone: { x: 100, y: 70, size: 0.7 },
   tablet: { x: 95, y: 78, size: 0.8 },
   camera: { x: 100, y: 80, size: 1 },
@@ -87,16 +92,19 @@ const VIEW: Record<SellCategoryId, { x: number; y: number; size: number }> = {
   console: { x: 100, y: 62, size: 0.8 },
   desktop: { x: 105, y: 63, size: 0.8 },
   earbuds: { x: 100, y: 55, size: 0.9 },
+  repair: { x: 84, y: 75, size: 0.9 },
+  screenguard: { x: 100, y: 64, size: 0.8 },
+  bulk: { x: 95, y: 68, size: 0.8 },
 };
 
-function viewBox(view: SellCategoryId) {
+function viewBox(view: HomeTileId) {
   const { x, y, size } = VIEW[view];
   const width = VIEW_WIDTH / size;
   const height = VIEW_HEIGHT / size;
   return { x: x - width / 2, y: y - height / 2, width, height };
 }
 
-function Canvas({ width, height, view, children }: ArtProps & { view: SellCategoryId; children: ReactNode }) {
+function Canvas({ width, height, view, children }: ArtProps & { view: HomeTileId; children: ReactNode }) {
   const box = viewBox(view);
   return (
     <Svg width={width} height={height} viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`} preserveAspectRatio="xMidYMid slice" fill="none">
@@ -106,7 +114,7 @@ function Canvas({ width, height, view, children }: ArtProps & { view: SellCatego
 }
 
 /** The whole drawing bobbing up by `rise` (in drawing units) every `seconds`: the website's outer motion.g. */
-function Float({ width, height, view, rise, seconds, children }: ArtProps & { view: SellCategoryId; rise: number; seconds: number; children: ReactNode }) {
+function Float({ width, height, view, rise, seconds, children }: ArtProps & { view: HomeTileId; rise: number; seconds: number; children: ReactNode }) {
   const t = useLoop(seconds);
   const box = viewBox(view);
   const scale = Math.max(width / box.width, height / box.height);
@@ -612,7 +620,122 @@ function EarbudsArt({ width, height }: ArtProps) {
   );
 }
 
-export const CATEGORY_ART: Record<SellCategoryId, ComponentType<ArtProps>> = {
+function RepairArt({ width, height }: ArtProps) {
+  const scan = useLoop(2.5);
+  const tool = useLoop(2);
+  const scanProps = useAnimatedProps(() => ({ y1: 20 + 80 * scan.value, y2: 20 + 80 * scan.value }));
+  // On the website the screwdriver's own translate/rotate is replaced by its animation, so it sits at the corner.
+  const toolProps = useAnimatedProps(() => ({ matrix: moveDown(-4 * tool.value) }));
+  return (
+    <Float width={width} height={height} view="repair" rise={5} seconds={5}>
+      <G transform="translate(50, 20)">
+        <Rect x="0" y="0" width="68" height="110" rx="12" fill={tw.slate900} stroke={tw.slate700} strokeWidth="2" />
+        <Rect x="4" y="4" width="60" height="102" rx="9" fill={tw.slate950} />
+        <Rect x="10" y="15" width="48" height="40" rx="4" fill={tw.emerald950} fillOpacity={0.6} stroke={tw.emerald600} strokeOpacity={0.4} strokeWidth="1" />
+        <Cart x={34} y={35} width={22} />
+        <AnimatedLine animatedProps={scanProps} x1="4" y1="20" x2="64" y2="20" stroke={tw.cyan400} strokeWidth="2" />
+      </G>
+      <AnimatedG animatedProps={toolProps}>
+        <Rect x="-4" y="0" width="8" height="28" rx="2" fill={tw.orange600} stroke={tw.orange700} strokeWidth="1" />
+        <Rect x="-2" y="28" width="4" height="35" fill={tw.slate300} stroke={tw.slate400} strokeWidth="1" />
+        <Polygon points="-3,63 3,63 0,72" fill={tw.slate700} />
+      </AnimatedG>
+    </Float>
+  );
+}
+
+function GuardedPhone({ transform, glass, glow }: { transform: string; glass: string; glow: string }) {
+  return (
+    <G transform={transform}>
+      <Rect x="0" y="0" width="38" height="78" rx="8" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
+      <Rect x="2" y="2" width="34" height="74" rx="6" fill={tw.slate950} />
+      <Rect x="2" y="2" width="34" height="74" rx="6" fill={glass} fillOpacity={0.2} stroke={glow} strokeWidth="0.8" />
+      <Circle cx="19" cy="38" r="8" fill={glass === tw.cyan500 ? tw.cyan600 : tw.emerald600} />
+      <SvgText x="19" y="41" textAnchor="middle" fill="#ffffff" fontSize="6" fontWeight="bold">9H</SvgText>
+    </G>
+  );
+}
+
+function ScreenGuardArt({ width, height }: ArtProps) {
+  const guard = useLoop(2.5);
+  const guardProps = useAnimatedProps(() => ({ y: 2 - 3 * guard.value }));
+  return (
+    <Float width={width} height={height} view="screenguard" rise={4} seconds={4}>
+      <GuardedPhone transform="translate(30, 28) rotate(-16)" glass={tw.cyan500} glow={tw.cyan400} />
+      <GuardedPhone transform="translate(132, 20) rotate(16)" glass={tw.emerald500} glow={tw.emerald400} />
+      <G transform="translate(76, 14)">
+        <Rect x="0" y="0" width="48" height="96" rx="11" fill={tw.slate900} stroke={tw.emerald500} strokeWidth="2" />
+        <Rect x="3" y="3" width="42" height="90" rx="9" fill={tw.slate950} />
+        <Rect x="16" y="6" width="16" height="4" rx="2" fill={tw.black} />
+        <Circle cx="24" cy="48" r="20" fill={tw.emerald600} fillOpacity={0.3} />
+        <AnimatedRect animatedProps={guardProps} x="2" y="2" width="44" height="92" rx="8" fill={tw.cyan400} fillOpacity={0.25} stroke={tw.cyan400} strokeWidth="1.2" />
+        <Cart x={24} y={38} width={22} />
+      </G>
+    </Float>
+  );
+}
+
+function BulkArt({ width, height }: ArtProps) {
+  // On the website the badge's translate is replaced by its spin, so the ring turns around the drawing's corner
+  // while the ♻ centre stays at (144, 88).
+  const spin = useSpin(24);
+  const ringProps = useAnimatedProps(() => ({ matrix: rotateAbout(360 * spin.value, 0, 0) }));
+  return (
+    <Float width={width} height={height} view="bulk" rise={4} seconds={4}>
+      <Defs>
+        <LinearGradient id="bulk-laptop-screen" x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#022c22" />
+          <Stop offset="50%" stopColor="#064e3b" />
+          <Stop offset="100%" stopColor="#020617" />
+        </LinearGradient>
+      </Defs>
+      <G transform="translate(32, 18)">
+        <Rect x="0" y="0" width="104" height="68" rx="6" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.5" />
+        <Rect x="4" y="4" width="96" height="60" rx="4" fill="url(#bulk-laptop-screen)" />
+        <G transform="translate(10, 12)">
+          <Rect x="0" y="24" width="7" height="20" rx="2" fill="#10b981" opacity={0.6} />
+          <Rect x="10" y="16" width="7" height="28" rx="2" fill="#10b981" opacity={0.8} />
+          <Rect x="20" y="6" width="7" height="38" rx="2" fill="#34d399" />
+          <Rect x="30" y="18" width="7" height="26" rx="2" fill="#059669" opacity={0.7} />
+          <Rect x="45" y="10" width="36" height="5" rx="2" fill="#ffffff" opacity={0.3} />
+          <Rect x="45" y="20" width="26" height="4" rx="2" fill="#34d399" opacity={0.7} />
+          <Rect x="45" y="28" width="30" height="4" rx="2" fill="#ffffff" opacity={0.2} />
+          <Rect x="45" y="36" width="20" height="4" rx="2" fill="#10b981" opacity={0.5} />
+        </G>
+        <Path d="M -12 68 L 116 68 L 106 76 L -2 76 Z" fill={tw.slate800} stroke={tw.slate700} strokeWidth="1.2" />
+        <Rect x="42" y="68" width="22" height="2.5" rx="1" fill="#475569" />
+      </G>
+      <G transform="translate(98, 42) rotate(8)">
+        <Rect x="0" y="0" width="46" height="64" rx="6" fill={tw.slate900} stroke={tw.emerald600} strokeOpacity={0.7} strokeWidth="1.5" />
+        <Rect x="2.5" y="2.5" width="41" height="59" rx="4" fill={tw.slate950} />
+        <Rect x="6" y="8" width="34" height="20" rx="3" fill="#10b981" fillOpacity={0.15} />
+        <Circle cx="23" cy="18" r="6" fill="#10b981" fillOpacity={0.3} />
+      </G>
+      <G transform="translate(72, 50) rotate(-6)">
+        <Rect x="0" y="0" width="36" height="68" rx="8" fill={tw.slate950} stroke={tw.emerald500} strokeWidth="1.8" />
+        <Rect x="2" y="2" width="32" height="64" rx="6" fill={tw.slate950} />
+        <Rect x="12" y="4.5" width="12" height="3" rx="1.5" fill="#000000" />
+        <Circle cx="18" cy="34" r="12" fill="#10b981" fillOpacity={0.2} />
+        <Cart x={18} y={32} width={18} />
+      </G>
+      <AnimatedG animatedProps={ringProps}>
+        <Circle cx="0" cy="0" r="18" fill="#064e3b" stroke="#10b981" strokeWidth="2" />
+        <Path d="M 0 -11 L 3 -6 L -3 -6 Z" fill="#34d399" />
+        <Path d="M 0 -10 A 10 10 0 0 1 9 4" fill="none" stroke="#34d399" strokeWidth="1.8" strokeLinecap="round" />
+        <Path d="M 9 4 L 11 -1 L 6 1 Z" fill="#34d399" />
+        <Path d="M 9 4 A 10 10 0 0 1 -9 4" fill="none" stroke="#34d399" strokeWidth="1.8" strokeLinecap="round" />
+        <Path d="M -9 4 L -6 9 L -4 4 Z" fill="#34d399" />
+        <Path d="M -9 4 A 10 10 0 0 1 0 -10" fill="none" stroke="#34d399" strokeWidth="1.8" strokeLinecap="round" />
+      </AnimatedG>
+      <G transform="translate(144, 88)">
+        <Circle cx="0" cy="0" r="7" fill="#10b981" />
+        <SvgText x="0" y="2.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fill="#022c22">♻</SvgText>
+      </G>
+    </Float>
+  );
+}
+
+export const CATEGORY_ART: Record<HomeTileId, ComponentType<ArtProps>> = {
   smartphone: SmartphoneArt,
   tablet: TabletArt,
   camera: CameraArt,
@@ -622,4 +745,7 @@ export const CATEGORY_ART: Record<SellCategoryId, ComponentType<ArtProps>> = {
   console: ConsoleArt,
   desktop: DesktopArt,
   earbuds: EarbudsArt,
+  repair: RepairArt,
+  screenguard: ScreenGuardArt,
+  bulk: BulkArt,
 };

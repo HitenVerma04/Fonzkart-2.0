@@ -1,11 +1,12 @@
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { notificationsApi, orderKeys, useNotifications, useSession, type AppNotification } from '@fonzkart/api';
-import { Button, EmptyState, ErrorState, Loading, colors, font, formatDateTime, radius, spacing } from '@fonzkart/ui';
+import { Button, EmptyState, ErrorState, font, formatDateTime, Loading, makeStyles, radius, spacing } from '@fonzkart/ui';
 import { PAGE_PADDING } from '../src/grid';
 
 export default function Notifications() {
+  const styles = useStyles();
   const router = useRouter();
   const client = useQueryClient();
   const { session } = useSession();
@@ -51,14 +52,14 @@ export default function Notifications() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   list: { padding: PAGE_PADDING, gap: spacing.sm, maxWidth: 640, width: '100%', alignSelf: 'center', flexGrow: 1 },
   item: { backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.md, gap: 4 },
-  unread: { borderColor: '#bbf7d0', backgroundColor: colors.greenSoft },
+  unread: { borderColor: colors.greenBorder, backgroundColor: colors.greenSoft },
   pressed: { opacity: 0.7 },
   itemTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: font.body, fontWeight: '700', color: colors.text, flex: 1 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.green },
   message: { fontSize: font.small, color: colors.textSoft },
   date: { fontSize: font.tiny, color: colors.muted },
-});
+}));

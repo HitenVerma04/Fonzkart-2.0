@@ -167,6 +167,20 @@ model DeviceDisplayPrice {
   updatedAt     DateTime @updatedAt
 }
 
+// The Customer app's home-page carousel, edited in the Admin app ("Edit carousel view"); read and written only by
+// the Spring Boot backend (CarouselService).
+model CarouselSlide {
+  id           String   @id @default(cuid())
+  imageUrl     String   // a website path (/uploads/...) or https URL
+  title        String
+  subtitle     String   @default("")
+  category     String?  // sell category the card opens (e.g. 'smartphone'); null = no tap
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model Notification {
   id        String   @id @default(cuid())
   userId    String?  // Target user (if specific)

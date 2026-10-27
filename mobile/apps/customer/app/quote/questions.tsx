@@ -1,14 +1,15 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { BackHandler, Platform, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native';
+import { BackHandler, Platform, ScrollView, Text, View, type ScrollViewInstance } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuestionnaire } from '@fonzkart/api';
 import { isStepComplete, stepsForDevice, type Answers } from '@fonzkart/core';
-import { Button, EmptyState, ErrorState, Loading, QuestionStepView, RemoteImage, colors, font, radius, spacing } from '@fonzkart/ui';
+import { Button, EmptyState, ErrorState, font, Loading, makeStyles, QuestionStepView, radius, RemoteImage, spacing } from '@fonzkart/ui';
 import { PAGE_PADDING } from '../../src/grid';
 import { saveAnswers, useQuoteDraft } from '../../src/quoteDraft';
 
 export default function Questions() {
+  const styles = useStyles();
   const router = useRouter();
   const draft = useQuoteDraft();
   const questionnaire = useQuestionnaire();
@@ -84,7 +85,7 @@ export default function Questions() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   screen: { flex: 1, backgroundColor: colors.background },
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.sm, maxWidth: 640, width: '100%', alignSelf: 'center' },
   device: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.sm, marginBottom: spacing.sm },
@@ -95,4 +96,4 @@ const styles = StyleSheet.create({
   footer: { flexDirection: 'row', gap: spacing.md, padding: spacing.lg, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.border },
   back: { flex: 1 },
   continue: { flex: 2 },
-});
+}));

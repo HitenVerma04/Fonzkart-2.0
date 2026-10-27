@@ -1,21 +1,15 @@
 // Order building blocks shared by the three apps. Labels, steps and payout state come from the website's own
 // lib/order-status.ts (copied into @fonzkart/core), so an order reads the same on the website and in every app.
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { formatInr, statusLabel, statusTone, type Tone, type TrackerStep } from '@fonzkart/core';
-import { colors, font, radius, spacing } from './theme';
+import { makeStyles, useColors } from './ThemeContext';
+import { font, radius, spacing, type Palette } from './theme';
 
-const TONE_COLORS: Record<Tone, { background: string; text: string }> = {
-  amber: { background: '#fef3c7', text: '#92400e' },
-  blue: { background: '#dbeafe', text: '#1d4ed8' },
-  orange: { background: '#ffedd5', text: '#9a3412' },
-  purple: { background: '#f3e8ff', text: '#7e22ce' },
-  green: { background: '#dcfce7', text: '#15803d' },
-  red: { background: '#fee2e2', text: '#b91c1c' },
-  gray: { background: '#f3f4f6', text: '#4b5563' },
-};
 
 export function StatusBadge({ status, audience = 'customer' }: { status: string; audience?: 'customer' | 'staff' }) {
-  const tone = TONE_COLORS[statusTone(status)];
+  const colors = useColors();
+  const styles = useStyles();
+  const tone = colors.tones[statusTone(status)];
   return (
     <View style={[styles.badge, { backgroundColor: tone.background }]}>
       <Text style={[styles.badgeText, { color: tone.text }]}>{statusLabel(status, audience)}</Text>
@@ -44,6 +38,7 @@ export function OrderCard({ orderNumber, device, price, status, date, subtitle, 
   audience?: 'customer' | 'staff';
   onPress?: () => void;
 }) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -65,21 +60,19 @@ export function OrderCard({ orderNumber, device, price, status, date, subtitle, 
   );
 }
 
-const STEP_COLORS = {
-  done: colors.green,
-  current: '#2563eb',
-  upcoming: '#d1d5db',
-  failed: colors.danger,
-};
+const stepColor = (colors: Palette, state: TrackerStep['state']) =>
+  state === 'done' ? colors.green : state === 'current' ? '#2563eb' : state === 'failed' ? colors.danger : colors.track;
 
 /** The customer tracker (trackerSteps): one row per stage. */
 export function Tracker({ steps }: { steps: TrackerStep[] }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <View accessibilityRole="list">
       {steps.map((step, i) => (
         <View key={step.key} style={styles.step} accessibilityLabel={`${step.label}: ${step.state}${step.detail ? `. ${step.detail}` : ''}`}>
           <View style={styles.rail}>
-            <View style={[styles.dot, { backgroundColor: STEP_COLORS[step.state] }]}>
+            <View style={[styles.dot, { backgroundColor: stepColor(colors, step.state) }]}>
               <Text style={styles.dotText}>{step.state === 'done' ? '✓' : step.state === 'failed' ? '!' : ''}</Text>
             </View>
             {i < steps.length - 1 ? <View style={[styles.line, step.state === 'done' && { backgroundColor: colors.green }]} /> : null}
@@ -94,7 +87,7 @@ export function Tracker({ steps }: { steps: TrackerStep[] }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   badge: { borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: 3, alignSelf: 'flex-start' },
   badgeText: { fontSize: font.tiny, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.3 },
   card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: spacing.xs },
@@ -110,8 +103,8 @@ const styles = StyleSheet.create({
   rail: { alignItems: 'center', width: 24 },
   dot: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   dotText: { color: colors.white, fontSize: 13, fontWeight: '800' },
-  line: { width: 2, flex: 1, minHeight: 18, backgroundColor: '#e5e7eb', marginVertical: 2 },
+  line: { width: 2, flex: 1, minHeight: 18, backgroundColor: colors.border, marginVertical: 2 },
   stepBody: { flex: 1, paddingBottom: spacing.lg, gap: 2 },
   stepLabel: { fontSize: font.body, fontWeight: '700', color: colors.text },
   stepDetail: { fontSize: font.small, color: colors.muted },
-});
+}));

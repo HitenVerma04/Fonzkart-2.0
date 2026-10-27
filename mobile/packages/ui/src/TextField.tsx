@@ -1,7 +1,10 @@
-import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
-import { colors, font, radius, spacing } from './theme';
+import { Text, TextInput, View, type TextInputProps } from 'react-native';
+import { makeStyles, useColors } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 export function TextField({ label, prefix, hint, ...input }: TextInputProps & { label: string; prefix?: string; hint?: string }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
@@ -19,7 +22,7 @@ export function TextField({ label, prefix, hint, ...input }: TextInputProps & { 
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   field: { gap: spacing.xs },
   label: { fontSize: font.small, fontWeight: '600', color: colors.textSoft },
   box: {
@@ -35,4 +38,4 @@ const styles = StyleSheet.create({
   prefix: { fontSize: font.body, color: colors.muted, marginRight: spacing.sm },
   input: { flex: 1, fontSize: font.body, color: colors.text, paddingVertical: spacing.sm },
   hint: { fontSize: font.tiny, color: colors.muted },
-});
+}));

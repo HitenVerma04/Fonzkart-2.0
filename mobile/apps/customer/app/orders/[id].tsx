@@ -1,15 +1,16 @@
 // The customer tracker: the website's trackerSteps() for this order, refreshed every 20 s and when the app comes
 // back, so a change made by the executive, partner or admin (in their app or on the website) shows here.
-import { Linking, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useMyOrder } from '@fonzkart/api';
 import {
   displayPhone, failureReasonOf, formatInr, isFailed, parseAnswers, payoutOf, priceReviewOf, telHref, trackerSteps,
 } from '@fonzkart/core';
-import { Button, ErrorState, Loading, Notice, StatusBadge, Tracker, colors, font, formatDateTime, radius, spacing } from '@fonzkart/ui';
+import { Button, ErrorState, font, formatDateTime, Loading, makeStyles, Notice, radius, spacing, StatusBadge, Tracker } from '@fonzkart/ui';
 import { PAGE_PADDING } from '../../src/grid';
 
 export default function OrderTracker() {
+  const styles = useStyles();
   const { id, placed } = useLocalSearchParams<{ id: string; placed?: string }>();
   const order = useMyOrder(id);
 
@@ -73,6 +74,7 @@ export default function OrderTracker() {
 }
 
 function Row({ label, value }: { label: string; value: string }) {
+  const styles = useStyles();
   return (
     <View style={styles.row}>
       <Text style={styles.muted}>{label}</Text>
@@ -81,7 +83,7 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.lg, maxWidth: 640, width: '100%', alignSelf: 'center' },
   card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: spacing.sm },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -92,4 +94,4 @@ const styles = StyleSheet.create({
   row: { gap: 2, marginBottom: spacing.xs },
   muted: { fontSize: font.small, color: colors.muted },
   value: { fontSize: font.body, fontWeight: '600', color: colors.text },
-});
+}));

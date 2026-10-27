@@ -1,7 +1,7 @@
 // Pickup booking: the website's booking steps (address, time, payment) on one screen. The order is placed on the
 // same backend as the website, at the server's price for the device and answers (the offer the customer saw).
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import { usePincodeAvailability, usePlaceOrder, useProfile, useQuote, useSession } from '@fonzkart/api';
@@ -9,12 +9,14 @@ import {
   PAYMENT_METHODS, availableSlots, bookingAnswers, bookingProblems, cleanPincode, expressAvailable, formatInr,
   isCompletePincode, pickupDays, type PaymentMethod,
 } from '@fonzkart/core';
-import { Button, ChoiceCard, EmptyState, Notice, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
+import { Button, ChoiceCard, EmptyState, font, makeStyles, Notice, radius, spacing, TextField, useColors } from '@fonzkart/ui';
 import { networkMessage } from '../src/authFlow';
 import { PAGE_PADDING } from '../src/grid';
 import { useQuoteDraft } from '../src/quoteDraft';
 
 export default function Book() {
+  const colors = useColors();
+  const styles = useStyles();
   const router = useRouter();
   const params = useLocalSearchParams<{ pincode?: string }>();
   const draft = useQuoteDraft();
@@ -198,6 +200,7 @@ export default function Book() {
 function Chip({ label, caption, selected, wide, onPress }: {
   label: string; caption?: string; selected: boolean; wide?: boolean; onPress: () => void;
 }) {
+  const styles = useStyles();
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected }}
       style={[styles.chip, wide && styles.chipWide, selected && styles.chipSelected]}>
@@ -207,7 +210,7 @@ function Chip({ label, caption, selected, wide, onPress }: {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.lg, maxWidth: 640, width: '100%', alignSelf: 'center' },
   summary: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.md },
   device: { flex: 1, fontSize: font.body, fontWeight: '700', color: colors.text },
@@ -221,9 +224,9 @@ const styles = StyleSheet.create({
   chipLabel: { fontSize: font.small, fontWeight: '700', color: colors.text },
   chipCaption: { fontSize: font.heading, fontWeight: '800', color: colors.text },
   chipLabelSelected: { color: colors.white },
-  express: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, borderWidth: 1, borderColor: '#fcd34d', backgroundColor: '#fffbeb', borderRadius: radius.md, padding: spacing.md },
+  express: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, borderWidth: 1, borderColor: colors.warning.border, backgroundColor: colors.warning.background, borderRadius: radius.md, padding: spacing.md },
   disabled: { opacity: 0.55 },
   expressText: { flex: 1, gap: 2 },
   expressTitle: { fontSize: font.body, fontWeight: '700', color: colors.text },
   small: { fontSize: font.small, color: colors.muted },
-});
+}));

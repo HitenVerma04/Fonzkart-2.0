@@ -1,17 +1,20 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useBrands, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
-import { ErrorState, Loading, Logo, RemoteImage, SearchField, Tile, colors, font, radius, spacing } from '@fonzkart/ui';
-import { CategoryCard } from '../src/categoryArt/CategoryCard';
-import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../src/grid';
+import { ErrorState, font, Loading, Logo, makeStyles, radius, RemoteImage, SearchField, spacing, Tile } from '@fonzkart/ui';
+import { CategoryCard } from '../../src/categoryArt/CategoryCard';
+import { HomeCarousel } from '../../src/HomeCarousel';
+import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 
 const TOP_BRANDS = 8;
 
 export default function Home() {
+  const styles = useStyles();
   const router = useRouter();
   const categoryWidth = useTileWidth(3);
+  const carouselWidth = useTileWidth(1);
   const brandWidth = useTileWidth(4);
   const brands = useBrands('smartphone');
   const { session } = useSession();
@@ -34,9 +37,9 @@ export default function Home() {
               </Pressable>
             ) : null}
             <Pressable
-              onPress={() => router.push('/account')}
+              onPress={() => router.navigate('/profile')}
               accessibilityRole="button"
-              accessibilityLabel="Account"
+              accessibilityLabel="Profile"
               style={({ pressed }) => [styles.account, pressed && styles.pressed]}
             >
               <Text style={styles.accountText} numberOfLines={1}>{accountLabel}</Text>
@@ -44,12 +47,14 @@ export default function Home() {
           </View>
         </View>
 
-        <Text style={styles.title}>Sell your old device</Text>
+        <Text style={styles.title}>Turn your old devices into <Text style={styles.highlight}>cash</Text></Text>
         <Pressable onPress={() => router.push('/search')} accessibilityRole="search">
           <View pointerEvents="none">
             <SearchField placeholder="Search your phone, e.g. iPhone 14" editable={false} />
           </View>
         </Pressable>
+
+        <HomeCarousel width={carouselWidth} />
 
         <Text style={styles.section}>Choose a category</Text>
         <View style={styles.grid}>
@@ -63,6 +68,13 @@ export default function Home() {
               onPress={() => router.push({ pathname: '/category/[id]', params: { id: category.id } })}
             />
           ))}
+          {/* The website's other cards, after the sell categories as there. */}
+          <CategoryCard id="repair" name="Repair" width={categoryWidth} index={SELL_CATEGORIES.length}
+            onPress={() => router.navigate('/repair')} />
+          <CategoryCard id="screenguard" name="Screen Guard" width={categoryWidth} index={SELL_CATEGORIES.length + 1}
+            onPress={() => router.push('/screen-guard')} />
+          <CategoryCard id="bulk" name="Bulk Orders" width={categoryWidth} index={SELL_CATEGORIES.length + 2}
+            onPress={() => router.push('/bulk')} />
         </View>
 
         <Text style={styles.section}>Top phone brands</Text>
@@ -88,7 +100,7 @@ export default function Home() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   safe: { flex: 1, backgroundColor: colors.background },
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing.sm },
@@ -96,7 +108,8 @@ const styles = StyleSheet.create({
   account: { maxWidth: 120, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
   accountText: { fontSize: font.small, fontWeight: '700', color: colors.navy },
   title: { fontSize: font.title, fontWeight: '800', color: colors.navy },
+  highlight: { color: colors.green },
   section: { fontSize: font.heading, fontWeight: '700', color: colors.text, marginTop: spacing.md },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
   pressed: { opacity: 0.7 },
-});
+}));

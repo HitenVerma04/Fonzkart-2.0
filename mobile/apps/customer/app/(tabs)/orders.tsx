@@ -1,10 +1,12 @@
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useMyOrders, useSession } from '@fonzkart/api';
-import { Button, EmptyState, ErrorState, Loading, OrderCard, colors, font, spacing } from '@fonzkart/ui';
+import { Button, EmptyState, ErrorState, font, Loading, makeStyles, OrderCard, spacing, useColors } from '@fonzkart/ui';
 import { PAGE_PADDING } from '../../src/grid';
 
 export default function MyOrders() {
+  const colors = useColors();
+  const styles = useStyles();
   const router = useRouter();
   const { session } = useSession();
   const orders = useMyOrders(session.status === 'signedIn');
@@ -26,7 +28,8 @@ export default function MyOrders() {
       data={orders.data}
       keyExtractor={o => o.id}
       contentContainerStyle={styles.list}
-      refreshControl={<RefreshControl refreshing={orders.isRefetching} onRefresh={() => void orders.refetch()} />}
+      refreshControl={<RefreshControl refreshing={orders.isRefetching} onRefresh={() => void orders.refetch()}
+        colors={[colors.green]} tintColor={colors.green} />}
       ListEmptyComponent={<EmptyState message="No orders yet. Value a device to book your first pickup." />}
       renderItem={({ item }) => (
         <OrderCard
@@ -43,8 +46,8 @@ export default function MyOrders() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   list: { padding: PAGE_PADDING, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center', flexGrow: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl, gap: spacing.md },
   text: { fontSize: font.body, color: colors.muted },
-});
+}));

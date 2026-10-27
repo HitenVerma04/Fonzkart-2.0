@@ -1,5 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-import { colors, font, radius, spacing } from './theme';
+import { ActivityIndicator, Pressable, Text } from 'react-native';
+import { makeStyles, useColors } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 export function Button({ title, onPress, variant = 'primary', disabled, loading }: {
   title: string;
@@ -8,6 +9,10 @@ export function Button({ title, onPress, variant = 'primary', disabled, loading 
   disabled?: boolean;
   loading?: boolean;
 }) {
+  const colors = useColors();
+  const styles = useStyles();
+  const pressedStyles = usePressedStyles();
+  const textStyles = useTextStyles();
   const inactive = disabled || loading;
   return (
     <Pressable
@@ -32,23 +37,23 @@ export function Button({ title, onPress, variant = 'primary', disabled, loading 
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   base: { minHeight: 50, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.xl },
   primary: { backgroundColor: colors.green },
   secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   link: { minHeight: 40, paddingHorizontal: spacing.sm },
   disabled: { opacity: 0.45 },
   text: { fontSize: font.body, fontWeight: '700' },
-});
+}));
 
-const pressedStyles = StyleSheet.create({
-  primary: { backgroundColor: colors.greenDark },
+const usePressedStyles = makeStyles(colors => ({
+  primary: { backgroundColor: colors.greenPressed },
   secondary: { borderColor: colors.green, backgroundColor: colors.greenSoft },
   link: { opacity: 0.6 },
-});
+}));
 
-const textStyles = StyleSheet.create({
+const useTextStyles = makeStyles(colors => ({
   primary: { color: colors.white },
   secondary: { color: colors.navy },
   link: { color: colors.green },
-});
+}));

@@ -1,10 +1,11 @@
 // A small dialog asking for one line of text (a reason, a payment reference). React Native's Alert.prompt is
 // iPhone-only, so the apps use this on both platforms.
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Text, View } from 'react-native';
 import { Button } from './Button';
 import { TextField } from './TextField';
-import { colors, font, radius, spacing } from './theme';
+import { makeStyles } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 export function TextPrompt({ visible, title, message, label, placeholder, confirmLabel, required, keyboardType, onSubmit, onClose }: {
   visible: boolean;
@@ -18,6 +19,7 @@ export function TextPrompt({ visible, title, message, label, placeholder, confir
   onSubmit: (text: string) => void;
   onClose: () => void;
 }) {
+  const styles = useStyles();
   const [text, setText] = useState('');
   useEffect(() => {
     if (visible) setText('');
@@ -41,11 +43,11 @@ export function TextPrompt({ visible, title, message, label, placeholder, confir
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(17,24,39,0.45)', justifyContent: 'center', padding: spacing.lg },
+const useStyles = makeStyles(colors => ({
+  backdrop: { flex: 1, backgroundColor: colors.backdrop, justifyContent: 'center', padding: spacing.lg },
   dialog: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.lg, gap: spacing.md, maxWidth: 480, width: '100%', alignSelf: 'center' },
   title: { fontSize: font.heading, fontWeight: '800', color: colors.navy },
   message: { fontSize: font.small, color: colors.muted },
   actions: { flexDirection: 'row', gap: spacing.md },
   action: { flex: 1 },
-});
+}));

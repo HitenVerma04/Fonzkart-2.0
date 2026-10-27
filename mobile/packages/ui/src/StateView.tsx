@@ -1,7 +1,10 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, font, radius, spacing } from './theme';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { makeStyles, useColors } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 export function Loading({ label = 'Loading…' }: { label?: string }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <View style={styles.center}>
       <ActivityIndicator color={colors.green} size="large" />
@@ -14,6 +17,7 @@ export function ErrorState({ message = 'Could not reach Fonzkart. Check your int
   message?: string;
   onRetry?: () => void;
 }) {
+  const styles = useStyles();
   return (
     <View style={styles.center}>
       <Text style={styles.title}>Something went wrong</Text>
@@ -28,6 +32,7 @@ export function ErrorState({ message = 'Could not reach Fonzkart. Check your int
 }
 
 export function EmptyState({ message }: { message: string }) {
+  const styles = useStyles();
   return (
     <View style={styles.center}>
       <Text style={styles.text}>{message}</Text>
@@ -35,11 +40,11 @@ export function EmptyState({ message }: { message: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl, gap: spacing.sm, minHeight: 200 },
   title: { fontSize: font.heading, fontWeight: '700', color: colors.text },
   text: { fontSize: font.body, color: colors.muted, textAlign: 'center' },
   button: { marginTop: spacing.sm, backgroundColor: colors.green, borderRadius: radius.pill, paddingHorizontal: spacing.xl, paddingVertical: spacing.md },
-  pressed: { backgroundColor: colors.greenDark },
+  pressed: { backgroundColor: colors.greenPressed },
   buttonText: { color: colors.white, fontWeight: '700', fontSize: font.body },
-});
+}));

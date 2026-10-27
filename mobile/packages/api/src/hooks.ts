@@ -6,7 +6,7 @@ import { quoteApi } from './quote';
 import { customerOrdersApi, executiveApi, notificationsApi, staffOrdersApi, type PlaceOrderInput } from './orders';
 import { ridersApi } from './riders';
 import { adminApi } from './admin';
-import { catalogAdminApi, emailApi } from './content';
+import { carouselApi, catalogAdminApi, emailApi } from './content';
 
 export function createQueryClient() {
   return new QueryClient({
@@ -285,12 +285,21 @@ export const usePricingRules = (category: string) =>
 
 export const contentKeys = {
   bannerPrices: ['staff', 'banner-prices'] as const,
+  /** The customer home page's carousel (public). */
+  carousel: ['content', 'carousel'] as const,
+  /** Every carousel card, hidden ones too (Admin app). */
+  carouselAdmin: ['staff', 'carousel'] as const,
   email: (account?: string) => ['staff', 'email', account ?? null] as const,
   emailMessage: (id: string) => ['staff', 'email-message', id] as const,
 };
 
 export const useBannerPrices = () =>
   useQuery({ queryKey: contentKeys.bannerPrices, queryFn: ({ signal }) => catalogAdminApi.bannerPrices(signal), staleTime: 0 });
+/** At most a minute old; the home screen also reloads it when the app comes back on screen. */
+export const useCarousel = () =>
+  useQuery({ queryKey: contentKeys.carousel, queryFn: ({ signal }) => carouselApi.visible(signal), staleTime: 60_000 });
+export const useCarouselAdmin = () =>
+  useQuery({ queryKey: contentKeys.carouselAdmin, queryFn: ({ signal }) => carouselApi.all(signal), staleTime: 0 });
 export const useHomepageCities = () =>
   useQuery({ queryKey: ['staff', 'homepage-cities'], queryFn: ({ signal }) => adminApi.homepageCities(signal), staleTime: 0 });
 export const useEmailMessages = (account?: string) =>

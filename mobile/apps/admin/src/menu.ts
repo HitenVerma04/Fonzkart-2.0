@@ -1,6 +1,8 @@
-// The Admin app's sections by role: the same as the website's admin sidebar (components/admin/AdminSidebar.tsx).
+// The Admin app's sections by role: the same as the website's admin sidebar (components/admin/AdminSidebar.tsx),
+// plus "Edit carousel view", which only the Customer app has.
 export type Section = {
-  href: '/orders' | '/partners' | '/riders' | '/cities' | '/zonal-heads' | '/users' | '/rm' | '/pricing' | '/catalog' | '/homepage' | '/email';
+  href: '/orders' | '/partners' | '/riders' | '/cities' | '/zonal-heads' | '/users' | '/rm' | '/pricing' | '/catalog' | '/homepage'
+    | '/carousel' | '/email';
   title: string;
   detail: string;
   roles: string[];
@@ -21,6 +23,7 @@ export const SECTIONS: Section[] = [
   { href: '/pricing', title: 'Pricing rules', detail: 'Deductions per answer and category', roles: ADMINS },
   { href: '/catalog', title: 'Catalog', detail: 'Brands, models, variants and pictures', roles: ADMINS },
   { href: '/homepage', title: 'Landing page', detail: 'Banner prices and featured cities', roles: ADMINS },
+  { href: '/carousel', title: 'Edit carousel view', detail: 'Cards on the Customer app home screen', roles: ADMINS },
   { href: '/email', title: 'Email', detail: 'The Fonzkart mailboxes', roles: [...ADMINS, ZH, RM] },
 ];
 

@@ -1,5 +1,5 @@
 export { config } from './config';
-export { imageUrl } from './images';
+export { imageUrl, modelImage } from './images';
 export { formatInr } from './format';
 export { SELL_CATEGORIES, categoryName, sellCategoryOf, type SellCategoryId } from './categories';
 export { cleanPincode, isCompletePincode } from './pincode';

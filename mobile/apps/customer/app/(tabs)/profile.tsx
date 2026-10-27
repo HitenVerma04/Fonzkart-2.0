@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { Alert, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { accountApi, useNotifications, useProfile, useSession } from '@fonzkart/api';
-import { Button, ErrorState, Loading, Logo, Notice, colors, font, radius, spacing } from '@fonzkart/ui';
+import {
+  Button, ErrorState, font, Loading, Logo, makeStyles, Notice, radius, Segmented, spacing, useTheme, type ThemePreference,
+} from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
 import { PAGE_PADDING } from '../../src/grid';
 
 export default function Account() {
+  const styles = useStyles();
   const router = useRouter();
   const { session, signOut } = useSession();
   const profile = useProfile(session.status === 'signedIn');
@@ -22,7 +25,7 @@ export default function Account() {
     try {
       await accountApi.deleteAccount();
       await signOut();
-      router.dismissAll();
+      router.navigate('/');
     } catch (error) {
       setDeleteError(networkMessage(error));
     } finally {
@@ -53,6 +56,7 @@ export default function Account() {
           <Button title="Sign in" onPress={() => router.push('/account/sign-in')} />
           <Button title="Create account" variant="secondary" onPress={() => router.push('/account/sign-up')} />
         </View>
+        <AppearancePicker />
       </ScrollView>
     );
   }
@@ -72,8 +76,9 @@ export default function Account() {
           </>
         )}
       </View>
-      <Button title="My orders" onPress={() => router.push('/orders')} />
+      <Button title="My orders" onPress={() => router.navigate('/orders')} />
       <Button title={unread ? `Notifications (${unread} new)` : 'Notifications'} variant="secondary" onPress={() => router.push('/notifications')} />
+      <AppearancePicker />
       <Button title="Sign out" variant="secondary" onPress={() => void signOut()} />
       <Button title="Delete my account" variant="link" loading={deleting} onPress={confirmDelete} />
       {deleteError ? <Notice tone="error" text={deleteError} /> : null}
@@ -81,7 +86,24 @@ export default function Account() {
   );
 }
 
+/** Light or dark mode: follow the phone (System), or always Light or Dark. Remembered on this phone. */
+function AppearancePicker() {
+  const styles = useStyles();
+  const { preference, setPreference } = useTheme();
+  return (
+    <View style={[styles.card, styles.appearance]}>
+      <Text style={styles.rowLabel}>Appearance</Text>
+      <Segmented<ThemePreference>
+        value={preference}
+        onChange={setPreference}
+        options={[{ id: 'system', label: 'System' }, { id: 'light', label: 'Light' }, { id: 'dark', label: 'Dark' }]}
+      />
+    </View>
+  );
+}
+
 function Row({ label, value }: { label: string; value: string }) {
+  const styles = useStyles();
   return (
     <View style={styles.row}>
       <Text style={styles.rowLabel}>{label}</Text>
@@ -90,15 +112,16 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.lg, maxWidth: 640, width: '100%', alignSelf: 'center' },
   center: { alignItems: 'center', paddingTop: spacing.xxl },
   title: { fontSize: font.title, fontWeight: '800', color: colors.navy },
   text: { fontSize: font.body, color: colors.muted, textAlign: 'center' },
   actions: { alignSelf: 'stretch', gap: spacing.md, marginTop: spacing.md },
   card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: spacing.md },
+  appearance: { alignSelf: 'stretch', gap: spacing.sm },
   name: { fontSize: font.title, fontWeight: '800', color: colors.navy },
   row: { gap: 2 },
   rowLabel: { fontSize: font.small, color: colors.muted },
   rowValue: { fontSize: font.body, fontWeight: '600', color: colors.text },
-});
+}));

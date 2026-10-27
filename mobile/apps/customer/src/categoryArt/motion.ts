@@ -1,6 +1,6 @@
 // The website's framer-motion loops (components/sell/CategorySelector.tsx), on the UI thread with Reanimated.
 import { useEffect } from 'react';
-import { Circle, G, Path, Rect } from 'react-native-svg';
+import { Circle, G, Line, Path, Rect } from 'react-native-svg';
 import Animated, {
   Easing,
   cancelAnimation,
@@ -15,6 +15,7 @@ export const AnimatedG = Animated.createAnimatedComponent(G);
 export const AnimatedPath = Animated.createAnimatedComponent(Path);
 export const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 export const AnimatedRect = Animated.createAnimatedComponent(Rect);
+export const AnimatedLine = Animated.createAnimatedComponent(Line);
 
 // framer-motion's "easeInOut".
 const easeInOut = Easing.bezier(0.42, 0, 0.58, 1);

@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, font, radius, spacing } from './theme';
+import { Pressable, Text, View } from 'react-native';
+import { makeStyles } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 /** One answer in the device questionnaire: a radio (single choice) or a checkbox (several choices). */
 export function ChoiceCard({ label, description, selected, multi, onPress }: {
@@ -9,6 +10,7 @@ export function ChoiceCard({ label, description, selected, multi, onPress }: {
   multi?: boolean;
   onPress: () => void;
 }) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -35,6 +37,7 @@ export function YesNo({ question, detail, value, onChange }: {
   value: boolean | undefined;
   onChange: (value: boolean) => void;
 }) {
+  const styles = useStyles();
   return (
     <View style={styles.question}>
       <Text style={styles.label}>{question}</Text>
@@ -60,7 +63,7 @@ export function YesNo({ question, detail, value, onChange }: {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -94,4 +97,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   yesNoText: { fontSize: font.body, fontWeight: '700', color: colors.text },
-});
+}));

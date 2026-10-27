@@ -1,11 +1,12 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useBrands } from '@fonzkart/api';
 import { categoryName } from '@fonzkart/core';
-import { EmptyState, ErrorState, Loading, RemoteImage, Tile, colors, font, spacing } from '@fonzkart/ui';
+import { EmptyState, ErrorState, font, Loading, makeStyles, RemoteImage, spacing, Tile } from '@fonzkart/ui';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 
 export default function CategoryBrands() {
+  const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const width = useTileWidth(3);
@@ -41,8 +42,8 @@ export default function CategoryBrands() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center' },
   hint: { fontSize: font.body, color: colors.muted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
-});
+}));

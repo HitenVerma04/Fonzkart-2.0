@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, font, radius, spacing } from './theme';
+import { Pressable, Text, View } from 'react-native';
+import { makeStyles } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 /** A tappable card with a picture above a label (categories, brands, models). */
 export function Tile({ label, caption, image, onPress, width }: {
@@ -10,6 +11,7 @@ export function Tile({ label, caption, image, onPress, width }: {
   onPress: () => void;
   width: number;
 }) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -24,7 +26,7 @@ export function Tile({ label, caption, image, onPress, width }: {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   tile: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
@@ -37,4 +39,4 @@ const styles = StyleSheet.create({
   image: { alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
   label: { fontSize: font.small, fontWeight: '600', color: colors.text, textAlign: 'center' },
   caption: { fontSize: font.tiny, color: colors.green, fontWeight: '600', marginTop: 2, textAlign: 'center' },
-});
+}));

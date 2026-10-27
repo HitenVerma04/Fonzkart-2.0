@@ -1,9 +1,11 @@
 // Layout pieces for the staff apps (Partner, Admin): cards, label/value rows, segmented tabs and a list picker.
 import type { ReactNode } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, font, radius, spacing } from './theme';
+import { FlatList, Modal, Pressable, Text, View } from 'react-native';
+import { makeStyles } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 export function Card({ title, children, right }: { title?: string; children: ReactNode; right?: ReactNode }) {
+  const styles = useStyles();
   return (
     <View style={styles.card}>
       {title || right ? (
@@ -18,6 +20,7 @@ export function Card({ title, children, right }: { title?: string; children: Rea
 }
 
 export function InfoRow({ label, value }: { label: string; value: string | null | undefined }) {
+  const styles = useStyles();
   return (
     <View style={styles.row}>
       <Text style={styles.rowLabel}>{label}</Text>
@@ -32,6 +35,7 @@ export function Segmented<T extends string>({ options, value, onChange }: {
   value: T;
   onChange: (id: T) => void;
 }) {
+  const styles = useStyles();
   return (
     <View style={styles.segments} accessibilityRole="tablist">
       {options.map(o => {
@@ -60,6 +64,7 @@ export function ListPicker<T>({ visible, title, items, keyOf, labelOf, detailOf,
   onPick: (item: T) => void;
   onClose: () => void;
 }) {
+  const styles = useStyles();
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose} presentationStyle="pageSheet">
       <View style={styles.sheet}>
@@ -87,7 +92,7 @@ export function ListPicker<T>({ visible, title, items, keyOf, labelOf, detailOf,
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: spacing.sm },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xs },
   cardTitle: { fontSize: font.heading, fontWeight: '700', color: colors.text },
@@ -109,4 +114,4 @@ const styles = StyleSheet.create({
   optionLabel: { fontSize: font.body, fontWeight: '700', color: colors.text },
   optionDetail: { fontSize: font.small, color: colors.muted },
   empty: { fontSize: font.body, color: colors.muted, textAlign: 'center', padding: spacing.xl },
-});
+}));

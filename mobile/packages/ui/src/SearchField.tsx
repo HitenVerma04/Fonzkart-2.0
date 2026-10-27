@@ -1,7 +1,10 @@
-import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
-import { colors, font, radius, spacing } from './theme';
+import { Text, TextInput, View, type TextInputProps } from 'react-native';
+import { makeStyles, useColors } from './ThemeContext';
+import { font, radius, spacing } from './theme';
 
 export function SearchField(props: TextInputProps) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <View style={styles.box}>
       <Text style={styles.icon} accessibilityElementsHidden importantForAccessibility="no">⌕</Text>
@@ -18,7 +21,7 @@ export function SearchField(props: TextInputProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(colors => ({
   box: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -31,4 +34,4 @@ const styles = StyleSheet.create({
   },
   icon: { fontSize: 20, color: colors.muted, marginRight: spacing.sm },
   input: { flex: 1, fontSize: font.body, color: colors.text, paddingVertical: spacing.sm },
-});
+}));
