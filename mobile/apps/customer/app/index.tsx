@@ -1,14 +1,13 @@
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useBrands, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
 import { ErrorState, Loading, Logo, RemoteImage, SearchField, Tile, colors, font, radius, spacing } from '@fonzkart/ui';
-import { CATEGORY_IMAGES } from '../src/categoryImages';
+import { CategoryCard } from '../src/categoryArt/CategoryCard';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../src/grid';
 
 const TOP_BRANDS = 8;
-const CARD_RATIO = 2000 / 1600; // category card pictures are 4:5 portrait
 
 export default function Home() {
   const router = useRouter();
@@ -54,17 +53,15 @@ export default function Home() {
 
         <Text style={styles.section}>Choose a category</Text>
         <View style={styles.grid}>
-          {SELL_CATEGORIES.map(category => (
-            // The card pictures carry their own title, so no label is drawn under them.
-            <Pressable
+          {SELL_CATEGORIES.map((category, index) => (
+            <CategoryCard
               key={category.id}
+              id={category.id}
+              name={category.name}
+              width={categoryWidth}
+              index={index}
               onPress={() => router.push({ pathname: '/category/[id]', params: { id: category.id } })}
-              accessibilityRole="button"
-              accessibilityLabel={category.name}
-              style={({ pressed }) => pressed && styles.pressed}
-            >
-              <Image source={CATEGORY_IMAGES[category.id]} style={{ width: categoryWidth, height: categoryWidth * CARD_RATIO }} resizeMode="contain" />
-            </Pressable>
+            />
           ))}
         </View>
 
