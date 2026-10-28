@@ -27,9 +27,11 @@ export function Glass({ children, style, strong, radius = radii.lg, shadow = 'md
         style,
       ]}
     >
+      {/* The sheen covers the whole surface, border included, so its corners round exactly like the surface's own
+          (a shorter layer gets a tighter curve and pokes out at the corners); the gradient itself fades out by 60%. */}
       <View
         pointerEvents="none"
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '60%', borderRadius: radius, backgroundImage: d.glass.sheen }}
+        style={{ position: 'absolute', top: -1, left: -1, right: -1, bottom: -1, borderRadius: radius, backgroundImage: d.glass.sheen }}
       />
       {children}
     </View>
