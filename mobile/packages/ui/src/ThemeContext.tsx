@@ -32,8 +32,14 @@ const ThemeContext = createContext<ThemeValue>({
 });
 
 const PREFERENCES: ThemePreference[] = ['system', 'light', 'dark'];
+const DEFAULT_PALETTES = { light: lightColors, dark: darkColors };
 
-export function ThemeProvider({ storage, children }: { storage?: ThemeStorage; children: ReactNode }) {
+/** `palettes` lets an app use its own light and dark colours (the Customer app); the default is the shared pair. */
+export function ThemeProvider({ storage, palettes = DEFAULT_PALETTES, children }: {
+  storage?: ThemeStorage;
+  palettes?: { light: Palette; dark: Palette };
+  children: ReactNode;
+}) {
   const system = useColorScheme();
   const [preference, setPreferenceState] = useState<ThemePreference>('system');
 
@@ -55,8 +61,8 @@ export function ThemeProvider({ storage, children }: { storage?: ThemeStorage; c
 
   const scheme: ColorScheme = preference === 'system' ? (system === 'dark' ? 'dark' : 'light') : preference;
   const value = useMemo(
-    () => ({ scheme, colors: scheme === 'dark' ? darkColors : lightColors, preference, setPreference }),
-    [scheme, preference, setPreference],
+    () => ({ scheme, colors: scheme === 'dark' ? palettes.dark : palettes.light, preference, setPreference }),
+    [scheme, palettes, preference, setPreference],
   );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

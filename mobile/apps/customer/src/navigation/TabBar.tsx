@@ -1,60 +1,63 @@
-// The Customer app's bottom tabs (Sell, Buy, Repair, My orders, Profile) in Fonzkart green: a light-green highlight springs to
-// the chosen tab, its icon pops, and presses ripple in green on Android.
+// The Customer app's bottom tabs (Sell, Buy, Repair, My orders, Profile): a floating glass bar. A green-tinted pill
+// springs to the chosen tab, whose icon fills in, lifts and pops; presses also ripple in green on Android.
 import { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { makeStyles, useColors } from '@fonzkart/ui';
-import { TabIcon, type TabIconName } from './TabIcon';
-
-const SPRING = { damping: 18, stiffness: 220, mass: 0.6 };
+import { Glass, Icon, motion, radii, TAB_BAR_HEIGHT, Tap, type IconName } from '../design';
 
 /** Route name → icon. Routes not listed get the Sell icon. */
-const ICONS: Record<string, TabIconName> = { buy: 'buy', index: 'sell', repair: 'repair', orders: 'orders', profile: 'profile' };
+const ICONS: Record<string, IconName> = { buy: 'buy', index: 'sell', repair: 'repair', orders: 'orders', profile: 'profile' };
+const PAD = 6;
 
-export function FonzkartTabBar({ state, descriptors, emitter, navigateToTab, insets }: BottomTabBarProps) {
+export function FonzkartTabBar({ state, descriptors, emitter, navigateToTab }: BottomTabBarProps) {
   const styles = useStyles();
+  const insets = useSafeAreaInsets();
   const [width, setWidth] = useState(0);
-  const tabWidth = width / state.routes.length;
+  const tabWidth = (width - PAD * 2) / state.routes.length;
   const x = useSharedValue(0);
   const placed = useSharedValue(false);
 
   useEffect(() => {
     if (!tabWidth) return;
     // The first placement jumps; later ones spring.
-    x.value = placed.value ? withSpring(state.index * tabWidth, SPRING) : state.index * tabWidth;
+    x.value = placed.value ? withSpring(state.index * tabWidth, motion.snappy) : state.index * tabWidth;
     placed.value = true;
   }, [state.index, tabWidth, x, placed]);
 
-  const highlight = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
+  const pill = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
 
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 6) }]} onLayout={e => setWidth(e.nativeEvent.layout.width)} role="tablist">
-      {tabWidth ? (
-        <Animated.View pointerEvents="none" style={[styles.highlightTrack, { width: tabWidth }, highlight]}>
-          <View style={styles.highlight} />
-        </Animated.View>
-      ) : null}
-      {state.routes.map((route, index) => {
-        const focused = index === state.index;
-        const { options } = descriptors[route.key]!;
-        const label = typeof options.tabBarLabel === 'string' ? options.tabBarLabel : options.title ?? route.name;
-        const onPress = () => {
-          const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-          if (!focused && !event.defaultPrevented) navigateToTab(route.key);
-        };
-        return (
-          <Tab key={route.key} label={label} icon={ICONS[route.name] ?? 'sell'} focused={focused} onPress={onPress}
-            onLongPress={() => emitter.emit({ type: 'tabLongPress', target: route.key })} />
-        );
-      })}
+    <View pointerEvents="box-none" style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+      <Glass strong radius={radii.pill} shadow="lg" style={styles.bar} onLayout={e => setWidth(e.nativeEvent.layout.width)} role="tablist">
+        {tabWidth ? (
+          <Animated.View pointerEvents="none" style={[styles.pillTrack, { width: tabWidth }, pill]}>
+            <View style={styles.pill} />
+          </Animated.View>
+        ) : null}
+        {state.routes.map((route, index) => {
+          const focused = index === state.index;
+          const { options } = descriptors[route.key]!;
+          const label = typeof options.tabBarLabel === 'string' ? options.tabBarLabel : options.title ?? route.name;
+          const onPress = () => {
+            const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+            if (!focused && !event.defaultPrevented) navigateToTab(route.key);
+          };
+          return (
+            <Tab key={route.key} label={label} icon={ICONS[route.name] ?? 'sell'} focused={focused} onPress={onPress}
+              onLongPress={() => emitter.emit({ type: 'tabLongPress', target: route.key })} />
+          );
+        })}
+      </Glass>
     </View>
   );
 }
 
 function Tab({ label, icon, focused, onPress, onLongPress }: {
   label: string;
-  icon: TabIconName;
+  icon: IconName;
   focused: boolean;
   onPress: () => void;
   onLongPress: () => void;
@@ -62,42 +65,39 @@ function Tab({ label, icon, focused, onPress, onLongPress }: {
   const colors = useColors();
   const styles = useStyles();
   const scale = useSharedValue(1);
+  const lift = useSharedValue(focused ? 1 : 0);
   useEffect(() => {
-    if (focused) scale.value = withSequence(withTiming(1.18, { duration: 110 }), withSpring(1, SPRING));
-  }, [focused, scale]);
-  const pop = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+    lift.value = withSpring(focused ? 1 : 0, motion.snappy);
+    if (focused) scale.value = withSequence(withTiming(1.2, { duration: 120 }), withSpring(1, motion.press));
+  }, [focused, scale, lift]);
+  const iconStyle = useAnimatedStyle(() => ({ transform: [{ translateY: -2 * lift.value }, { scale: scale.value }] }));
   const color = focused ? colors.green : colors.muted;
 
   return (
-    <Pressable
+    <Tap
       onPress={onPress}
       onLongPress={onLongPress}
+      scaleTo={0.9}
       role="tab"
       accessibilityState={{ selected: focused }}
       accessibilityLabel={label}
-      android_ripple={{ color: colors.ripple, borderless: true, radius: 36 }}
+      android_ripple={{ color: colors.ripple, borderless: true, radius: 34 }}
       style={styles.tab}
     >
-      <Animated.View style={[styles.icon, pop]}>
-        <TabIcon name={icon} color={color} focused={focused} />
+      <Animated.View style={iconStyle}>
+        <Icon name={icon} color={color} size={23} filled={focused} />
       </Animated.View>
       <Text style={[styles.label, { color }, focused && styles.labelFocused]} numberOfLines={1}>{label}</Text>
-    </Pressable>
+    </Tap>
   );
 }
 
 const useStyles = makeStyles(colors => ({
-  bar: {
-    flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: 6,
-  },
-  highlightTrack: { position: 'absolute', top: 6, left: 0, alignItems: 'center' },
-  highlight: { width: 56, height: 30, borderRadius: 15, backgroundColor: colors.greenTint },
-  tab: { flex: 1, alignItems: 'center', gap: 2 },
-  icon: { height: 30, justifyContent: 'center' },
-  label: { fontSize: 11, fontWeight: '600' },
+  wrap: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 14, alignItems: 'center' },
+  bar: { flexDirection: 'row', height: TAB_BAR_HEIGHT, padding: PAD, width: '100%', maxWidth: 520 },
+  pillTrack: { position: 'absolute', top: PAD, bottom: PAD, left: PAD, paddingHorizontal: 3 },
+  pill: { flex: 1, borderRadius: radii.pill, backgroundColor: colors.greenTint, borderWidth: 1, borderColor: colors.greenBorder },
+  tab: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 1 },
+  label: { fontSize: 10.5, fontWeight: '600', letterSpacing: 0.1 },
   labelFocused: { fontWeight: '800' },
 }));
