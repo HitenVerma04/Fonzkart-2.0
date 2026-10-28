@@ -1,12 +1,15 @@
 // Home: a green header with the brand, greeting, notifications and the search bar; the carousel; the sell
 // categories; Fonzkart's services; top phone brands; and how selling works.
-import { ScrollView, Text, View } from 'react-native';
+import { useCallback } from 'react';
+import { Text, View } from 'react-native';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useBrands, useNotifications, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
 import { Logo, makeStyles } from '@fonzkart/ui';
 import { CategoryCard } from '../../src/categoryArt/CategoryCard';
+import { ArtActivity } from '../../src/categoryArt/motion';
 import {
   Appear, ErrorState, Icon, IconBadge, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles,
   Tile, type, useDesign, useTabBarSpace, type IconName,
@@ -43,9 +46,41 @@ export default function Home() {
   const unread = inbox.data?.some(n => !n.isRead) ?? false;
   const firstName = signedIn ? session.user.name.trim().split(/\s+/)[0] : '';
 
+  // The category drawings move only while this screen is in front and the list is still: animating a dozen SVGs
+  // during a scroll or a screen transition is what made both stutter.
+  const artActive = useSharedValue(true);
+  const focused = useSharedValue(true);
+  const scrolling = useSharedValue(false);
+  useFocusEffect(useCallback(() => {
+    focused.value = true;
+    artActive.value = !scrolling.value;
+    return () => {
+      focused.value = false;
+      artActive.value = false;
+    };
+  }, [artActive, focused, scrolling]));
+  const onScroll = useAnimatedScrollHandler({
+    onBeginDrag: () => {
+      scrolling.value = true;
+      artActive.value = false;
+    },
+    onEndDrag: e => {
+      // No fling: the list stops here. Otherwise wait for the momentum to end.
+      if (Math.abs(e.velocity?.y ?? 0) < 0.05) {
+        scrolling.value = false;
+        artActive.value = focused.value;
+      }
+    },
+    onMomentumEnd: () => {
+      scrolling.value = false;
+      artActive.value = focused.value;
+    },
+  });
+
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled">
+    <ArtActivity.Provider value={artActive}>
+    <Animated.ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
       <View style={[styles.hero, { backgroundImage: d.heroGradient, paddingTop: insets.top + 10 }]}>
         <View style={styles.heroInner}>
           <View style={styles.topRow}>
@@ -143,7 +178,8 @@ export default function Home() {
           </View>
         </Appear>
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
+    </ArtActivity.Provider>
   );
 }
 

@@ -7,7 +7,7 @@ import { formatInr, statusLabel, statusTone, type TrackerStep } from '@fonzkart/
 import { formatDateTime, makeStyles, useColors } from '@fonzkart/ui';
 import { Icon } from './Icon';
 import { Tap } from './Tap';
-import { radii, type, useDesign } from './tokens';
+import { radii, type } from './tokens';
 
 export function StatusBadge({ status }: { status: string }) {
   const colors = useColors();
@@ -31,7 +31,6 @@ export function OrderCard({ orderNumber, device, price, status, date, subtitle, 
   onPress?: () => void;
 }) {
   const colors = useColors();
-  const d = useDesign();
   const styles = useStyles();
   return (
     <Tap
@@ -39,7 +38,7 @@ export function OrderCard({ orderNumber, device, price, status, date, subtitle, 
       scaleTo={0.98}
       accessibilityRole="button"
       accessibilityLabel={`Order ${orderNumber}, ${device}, ${statusLabel(status, 'customer')}`}
-      style={[styles.card, { boxShadow: d.shadow.sm }]}
+      style={styles.card}
     >
       <View style={styles.cardTop}>
         <View style={styles.deviceIcon}>

@@ -78,7 +78,6 @@ export function ListItem({ leading, title, subtitle, trailing, onPress, highligh
   accessibilityLabel?: string;
 }) {
   const colors = useColors();
-  const d = useDesign();
   const styles = useStyles();
   return (
     <Tap
@@ -87,7 +86,7 @@ export function ListItem({ leading, title, subtitle, trailing, onPress, highligh
       scaleTo={0.98}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={accessibilityLabel ?? [title, subtitle].filter(Boolean).join(', ')}
-      style={[styles.item, { boxShadow: d.shadow.sm }, highlighted && styles.itemHighlighted]}
+      style={[styles.item, highlighted && styles.itemHighlighted]}
     >
       {leading}
       <View style={styles.itemText}>

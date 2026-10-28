@@ -7,7 +7,7 @@ import { imageUrl } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import { Skeleton } from './Skeleton';
 import { Tap } from './Tap';
-import { radii, type, useDesign } from './tokens';
+import { radii, type } from './tokens';
 
 export function ProductImage({ uri, label, size }: { uri: string | null | undefined; label: string; size: number }) {
   const styles = useStyles();
@@ -52,11 +52,10 @@ export function Tile({ label, caption, image, onPress, width }: {
   onPress: () => void;
   width: number;
 }) {
-  const d = useDesign();
   const styles = useStyles();
   return (
     <Tap onPress={onPress} scaleTo={0.95} accessibilityRole="button" accessibilityLabel={label}
-      style={[styles.tile, { width, boxShadow: d.shadow.sm }]}>
+      style={[styles.tile, { width }]}>
       <View style={styles.well}>{image}</View>
       <Text style={styles.label} numberOfLines={2}>{label}</Text>
       {caption ? <Text style={styles.caption} numberOfLines={1}>{caption}</Text> : null}
