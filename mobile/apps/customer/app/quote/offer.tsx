@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { customerOrdersApi, usePincodeAvailability, useQuestionnaire, useQuote, useSession } from '@fonzkart/api';
 import { cleanPincode, describeAnswers, formatInr, isCompletePincode, stepsForDevice } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
 import {
-  Appear, Button, Card, EmptyState, ErrorState, Icon, InfoRow, LoadingDots, Notice, Page, ProductImage, radii, Skeleton,
+  Appear, Button, Card, EmptyState, ErrorState, Icon, LoadingDots, Notice, Page, ProductImage, radii, Skeleton,
   TextField, type, useDesign,
 } from '../../src/design';
 import { useQuoteDraft } from '../../src/quoteDraft';
@@ -73,7 +73,7 @@ export default function Offer() {
                 <ErrorState message="Could not calculate the price. Check your internet connection." onRetry={() => quote.refetch()} />
               </View>
             ) : (
-              <Animated.Text entering={ZoomIn.springify().damping(12)} style={styles.price}
+              <Animated.Text entering={FadeIn.duration(300)} style={styles.price}
                 accessibilityLabel={`Your final offer ${formatInr(quote.data.price)}`}>
                 {formatInr(quote.data.price)}
               </Animated.Text>
@@ -142,9 +142,23 @@ export default function Offer() {
 
       {summary.length ? (
         <Appear index={2}>
-          <Card title="Your answers" icon="check">
-            {summary.map(line => <InfoRow key={line.title} label={line.title} value={line.value} />)}
-            <Button title="Change answers" variant="link" onPress={() => router.back()} />
+          <Card
+            title="Your answers"
+            icon="check"
+            right={<Button title="Edit" variant="secondary" size="sm" onPress={() => router.back()} />}
+          >
+            <Text style={styles.answersHint}>Your price is based on these answers. The executive confirms them at pickup.</Text>
+            <View style={styles.answers}>
+              {summary.map((line, i) => (
+                <View key={line.title} style={[styles.answer, i > 0 && styles.answerDivider]}>
+                  <View style={styles.answerMark}>
+                    <Icon name="check" color={colors.green} size={12} strokeWidth={3} />
+                  </View>
+                  <Text style={styles.answerTitle}>{line.title}</Text>
+                  <Text style={styles.answerValue}>{line.value}</Text>
+                </View>
+              ))}
+            </View>
           </Card>
         </Appear>
       ) : null}
@@ -168,4 +182,11 @@ const useStyles = makeStyles(colors => ({
   request: { gap: 12 },
   hint: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   small: { ...type.small, color: colors.muted, textAlign: 'center' },
+  answersHint: { ...type.small, color: colors.muted, marginTop: -4 },
+  answers: { borderRadius: radii.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, paddingHorizontal: 14 },
+  answer: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 12 },
+  answerDivider: { borderTopWidth: 1, borderTopColor: colors.border },
+  answerMark: { width: 20, height: 20, borderRadius: 10, backgroundColor: colors.greenTint, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+  answerTitle: { flex: 1, ...type.small, color: colors.muted },
+  answerValue: { flex: 1.2, ...type.small, fontWeight: '700', color: colors.text, textAlign: 'right' },
 }));

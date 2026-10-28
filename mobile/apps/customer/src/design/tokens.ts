@@ -90,11 +90,11 @@ export const type = {
   tiny: { fontSize: 11, lineHeight: 14, fontWeight: '700' as const, letterSpacing: 0.6 },
 };
 
-/** Springs and durations shared by every animation, so the app moves in one way. */
+/** Springs and durations shared by every animation. Damped enough that nothing visibly bounces. */
 export const motion = {
-  press: { damping: 14, stiffness: 420, mass: 0.6 },
-  gentle: { damping: 18, stiffness: 190, mass: 0.8 },
-  snappy: { damping: 20, stiffness: 300, mass: 0.7 },
+  press: { damping: 26, stiffness: 420, mass: 0.6 },
+  gentle: { damping: 28, stiffness: 190, mass: 0.8 },
+  snappy: { damping: 28, stiffness: 300, mass: 0.7 },
   fast: 160,
   base: 260,
   slow: 420,

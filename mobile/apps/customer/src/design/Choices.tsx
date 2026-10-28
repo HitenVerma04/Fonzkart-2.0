@@ -30,7 +30,7 @@ export function ChoiceCard({ label, description, selected, multi, onPress }: {
     >
       <View style={[multi ? styles.box : styles.radio, selected && styles.markOn]}>
         {selected ? (
-          <Animated.View entering={ZoomIn.springify().damping(14)}>
+          <Animated.View entering={ZoomIn.duration(160)}>
             <Icon name="check" color={d.onGreen} size={14} strokeWidth={3} />
           </Animated.View>
         ) : null}

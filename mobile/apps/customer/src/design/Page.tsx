@@ -33,10 +33,10 @@ export function Page({ children, gap = 16, bottom = 32, contentStyle, ...scroll 
   );
 }
 
-/** Fades and lifts a section in, a little after the one before it. */
+/** Fades and lifts a section in (no bounce), a little after the one before it. */
 export function Appear({ index = 0, children, style }: { index?: number; children: ReactNode; style?: StyleProp<ViewStyle> }) {
   return (
-    <Animated.View entering={FadeInDown.duration(420).delay(60 + index * 70).springify().damping(18)} style={style}>
+    <Animated.View entering={FadeInDown.duration(300).delay(40 + index * 50)} style={style}>
       {children}
     </Animated.View>
   );

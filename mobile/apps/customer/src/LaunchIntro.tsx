@@ -34,7 +34,7 @@ export function LaunchIntro() {
   useEffect(() => {
     SplashScreen.hide();
     const ease = Easing.bezier(0.22, 1, 0.36, 1);
-    pop.value = withSequence(withTiming(1.75, { duration: 180 }), withSpring(1, { damping: 14, stiffness: 160 }));
+    pop.value = withSequence(withTiming(1.75, { duration: 180 }), withSpring(1, { damping: 22, stiffness: 160 }));
     glow.value = withDelay(120, withSequence(withTiming(1, { duration: 300 }), withTiming(0, { duration: 600 })));
     reveal.value = withDelay(520, withTiming(full, { duration: 620, easing: ease }));
     sweep.value = withDelay(1150, withTiming(1, { duration: 650, easing: Easing.inOut(Easing.quad) }));
