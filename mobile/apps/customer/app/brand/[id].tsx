@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useBrand, useModels } from '@fonzkart/api';
-import { EmptyState, ErrorState, Loading, RemoteImage, SearchField, Tile, spacing } from '@fonzkart/ui';
+import { makeStyles } from '@fonzkart/ui';
 import { modelImage } from '@fonzkart/core';
-import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
+import { EmptyState, ErrorState, MAX_CONTENT, PAGE_PADDING, ProductImage, SearchBar, SkeletonTiles, Tile } from '../../src/design';
+import { GRID_GAP, useTileWidth } from '../../src/grid';
 
 const COLUMNS = 2;
 
 export default function BrandModels() {
+  const styles = useStyles();
   const { id, category, name } = useLocalSearchParams<{ id: string; category?: string; name?: string }>();
   const router = useRouter();
   const width = useTileWidth(COLUMNS);
@@ -27,7 +29,9 @@ export default function BrandModels() {
     <>
       <Stack.Screen options={{ title: brandName }} />
       {models.isPending ? (
-        <Loading />
+        <View style={styles.page}>
+          <SkeletonTiles count={6} width={width} imageHeight={width - 56} />
+        </View>
       ) : models.isError ? (
         <ErrorState onRetry={() => models.refetch()} />
       ) : (
@@ -37,13 +41,17 @@ export default function BrandModels() {
           numColumns={COLUMNS}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.page}
+          style={styles.list}
+          showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           ListHeaderComponent={
             <View style={styles.filter}>
-              <SearchField value={filter} onChangeText={setFilter} placeholder={`Search ${brandName} models`} />
+              <SearchBar value={filter} onChangeText={setFilter} placeholder={`Search ${brandName} models`} />
             </View>
           }
-          ListEmptyComponent={<EmptyState message={filter ? 'No model matches your search.' : 'No models listed for this brand yet.'} />}
+          ListEmptyComponent={
+            <EmptyState icon="search" message={filter ? 'No model matches your search.' : 'No models listed for this brand yet.'} />
+          }
           renderItem={({ item }) => {
             const img = modelImage(item.img, category ?? item.category);
             return (
@@ -51,7 +59,7 @@ export default function BrandModels() {
                 label={item.name}
                 width={width}
                 onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: img ?? '', category: category ?? item.category } })}
-                image={<RemoteImage uri={img} label={item.name} size={width - 48} />}
+                image={<ProductImage uri={img} label={item.name} size={width - 56} />}
               />
             );
           }}
@@ -61,8 +69,9 @@ export default function BrandModels() {
   );
 }
 
-const styles = StyleSheet.create({
-  page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: GRID_GAP, maxWidth: 640, width: '100%', alignSelf: 'center' },
+const useStyles = makeStyles(colors => ({
+  list: { backgroundColor: colors.background },
+  page: { padding: PAGE_PADDING, paddingTop: 4, paddingBottom: 32, gap: GRID_GAP, maxWidth: MAX_CONTENT, width: '100%', alignSelf: 'center' },
   row: { gap: GRID_GAP },
-  filter: { marginBottom: spacing.xs },
-});
+  filter: { marginBottom: 4 },
+}));

@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { ScrollView, Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { authApi } from '@fonzkart/api';
-import { Button, font, makeStyles, Notice, spacing, TextField } from '@fonzkart/ui';
+import { Logo, makeStyles } from '@fonzkart/ui';
 import { networkMessage, useAuthOutcome } from '../../src/authFlow';
-import { PAGE_PADDING } from '../../src/grid';
+import { Appear, Button, Notice, Page, TextField, type, useDesign } from '../../src/design';
 
 export default function SignUp() {
   const styles = useStyles();
+  const d = useDesign();
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const handle = useAuthOutcome(returnTo);
   const [name, setName] = useState('');
@@ -33,48 +34,57 @@ export default function SignUp() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-      <Text style={styles.title}>Create account</Text>
-      <TextField label="Full name" value={name} onChangeText={setName} placeholder="John Doe" autoComplete="name" textContentType="name" />
-      <TextField
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        placeholder="john@example.com"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-        autoComplete="email"
-        textContentType="emailAddress"
-      />
-      <TextField
-        label="Phone number"
-        prefix="+91"
-        value={phone}
-        onChangeText={text => setPhone(text.replace(/\D/g, '').slice(0, 10))}
-        placeholder="9876543210"
-        keyboardType="phone-pad"
-        maxLength={10}
-        autoComplete="tel"
-        textContentType="telephoneNumber"
-      />
-      <TextField
-        label="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoComplete="new-password"
-        textContentType="newPassword"
-      />
-      <Text style={styles.hint}>We'll email you a 6-digit code to confirm your address.</Text>
-      {error ? <Notice tone="error" text={error} /> : null}
-      <Button title="Create account" onPress={submit} loading={busy} disabled={!complete} />
-    </ScrollView>
+    <Page>
+      <Appear style={styles.hero}>
+        <View style={[styles.disc, { boxShadow: d.shadow.green }]}><Logo variant="f" height={52} /></View>
+        <Text style={styles.title}>Create your account</Text>
+        <Text style={styles.subtitle}>Sell your devices in minutes and get paid at your door.</Text>
+      </Appear>
+      <Appear index={1} style={styles.form}>
+        <TextField label="Full name" value={name} onChangeText={setName} placeholder="John Doe" autoComplete="name" textContentType="name" />
+        <TextField
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="john@example.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoComplete="email"
+          textContentType="emailAddress"
+        />
+        <TextField
+          label="Phone number"
+          prefix="+91"
+          value={phone}
+          onChangeText={text => setPhone(text.replace(/\D/g, '').slice(0, 10))}
+          placeholder="9876543210"
+          keyboardType="phone-pad"
+          maxLength={10}
+          autoComplete="tel"
+          textContentType="telephoneNumber"
+        />
+        <TextField
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoComplete="new-password"
+          textContentType="newPassword"
+        />
+        <Text style={styles.hint}>We'll email you a 6-digit code to confirm your address.</Text>
+        {error ? <Notice tone="error" text={error} /> : null}
+        <Button title="Create account" onPress={submit} loading={busy} disabled={!complete} />
+      </Appear>
+    </Page>
   );
 }
 
 const useStyles = makeStyles(colors => ({
-  page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.lg, maxWidth: 640, width: '100%', alignSelf: 'center' },
-  title: { fontSize: font.title, fontWeight: '800', color: colors.navy },
-  hint: { fontSize: font.small, color: colors.muted },
+  hero: { alignItems: 'center', gap: 6, marginTop: 8, marginBottom: 6 },
+  disc: { width: 92, height: 92, borderRadius: 46, backgroundColor: colors.greenTint, borderWidth: 1, borderColor: colors.greenBorder, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  title: { ...type.title, color: colors.navy, textAlign: 'center' },
+  subtitle: { ...type.body, color: colors.muted, textAlign: 'center' },
+  form: { gap: 16 },
+  hint: { ...type.small, color: colors.muted },
 }));

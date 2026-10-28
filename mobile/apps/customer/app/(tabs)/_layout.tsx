@@ -1,4 +1,5 @@
-// The bottom tabs: Sell (the home screen, route "/", so the app opens on it), Buy, Repair, My orders, Profile.
+// The bottom tabs: Sell (the home screen, route "/", so the app opens on it), Buy, Repair, My orders, Profile. Each
+// tab draws its own large title; the floating tab bar sits over the content.
 import { Tabs } from 'expo-router/js-tabs';
 import { useColors } from '@fonzkart/ui';
 import { FonzkartTabBar } from '../../src/navigation/TabBar';
@@ -10,16 +11,9 @@ export default function TabsLayout() {
     <Tabs
       backBehavior="history"
       tabBar={props => <FonzkartTabBar {...props} />}
-      screenOptions={{
-        animation: 'shift',
-        headerTintColor: colors.green,
-        headerTitleStyle: { fontWeight: '700', color: colors.navy },
-        headerShadowVisible: false,
-        headerStyle: { backgroundColor: colors.surface },
-        sceneStyle: { backgroundColor: colors.background },
-      }}
+      screenOptions={{ animation: 'shift', headerShown: false, sceneStyle: { backgroundColor: colors.background } }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Sell', headerShown: false }} />
+      <Tabs.Screen name="index" options={{ title: 'Sell' }} />
       <Tabs.Screen name="buy" options={{ title: 'Buy' }} />
       <Tabs.Screen name="repair" options={{ title: 'Repair' }} />
       <Tabs.Screen name="orders" options={{ title: 'My orders' }} />

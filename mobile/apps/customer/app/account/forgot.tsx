@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { ScrollView, Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { authApi } from '@fonzkart/api';
-import { Button, font, makeStyles, Notice, spacing, TextField } from '@fonzkart/ui';
+import { Logo, makeStyles } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
-import { PAGE_PADDING } from '../../src/grid';
+import { Appear, Button, Notice, Page, TextField, type, useDesign } from '../../src/design';
 
 export default function Forgot() {
   const styles = useStyles();
+  const d = useDesign();
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const router = useRouter();
   const [step, setStep] = useState<'email' | 'code'>('email');
@@ -42,11 +43,16 @@ export default function Forgot() {
   });
 
   return (
-    <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-      <Text style={styles.title}>Reset password</Text>
+    <Page>
+      <Appear style={styles.hero}>
+        <View style={[styles.disc, { boxShadow: d.shadow.green }]}><Logo variant="f" height={52} /></View>
+        <Text style={styles.title}>Reset password</Text>
+        <Text style={styles.subtitle}>
+          {step === 'email' ? "Enter your registered email. We'll send a 6-digit code." : 'Enter the code and choose a new password.'}
+        </Text>
+      </Appear>
       {step === 'email' ? (
-        <>
-          <Text style={styles.text}>Enter your registered email. We'll send a 6-digit code.</Text>
+        <Appear key="email" index={1} style={styles.form}>
           <TextField
             label="Email"
             value={email}
@@ -59,9 +65,9 @@ export default function Forgot() {
           />
           {error ? <Notice tone="error" text={error} /> : null}
           <Button title="Send code" onPress={sendCode} loading={busy} disabled={!email.trim()} />
-        </>
+        </Appear>
       ) : (
-        <>
+        <Appear key="code" index={1} style={styles.form}>
           <Notice tone="success" text={`Code sent to ${email.trim()}. It is valid for 15 minutes.`} />
           <TextField
             label="Code"
@@ -72,6 +78,7 @@ export default function Forgot() {
             maxLength={6}
             autoComplete="one-time-code"
             textContentType="oneTimeCode"
+            style={styles.code}
           />
           <TextField
             label="New password"
@@ -84,14 +91,17 @@ export default function Forgot() {
           {error ? <Notice tone="error" text={error} /> : null}
           <Button title="Set new password" onPress={reset} loading={busy} disabled={otp.length !== 6 || !password} />
           <Button title="Use a different email" variant="link" onPress={() => { setStep('email'); setOtp(''); setError(null); }} />
-        </>
+        </Appear>
       )}
-    </ScrollView>
+    </Page>
   );
 }
 
 const useStyles = makeStyles(colors => ({
-  page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.lg, maxWidth: 640, width: '100%', alignSelf: 'center' },
-  title: { fontSize: font.title, fontWeight: '800', color: colors.navy },
-  text: { fontSize: font.body, color: colors.textSoft },
+  hero: { alignItems: 'center', gap: 6, marginTop: 8, marginBottom: 6 },
+  disc: { width: 92, height: 92, borderRadius: 46, backgroundColor: colors.greenTint, borderWidth: 1, borderColor: colors.greenBorder, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  title: { ...type.title, color: colors.navy, textAlign: 'center' },
+  subtitle: { ...type.body, color: colors.muted, textAlign: 'center' },
+  form: { gap: 16 },
+  code: { fontSize: 28, letterSpacing: 12, fontWeight: '800', textAlign: 'center' },
 }));

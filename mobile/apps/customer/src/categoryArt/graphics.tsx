@@ -1,5 +1,6 @@
 // The website's animated category graphics (components/sell/CategorySelector.tsx, light theme), drawn with
-// react-native-svg. Same 200 × 150 drawings, colours and loops; tailwind classes are written out as colours.
+// react-native-svg. Same 200 × 150 drawings and loops; the website's other hues are mapped to Fonzkart greens of the
+// same lightness, so the app stays green-only.
 import type { ComponentType, ReactNode } from 'react';
 import Animated, { useAnimatedProps, useAnimatedStyle } from 'react-native-reanimated';
 import Svg, {
@@ -40,30 +41,30 @@ const tw = {
   slate800: '#1e293b',
   slate900: '#0f172a',
   slate950: '#020617',
-  purple400: '#c084fc',
-  purple500: '#a855f7',
-  purple600: '#9333ea',
-  purple950: '#3b0764',
-  pink400: '#f472b6',
-  pink500: '#ec4899',
-  blue400: '#60a5fa',
-  blue500: '#3b82f6',
-  blue600: '#2563eb',
-  blue900: '#1e3a8a',
+  purple400: '#86efac',
+  purple500: '#22c55e',
+  purple600: '#16a34a',
+  purple950: '#052e16',
+  pink400: '#bbf7d0',
+  pink500: '#4ade80',
+  blue400: '#4ade80',
+  blue500: '#22c55e',
+  blue600: '#16a34a',
+  blue900: '#14532d',
   emerald300: '#6ee7b7',
   emerald400: '#34d399',
   emerald500: '#10b981',
   emerald600: '#059669',
   emerald950: '#022c22',
-  cyan400: '#22d3ee',
-  cyan500: '#06b6d4',
-  cyan600: '#0891b2',
-  red400: '#f87171',
-  red500: '#ef4444',
-  orange500: '#f97316',
-  orange600: '#ea580c',
-  orange700: '#c2410c',
-  amber500: '#f59e0b',
+  cyan400: '#6ee7b7',
+  cyan500: '#10b981',
+  cyan600: '#059669',
+  red400: '#86efac',
+  red500: '#22c55e',
+  orange500: '#4ade80',
+  orange600: '#16a34a',
+  orange700: '#15803d',
+  amber500: '#a7f3d0',
 };
 
 const CART = require('../../../../brand/fonzkart_cart_icon.png');
@@ -152,14 +153,14 @@ function SmartphoneArt({ width, height }: ArtProps) {
       <Defs>
         <LinearGradient id="sp-hero-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <Stop offset="0%" stopColor="#030712" />
-          <Stop offset="40%" stopColor="#082f49" />
+          <Stop offset="40%" stopColor="#052e16" />
           <Stop offset="75%" stopColor="#064e3b" />
           <Stop offset="100%" stopColor="#022c22" />
         </LinearGradient>
         <LinearGradient id="sp-hero-wave1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#22d3ee" stopOpacity={0.85} />
-          <Stop offset="45%" stopColor="#3b82f6" stopOpacity={0.75} />
-          <Stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.35} />
+          <Stop offset="0%" stopColor="#6ee7b7" stopOpacity={0.85} />
+          <Stop offset="45%" stopColor="#22c55e" stopOpacity={0.75} />
+          <Stop offset="100%" stopColor="#22c55e" stopOpacity={0.35} />
         </LinearGradient>
         <LinearGradient id="sp-hero-wave2" x1="100%" y1="0%" x2="0%" y2="100%">
           <Stop offset="0%" stopColor="#10b981" stopOpacity={0.95} />
@@ -168,7 +169,7 @@ function SmartphoneArt({ width, height }: ArtProps) {
         </LinearGradient>
         <RadialGradient id="sp-hero-glow" cx="50%" cy="50%" r="55%">
           <Stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
-          <Stop offset="60%" stopColor="#0ea5e9" stopOpacity={0.12} />
+          <Stop offset="60%" stopColor="#10b981" stopOpacity={0.12} />
           <Stop offset="100%" stopColor="#000000" stopOpacity={0} />
         </RadialGradient>
         <LinearGradient id="sp-glass-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -177,13 +178,13 @@ function SmartphoneArt({ width, height }: ArtProps) {
           <Stop offset="60%" stopColor="#ffffff" stopOpacity={0} />
         </LinearGradient>
         <LinearGradient id="sp-left-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#090514" />
-          <Stop offset="60%" stopColor="#1e1b4b" />
-          <Stop offset="100%" stopColor="#312e81" />
+          <Stop offset="0%" stopColor="#021a0d" />
+          <Stop offset="60%" stopColor="#052e16" />
+          <Stop offset="100%" stopColor="#14532d" />
         </LinearGradient>
         <LinearGradient id="sp-left-ribbon" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#a855f7" stopOpacity={0.75} />
-          <Stop offset="100%" stopColor="#6366f1" stopOpacity={0.25} />
+          <Stop offset="0%" stopColor="#22c55e" stopOpacity={0.75} />
+          <Stop offset="100%" stopColor="#16a34a" stopOpacity={0.25} />
         </LinearGradient>
         <LinearGradient id="sp-right-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <Stop offset="0%" stopColor="#021a13" />
@@ -192,7 +193,7 @@ function SmartphoneArt({ width, height }: ArtProps) {
         </LinearGradient>
         <LinearGradient id="sp-right-ribbon" x1="0%" y1="0%" x2="100%" y2="100%">
           <Stop offset="0%" stopColor="#34d399" stopOpacity={0.75} />
-          <Stop offset="100%" stopColor="#0ea5e9" stopOpacity={0.25} />
+          <Stop offset="100%" stopColor="#10b981" stopOpacity={0.25} />
         </LinearGradient>
         <ClipPath id="sp-hero-screen-clip">
           <Rect x="3.5" y="3.5" width="57" height="115" rx="11" />
@@ -212,14 +213,14 @@ function SmartphoneArt({ width, height }: ArtProps) {
           <G clipPath="url(#sp-left-screen-clip)">
             <Rect x="2.5" y="2.5" width="41" height="91" rx="8" fill="url(#sp-left-bg)" />
             <Path d="M 0 35 Q 20 20 45 50 L 45 95 L 0 95 Z" fill="url(#sp-left-ribbon)" />
-            <Circle cx="20" cy="50" r="14" fill="#a855f7" fillOpacity={0.25} />
+            <Circle cx="20" cy="50" r="14" fill="#22c55e" fillOpacity={0.25} />
             <Circle cx="23" cy="7" r="1.5" fill="#000000" />
             <Polygon points="3,3 25,3 0,45 0,15" fill="url(#sp-glass-sheen)" />
             <SvgText x="23" y="24" textAnchor="middle" fontSize="5.5" fontWeight="700" fill="#ffffff" opacity={0.85}>09:41</SvgText>
             <Rect x="6" y="74" width="31" height="11" rx="3.5" fill="rgba(255, 255, 255, 0.12)" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="0.5" />
-            <Circle cx="12" cy="79.5" r="2.2" fill="#818cf8" />
-            <Circle cx="21.5" cy="79.5" r="2.2" fill="#c084fc" />
-            <Circle cx="31" cy="79.5" r="2.2" fill="#38bdf8" />
+            <Circle cx="12" cy="79.5" r="2.2" fill="#86efac" />
+            <Circle cx="21.5" cy="79.5" r="2.2" fill="#86efac" />
+            <Circle cx="31" cy="79.5" r="2.2" fill="#6ee7b7" />
           </G>
         </G>
       </AnimatedG>
@@ -237,8 +238,8 @@ function SmartphoneArt({ width, height }: ArtProps) {
             <SvgText x="24" y="24" textAnchor="middle" fontSize="5.5" fontWeight="700" fill="#ffffff" opacity={0.85}>09:41</SvgText>
             <Rect x="7" y="76" width="33" height="11" rx="3.5" fill="rgba(255, 255, 255, 0.12)" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="0.5" />
             <Circle cx="13" cy="81.5" r="2.2" fill="#34d399" />
-            <Circle cx="23.5" cy="81.5" r="2.2" fill="#38bdf8" />
-            <Circle cx="34" cy="81.5" r="2.2" fill="#fbbf24" />
+            <Circle cx="23.5" cy="81.5" r="2.2" fill="#6ee7b7" />
+            <Circle cx="34" cy="81.5" r="2.2" fill="#bbf7d0" />
           </G>
         </G>
       </AnimatedG>
@@ -263,7 +264,7 @@ function SmartphoneArt({ width, height }: ArtProps) {
               <Rect x="7.8" y="1.5" width="3.5" height="1.8" rx="0.5" fill="#10b981" />
             </G>
             <Rect x="22" y="6.5" width="20" height="5" rx="2.5" fill="#000000" />
-            <Circle cx="37" cy="9" r="1" fill="#0284c7" opacity={0.8} />
+            <Circle cx="37" cy="9" r="1" fill="#059669" opacity={0.8} />
             <G transform="translate(8, 20)">
               <Rect x="0" y="0" width="48" height="42" rx="8" fill="rgba(255, 255, 255, 0.09)" stroke="rgba(255, 255, 255, 0.2)" strokeWidth="0.8" />
               <Cart x={24} y={18} width={26} />
@@ -273,9 +274,9 @@ function SmartphoneArt({ width, height }: ArtProps) {
             <G transform="translate(8, 86)">
               <Rect x="0" y="0" width="48" height="19" rx="6" fill="rgba(255, 255, 255, 0.12)" stroke="rgba(255, 255, 255, 0.18)" strokeWidth="0.8" />
               <Rect x="4" y="4" width="8" height="8" rx="2.5" fill="#10b981" />
-              <Rect x="15" y="4" width="8" height="8" rx="2.5" fill="#3b82f6" />
-              <Rect x="26" y="4" width="8" height="8" rx="2.5" fill="#06b6d4" />
-              <Rect x="37" y="4" width="8" height="8" rx="2.5" fill="#f59e0b" />
+              <Rect x="15" y="4" width="8" height="8" rx="2.5" fill="#22c55e" />
+              <Rect x="26" y="4" width="8" height="8" rx="2.5" fill="#10b981" />
+              <Rect x="37" y="4" width="8" height="8" rx="2.5" fill="#a7f3d0" />
             </G>
             <Rect x="22" y="112" width="20" height="1.8" rx="0.9" fill="#ffffff" opacity={0.85} />
           </G>
@@ -348,10 +349,10 @@ function WatchArt({ width, height }: ArtProps) {
         <Rect x="0" y="20" width="40" height="60" rx="10" fill={tw.slate900} stroke={tw.slate700} strokeWidth="2" />
         <Rect x="4" y="24" width="32" height="52" rx="6" fill={tw.black} />
         <Circle cx="20" cy="50" r="10" stroke={tw.orange500} strokeWidth="2.5" fill="none" />
-        <SvgText x="20" y="53" textAnchor="middle" fill="#f97316" fontSize="5" fontWeight="bold" fontFamily="monospace">8,420</SvgText>
+        <SvgText x="20" y="53" textAnchor="middle" fill="#4ade80" fontSize="5" fontWeight="bold" fontFamily="monospace">8,420</SvgText>
       </G>
       <G transform="translate(100, 20)">
-        <Path d="M 32 0 V 24 M 32 80 V 104" stroke="#ea580c" strokeWidth="36" strokeLinecap="round" fill="none" />
+        <Path d="M 32 0 V 24 M 32 80 V 104" stroke="#16a34a" strokeWidth="36" strokeLinecap="round" fill="none" />
         <Rect x="2" y="20" width="60" height="64" rx="16" fill={tw.slate900} stroke={tw.slate700} strokeWidth="2.5" />
         <Rect x="6" y="24" width="52" height="56" rx="12" fill={tw.black} />
         <Rect x="62" y="34" width="4" height="14" rx="2" fill={tw.slate600} />

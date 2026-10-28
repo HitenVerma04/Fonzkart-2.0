@@ -1,19 +1,28 @@
-import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { notificationsApi, orderKeys, useNotifications, useSession, type AppNotification } from '@fonzkart/api';
-import { Button, EmptyState, ErrorState, font, formatDateTime, Loading, makeStyles, radius, spacing } from '@fonzkart/ui';
-import { PAGE_PADDING } from '../src/grid';
+import { formatDateTime, makeStyles, useColors } from '@fonzkart/ui';
+import {
+  Button, EmptyState, ErrorState, IconBadge, MAX_CONTENT, PAGE_PADDING, SkeletonRows, SkeletonScreen, Tap, radii, type, useDesign,
+} from '../src/design';
 
 export default function Notifications() {
+  const colors = useColors();
   const styles = useStyles();
   const router = useRouter();
   const client = useQueryClient();
   const { session } = useSession();
   const list = useNotifications(session.status === 'signedIn');
 
-  if (session.status !== 'signedIn') return <EmptyState message="Sign in to see updates about your orders." />;
-  if (list.isPending) return <Loading />;
+  if (session.status !== 'signedIn') return <EmptyState icon="bell" message="Sign in to see updates about your orders." />;
+  if (list.isPending) {
+    return (
+      <SkeletonScreen label="Loading notifications" style={styles.pad}>
+        <SkeletonRows count={6} image={40} />
+      </SkeletonScreen>
+    );
+  }
   if (list.isError) return <ErrorState onRetry={() => list.refetch()} />;
 
   const refresh = () => void client.invalidateQueries({ queryKey: orderKeys.notifications });
@@ -31,35 +40,53 @@ export default function Notifications() {
       data={list.data}
       keyExtractor={n => n.id}
       contentContainerStyle={styles.list}
-      refreshControl={<RefreshControl refreshing={list.isRefetching} onRefresh={() => void list.refetch()} />}
+      showsVerticalScrollIndicator={false}
+      refreshControl={<RefreshControl refreshing={list.isRefetching} onRefresh={() => void list.refetch()}
+        colors={[colors.green]} tintColor={colors.green} />}
       ListHeaderComponent={unread ? (
-        <Button title={`Mark all ${unread} as read`} variant="link"
-          onPress={() => void notificationsApi.markAllRead().catch(() => undefined).then(refresh)} />
+        <View style={styles.head}>
+          <Text style={styles.count}>{unread} new</Text>
+          <Button title="Mark all as read" variant="link" icon="check"
+            onPress={() => void notificationsApi.markAllRead().catch(() => undefined).then(refresh)} />
+        </View>
       ) : undefined}
-      ListEmptyComponent={<EmptyState message="No updates yet." />}
-      renderItem={({ item }) => (
-        <Pressable onPress={() => void open(item)} accessibilityRole="button"
-          style={({ pressed }) => [styles.item, !item.isRead && styles.unread, pressed && styles.pressed]}>
-          <View style={styles.itemTop}>
-            <Text style={styles.title}>{item.title}</Text>
-            {!item.isRead ? <View style={styles.dot} accessibilityLabel="Unread" /> : null}
-          </View>
-          <Text style={styles.message}>{item.message}</Text>
-          <Text style={styles.date}>{formatDateTime(item.createdAt)}</Text>
-        </Pressable>
-      )}
+      ListEmptyComponent={<EmptyState icon="bell" title="All caught up" message="No updates yet." />}
+      renderItem={({ item }) => <Item item={item} onPress={() => void open(item)} />}
     />
   );
 }
 
+function Item({ item, onPress }: { item: AppNotification; onPress: () => void }) {
+  const d = useDesign();
+  const styles = useStyles();
+  return (
+    <Tap onPress={onPress} scaleTo={0.98} accessibilityRole="button"
+      accessibilityLabel={`${item.isRead ? '' : 'Unread. '}${item.title}. ${item.message}`}
+      style={[styles.item, { boxShadow: d.shadow.sm }, !item.isRead && styles.unread]}>
+      <IconBadge name="bell" size={40} />
+      <View style={styles.itemText}>
+        <View style={styles.itemTop}>
+          <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+          {!item.isRead ? <View style={styles.dot} /> : null}
+        </View>
+        <Text style={styles.message}>{item.message}</Text>
+        <Text style={styles.date}>{formatDateTime(item.createdAt)}</Text>
+      </View>
+    </Tap>
+  );
+}
+
 const useStyles = makeStyles(colors => ({
-  list: { padding: PAGE_PADDING, gap: spacing.sm, maxWidth: 640, width: '100%', alignSelf: 'center', flexGrow: 1 },
-  item: { backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.md, gap: 4 },
+  pad: { padding: PAGE_PADDING },
+  list: { padding: PAGE_PADDING, paddingBottom: 32, gap: 10, maxWidth: MAX_CONTENT, width: '100%', alignSelf: 'center', flexGrow: 1 },
+  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  count: { ...type.tiny, textTransform: 'uppercase', color: colors.green },
+  item: { flexDirection: 'row', gap: 12, backgroundColor: colors.surface, borderRadius: radii.md, borderWidth: 1, borderColor: colors.border, padding: 14 },
   unread: { borderColor: colors.greenBorder, backgroundColor: colors.greenSoft },
-  pressed: { opacity: 0.7 },
-  itemTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { fontSize: font.body, fontWeight: '700', color: colors.text, flex: 1 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.green },
-  message: { fontSize: font.small, color: colors.textSoft },
-  date: { fontSize: font.tiny, color: colors.muted },
+  itemText: { flex: 1, gap: 4 },
+  itemTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  title: { flex: 1, ...type.label, fontSize: 15, color: colors.text },
+  dot: { width: 9, height: 9, borderRadius: 5, backgroundColor: colors.green },
+  message: { ...type.small, color: colors.textSoft },
+  date: { ...type.small, fontSize: 11, color: colors.muted },
 }));

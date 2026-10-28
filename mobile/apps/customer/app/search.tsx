@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MIN_SEARCH_LENGTH, useBrands, useModelSearch } from '@fonzkart/api';
-import { EmptyState, ErrorState, font, Loading, makeStyles, radius, RemoteImage, SearchField, spacing } from '@fonzkart/ui';
+import { makeStyles } from '@fonzkart/ui';
 import { modelImage } from '@fonzkart/core';
-import { PAGE_PADDING } from '../src/grid';
+import {
+  EmptyState, ErrorState, ListItem, MAX_CONTENT, PAGE_PADDING, ProductImage, SearchBar, SkeletonRows, SkeletonScreen,
+} from '../src/design';
 
 const DEBOUNCE_MS = 300;
 
@@ -25,11 +27,13 @@ export default function Search() {
 
   return (
     <View style={styles.page}>
-      <SearchField value={text} onChangeText={setText} placeholder="Search your phone, e.g. iPhone 14" autoFocus />
+      <SearchBar value={text} onChangeText={setText} placeholder="Search your phone, e.g. iPhone 14" autoFocus />
       {tooShort ? (
-        <EmptyState message="Type at least 2 letters of your device's name." />
+        <EmptyState icon="search" title="Find your device" message="Type at least 2 letters of your device's name." />
       ) : results.isPending ? (
-        <Loading label="Searching…" />
+        <SkeletonScreen label="Searching">
+          <SkeletonRows count={6} image={52} />
+        </SkeletonScreen>
       ) : results.isError ? (
         <ErrorState onRetry={() => results.refetch()} />
       ) : (
@@ -37,21 +41,16 @@ export default function Search() {
           data={results.data}
           keyExtractor={m => m.id}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.list}
-          ListEmptyComponent={<EmptyState message="No device found. Try a shorter name." />}
+          ListEmptyComponent={<EmptyState icon="search" title="No device found" message="Try a shorter name." />}
           renderItem={({ item }) => (
-            <Pressable
+            <ListItem
+              leading={<ProductImage uri={modelImage(item.img, item.category)} label={item.name} size={52} />}
+              title={item.name}
+              subtitle={brandNames.get(item.brandId) ?? item.brandId}
               onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: modelImage(item.img, item.category) ?? '', category: item.category } })}
-              accessibilityRole="button"
-              style={({ pressed }) => [styles.row, pressed && styles.pressed]}
-            >
-              <RemoteImage uri={modelImage(item.img, item.category)} label={item.name} size={52} />
-              <View style={styles.rowText}>
-                <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-                <Text style={styles.brand}>{brandNames.get(item.brandId) ?? item.brandId}</Text>
-              </View>
-              <Text style={styles.chevron}>›</Text>
-            </Pressable>
+            />
           )}
         />
       )}
@@ -60,12 +59,6 @@ export default function Search() {
 }
 
 const useStyles = makeStyles(colors => ({
-  page: { flex: 1, padding: PAGE_PADDING, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center' },
-  list: { gap: spacing.sm, paddingBottom: spacing.xxl },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.sm },
-  pressed: { borderColor: colors.green, backgroundColor: colors.greenSoft },
-  rowText: { flex: 1 },
-  name: { fontSize: font.body, fontWeight: '600', color: colors.text },
-  brand: { fontSize: font.small, color: colors.muted, marginTop: 2 },
-  chevron: { fontSize: 24, color: colors.muted, paddingHorizontal: spacing.sm },
+  page: { flex: 1, padding: PAGE_PADDING, paddingTop: 4, gap: 14, maxWidth: MAX_CONTENT, width: '100%', alignSelf: 'center', backgroundColor: colors.background },
+  list: { gap: 10, paddingBottom: 32 },
 }));

@@ -1,53 +1,72 @@
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useMyOrders, useSession } from '@fonzkart/api';
-import { Button, EmptyState, ErrorState, font, Loading, makeStyles, OrderCard, spacing, useColors } from '@fonzkart/ui';
-import { PAGE_PADDING } from '../../src/grid';
+import { makeStyles, useColors } from '@fonzkart/ui';
+import {
+  EmptyState, ErrorState, MAX_CONTENT, OrderCard, PAGE_PADDING, SkeletonRows, SkeletonScreen, TabTitle, useTabBarSpace,
+} from '../../src/design';
 
 export default function MyOrders() {
   const colors = useColors();
   const styles = useStyles();
   const router = useRouter();
+  const bottom = useTabBarSpace();
   const { session } = useSession();
   const orders = useMyOrders(session.status === 'signedIn');
+  const count = orders.data?.length;
 
-  if (session.status === 'loading') return <Loading />;
-  if (session.status === 'signedOut') {
+  const body = () => {
+    if (session.status === 'loading' || (session.status === 'signedIn' && orders.isPending)) {
+      return (
+        <SkeletonScreen label="Loading your orders" style={styles.pad}>
+          <SkeletonRows count={4} image={44} trailing />
+        </SkeletonScreen>
+      );
+    }
+    if (session.status === 'signedOut') {
+      return (
+        <EmptyState icon="orders" title="Track every pickup" message="Sign in to see your orders and follow each pickup live."
+          action={{ label: 'Sign in', onPress: () => router.push({ pathname: '/account/sign-in', params: { returnTo: '/orders' } }) }} />
+      );
+    }
+    if (orders.isError) return <ErrorState onRetry={() => orders.refetch()} />;
     return (
-      <View style={styles.center}>
-        <Text style={styles.text}>Sign in to see your orders.</Text>
-        <Button title="Sign in" onPress={() => router.push({ pathname: '/account/sign-in', params: { returnTo: '/orders' } })} />
-      </View>
+      <FlatList
+        data={orders.data}
+        keyExtractor={o => o.id}
+        contentContainerStyle={[styles.list, { paddingBottom: bottom }]}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={orders.isRefetching} onRefresh={() => void orders.refetch()}
+          colors={[colors.green]} tintColor={colors.green} />}
+        ListEmptyComponent={
+          <EmptyState icon="orders" title="No orders yet" message="Value a device to book your first free pickup."
+            action={{ label: 'Sell a device', onPress: () => router.navigate('/') }} />
+        }
+        renderItem={({ item }) => (
+          <OrderCard
+            orderNumber={item.orderNumber}
+            device={item.device}
+            price={item.price}
+            status={item.status}
+            date={item.date}
+            subtitle={item.executive ? `Executive: ${item.executive.name}` : undefined}
+            onPress={() => router.push({ pathname: '/orders/[id]', params: { id: item.id } })}
+          />
+        )}
+      />
     );
-  }
-  if (orders.isPending) return <Loading label="Loading your orders…" />;
-  if (orders.isError) return <ErrorState onRetry={() => orders.refetch()} />;
+  };
 
   return (
-    <FlatList
-      data={orders.data}
-      keyExtractor={o => o.id}
-      contentContainerStyle={styles.list}
-      refreshControl={<RefreshControl refreshing={orders.isRefetching} onRefresh={() => void orders.refetch()}
-        colors={[colors.green]} tintColor={colors.green} />}
-      ListEmptyComponent={<EmptyState message="No orders yet. Value a device to book your first pickup." />}
-      renderItem={({ item }) => (
-        <OrderCard
-          orderNumber={item.orderNumber}
-          device={item.device}
-          price={item.price}
-          status={item.status}
-          date={item.date}
-          subtitle={item.executive ? `Executive: ${item.executive.name}` : undefined}
-          onPress={() => router.push({ pathname: '/orders/[id]', params: { id: item.id } })}
-        />
-      )}
-    />
+    <View style={styles.screen}>
+      <TabTitle title="My orders" subtitle={count ? `${count} order${count === 1 ? '' : 's'}` : undefined} />
+      {body()}
+    </View>
   );
 }
 
 const useStyles = makeStyles(colors => ({
-  list: { padding: PAGE_PADDING, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center', flexGrow: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl, gap: spacing.md },
-  text: { fontSize: font.body, color: colors.muted },
+  screen: { flex: 1, backgroundColor: colors.background },
+  pad: { padding: PAGE_PADDING },
+  list: { padding: PAGE_PADDING, paddingTop: 4, gap: 12, maxWidth: MAX_CONTENT, width: '100%', alignSelf: 'center', flexGrow: 1 },
 }));

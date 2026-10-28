@@ -1,13 +1,16 @@
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useVariants } from '@fonzkart/api';
 import { formatInr, sellCategoryOf } from '@fonzkart/core';
-import { EmptyState, ErrorState, font, Loading, makeStyles, radius, RemoteImage, spacing } from '@fonzkart/ui';
-import { PAGE_PADDING } from '../../src/grid';
+import { makeStyles } from '@fonzkart/ui';
+import {
+  Appear, EmptyState, ErrorState, ListItem, Page, ProductImage, radii, SectionHeader, SkeletonRows, type, useDesign,
+} from '../../src/design';
 import { startQuote } from '../../src/quoteDraft';
 
 export default function ModelVariants() {
   const styles = useStyles();
+  const d = useDesign();
   const { id, name, img, category } = useLocalSearchParams<{ id: string; name?: string; img?: string; category?: string }>();
   const router = useRouter();
   const variants = useVariants(id);
@@ -16,65 +19,66 @@ export default function ModelVariants() {
   return (
     <>
       <Stack.Screen options={{ title }} />
-      <ScrollView contentContainerStyle={styles.page}>
-        <View style={styles.hero}>
-          <RemoteImage uri={img} label={title} size={180} />
-          <Text style={styles.name}>{title}</Text>
-        </View>
+      <Page>
+        <Appear>
+          <View style={[styles.hero, { boxShadow: d.shadow.md }]}>
+            <View style={styles.well}>
+              <ProductImage uri={img} label={title} size={170} />
+            </View>
+            <Text style={styles.name}>{title}</Text>
+          </View>
+        </Appear>
 
-        <Text style={styles.section}>Choose your variant</Text>
-        <Text style={styles.hint}>Then answer a few questions to get your exact price.</Text>
-        {variants.isPending ? (
-          <Loading />
-        ) : variants.isError ? (
-          <ErrorState onRetry={() => variants.refetch()} />
-        ) : variants.data.length === 0 ? (
-          <EmptyState message="No variants listed for this model yet." />
-        ) : (
-          variants.data.map(variant => (
-            <Pressable
-              key={variant.id}
-              accessibilityRole="button"
-              accessibilityLabel={`${variant.name}, max value ${formatInr(variant.basePrice)}`}
-              onPress={() => {
-                startQuote({
-                  modelId: id,
-                  modelName: title,
-                  img: img ?? '',
-                  variantId: variant.id,
-                  variantName: variant.name,
-                  basePrice: variant.basePrice,
-                  category: sellCategoryOf(category),
-                });
-                router.push('/quote/questions');
-              }}
-              style={({ pressed }) => [styles.variant, pressed && styles.pressed]}
-            >
-              <Text style={styles.variantName}>{variant.name}</Text>
-              <View style={styles.price}>
-                <Text style={styles.priceLabel}>Max value</Text>
-                <Text style={styles.priceValue}>{formatInr(variant.basePrice)}</Text>
-              </View>
-              <Text style={styles.chevron}>›</Text>
-            </Pressable>
-          ))
-        )}
-      </ScrollView>
+        <Appear index={1} style={styles.block}>
+          <SectionHeader title="Choose your variant" subtitle="Then answer a few questions to get your exact price." />
+          {variants.isPending ? (
+            <SkeletonRows count={3} image={0} trailing />
+          ) : variants.isError ? (
+            <ErrorState onRetry={() => variants.refetch()} />
+          ) : variants.data.length === 0 ? (
+            <EmptyState icon="box" message="No variants listed for this model yet." />
+          ) : (
+            variants.data.map(variant => (
+              <ListItem
+                key={variant.id}
+                title={variant.name}
+                accessibilityLabel={`${variant.name}, max value ${formatInr(variant.basePrice)}`}
+                trailing={
+                  <View style={styles.price}>
+                    <Text style={styles.priceLabel}>Max value</Text>
+                    <Text style={styles.priceValue}>{formatInr(variant.basePrice)}</Text>
+                  </View>
+                }
+                onPress={() => {
+                  startQuote({
+                    modelId: id,
+                    modelName: title,
+                    img: img ?? '',
+                    variantId: variant.id,
+                    variantName: variant.name,
+                    basePrice: variant.basePrice,
+                    category: sellCategoryOf(category),
+                  });
+                  router.push('/quote/questions');
+                }}
+              />
+            ))
+          )}
+        </Appear>
+      </Page>
     </>
   );
 }
 
 const useStyles = makeStyles(colors => ({
-  page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center' },
-  hero: { alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.xl, gap: spacing.md },
-  name: { fontSize: font.title, fontWeight: '800', color: colors.navy, textAlign: 'center' },
-  section: { fontSize: font.heading, fontWeight: '700', color: colors.text, marginTop: spacing.sm },
-  hint: { fontSize: font.small, color: colors.muted, marginTop: -spacing.sm },
-  variant: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, paddingLeft: spacing.lg, paddingRight: spacing.sm, paddingVertical: spacing.md },
-  pressed: { borderColor: colors.green, backgroundColor: colors.greenSoft },
-  variantName: { flex: 1, fontSize: font.body, fontWeight: '700', color: colors.text },
+  hero: { alignItems: 'center', backgroundColor: colors.surface, borderRadius: radii.xl, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 14 },
+  well: {
+    alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', paddingVertical: 20, borderRadius: radii.lg,
+    backgroundImage: `radial-gradient(circle at 50% 45%, ${colors.greenTint} 0%, ${colors.greenSoft} 55%, ${colors.surface} 100%)`,
+  },
+  name: { ...type.title, color: colors.navy, textAlign: 'center', paddingHorizontal: 8, paddingBottom: 6 },
+  block: { gap: 10 },
   price: { alignItems: 'flex-end' },
-  priceLabel: { fontSize: font.tiny, color: colors.muted },
-  priceValue: { fontSize: font.heading, fontWeight: '800', color: colors.green },
-  chevron: { fontSize: 24, color: colors.muted },
+  priceLabel: { ...type.small, fontSize: 11, color: colors.muted },
+  priceValue: { ...type.heading, fontWeight: '800', color: colors.green },
 }));

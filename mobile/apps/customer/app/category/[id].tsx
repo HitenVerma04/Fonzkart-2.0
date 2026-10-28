@@ -1,9 +1,10 @@
-import { ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useBrands } from '@fonzkart/api';
 import { categoryName } from '@fonzkart/core';
-import { EmptyState, ErrorState, font, Loading, makeStyles, RemoteImage, spacing, Tile } from '@fonzkart/ui';
-import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
+import { makeStyles } from '@fonzkart/ui';
+import { Appear, EmptyState, ErrorState, Page, ProductImage, SkeletonTiles, Tile, type } from '../../src/design';
+import { GRID_GAP, useTileWidth } from '../../src/grid';
 
 export default function CategoryBrands() {
   const styles = useStyles();
@@ -16,34 +17,37 @@ export default function CategoryBrands() {
   return (
     <>
       <Stack.Screen options={{ title }} />
-      {brands.isPending ? (
-        <Loading />
-      ) : brands.isError ? (
-        <ErrorState onRetry={() => brands.refetch()} />
-      ) : brands.data.length === 0 ? (
-        <EmptyState message="No brands in this category yet." />
-      ) : (
-        <ScrollView contentContainerStyle={styles.page}>
-          <Text style={styles.hint}>Select your brand</Text>
-          <View style={styles.grid}>
+      <Page>
+        <Appear>
+          <Text style={styles.title}>Select your brand</Text>
+          <Text style={styles.hint}>We'll show your device's best price next.</Text>
+        </Appear>
+        {brands.isPending ? (
+          <SkeletonTiles count={9} width={width} imageHeight={width - 40} />
+        ) : brands.isError ? (
+          <ErrorState onRetry={() => brands.refetch()} />
+        ) : brands.data.length === 0 ? (
+          <EmptyState icon="box" title="No brands yet" message="No brands in this category yet." />
+        ) : (
+          <Appear index={1} style={styles.grid}>
             {brands.data.map(brand => (
               <Tile
                 key={brand.id}
                 label={brand.name}
                 width={width}
                 onPress={() => router.push({ pathname: '/brand/[id]', params: { id: brand.id, category: id, name: brand.name } })}
-                image={<RemoteImage uri={brand.logo} label={brand.name} size={width - 36} />}
+                image={<ProductImage uri={brand.logo} label={brand.name} size={width - 40} />}
               />
             ))}
-          </View>
-        </ScrollView>
-      )}
+          </Appear>
+        )}
+      </Page>
     </>
   );
 }
 
 const useStyles = makeStyles(colors => ({
-  page: { padding: PAGE_PADDING, paddingBottom: spacing.xxl, gap: spacing.md, maxWidth: 640, width: '100%', alignSelf: 'center' },
-  hint: { fontSize: font.body, color: colors.muted },
+  title: { ...type.title, color: colors.navy },
+  hint: { ...type.body, color: colors.muted, marginTop: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
 }));
