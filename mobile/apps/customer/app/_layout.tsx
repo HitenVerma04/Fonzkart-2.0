@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
 import { SessionProvider, createQueryClient } from '@fonzkart/api';
 import { ThemeProvider, useRefreshOnAppFocus, useTheme } from '@fonzkart/ui';
 import { AppHeader, customerPalettes } from '../src/design';
@@ -27,6 +28,11 @@ export default function RootLayout() {
 
 function Screens() {
   const { scheme, colors } = useTheme();
+  // The native window behind every screen: without this it stays white and flashes through while a screen slides
+  // in or out in dark mode.
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(colors.background).catch(() => undefined);
+  }, [colors.background]);
   // Pushed screens slide in from the right (the iOS motion on both platforms), under the app's own header.
   const screenOptions = useMemo(() => ({
     header: AppHeader,

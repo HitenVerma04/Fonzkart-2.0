@@ -68,7 +68,7 @@ function Tab({ label, icon, focused, onPress, onLongPress }: {
   const lift = useSharedValue(focused ? 1 : 0);
   useEffect(() => {
     lift.value = withSpring(focused ? 1 : 0, motion.snappy);
-    if (focused) scale.value = withSequence(withTiming(1.08, { duration: 120 }), withSpring(1, motion.press));
+    if (focused) scale.value = withSequence(withTiming(1.12, { duration: 120 }), withSpring(1, motion.press));
   }, [focused, scale, lift]);
   const iconStyle = useAnimatedStyle(() => ({ transform: [{ translateY: -2 * lift.value }, { scale: scale.value }] }));
   const color = focused ? colors.green : colors.muted;

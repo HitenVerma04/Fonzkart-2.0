@@ -80,10 +80,10 @@ export function CategoryCard({ id, name, width, index, onPress }: {
         <Text style={[styles.name, { color: text, height: nameArea, paddingTop: 8 * k, paddingHorizontal: 8 * k, fontSize: 15 * k, lineHeight: 20 * k }]}
           numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1}>{name}</Text>
         <View pointerEvents="none" style={[styles.gloss, dark && styles.glossDark]} />
-        <View style={styles.art} pointerEvents="none">
+        <View style={[styles.art, dark && { backgroundColor: look.background, marginHorizontal: 6 * k, borderRadius: 12 * k }]} pointerEvents="none">
           <Animated.View style={[styles.ground, { width: width * 0.5, height: 7 * k, borderRadius: 4 * k, bottom: 2 * k }, ground]} />
           <Animated.View style={tilt}>
-            <Art width={width} height={height - nameArea - captionArea} />
+            <Art width={dark ? width - 12 * k : width} height={height - nameArea - captionArea} />
           </Animated.View>
         </View>
         <Text style={[styles.caption, { color: text, height: captionArea, paddingHorizontal: 8 * k, paddingTop: 2 * k, fontSize: 8 * k, lineHeight: 10 * k }]}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   // dark:bg-white/[0.03] dark:border-white/10 on the website
   glass: { backgroundColor: 'rgba(255, 255, 255, 0.04)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)' },
   name: { fontWeight: '800', letterSpacing: -0.3 },
-  art: { flex: 1, alignItems: 'center' },
+  art: { flex: 1, alignItems: 'center', overflow: 'hidden' },
   ground: { position: 'absolute', backgroundColor: 'rgba(0,0,0,0.12)' },
   gloss: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%)' },
   glossDark: { backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 45%)' },

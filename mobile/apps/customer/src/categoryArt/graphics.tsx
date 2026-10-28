@@ -426,43 +426,62 @@ function ConsoleArt({ width, height }: ArtProps) {
   );
 }
 
-function SideTv({ transform, glow }: { transform: string; glow: string }) {
-  return (
-    <G transform={transform}>
-      <Path d="M 28 42 V 50 M 20 50 H 36" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      <Rect x="0" y="0" width="56" height="34" rx="2" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.5" />
-      <Rect x="2" y="2" width="52" height="30" rx="1.5" fill={tw.slate950} />
-      <Circle cx="28" cy="17" r="10" fill={glow} fillOpacity={0.3} />
-      <Polygon points="25,14 33,17 25,20" fill={tw.white} />
-    </G>
-  );
-}
-
+/** A slim flat-panel TV playing a show (a sunset over hills, a progress bar filling), a light glint gliding over the
+ * glass, and a remote in front sending pulses to it. */
 function SmartTvArt({ width, height }: ArtProps) {
+  const play = useLoop(6);
+  const glint = useSpin(5);
+  const signal = useSpin(1.6);
+  const progressProps = useAnimatedProps(() => ({ width: lerp(28, 104, play.value) }));
+  const glintProps = useAnimatedProps(() => ({ matrix: [1, 0, -0.5, 1, lerp(-40, 190, glint.value), 0] }));
+  const ring1 = useAnimatedProps(() => ({ r: 4 + signal.value * 10, opacity: 1 - signal.value }));
+  const ring2 = useAnimatedProps(() => ({ r: 4 + ((signal.value + 0.5) % 1) * 10, opacity: 1 - ((signal.value + 0.5) % 1) }));
   return (
-    <Float width={width} height={height} view="smarttv" rise={4} seconds={6}>
-      <SideTv transform="translate(15, 34) rotate(-12)" glow={tw.blue500} />
-      <SideTv transform="translate(130, 34) rotate(12)" glow={tw.purple500} />
-      <G transform="translate(48, 18)">
-        <Path d="M 35 72 L 69 72 L 75 80 H 29 Z" fill={tw.slate700} />
-        <Rect x="49" y="60" width="6" height="12" fill={tw.slate600} />
-        <Rect x="0" y="0" width="104" height="62" rx="3" fill={tw.slate900} stroke={tw.slate700} strokeWidth="2" />
-        <Rect x="2.5" y="2.5" width="99" height="57" rx="2" fill={tw.slate950} />
-        <Circle cx="52" cy="30" r="28" fill={tw.emerald500} fillOpacity={0.2} />
-        <Rect x="8" y="8" width="26" height="18" rx="2" fill={tw.red500} fillOpacity={0.4} stroke={tw.red400} strokeWidth="0.6" />
-        <Polygon points="19,17 23,19 19,21" fill={tw.white} />
-        <Cart x={50} y={18} width={22} />
-        <Rect x="70" y="8" width="26" height="18" rx="2" fill={tw.emerald500} fillOpacity={0.4} stroke={tw.emerald400} strokeWidth="0.6" />
-        {[8, 26, 44, 62, 80].map(x => (
-          <Rect key={x} x={x} y="32" width="14" height="8" rx="1.5" fill={tw.slate800} />
-        ))}
+    <Float width={width} height={height} view="smarttv" rise={3} seconds={6}>
+      <Defs>
+        <LinearGradient id="tv-sky" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor="#1e1b4b" />
+          <Stop offset="0.55" stopColor="#7c3aed" />
+          <Stop offset="1" stopColor="#f97316" />
+        </LinearGradient>
+        <ClipPath id="tv-screen">
+          <Rect x="27" y="6" width="146" height="80" rx="1.5" />
+        </ClipPath>
+      </Defs>
+      {/* feet */}
+      <Path d="M 48 92 L 42 101 M 152 92 L 158 101" stroke={tw.slate600} strokeWidth="3" strokeLinecap="round" />
+      {/* panel and screen */}
+      <Rect x="24" y="3" width="152" height="90" rx="3" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
+      <G clipPath="url(#tv-screen)">
+        <Rect x="27" y="6" width="146" height="80" fill="url(#tv-sky)" />
+        <Circle cx="128" cy="52" r="12" fill={tw.amber500} fillOpacity={0.9} />
+        <Path d="M 27 70 Q 55 48 82 64 T 132 60 T 173 66 V 86 H 27 Z" fill="#14532d" />
+        <Path d="M 27 78 Q 70 62 110 74 T 173 74 V 86 H 27 Z" fill="#052e16" />
+        <Rect x="35" y="12" width="40" height="5" rx="2.5" fill={tw.white} fillOpacity={0.85} />
+        <Rect x="35" y="20" width="26" height="3.5" rx="1.75" fill={tw.white} fillOpacity={0.5} />
+        <Cart x={160} y={15} width={16} />
+        <Rect x="35" y="79" width="104" height="2.5" rx="1.25" fill={tw.white} fillOpacity={0.3} />
+        <AnimatedRect animatedProps={progressProps} x="35" y="79" width="28" height="2.5" rx="1.25" fill={tw.emerald400} />
+        <AnimatedG animatedProps={glintProps}>
+          <Rect x="0" y="0" width="16" height="92" fill={tw.white} fillOpacity={0.12} />
+        </AnimatedG>
       </G>
-      <G transform="translate(172, 32) rotate(14)">
-        <Rect x="0" y="0" width="12" height="46" rx="5" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
-        <Circle cx="6" cy="6" r="2" fill={tw.red500} />
-        <Circle cx="6" cy="16" r="4" fill={tw.slate800} stroke={tw.slate600} strokeWidth="0.8" />
-        <Rect x="2.5" y="26" width="7" height="2.5" rx="1" fill={tw.emerald500} />
-        <Rect x="2.5" y="31" width="7" height="2.5" rx="1" fill={tw.blue500} />
+      {/* chin with the power light */}
+      <Rect x="96" y="89" width="8" height="1.6" rx="0.8" fill={tw.emerald400} />
+      {/* the remote in front, its signal pulsing towards the TV */}
+      <AnimatedCircle animatedProps={ring1} cx="130" cy="98" r="4" stroke={tw.emerald400} strokeWidth="1.2" fill="none" />
+      <AnimatedCircle animatedProps={ring2} cx="130" cy="98" r="4" stroke={tw.emerald400} strokeWidth="1.2" fill="none" />
+      <G transform="translate(132, 100) rotate(-30)">
+        <Rect x="0" y="0" width="15" height="48" rx="7.5" fill={tw.slate800} stroke={tw.slate600} strokeWidth="1" />
+        <Circle cx="7.5" cy="6" r="1.8" fill={tw.red500} />
+        <Circle cx="7.5" cy="17" r="5" fill={tw.slate900} stroke={tw.slate500} strokeWidth="0.8" />
+        <Circle cx="7.5" cy="17" r="1.8" fill={tw.slate600} />
+        {[27, 32, 37].map(y => (
+          <G key={y}>
+            <Rect x="3" y={y} width="3.5" height="2.5" rx="1" fill={tw.slate600} />
+            <Rect x="8.5" y={y} width="3.5" height="2.5" rx="1" fill={tw.slate600} />
+          </G>
+        ))}
       </G>
     </Float>
   );
@@ -504,52 +523,57 @@ function LaptopArt({ width, height }: ArtProps) {
   );
 }
 
+/** A desk setup: a monitor on its stand showing a desktop with windows and a taskbar, the cursor moving across it,
+ * a keyboard and mouse in front, and a tower PC with a spinning lit fan. */
 function DesktopArt({ width, height }: ArtProps) {
-  const orbit = useSpin(8);
-  const orbitProps = useAnimatedProps(() => ({ matrix: rotateAbout(360 * orbit.value, 63, 20) }));
+  const cursor = useLoop(4);
+  const fan = useSpin(2.5);
+  const cursorProps = useAnimatedProps(() => ({ matrix: [1, 0, 0, 1, lerp(52, 112, cursor.value), lerp(46, 22, cursor.value)] }));
+  const fanProps = useAnimatedProps(() => ({ matrix: rotateAbout(360 * fan.value, 172, 46) }));
   return (
-    <Float width={width} height={height} view="desktop" rise={4} seconds={5}>
-      <G transform="translate(18, 38) rotate(-10)">
-        <Path d="M 28 36 V 46 M 18 46 H 38" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-        <Rect x="0" y="0" width="56" height="36" rx="3" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
-        <Rect x="2" y="2" width="52" height="32" rx="1.5" fill={tw.slate950} />
-        <Circle cx="20" cy="18" r="9" fill={tw.blue600} fillOpacity={0.3} stroke={tw.blue500} strokeOpacity={0.5} strokeWidth="1" />
-        <Circle cx="20" cy="18" r="4" fill={tw.blue500} />
-        <Line x1="20" y1="18" x2="44" y2="14" stroke={tw.emerald400} strokeWidth="1.2" />
-      </G>
-      <G transform="translate(126, 40) rotate(8)">
-        <Path d="M 28 36 V 46 M 18 46 H 38" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-        <Rect x="0" y="0" width="56" height="36" rx="3" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
-        <Rect x="2" y="2" width="52" height="32" rx="1.5" fill={tw.slate950} />
-        <Circle cx="36" cy="18" r="9" stroke={tw.emerald400} strokeOpacity={0.6} strokeWidth="1" strokeDasharray={[2, 2]} fill="none" />
-      </G>
-      <G transform="translate(52, 26)">
-        <Path d="M 44 50 V 62 M 32 62 H 56" stroke="#475569" strokeWidth="3" strokeLinecap="round" fill="none" />
-        <Rect x="0" y="0" width="88" height="52" rx="4" fill={tw.slate900} stroke={tw.emerald500} strokeWidth="1.8" />
-        <Rect x="2.5" y="2.5" width="83" height="47" rx="2" fill={tw.slate950} />
-        <Circle cx="25" cy="26" r="12" fill={tw.blue900} fillOpacity={0.4} stroke={tw.blue600} strokeWidth="1.2" />
-        <Circle cx="25" cy="26" r="6" fill={tw.blue500} />
-        <Line x1="25" y1="26" x2="63" y2="20" stroke={tw.emerald400} strokeWidth="1.8" />
-        <Circle cx="44" cy="23" r="2" fill={tw.emerald400} />
-        <AnimatedG animatedProps={orbitProps}>
-          <Circle cx="63" cy="20" r="14" stroke={tw.emerald400} strokeWidth="1.2" strokeDasharray={[3, 3]} fill="none" />
-        </AnimatedG>
-        <Cart x={63} y={20} width={18} />
-      </G>
-      <G transform="translate(138, 28)">
-        <Rect x="0" y="0" width="22" height="58" rx="3" fill={tw.slate900} stroke={tw.emerald500} strokeWidth="1.5" />
-        <Circle cx="11" cy="14" r="4.5" fill={tw.blue500} stroke={tw.cyan400} strokeWidth="1" />
-        <Line x1="6" y1="28" x2="16" y2="28" stroke={tw.slate600} strokeWidth="1" />
-        <Line x1="6" y1="32" x2="16" y2="32" stroke={tw.slate600} strokeWidth="1" />
-        <Line x1="6" y1="36" x2="16" y2="36" stroke={tw.slate600} strokeWidth="1" />
-        <Circle cx="11" cy="48" r="1.5" fill={tw.emerald400} />
-      </G>
-      <G transform="translate(174, 40) rotate(6)">
-        <Rect x="0" y="0" width="18" height="54" rx="3" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
-        <Circle cx="9" cy="13" r="3.5" fill={tw.blue500} stroke={tw.cyan400} strokeWidth="0.8" />
-        <Line x1="5" y1="26" x2="13" y2="26" stroke={tw.slate600} strokeWidth="0.8" />
-        <Line x1="5" y1="30" x2="13" y2="30" stroke={tw.slate600} strokeWidth="0.8" />
-      </G>
+    <Float width={width} height={height} view="desktop" rise={3} seconds={5}>
+      <Defs>
+        <LinearGradient id="desk-wall" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor="#0ea5e9" />
+          <Stop offset="1" stopColor="#10b981" />
+        </LinearGradient>
+      </Defs>
+      {/* tower PC */}
+      <Rect x="156" y="14" width="32" height="88" rx="4" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
+      <Rect x="160" y="18" width="24" height="56" rx="2" fill={tw.slate950} />
+      <Circle cx="172" cy="46" r="10" fill="none" stroke={tw.emerald500} strokeWidth="1.2" strokeOpacity={0.7} />
+      <AnimatedG animatedProps={fanProps}>
+        <Path d="M 172 46 L 172 38 M 172 46 L 179 50 M 172 46 L 165 50" stroke={tw.emerald400} strokeWidth="2" strokeLinecap="round" />
+      </AnimatedG>
+      <Circle cx="172" cy="46" r="2" fill={tw.slate700} />
+      <Rect x="164" y="80" width="16" height="2" rx="1" fill={tw.slate700} />
+      <Circle cx="172" cy="90" r="2.5" fill={tw.emerald400} />
+      {/* monitor on its stand */}
+      <Path d="M 86 76 L 82 94 H 102 L 98 76 Z" fill={tw.slate600} />
+      <Rect x="70" y="93" width="44" height="4" rx="2" fill={tw.slate700} />
+      <Rect x="22" y="4" width="140" height="74" rx="4" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.4" />
+      <Rect x="25" y="7" width="134" height="62" rx="1.5" fill="url(#desk-wall)" />
+      <Rect x="23" y="70" width="138" height="7" rx="3" fill={tw.slate300} />
+      {/* windows and taskbar */}
+      <Rect x="34" y="14" width="58" height="38" rx="2" fill={tw.white} fillOpacity={0.92} />
+      <Rect x="34" y="14" width="58" height="6" rx="2" fill={tw.slate800} />
+      <Rect x="38" y="25" width="34" height="3" rx="1.5" fill={tw.slate400} />
+      <Rect x="38" y="31" width="44" height="3" rx="1.5" fill={tw.slate300} />
+      <Rect x="38" y="37" width="28" height="3" rx="1.5" fill={tw.slate300} />
+      <Rect x="100" y="24" width="50" height="34" rx="2" fill={tw.slate900} fillOpacity={0.85} />
+      <Cart x={125} y={42} width={20} />
+      <Rect x="25" y="63" width="134" height="6" fill={tw.slate900} fillOpacity={0.7} />
+      {[30, 38, 46, 54].map(x => <Rect key={x} x={x} y="64.5" width="5" height="3" rx="1" fill={x === 30 ? tw.emerald400 : tw.slate400} />)}
+      <AnimatedG animatedProps={cursorProps}>
+        <Path d="M 0 0 L 0 9 L 2.5 6.5 L 4.5 10.5 L 6 9.8 L 4 6 L 7.5 6 Z" fill={tw.white} stroke={tw.slate900} strokeWidth="0.6" />
+      </AnimatedG>
+      {/* keyboard and mouse */}
+      <Path d="M 40 104 H 136 L 142 120 H 34 Z" fill={tw.slate800} stroke={tw.slate600} strokeWidth="1" />
+      {[0, 1, 2].map(row => (
+        <Path key={row} d={`M ${43 - row * 2} ${108 + row * 4} H ${133 + row * 2}`} stroke={tw.slate500} strokeWidth="2" strokeDasharray={[4, 1.5]} />
+      ))}
+      <Path d="M 152 106 C 152 100, 164 100, 164 106 V 114 C 164 120, 152 120, 152 114 Z" fill={tw.slate800} stroke={tw.slate600} strokeWidth="1" />
+      <Path d="M 158 101 V 107" stroke={tw.slate500} strokeWidth="0.8" />
     </Float>
   );
 }
@@ -572,50 +596,69 @@ function CameraArt({ width, height }: ArtProps) {
   );
 }
 
-/** A small earbud standing in a side case, at (x, -12) of the case. */
-function SmallBud({ x, fill, stroke }: { x: number; fill: string; stroke: string }) {
+/** One earbud: a glossy head with its grey ear tip, and the stem; `flip` mirrors it for the right ear. */
+function Bud({ flip }: { flip?: boolean }) {
   return (
-    <G transform={`translate(${x}, -12)`}>
-      <Rect x="-1.5" y="0" width="3" height="12" rx="1.5" fill={fill} stroke={stroke} strokeWidth="0.8" />
-      <Circle cx="0" cy="0" r="3.5" fill={fill} stroke={stroke} strokeWidth="0.8" />
+    <G transform={flip ? 'scale(-1, 1)' : undefined}>
+      <Rect x="-3.5" y="6" width="7" height="26" rx="3.5" fill={tw.white} stroke={tw.slate300} strokeWidth="1" />
+      <Rect x="-2.6" y="27" width="5.2" height="3" rx="1.2" fill={tw.slate300} />
+      <Path d="M -9 -2 C -9 -12, 9 -14, 10 -3 C 11 6, 2 10, -2 9 C -7 8, -9 4, -9 -2 Z" fill={tw.white} stroke={tw.slate300} strokeWidth="1" />
+      <Path d="M -12 -4 C -15 -4, -15 4, -12 4 L -8 3 L -8 -3 Z" fill={tw.slate400} />
+      <Circle cx="3" cy="-3" r="1.4" fill={tw.slate800} />
+      <Path d="M -4 -8 C -1 -10, 3 -10, 5 -8" stroke={tw.slate200} strokeWidth="1.2" strokeLinecap="round" />
     </G>
   );
 }
 
-function WhiteBud({ x }: { x: number }) {
+/** One side's sound waves, growing outwards from (x, 40) and fading. */
+function SoundWaves({ x, side }: { x: number; side: 1 | -1 }) {
+  const t = useSpin(2.4);
+  const props = useAnimatedProps(() => {
+    const s = 1 + t.value * 0.4;
+    return { opacity: 1 - t.value, matrix: [s, 0, 0, s, x - s * x, 40 - s * 40] };
+  });
+  const d = `M ${x} 30 Q ${x - 6 * side} 40 ${x} 50 M ${x + 7 * side} 25 Q ${x - 2 * side} 40 ${x + 7 * side} 55`;
   return (
-    <G transform={`translate(${x}, 6)`}>
-      <Rect x="2" y="6" width="5" height="18" rx="2.5" fill={tw.white} stroke={tw.slate300} strokeWidth="1.2" />
-      <Circle cx="4.5" cy="6" r="5.5" fill={tw.white} stroke={tw.slate300} strokeWidth="1.2" />
-      <Circle cx="4.5" cy="6" r="2" fill={tw.slate900} />
-    </G>
+    <AnimatedG animatedProps={props}>
+      <Path d={d} stroke={tw.emerald400} strokeWidth="1.6" strokeLinecap="round" fill="none" />
+    </AnimatedG>
   );
 }
 
+/** An open charging case with both earbuds lifting out of it in turn, sound waves either side and the green charge
+ * light breathing. */
 function EarbudsArt({ width, height }: ArtProps) {
+  const left = useLoop(3.2);
+  const right = useLoop(3.2, 1.6);
+  const pulse = useLoop(2);
+  const leftProps = useAnimatedProps(() => ({ matrix: rotateAbout(-14 - 4 * left.value, 80, 52, -7 * left.value) }));
+  const rightProps = useAnimatedProps(() => ({ matrix: rotateAbout(14 + 4 * right.value, 120, 52, -7 * right.value) }));
+  const ledProps = useAnimatedProps(() => ({ opacity: 0.35 + 0.65 * pulse.value }));
   return (
-    <Float width={width} height={height} view="earbuds" rise={4} seconds={4.5}>
-      <G transform="translate(24, 48) rotate(-12)">
-        <SmallBud x={8} fill={tw.slate800} stroke={tw.slate600} />
-        <SmallBud x={22} fill={tw.slate800} stroke={tw.slate600} />
-        <Rect x="0" y="0" width="30" height="24" rx="8" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
-        <Path d="M 0 8 Q 15 12 30 8" stroke="#334155" strokeWidth="1" fill="none" />
-        <Circle cx="15" cy="16" r="1.5" fill={tw.cyan400} />
-      </G>
-      <G transform="translate(144, 42) rotate(12)">
-        <SmallBud x={8} fill={tw.slate700} stroke={tw.slate500} />
-        <SmallBud x={22} fill={tw.slate700} stroke={tw.slate500} />
-        <Rect x="0" y="0" width="30" height="24" rx="8" fill={tw.slate800} stroke={tw.slate600} strokeWidth="1.2" />
-        <Path d="M 0 8 Q 15 12 30 8" stroke="#475569" strokeWidth="1" fill="none" />
-        <Circle cx="15" cy="16" r="1.5" fill={tw.emerald400} />
-      </G>
-      <G transform="translate(74, 28)">
-        <WhiteBud x={12} />
-        <WhiteBud x={36} />
-        <Rect x="0" y="24" width="54" height="42" rx="14" fill={tw.white} stroke={tw.slate300} strokeWidth="1.8" />
-        <Path d="M 0 38 Q 27 44 54 38" stroke={tw.slate200} strokeWidth="1.2" fill="none" />
-        <Cart x={27} y={50} width={18} />
-      </G>
+    <Float width={width} height={height} view="earbuds" rise={3} seconds={4.5}>
+      <Defs>
+        <LinearGradient id="bud-case" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor="#ffffff" />
+          <Stop offset="1" stopColor="#e2e8f0" />
+        </LinearGradient>
+      </Defs>
+      <SoundWaves x={44} side={-1} />
+      <SoundWaves x={156} side={1} />
+      {/* open lid behind */}
+      <Path d="M 66 64 C 66 44, 134 44, 134 64 Z" fill="url(#bud-case)" stroke={tw.slate300} strokeWidth="1.4" />
+      <Path d="M 72 62 C 74 52, 126 52, 128 62" stroke={tw.slate200} strokeWidth="1.2" fill="none" />
+      {/* earbuds */}
+      <AnimatedG animatedProps={leftProps}>
+        <G transform="translate(80, 34)"><Bud /></G>
+      </AnimatedG>
+      <AnimatedG animatedProps={rightProps}>
+        <G transform="translate(120, 34)"><Bud flip /></G>
+      </AnimatedG>
+      {/* case body */}
+      <Rect x="62" y="64" width="76" height="50" rx="22" fill="url(#bud-case)" stroke={tw.slate300} strokeWidth="1.6" />
+      <Path d="M 66 70 H 134" stroke={tw.slate300} strokeWidth="1" />
+      <AnimatedCircle animatedProps={ledProps} cx="100" cy="80" r="2.2" fill={tw.emerald500} />
+      <Cart x={100} y={98} width={20} />
     </Float>
   );
 }

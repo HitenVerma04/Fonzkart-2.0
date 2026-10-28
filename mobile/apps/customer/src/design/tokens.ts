@@ -90,11 +90,11 @@ export const type = {
   tiny: { fontSize: 11, lineHeight: 14, fontWeight: '700' as const, letterSpacing: 0.6 },
 };
 
-/** Springs and durations shared by every animation. Damped enough that nothing visibly bounces. */
+/** Springs and durations shared by every animation: a light, quickly settling bounce. */
 export const motion = {
-  press: { damping: 26, stiffness: 420, mass: 0.6 },
-  gentle: { damping: 28, stiffness: 190, mass: 0.8 },
-  snappy: { damping: 28, stiffness: 300, mass: 0.7 },
+  press: { damping: 18, stiffness: 420, mass: 0.6 },
+  gentle: { damping: 20, stiffness: 190, mass: 0.8 },
+  snappy: { damping: 22, stiffness: 300, mass: 0.7 },
   fast: 160,
   base: 260,
   slow: 420,

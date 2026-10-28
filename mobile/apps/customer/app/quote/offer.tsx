@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { customerOrdersApi, usePincodeAvailability, useQuestionnaire, useQuote, useSession } from '@fonzkart/api';
 import { cleanPincode, describeAnswers, formatInr, isCompletePincode, stepsForDevice } from '@fonzkart/core';
@@ -73,7 +73,7 @@ export default function Offer() {
                 <ErrorState message="Could not calculate the price. Check your internet connection." onRetry={() => quote.refetch()} />
               </View>
             ) : (
-              <Animated.Text entering={FadeIn.duration(300)} style={styles.price}
+              <Animated.Text entering={ZoomIn.springify().damping(20).stiffness(180)} style={styles.price}
                 accessibilityLabel={`Your final offer ${formatInr(quote.data.price)}`}>
                 {formatInr(quote.data.price)}
               </Animated.Text>
