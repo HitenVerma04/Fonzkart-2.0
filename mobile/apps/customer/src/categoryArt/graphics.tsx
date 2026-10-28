@@ -90,7 +90,7 @@ const VIEW: Record<HomeTileId, { x: number; y: number; size: number }> = {
   watch: { x: 92, y: 74, size: 0.8 },
   smarttv: { x: 100, y: 58, size: 0.8 },
   console: { x: 100, y: 62, size: 0.8 },
-  desktop: { x: 105, y: 63, size: 0.8 },
+  desktop: { x: 105, y: 62, size: 0.66 },
   earbuds: { x: 100, y: 55, size: 0.9 },
   repair: { x: 84, y: 75, size: 0.9 },
   screenguard: { x: 100, y: 64, size: 0.8 },
@@ -504,7 +504,16 @@ function LaptopArt({ width, height }: ArtProps) {
       </Defs>
       <G transform="translate(28, 22)">
         <Path d="M 5 82 L 139 82 L 148 98 H -4 Z" fill={tw.slate800} stroke={tw.slate600} strokeWidth="1.5" />
-        <Rect x="52" y="86" width="40" height="5" rx="2" fill={tw.slate600} />
+        {/* keyboard: three rows of keys widening towards the front, the space bar, and the trackpad */}
+        {[0, 1, 2].map(row => {
+          const x0 = 10 - row * 2.4;
+          const keyWidth = (124 + row * 4.8) / 14;
+          return Array.from({ length: 14 }, (_, i) => (
+            <Rect key={`${row}-${i}`} x={x0 + i * keyWidth} y={83.4 + row * 2.9} width={keyWidth - 1.1} height={2.1} rx={0.6} fill={tw.slate700} />
+          ));
+        })}
+        <Rect x="50" y="92.1" width="44" height="2.1" rx="0.6" fill={tw.slate700} />
+        <Rect x="60" y="94.8" width="24" height="2.6" rx="1" fill={tw.slate700} stroke={tw.slate600} strokeWidth="0.5" />
         <Rect x="18" y="8" width="108" height="74" rx="6" fill={tw.slate900} stroke={tw.slate700} strokeWidth="2" />
         <Rect x="22" y="12" width="100" height="66" rx="3" fill={tw.slate950} />
         <G clipPath="url(#laptop-clip-web)">
