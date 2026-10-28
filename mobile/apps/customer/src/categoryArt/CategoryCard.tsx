@@ -7,14 +7,14 @@
 // same shape and shows the same part of each drawing on every phone. The card text ignores the phone's font-size
 // setting for the same reason; the card's name is also its accessibility label.
 //
-// Scrolling: while the drawings are paused (see ArtActivity), each card is kept as one ready-drawn picture
-// (renderToHardwareTextureAndroid), so the list only moves pictures instead of redrawing SVGs.
-import { memo, useContext, useState } from 'react';
+// Smoothness: only the card in the Spotlight animates its drawing's inner parts (each frame of those redraws the SVG);
+// every other card is a ready-drawn picture that floats and tilts, which the graphics chip does at almost no cost.
+import { memo, useContext } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle, withDelay, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useDerivedValue, withDelay, withTiming, type SharedValue } from 'react-native-reanimated';
 import { radius } from '@fonzkart/ui';
 import { Tap } from '../design';
-import { ArtActivity, useLoop } from './motion';
+import { ArtActivity, Spotlight, useLoop } from './motion';
 import { CATEGORY_ART, type HomeTileId } from './graphics';
 
 const CARD_RATIO = 1.4;
@@ -66,12 +66,10 @@ export function CategoryCard({ id, name, width, index, onPress }: {
   onPress: () => void;
 }) {
   const look = LOOK[id];
-  const active = useContext(ArtActivity);
-  const [still, setStill] = useState(!active.value);
-  useAnimatedReaction(() => active.value, (running, previous) => {
-    if (running !== previous) runOnJS(setStill)(!running);
-  });
-  const sway = useLoop(7, (index % 3) * 0.6);
+  const screenActive = useContext(ArtActivity);
+  const spotlight = useContext(Spotlight);
+  const active = useDerivedValue(() => screenActive.value && (spotlight.value === null || spotlight.value === id));
+  const sway = useLoop(7, (index % 3) * 0.6, false);
   const tilt = useAnimatedStyle(() => ({
     transform: [{ perspective: 600 }, { rotateX: '6deg' }, { rotateY: `${-9 + sway.value * 18}deg` }],
   }));
@@ -80,7 +78,7 @@ export function CategoryCard({ id, name, width, index, onPress }: {
   const nameArea = Math.round(NAME_AREA * k);
   const captionArea = Math.round(CAPTION_AREA * k);
   return (
-    <Animated.View entering={appear(index)} renderToHardwareTextureAndroid={still}>
+    <Animated.View entering={appear(index)}>
       <Tap
         onPress={onPress}
         scaleTo={0.94}
@@ -93,7 +91,9 @@ export function CategoryCard({ id, name, width, index, onPress }: {
         <View pointerEvents="none" style={styles.gloss} />
         <View style={styles.art} pointerEvents="none">
           <Animated.View style={tilt}>
-            <CardArt id={id} width={width} height={height - nameArea - captionArea} />
+            <ArtActivity.Provider value={active as SharedValue<boolean>}>
+              <CardArt id={id} width={width} height={height - nameArea - captionArea} />
+            </ArtActivity.Provider>
           </Animated.View>
         </View>
         <Text style={[styles.caption, { color: look.text, height: captionArea, paddingHorizontal: 8 * k, paddingTop: 2 * k, fontSize: 8 * k, lineHeight: 10 * k }]}

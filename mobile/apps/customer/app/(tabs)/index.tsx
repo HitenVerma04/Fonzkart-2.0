@@ -1,6 +1,6 @@
 // Home: a green header with the brand, greeting, notifications and the search bar; the carousel; the sell
 // categories; Fonzkart's services; top phone brands; and how selling works.
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,7 +9,7 @@ import { useBrands, useNotifications, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
 import { Logo, makeStyles } from '@fonzkart/ui';
 import { CategoryCard } from '../../src/categoryArt/CategoryCard';
-import { ArtActivity } from '../../src/categoryArt/motion';
+import { ArtActivity, Spotlight } from '../../src/categoryArt/motion';
 import {
   Appear, ErrorState, Icon, IconBadge, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles,
   Tile, type, useDesign, useTabBarSpace, type IconName,
@@ -18,6 +18,8 @@ import { HomeCarousel } from '../../src/HomeCarousel';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 
 const TOP_BRANDS = 8;
+const SPOTLIGHT_MS = 3500;
+const SPOTLIGHT_ORDER = [...SELL_CATEGORIES.map(c => c.id), 'repair', 'screenguard', 'bulk'];
 const SUGGESTIONS = ['iPhone 13', 'Galaxy S23', 'OnePlus 11', 'iPad Air', 'MacBook Air', 'Apple Watch'];
 const PERKS: { icon: IconName; label: string }[] = [
   { icon: 'bolt', label: 'Instant cash' },
@@ -59,6 +61,17 @@ export default function Home() {
       artActive.value = false;
     };
   }, [artActive, focused, scrolling]));
+  // One card at a time plays its drawing's full animation, moving on every few seconds (like a store's featured
+  // tile); the rest float and tilt as ready-drawn pictures. Redrawing a dozen SVGs every frame is what dropped frames.
+  const spotlight = useSharedValue<string | null>(SPOTLIGHT_ORDER[0]!);
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      i = (i + 1) % SPOTLIGHT_ORDER.length;
+      spotlight.value = SPOTLIGHT_ORDER[i]!;
+    }, SPOTLIGHT_MS);
+    return () => clearInterval(timer);
+  }, [spotlight]);
   const onScroll = useAnimatedScrollHandler({
     onBeginDrag: () => {
       scrolling.value = true;
@@ -79,6 +92,7 @@ export default function Home() {
 
   return (
     <ArtActivity.Provider value={artActive}>
+    <Spotlight.Provider value={spotlight}>
     <Animated.ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
       <View style={[styles.hero, { backgroundImage: d.heroGradient, paddingTop: insets.top + 10 }]}>
@@ -179,6 +193,7 @@ export default function Home() {
         </Appear>
       </View>
     </Animated.ScrollView>
+    </Spotlight.Provider>
     </ArtActivity.Provider>
   );
 }

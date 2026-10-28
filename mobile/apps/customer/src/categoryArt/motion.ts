@@ -1,5 +1,5 @@
 // The website's framer-motion loops (components/sell/CategorySelector.tsx), on the UI thread with Reanimated.
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { Circle, G, Line, Path, Rect } from 'react-native-svg';
 import Animated, {
   Easing,
@@ -7,6 +7,7 @@ import Animated, {
   makeMutable,
   useAnimatedReaction,
   useSharedValue,
+  runOnJS,
   withSequence,
   withDelay,
   withRepeat,
@@ -24,17 +25,28 @@ export const AnimatedLine = Animated.createAnimatedComponent(Line);
 const easeInOut = Easing.bezier(0.42, 0, 0.58, 1);
 
 /**
- * Whether the drawings may move. The home screen turns this off while the list scrolls and while another screen
- * covers it: a dozen SVG drawings redrawing every frame would otherwise make scrolling and screen transitions
- * stutter. Drawings outside a provider (the Bulk orders page) always move.
+ * Whether a drawing's inner parts may move (each frame of those redraws the whole SVG, which is costly). The home
+ * screen gives each card its own switch: on for the one card in the spotlight, off for the rest, and off for all
+ * while the list scrolls or another screen covers it. Drawings outside a provider (the Bulk orders page) always move.
  */
 const ALWAYS = makeMutable(true);
 export const ArtActivity = createContext<SharedValue<boolean>>(ALWAYS);
 
-/** 0 → 1 → 0 every `seconds`, forever: a framer-motion keyframe loop [a, b, a]. `delay` only holds the first run. */
-export function useLoop(seconds: number, delay = 0): SharedValue<number> {
+/**
+ * Which home card plays its full animation right now (the others float and tilt as still pictures). null: every card
+ * does, for a card shown outside the home screen.
+ */
+export const Spotlight = createContext<SharedValue<string | null>>(makeMutable<string | null>(null));
+
+/**
+ * 0 → 1 → 0 every `seconds`, forever: a framer-motion keyframe loop [a, b, a]. `delay` only holds the first run.
+ * With `pausable` false it ignores ArtActivity: for whole-view motions (a drawing floating, a card tilting), which
+ * the phone's graphics chip moves as a finished picture at almost no cost.
+ */
+export function useLoop(seconds: number, delay = 0, pausable = true): SharedValue<number> {
   const t = useSharedValue(0);
-  const active = useContext(ArtActivity);
+  const context = useContext(ArtActivity);
+  const active = pausable ? context : ALWAYS;
   const half = seconds * 500;
   useEffect(() => {
     if (active.value) t.value = withDelay(delay * 1000, withRepeat(withTiming(1, { duration: half, easing: easeInOut }), -1, true));
@@ -47,6 +59,16 @@ export function useLoop(seconds: number, delay = 0): SharedValue<number> {
     else t.value = withRepeat(withTiming(t.value < 0.5 ? 1 : 0, { duration: half, easing: easeInOut }), -1, true);
   }, [half]);
   return t;
+}
+
+/** True while this drawing is paused: it can then be kept as a ready-drawn picture (see Canvas). */
+export function useArtStill(): boolean {
+  const active = useContext(ArtActivity);
+  const [still, setStill] = useState(!active.value);
+  useAnimatedReaction(() => active.value, (running, previous) => {
+    if (running !== previous) runOnJS(setStill)(!running);
+  });
+  return still;
 }
 
 /** 0 → 1 every `seconds` at a steady speed, restarting: one full turn of `rotate: 360`. */

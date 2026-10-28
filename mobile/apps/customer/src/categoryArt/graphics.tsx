@@ -1,6 +1,7 @@
 // The website's animated category graphics (components/sell/CategorySelector.tsx, light theme), drawn with
 // react-native-svg. Same 200 × 150 drawings, colours and loops; tailwind classes are written out as colours.
 import type { ComponentType, ReactNode } from 'react';
+import { View } from 'react-native';
 import Animated, { useAnimatedProps, useAnimatedStyle } from 'react-native-reanimated';
 import Svg, {
   Circle,
@@ -19,7 +20,7 @@ import Svg, {
   type GProps,
 } from 'react-native-svg';
 import type { SellCategoryId } from '@fonzkart/core';
-import { AnimatedCircle, AnimatedLine, AnimatedPath, AnimatedRect, AnimatedG as AnimatedGroup, lerp, moveDown, rotateAbout, useLoop, useSpin } from './motion';
+import { AnimatedCircle, AnimatedLine, AnimatedPath, AnimatedRect, AnimatedG as AnimatedGroup, lerp, moveDown, rotateAbout, useArtStill, useLoop, useSpin } from './motion';
 
 /** The home screen's cards: the sell categories plus the website's Repair, Screen Guard and Bulk Orders cards. */
 export type HomeTileId = SellCategoryId | 'repair' | 'screenguard' | 'bulk';
@@ -104,18 +105,23 @@ function viewBox(view: HomeTileId) {
   return { x: x - width / 2, y: y - height / 2, width, height };
 }
 
+/** The drawing. While it is paused it is kept as a ready-drawn picture, so moving or tilting it costs nothing. */
 function Canvas({ width, height, view, children }: ArtProps & { view: HomeTileId; children: ReactNode }) {
   const box = viewBox(view);
+  const still = useArtStill();
   return (
-    <Svg width={width} height={height} viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`} preserveAspectRatio="xMidYMid slice" fill="none">
-      {children}
-    </Svg>
+    <View renderToHardwareTextureAndroid={still} style={{ width, height }}>
+      <Svg width={width} height={height} viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`} preserveAspectRatio="xMidYMid slice" fill="none">
+        {children}
+      </Svg>
+    </View>
   );
 }
 
-/** The whole drawing bobbing up by `rise` (in drawing units) every `seconds`: the website's outer motion.g. */
+/** The whole drawing bobbing up by `rise` (in drawing units) every `seconds`: the website's outer motion.g. It moves
+ * the finished picture, so it keeps going while the inner parts are paused. */
 function Float({ width, height, view, rise, seconds, children }: ArtProps & { view: HomeTileId; rise: number; seconds: number; children: ReactNode }) {
-  const t = useLoop(seconds);
+  const t = useLoop(seconds, 0, false);
   const box = viewBox(view);
   const scale = Math.max(width / box.width, height / box.height);
   const style = useAnimatedStyle(() => ({ transform: [{ translateY: -rise * t.value * scale }] }));
