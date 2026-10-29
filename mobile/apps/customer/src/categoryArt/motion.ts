@@ -1,7 +1,6 @@
 // The website's framer-motion loops (components/sell/CategorySelector.tsx), on the UI thread with Reanimated.
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Circle, G, Line, Path, Rect } from 'react-native-svg';
-import Animated, {
+import {
   Easing,
   cancelAnimation,
   makeMutable,
@@ -15,35 +14,21 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 
-export const AnimatedG = Animated.createAnimatedComponent(G);
-export const AnimatedPath = Animated.createAnimatedComponent(Path);
-export const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-export const AnimatedRect = Animated.createAnimatedComponent(Rect);
-export const AnimatedLine = Animated.createAnimatedComponent(Line);
-
 // framer-motion's "easeInOut".
 const easeInOut = Easing.bezier(0.42, 0, 0.58, 1);
 
 /**
- * Whether a drawing's inner parts may move (each frame of those redraws the whole SVG, which is costly). The home
- * screen gives each card its own switch: on for the one card in the spotlight, off for the rest, and off for all
- * while the list scrolls or another screen covers it. Drawings outside a provider (the Bulk orders page) always move.
+ * Whether a drawing's inner parts may move. The home screen turns this off only while nobody can see the drawings
+ * (another screen covers it, or the cards are scrolled off screen). Drawings outside a provider always move.
  */
 const ALWAYS = makeMutable(true);
 export const ArtActivity = createContext<SharedValue<boolean>>(ALWAYS);
 
 /**
- * Which home card plays its full animation right now (the others float and tilt as still pictures). null: every card
- * does, for a card shown outside the home screen.
- */
-/**
- * Whether whole-view motions (a drawing floating, a card tilting) may run. They are cheap, but two dozen of them still
- * compete with scrolling, so the home screen pauses them while scrolling, while covered and while the cards are off
+ * Whether whole-view motions (a drawing floating, a card tilting) may run: same rule as ArtActivity on the home
  * screen. Elsewhere they always run.
  */
 export const MotionActivity = createContext<SharedValue<boolean>>(ALWAYS);
-
-export const Spotlight = createContext<SharedValue<string | null>>(makeMutable<string | null>(null));
 
 /**
  * 0 → 1 → 0 every `seconds`, forever: a framer-motion keyframe loop [a, b, a]. `delay` only holds the first run.

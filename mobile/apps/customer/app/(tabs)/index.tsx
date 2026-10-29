@@ -1,6 +1,6 @@
 // Home: a green header with the brand, greeting, notifications and the search bar; the carousel; the sell
 // categories; Fonzkart's services; top phone brands; and how selling works.
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
 import Animated, { runOnUI, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,7 +9,7 @@ import { useBrands, useNotifications, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
 import { Logo, makeStyles } from '@fonzkart/ui';
 import { CategoryCard } from '../../src/categoryArt/CategoryCard';
-import { ArtActivity, MotionActivity, Spotlight } from '../../src/categoryArt/motion';
+import { ArtActivity, MotionActivity } from '../../src/categoryArt/motion';
 import {
   Appear, ErrorState, Icon, IconBadge, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles,
   Tile, type, useDesign, useTabBarSpace, type IconName,
@@ -18,8 +18,6 @@ import { HomeCarousel } from '../../src/HomeCarousel';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 
 const TOP_BRANDS = 8;
-const SPOTLIGHT_MS = 3500;
-const SPOTLIGHT_ORDER = [...SELL_CATEGORIES.map(c => c.id), 'repair', 'screenguard', 'bulk'];
 const SUGGESTIONS = ['iPhone 13', 'Galaxy S23', 'OnePlus 11', 'iPad Air', 'MacBook Air', 'Apple Watch'];
 const PERKS: { icon: IconName; label: string }[] = [
   { icon: 'bolt', label: 'Instant cash' },
@@ -48,13 +46,12 @@ export default function Home() {
   const unread = inbox.data?.some(n => !n.isRead) ?? false;
   const firstName = signedIn ? session.user.name.trim().split(/\s+/)[0] : '';
 
-  // The category cards move (float, tilt, the spotlight's drawing) only while this screen is in front, the list is
-  // still, and the cards are on screen. Animating during a scroll or a screen transition, or off screen, is what made
-  // the home screen stutter; the same rule keeps busy store apps smooth.
+  // Every category card animates all the time (the drawings are drawn by Skia on the GPU, see categoryArt/skiaSvg),
+  // including while the list scrolls. They pause only when no one can see them: while another screen covers this one,
+  // or when the cards are scrolled completely off screen.
   const { height: viewport } = useWindowDimensions();
   const artActive = useSharedValue(true);
   const focused = useSharedValue(true);
-  const scrolling = useSharedValue(false);
   const scrollY = useSharedValue(0);
   const bodyTop = useSharedValue(0);
   const cardsTop = useSharedValue(0);
@@ -63,7 +60,8 @@ export default function Home() {
     'worklet';
     const top = bodyTop.value + cardsTop.value;
     const bottom = bodyTop.value + cardsBottom.value;
-    artActive.value = focused.value && !scrolling.value && scrollY.value + viewport > top && scrollY.value < bottom;
+    const visible = focused.value && scrollY.value + viewport > top && scrollY.value < bottom;
+    if (artActive.value !== visible) artActive.value = visible;
   };
   useFocusEffect(useCallback(() => {
     focused.value = true;
@@ -73,36 +71,9 @@ export default function Home() {
       artActive.value = false;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [artActive, focused, scrolling]));
-  // One card at a time plays its drawing's full animation, moving on every few seconds (like a store's featured
-  // tile); the rest float and tilt as ready-drawn pictures. Redrawing a dozen SVGs every frame is what dropped frames.
-  const spotlight = useSharedValue<string | null>(SPOTLIGHT_ORDER[0]!);
-  useEffect(() => {
-    let i = 0;
-    const timer = setInterval(() => {
-      i = (i + 1) % SPOTLIGHT_ORDER.length;
-      spotlight.value = SPOTLIGHT_ORDER[i]!;
-    }, SPOTLIGHT_MS);
-    return () => clearInterval(timer);
-  }, [spotlight]);
+  }, [artActive, focused]));
   const onScroll = useAnimatedScrollHandler({
     onScroll: e => {
-      scrollY.value = e.contentOffset.y;
-    },
-    onBeginDrag: () => {
-      scrolling.value = true;
-      artActive.value = false;
-    },
-    onEndDrag: e => {
-      // No fling: the list stops here. Otherwise wait for the momentum to end.
-      if (Math.abs(e.velocity?.y ?? 0) < 0.05) {
-        scrolling.value = false;
-        scrollY.value = e.contentOffset.y;
-        settle();
-      }
-    },
-    onMomentumEnd: e => {
-      scrolling.value = false;
       scrollY.value = e.contentOffset.y;
       settle();
     },
@@ -111,7 +82,6 @@ export default function Home() {
   return (
     <ArtActivity.Provider value={artActive}>
     <MotionActivity.Provider value={artActive}>
-    <Spotlight.Provider value={spotlight}>
     <Animated.ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
       <View style={[styles.hero, { backgroundImage: d.heroGradient, paddingTop: insets.top + 10 }]}>
@@ -218,7 +188,6 @@ export default function Home() {
         </Appear>
       </View>
     </Animated.ScrollView>
-    </Spotlight.Provider>
     </MotionActivity.Provider>
     </ArtActivity.Provider>
   );

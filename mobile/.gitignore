@@ -11,3 +11,5 @@ apps/*/ios/
 *.keystore
 .env*.local
 builds/
+# Skia engine for the web preview (copied from node_modules/canvaskit-wasm; not needed on phones).
+apps/*/public/canvaskit.wasm

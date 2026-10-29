@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Linking, Text, View } from 'react-native';
 import { makeStyles } from '@fonzkart/ui';
-import { CATEGORY_ART } from '../src/categoryArt/graphics';
+import { CATEGORY_ART } from '../src/categoryArt/art';
 import { BULK_MESSAGE, CONTACT } from '../src/contact';
 import { useTileWidth } from '../src/grid';
 import { Appear, Button, Card, IconBadge, Notice, Page, radii, type, useDesign, type IconName } from '../src/design';

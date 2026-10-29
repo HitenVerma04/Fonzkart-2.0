@@ -1,9 +1,14 @@
 // The website's animated category graphics (components/sell/CategorySelector.tsx, light theme), drawn with
-// react-native-svg. Same 200 × 150 drawings, colours and loops; tailwind classes are written out as colours.
+// Skia through skiaSvg (react-native-svg's element names, GPU drawing; see there for why). Same 200 × 150 drawings, colours and loops; tailwind classes are written out as colours.
 import type { ComponentType, ReactNode } from 'react';
-import { View } from 'react-native';
-import Animated, { useAnimatedProps, useAnimatedStyle } from 'react-native-reanimated';
+// useAnimatedProps here is a derived value: the skiaSvg elements read it on the UI thread.
+import Animated, { useAnimatedStyle, useDerivedValue as useAnimatedProps } from 'react-native-reanimated';
 import Svg, {
+  AnimatedCircle,
+  AnimatedG,
+  AnimatedLine,
+  AnimatedPath,
+  AnimatedRect,
   Circle,
   ClipPath,
   Defs,
@@ -17,16 +22,13 @@ import Svg, {
   Rect,
   Stop,
   Text as SvgText,
-  type GProps,
-} from 'react-native-svg';
+} from './skiaSvg';
 import type { SellCategoryId } from '@fonzkart/core';
-import { AnimatedCircle, AnimatedLine, AnimatedPath, AnimatedRect, AnimatedG as AnimatedGroup, lerp, moveDown, rotateAbout, useArtStill, useLoop, useSpin } from './motion';
+import { lerp, moveDown, rotateAbout, useLoop, useSpin } from './motion';
 
 /** The home screen's cards: the sell categories plus the website's Repair, Screen Guard and Bulk Orders cards. */
 export type HomeTileId = SellCategoryId | 'repair' | 'screenguard' | 'bulk';
 
-// The native `matrix` prop is not in GProps (react-native-svg computes it from `transform` on the JS side).
-const AnimatedG = AnimatedGroup as unknown as ComponentType<GProps & { animatedProps?: unknown }>;
 
 // Tailwind colours the website's classes use.
 const tw = {
@@ -105,16 +107,13 @@ function viewBox(view: HomeTileId) {
   return { x: x - width / 2, y: y - height / 2, width, height };
 }
 
-/** The drawing. While it is paused it is kept as a ready-drawn picture, so moving or tilting it costs nothing. */
+/** The drawing: the window of the 200 × 150 artwork for this card, filling the given size. */
 function Canvas({ width, height, view, children }: ArtProps & { view: HomeTileId; children: ReactNode }) {
   const box = viewBox(view);
-  const still = useArtStill();
   return (
-    <View renderToHardwareTextureAndroid={still} style={{ width, height }}>
-      <Svg width={width} height={height} viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`} preserveAspectRatio="xMidYMid slice" fill="none">
-        {children}
-      </Svg>
-    </View>
+    <Svg width={width} height={height} viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`} preserveAspectRatio="xMidYMid slice">
+      {children}
+    </Svg>
   );
 }
 
@@ -787,7 +786,9 @@ function BulkArt({ width, height }: ArtProps) {
       </AnimatedG>
       <G transform="translate(144, 88)">
         <Circle cx="0" cy="0" r="7" fill="#10b981" />
-        <SvgText x="0" y="2.5" textAnchor="middle" fontSize="6.5" fontWeight="900" fill="#022c22">♻</SvgText>
+        {/* The recycling mark, drawn (a font may not have the ♻ symbol). */}
+        <Path d="M -3.4 -1.6 A 3.6 3.6 0 1 1 -1.2 3.4" stroke="#022c22" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+        <Path d="M -3.6 -3.6 L -3.6 0 L -0.4 -1.4 Z" fill="#022c22" />
       </G>
     </Float>
   );

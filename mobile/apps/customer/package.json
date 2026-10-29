@@ -14,6 +14,7 @@
     "@fonzkart/api": "*",
     "@fonzkart/core": "*",
     "@fonzkart/ui": "*",
+    "@shopify/react-native-skia": "2.14.0",
     "@tanstack/react-query": "^5.104.1",
     "expo": "~58.0.19",
     "expo-constants": "~58.0.13",

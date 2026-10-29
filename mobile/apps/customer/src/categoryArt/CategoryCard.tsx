@@ -7,15 +7,16 @@
 // same shape and shows the same part of each drawing on every phone. The card text ignores the phone's font-size
 // setting for the same reason; the card's name is also its accessibility label.
 //
-// Smoothness: only the card in the Spotlight animates its drawing's inner parts (each frame of those redraws the SVG);
-// every other card is a ready-drawn picture that floats and tilts, which the graphics chip does at almost no cost.
-import { memo, useContext } from 'react';
+// Every card animates its drawing fully (drawn by Skia on the GPU) and floats and tilts as a whole (a native view
+// transform).
+import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useDerivedValue, withDelay, withTiming, type SharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withDelay, withTiming } from 'react-native-reanimated';
 import { radius } from '@fonzkart/ui';
 import { Tap } from '../design';
-import { ArtActivity, Spotlight, useLoop } from './motion';
-import { CATEGORY_ART, type HomeTileId } from './graphics';
+import { useLoop } from './motion';
+import { CATEGORY_ART } from './art';
+import type { HomeTileId } from './graphics';
 
 const CARD_RATIO = 1.4;
 const REFERENCE_WIDTH = 112;
@@ -66,9 +67,6 @@ export function CategoryCard({ id, name, width, index, onPress }: {
   onPress: () => void;
 }) {
   const look = LOOK[id];
-  const screenActive = useContext(ArtActivity);
-  const spotlight = useContext(Spotlight);
-  const active = useDerivedValue(() => screenActive.value && (spotlight.value === null || spotlight.value === id));
   const sway = useLoop(7, (index % 3) * 0.6, 'motion');
   const tilt = useAnimatedStyle(() => ({
     transform: [{ perspective: 600 }, { rotateX: '6deg' }, { rotateY: `${-9 + sway.value * 18}deg` }],
@@ -91,9 +89,7 @@ export function CategoryCard({ id, name, width, index, onPress }: {
           numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} maxFontSizeMultiplier={1}>{name}</Text>
         <View style={styles.art} pointerEvents="none">
           <Animated.View style={tilt}>
-            <ArtActivity.Provider value={active as SharedValue<boolean>}>
-              <CardArt id={id} width={width} height={height - nameArea - captionArea} />
-            </ArtActivity.Provider>
+            <CardArt id={id} width={width} height={height - nameArea - captionArea} />
           </Animated.View>
         </View>
         <Text style={[styles.caption, { color: look.text, height: captionArea, paddingHorizontal: 8 * k, paddingTop: 2 * k, fontSize: 8 * k, lineHeight: 10 * k }]}
