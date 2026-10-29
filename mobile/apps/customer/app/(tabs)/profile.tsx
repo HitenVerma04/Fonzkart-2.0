@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Alert, Platform, Text, View } from 'react-native';
+import { Alert, Linking, Platform, Text, View } from 'react-native';
+import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { accountApi, useNotifications, useProfile, useSession } from '@fonzkart/api';
 import { Logo, makeStyles, useTheme, type ThemePreference } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
+import { CONTACT } from '../../src/contact';
 import {
   Appear, Button, Card, ErrorState, Icon, IconBadge, ListItem, Notice, Page, radii, Segmented, Skeleton, TabTitle, type,
   useDesign, useTabBarSpace,
@@ -64,6 +66,7 @@ export default function Account() {
             </View>
           </Appear>
           <Appear index={1}><AppearancePicker /></Appear>
+          <Appear index={2}><HelpAndAbout /></Appear>
         </Page>
       </View>
     );
@@ -113,6 +116,7 @@ export default function Account() {
         </Appear>
 
         <Appear index={2}><AppearancePicker /></Appear>
+        <Appear index={3}><HelpAndAbout /></Appear>
 
         <Appear index={3} style={styles.list}>
           <Button title="Sign out" variant="outline" icon="logout" onPress={() => void signOut()} />
@@ -120,6 +124,21 @@ export default function Account() {
           {deleteError ? <Notice tone="error" text={deleteError} /> : null}
         </Appear>
       </Page>
+    </View>
+  );
+}
+
+/** Ways to reach Fonzkart (the website's contact page), and the app version, as store apps show at the bottom. */
+function HelpAndAbout() {
+  const styles = useStyles();
+  const open = (url: string) => void Linking.openURL(url).catch(() => undefined);
+  return (
+    <View style={styles.list}>
+      <Text style={styles.groupTitle}>Help & support</Text>
+      <ListItem leading={<IconBadge name="phone" />} title="Call us" subtitle={`${CONTACT.phoneDisplay} · ${CONTACT.hours}`} onPress={() => open(`tel:${CONTACT.phone}`)} />
+      <ListItem leading={<IconBadge name="chat" />} title="Chat on WhatsApp" subtitle="Quick answers about prices and pickups" onPress={() => open(`https://wa.me/${CONTACT.whatsapp}`)} />
+      <ListItem leading={<IconBadge name="mail" />} title="Email us" subtitle={CONTACT.email} onPress={() => open(`mailto:${CONTACT.email}`)} />
+      <Text style={styles.version}>Fonzkart {Constants.expoConfig?.version ?? ''}</Text>
     </View>
   );
 }
@@ -157,4 +176,6 @@ const useStyles = makeStyles(colors => ({
   name: { ...type.title, fontSize: 22, color: '#ffffff' },
   contact: { ...type.small, color: 'rgba(255,255,255,0.85)' },
   list: { gap: 10 },
+  groupTitle: { ...type.small, fontWeight: '700', color: colors.muted, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 6, marginLeft: 4 },
+  version: { ...type.small, fontSize: 12, color: colors.muted, textAlign: 'center', marginTop: 10 },
 }));

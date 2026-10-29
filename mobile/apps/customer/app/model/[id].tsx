@@ -18,7 +18,8 @@ export default function ModelVariants() {
 
   return (
     <>
-      <Stack.Screen options={{ title }} />
+      {/* The name is the page's big title already; the header keeps just the back button. */}
+      <Stack.Screen options={{ title: '' }} />
       <Page>
         <Appear>
           <View style={[styles.hero, { boxShadow: d.shadow.md }]}>

@@ -121,7 +121,7 @@ function Canvas({ width, height, view, children }: ArtProps & { view: HomeTileId
 /** The whole drawing bobbing up by `rise` (in drawing units) every `seconds`: the website's outer motion.g. It moves
  * the finished picture, so it keeps going while the inner parts are paused. */
 function Float({ width, height, view, rise, seconds, children }: ArtProps & { view: HomeTileId; rise: number; seconds: number; children: ReactNode }) {
-  const t = useLoop(seconds, 0, false);
+  const t = useLoop(seconds, 0, 'motion');
   const box = viewBox(view);
   const scale = Math.max(width / box.width, height / box.height);
   const style = useAnimatedStyle(() => ({ transform: [{ translateY: -rise * t.value * scale }] }));

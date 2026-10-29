@@ -36,17 +36,25 @@ export const ArtActivity = createContext<SharedValue<boolean>>(ALWAYS);
  * Which home card plays its full animation right now (the others float and tilt as still pictures). null: every card
  * does, for a card shown outside the home screen.
  */
+/**
+ * Whether whole-view motions (a drawing floating, a card tilting) may run. They are cheap, but two dozen of them still
+ * compete with scrolling, so the home screen pauses them while scrolling, while covered and while the cards are off
+ * screen. Elsewhere they always run.
+ */
+export const MotionActivity = createContext<SharedValue<boolean>>(ALWAYS);
+
 export const Spotlight = createContext<SharedValue<string | null>>(makeMutable<string | null>(null));
 
 /**
  * 0 → 1 → 0 every `seconds`, forever: a framer-motion keyframe loop [a, b, a]. `delay` only holds the first run.
- * With `pausable` false it ignores ArtActivity: for whole-view motions (a drawing floating, a card tilting), which
- * the phone's graphics chip moves as a finished picture at almost no cost.
+ * `scope` 'detail' (a drawing's inner parts) follows ArtActivity; 'motion' (the whole drawing or card moving as a
+ * finished picture) follows MotionActivity.
  */
-export function useLoop(seconds: number, delay = 0, pausable = true): SharedValue<number> {
+export function useLoop(seconds: number, delay = 0, scope: 'detail' | 'motion' = 'detail'): SharedValue<number> {
   const t = useSharedValue(0);
-  const context = useContext(ArtActivity);
-  const active = pausable ? context : ALWAYS;
+  const detail = useContext(ArtActivity);
+  const motion = useContext(MotionActivity);
+  const active = scope === 'motion' ? motion : detail;
   const half = seconds * 500;
   useEffect(() => {
     if (active.value) t.value = withDelay(delay * 1000, withRepeat(withTiming(1, { duration: half, easing: easeInOut }), -1, true));

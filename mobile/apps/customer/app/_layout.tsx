@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, type NativeStackHeaderProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { SessionProvider, createQueryClient } from '@fonzkart/api';
@@ -35,7 +35,8 @@ function Screens() {
   }, [colors.background]);
   // Pushed screens slide in from the right (the iOS motion on both platforms), under the app's own header.
   const screenOptions = useMemo(() => ({
-    header: AppHeader,
+    // Rendered as a component (not called as a function), so its hooks stay its own.
+    header: (props: NativeStackHeaderProps) => <AppHeader {...props} />,
     animation: 'ios_from_right' as const,
     contentStyle: { backgroundColor: colors.background },
   }), [colors]);

@@ -69,7 +69,7 @@ export function CategoryCard({ id, name, width, index, onPress }: {
   const screenActive = useContext(ArtActivity);
   const spotlight = useContext(Spotlight);
   const active = useDerivedValue(() => screenActive.value && (spotlight.value === null || spotlight.value === id));
-  const sway = useLoop(7, (index % 3) * 0.6, false);
+  const sway = useLoop(7, (index % 3) * 0.6, 'motion');
   const tilt = useAnimatedStyle(() => ({
     transform: [{ perspective: 600 }, { rotateX: '6deg' }, { rotateY: `${-9 + sway.value * 18}deg` }],
   }));
@@ -86,9 +86,9 @@ export function CategoryCard({ id, name, width, index, onPress }: {
         accessibilityLabel={name}
         style={[styles.card, { width, height, backgroundColor: look.background }]}
       >
-        <Text style={[styles.name, { color: look.text, height: nameArea, paddingTop: 8 * k, paddingHorizontal: 8 * k, fontSize: 15 * k, lineHeight: 20 * k }]}
-          numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1}>{name}</Text>
         <View pointerEvents="none" style={styles.gloss} />
+        <Text style={[styles.name, { color: look.text, height: nameArea, paddingTop: 8 * k, paddingHorizontal: 8 * k, fontSize: (name.length > 11 ? 13.5 : 15) * k, lineHeight: 20 * k }]}
+          numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} maxFontSizeMultiplier={1}>{name}</Text>
         <View style={styles.art} pointerEvents="none">
           <Animated.View style={tilt}>
             <ArtActivity.Provider value={active as SharedValue<boolean>}>
@@ -104,11 +104,11 @@ export function CategoryCard({ id, name, width, index, onPress }: {
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: radius.lg, overflow: 'hidden' },
-  name: { fontWeight: '800', letterSpacing: -0.3 },
+  card: { borderRadius: radius.lg, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(15,31,23,0.08)' },
+  name: { fontWeight: '900', letterSpacing: -0.4 },
   art: { flex: 1, alignItems: 'center', overflow: 'hidden' },
-  gloss: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%)' },
+  gloss: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 40%)' },
   caption: {
-    textAlign: 'center', fontWeight: '700', letterSpacing: 0.4, textTransform: 'uppercase', opacity: 0.75,
+    textAlign: 'center', fontWeight: '700', letterSpacing: 0.4, textTransform: 'uppercase', opacity: 0.8,
   },
 });

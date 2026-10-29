@@ -51,7 +51,7 @@ export function ThemeProvider({ storage, palettes = DEFAULT_PALETTES, children }
 
   // Native parts (keyboard, alerts, switches) follow the same choice.
   useEffect(() => {
-    Appearance.setColorScheme(preference === 'system' ? 'unspecified' : preference);
+    Appearance.setColorScheme?.(preference === 'system' ? 'unspecified' : preference); // not on the web
   }, [preference]);
 
   const setPreference = useCallback((next: ThemePreference) => {

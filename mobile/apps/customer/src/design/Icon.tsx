@@ -19,7 +19,7 @@ export function Icon({ name, color, size = 24, filled = false, strokeWidth }: {
   // The duotone fill: the same colour, faint.
   const f = { ...s, fill: filled ? color : 'none', fillOpacity: filled ? 0.2 : 0 };
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <Svg width={size} height={size} viewBox="0 0 24 24">
       {name === 'sell' ? (
         <>
           <Path d="M3 12.4V4.6A1.6 1.6 0 0 1 4.6 3h7.8c.4 0 .8.2 1.1.5l7 7a1.6 1.6 0 0 1 0 2.3l-7.7 7.7a1.6 1.6 0 0 1-2.3 0l-7-7A1.6 1.6 0 0 1 3 12.4z" {...f} />

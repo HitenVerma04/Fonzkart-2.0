@@ -1,15 +1,15 @@
 // Home: a green header with the brand, greeting, notifications and the search bar; the carousel; the sell
 // categories; Fonzkart's services; top phone brands; and how selling works.
 import { useCallback, useEffect } from 'react';
-import { Text, View } from 'react-native';
-import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import { Text, useWindowDimensions, View } from 'react-native';
+import Animated, { runOnUI, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useBrands, useNotifications, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
 import { Logo, makeStyles } from '@fonzkart/ui';
 import { CategoryCard } from '../../src/categoryArt/CategoryCard';
-import { ArtActivity, Spotlight } from '../../src/categoryArt/motion';
+import { ArtActivity, MotionActivity, Spotlight } from '../../src/categoryArt/motion';
 import {
   Appear, ErrorState, Icon, IconBadge, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles,
   Tile, type, useDesign, useTabBarSpace, type IconName,
@@ -48,18 +48,31 @@ export default function Home() {
   const unread = inbox.data?.some(n => !n.isRead) ?? false;
   const firstName = signedIn ? session.user.name.trim().split(/\s+/)[0] : '';
 
-  // The category drawings move only while this screen is in front and the list is still: animating a dozen SVGs
-  // during a scroll or a screen transition is what made both stutter.
+  // The category cards move (float, tilt, the spotlight's drawing) only while this screen is in front, the list is
+  // still, and the cards are on screen. Animating during a scroll or a screen transition, or off screen, is what made
+  // the home screen stutter; the same rule keeps busy store apps smooth.
+  const { height: viewport } = useWindowDimensions();
   const artActive = useSharedValue(true);
   const focused = useSharedValue(true);
   const scrolling = useSharedValue(false);
+  const scrollY = useSharedValue(0);
+  const bodyTop = useSharedValue(0);
+  const cardsTop = useSharedValue(0);
+  const cardsBottom = useSharedValue(Number.MAX_SAFE_INTEGER);
+  const settle = () => {
+    'worklet';
+    const top = bodyTop.value + cardsTop.value;
+    const bottom = bodyTop.value + cardsBottom.value;
+    artActive.value = focused.value && !scrolling.value && scrollY.value + viewport > top && scrollY.value < bottom;
+  };
   useFocusEffect(useCallback(() => {
     focused.value = true;
-    artActive.value = !scrolling.value;
+    runOnUI(settle)();
     return () => {
       focused.value = false;
       artActive.value = false;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [artActive, focused, scrolling]));
   // One card at a time plays its drawing's full animation, moving on every few seconds (like a store's featured
   // tile); the rest float and tilt as ready-drawn pictures. Redrawing a dozen SVGs every frame is what dropped frames.
@@ -73,6 +86,9 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [spotlight]);
   const onScroll = useAnimatedScrollHandler({
+    onScroll: e => {
+      scrollY.value = e.contentOffset.y;
+    },
     onBeginDrag: () => {
       scrolling.value = true;
       artActive.value = false;
@@ -81,17 +97,20 @@ export default function Home() {
       // No fling: the list stops here. Otherwise wait for the momentum to end.
       if (Math.abs(e.velocity?.y ?? 0) < 0.05) {
         scrolling.value = false;
-        artActive.value = focused.value;
+        scrollY.value = e.contentOffset.y;
+        settle();
       }
     },
-    onMomentumEnd: () => {
+    onMomentumEnd: e => {
       scrolling.value = false;
-      artActive.value = focused.value;
+      scrollY.value = e.contentOffset.y;
+      settle();
     },
   });
 
   return (
     <ArtActivity.Provider value={artActive}>
+    <MotionActivity.Provider value={artActive}>
     <Spotlight.Provider value={spotlight}>
     <Animated.ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
@@ -126,11 +145,16 @@ export default function Home() {
         </View>
       </View>
 
-      <View style={styles.body}>
+      <View style={styles.body} onLayout={e => { bodyTop.value = e.nativeEvent.layout.y; }}>
         <Appear index={0}>
           <HomeCarousel width={carouselWidth} />
         </Appear>
 
+        <View style={styles.cards} onLayout={e => {
+          const { y, height } = e.nativeEvent.layout;
+          cardsTop.value = y;
+          cardsBottom.value = y + height;
+        }}>
         <Appear index={1} style={styles.block}>
           <SectionHeader title="Sell your device" subtitle="Choose a category to see your price" />
           <View style={styles.grid}>
@@ -155,6 +179,7 @@ export default function Home() {
             <CategoryCard id="bulk" name="Bulk Orders" width={categoryWidth} index={2} onPress={() => router.push('/bulk')} />
           </View>
         </Appear>
+        </View>
 
         <Appear index={3} style={styles.block}>
           <SectionHeader title="Top phone brands" action={{ label: 'See all', onPress: () => router.push({ pathname: '/category/[id]', params: { id: 'smartphone' } }) }} />
@@ -194,6 +219,7 @@ export default function Home() {
       </View>
     </Animated.ScrollView>
     </Spotlight.Provider>
+    </MotionActivity.Provider>
     </ArtActivity.Provider>
   );
 }
@@ -215,6 +241,7 @@ const useStyles = makeStyles(colors => ({
   perkText: { ...type.small, fontSize: 12, fontWeight: '700', color: '#ffffff' },
   body: { padding: PAGE_PADDING, gap: 22, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
   block: { gap: 12 },
+  cards: { gap: 22 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
   steps: { backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 16 },
   step: { flexDirection: 'row', gap: 14, alignItems: 'center' },

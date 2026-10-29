@@ -123,7 +123,7 @@ const LIGHT: Design = {
   heroGradient: 'linear-gradient(170deg, #0f7a37 0%, #16a34a 55%, #1fb257 100%)',
   glass: {
     fill: 'rgba(255,255,255,0.72)',
-    strongFill: 'rgba(255,255,255,0.9)',
+    strongFill: 'rgba(255,255,255,0.96)',
     border: 'rgba(255,255,255,0.85)',
     sheen: 'linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 60%)',
   },
@@ -143,7 +143,7 @@ const DARK: Design = {
   heroGradient: 'linear-gradient(170deg, #0a2a17 0%, #0b3a1f 45%, #060a08 100%)',
   glass: {
     fill: 'rgba(20,30,24,0.72)',
-    strongFill: 'rgba(16,24,20,0.92)',
+    strongFill: 'rgba(16,24,20,0.96)',
     border: 'rgba(255,255,255,0.1)',
     sheen: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%)',
   },

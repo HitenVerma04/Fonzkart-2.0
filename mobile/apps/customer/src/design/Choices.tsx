@@ -9,11 +9,13 @@ import { Icon, type IconName } from './Icon';
 import { Tap } from './Tap';
 import { motion, radii, type, useDesign } from './tokens';
 
-export function ChoiceCard({ label, description, selected, multi, onPress }: {
+/** One answer. `compact`: a half-width tile (tick-all-that-apply lists without descriptions, two per row). */
+export function ChoiceCard({ label, description, selected, multi, compact, onPress }: {
   label: string;
   description?: string;
   selected: boolean;
   multi?: boolean;
+  compact?: boolean;
   onPress: () => void;
 }) {
   const colors = useColors();
@@ -26,7 +28,7 @@ export function ChoiceCard({ label, description, selected, multi, onPress }: {
       accessibilityRole={multi ? 'checkbox' : 'radio'}
       accessibilityState={{ checked: selected }}
       accessibilityLabel={description ? `${label}. ${description}` : label}
-      style={[styles.card, selected && [styles.cardOn, { boxShadow: d.shadow.sm }]]}
+      style={[styles.card, compact && styles.cardCompact, selected && [styles.cardOn, { boxShadow: d.shadow.sm }]]}
     >
       <View style={[multi ? styles.box : styles.radio, selected && styles.markOn]}>
         {selected ? (
@@ -36,7 +38,7 @@ export function ChoiceCard({ label, description, selected, multi, onPress }: {
         ) : null}
       </View>
       <View style={styles.text}>
-        <Text style={[styles.label, selected && { color: colors.greenDark }]}>{label}</Text>
+        <Text style={[styles.label, compact && styles.labelCompact, selected && { color: colors.greenDark }]} numberOfLines={compact ? 2 : undefined}>{label}</Text>
         {description ? <Text style={styles.description}>{description}</Text> : null}
       </View>
     </Tap>
@@ -79,7 +81,9 @@ export function QuestionStepView({ step, answers, onChange }: {
   const styles = useStyles();
   const choices = (key: string, kind: string | undefined, options: QuestionOption[] | undefined) => {
     const multi = isMultiSelect(kind);
-    return (options ?? []).map(option => {
+    // Tick-all-that-apply lists of short labels (functional problems, accessories) read faster as a two-column grid.
+    const compact = multi && (options ?? []).every(o => !o.description && o.label.length <= 28);
+    const cards = (options ?? []).map(option => {
       const current = answers[key];
       const selected = multi ? Array.isArray(current) && current.includes(option.id) : current === option.id;
       return (
@@ -88,11 +92,13 @@ export function QuestionStepView({ step, answers, onChange }: {
           label={option.label}
           description={option.description}
           multi={multi}
+          compact={compact}
           selected={selected}
           onPress={() => onChange(key, multi ? toggleOption(current, option.id) : option.id)}
         />
       );
     });
+    return compact ? <View style={styles.grid}>{cards}</View> : cards;
   };
 
   return (
@@ -188,6 +194,9 @@ export function Segmented<T extends string>({ options, value, onChange }: {
 const useStyles = makeStyles(colors => ({
   card: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border, borderRadius: radii.md, padding: 16 },
   cardOn: { borderColor: colors.green, backgroundColor: colors.greenSoft },
+  cardCompact: { flexBasis: '45%', flexGrow: 1, paddingVertical: 14, paddingHorizontal: 12, gap: 10, minHeight: 56 },
+  labelCompact: { fontSize: 14 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.track, alignItems: 'center', justifyContent: 'center' },
   box: { width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: colors.track, alignItems: 'center', justifyContent: 'center' },
   markOn: { borderColor: colors.green, backgroundColor: colors.green },
