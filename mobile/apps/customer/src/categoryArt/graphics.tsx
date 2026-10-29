@@ -499,6 +499,9 @@ function CodeLine({ y, from, to, seconds, delay, color }: { y: number; from: num
   return <AnimatedRect animatedProps={props} x="30" y={y} width={from} height="4" rx="2" fill={color} />;
 }
 
+/** The laptop's screen frame runs from x 18 to 126; the base matches it at the hinge and widens by `flare` at the front. */
+const LAPTOP = { left: 18, right: 126, flare: 8 };
+
 function LaptopArt({ width, height }: ArtProps) {
   return (
     <Float width={width} height={height} view="laptop" rise={4} seconds={5}>
@@ -508,17 +511,23 @@ function LaptopArt({ width, height }: ArtProps) {
         </ClipPath>
       </Defs>
       <G transform="translate(28, 22)">
-        <Path d="M 5 82 L 139 82 L 148 98 H -4 Z" fill={tw.slate800} stroke={tw.slate600} strokeWidth="1.5" />
-        {/* keyboard: three rows of keys widening towards the front, the space bar, and the trackpad */}
+        {/* base: as wide as the screen at the hinge (18 → 126), widening towards the front edge for perspective */}
+        <Path d={`M ${LAPTOP.left} 82 L ${LAPTOP.right} 82 L ${LAPTOP.right + LAPTOP.flare} 98 L ${LAPTOP.left - LAPTOP.flare} 98 Z`}
+          fill={tw.slate800} stroke={tw.slate600} strokeWidth="1.5" strokeLinejoin="round" />
+        {/* keyboard: three rows of keys following the base's slant, the space bar, and the trackpad */}
         {[0, 1, 2].map(row => {
-          const x0 = 10 - row * 2.4;
-          const keyWidth = (124 + row * 4.8) / 14;
+          const y = 83.6 + row * 2.9;
+          const spread = ((y - 82) / 16) * LAPTOP.flare; // how far the base has widened at this row
+          const x0 = LAPTOP.left - spread + 5;
+          const keyWidth = (LAPTOP.right - LAPTOP.left + spread * 2 - 10) / 14;
           return Array.from({ length: 14 }, (_, i) => (
-            <Rect key={`${row}-${i}`} x={x0 + i * keyWidth} y={83.4 + row * 2.9} width={keyWidth - 1.1} height={2.1} rx={0.6} fill={tw.slate700} />
+            <Rect key={`${row}-${i}`} x={x0 + i * keyWidth} y={y} width={keyWidth - 1} height={2.1} rx={0.6} fill={tw.slate700} />
           ));
         })}
-        <Rect x="50" y="92.1" width="44" height="2.1" rx="0.6" fill={tw.slate700} />
-        <Rect x="60" y="94.8" width="24" height="2.6" rx="1" fill={tw.slate700} stroke={tw.slate600} strokeWidth="0.5" />
+        <Rect x="52" y="92.3" width="40" height="2.1" rx="0.6" fill={tw.slate700} />
+        <Rect x="60" y="95" width="24" height="2.4" rx="1" fill={tw.slate700} stroke={tw.slate600} strokeWidth="0.5" />
+        {/* hinge */}
+        <Rect x={LAPTOP.left + 2} y="80.6" width={LAPTOP.right - LAPTOP.left - 4} height="2.2" rx="1.1" fill={tw.slate600} />
         <Rect x="18" y="8" width="108" height="74" rx="6" fill={tw.slate900} stroke={tw.slate700} strokeWidth="2" />
         <Rect x="22" y="12" width="100" height="66" rx="3" fill={tw.slate950} />
         <G clipPath="url(#laptop-clip-web)">

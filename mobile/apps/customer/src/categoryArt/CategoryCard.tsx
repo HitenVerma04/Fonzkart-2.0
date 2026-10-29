@@ -85,7 +85,7 @@ export function CategoryCard({ id, name, width, index, onPress }: {
         style={[styles.card, { width, height, backgroundColor: look.background }]}
       >
         <View pointerEvents="none" style={styles.gloss} />
-        <Text style={[styles.name, { color: look.text, height: nameArea, paddingTop: 8 * k, paddingHorizontal: 8 * k, fontSize: (name.length > 11 ? 13.5 : 15) * k, lineHeight: 20 * k }]}
+        <Text style={[styles.name, { color: look.text, height: nameArea, paddingTop: 8 * k, paddingHorizontal: 8 * k, fontSize: (name.length > 10 ? 13.5 : 15) * k, lineHeight: 20 * k }]}
           numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} maxFontSizeMultiplier={1}>{name}</Text>
         <View style={styles.art} pointerEvents="none">
           <Animated.View style={tilt}>
