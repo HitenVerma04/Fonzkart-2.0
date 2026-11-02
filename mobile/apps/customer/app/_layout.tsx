@@ -1,6 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, type NativeStackHeaderProps } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, type ErrorBoundaryProps, type NativeStackHeaderProps } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { SessionProvider, createQueryClient } from '@fonzkart/api';
@@ -11,6 +13,26 @@ import { themeStorage } from '../src/themeStorage';
 import { tokenStorage } from '../src/tokenStorage';
 
 const queryClient = createQueryClient();
+
+/**
+ * If the app fails while drawing, show what went wrong instead of closing: the native splash is hidden here too (the
+ * launch animation that normally hides it may never have run), so the app never sits frozen on the splash.
+ */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28, gap: 12, backgroundColor: '#f4f7f5' }}>
+      <Text style={{ fontSize: 22, fontWeight: '800', color: '#0b2316' }}>Something went wrong</Text>
+      <Text style={{ fontSize: 14, color: '#64766c', textAlign: 'center' }} selectable>{error.message}</Text>
+      <Pressable onPress={() => void retry()} accessibilityRole="button"
+        style={{ marginTop: 8, backgroundColor: '#16a34a', borderRadius: 999, paddingHorizontal: 28, paddingVertical: 14 }}>
+        <Text style={{ color: '#ffffff', fontWeight: '700', fontSize: 16 }}>Try again</Text>
+      </Pressable>
+    </View>
+  );
+}
 
 export default function RootLayout() {
   useRefreshOnAppFocus();

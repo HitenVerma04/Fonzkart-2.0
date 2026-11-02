@@ -10,6 +10,9 @@
 // strokeWidth, strokeLinecap, strokeLinejoin, strokeDasharray, strokeDashoffset. Animated*: an `animatedProps`
 // shared value whose object may set matrix (G), d (Path), r / opacity (Circle), width / y (Rect), y1 / y2 (Line),
 // strokeDashoffset (Path).
+//
+// The useDerivedValue callbacks below run on the UI thread (worklets): they may only use the animated value and plain
+// numbers, strings and objects worked out beforehand, never this file's helpers (calling one there stops the app).
 import { Children, createContext, isValidElement, useContext, useMemo, type ReactElement, type ReactNode } from 'react';
 import { Platform } from 'react-native';
 import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
@@ -351,11 +354,13 @@ export function Path(p: PathProps) {
 }
 
 export function AnimatedPath({ animatedProps, ...p }: PathProps & Animated<{ d?: string; strokeDashoffset?: number }>) {
-  const dashOffset = useDerivedValue(() => animatedProps?.value.strokeDashoffset ?? num(p.strokeDashoffset as Num));
+  const dash0 = num(p.strokeDashoffset as Num);
+  const d0 = p.d;
+  const dashOffset = useDerivedValue(() => animatedProps?.value.strokeDashoffset ?? dash0);
   const paints = usePaints({ ...p, strokeDashoffset: dashOffset }, pathBox(p.d));
   const path = useDerivedValue(() => {
     'worklet';
-    return Skia.Path.MakeFromSVGString(animatedProps?.value.d ?? p.d) ?? Skia.Path.Make();
+    return Skia.Path.MakeFromSVGString(animatedProps?.value.d ?? d0) ?? Skia.Path.Make();
   });
   return <SkPath path={path}>{paints}</SkPath>;
 }
@@ -378,8 +383,10 @@ export function AnimatedLine({ animatedProps, ...p }: LineProps & Animated<{ y1?
   const paints = usePaints(p, { x: 0, y: 0, width: 1, height: 1 });
   const x1 = num(p.x1);
   const x2 = num(p.x2);
-  const p1 = useDerivedValue(() => vec(x1, animatedProps?.value.y1 ?? num(p.y1)));
-  const p2 = useDerivedValue(() => vec(x2, animatedProps?.value.y2 ?? num(p.y2)));
+  const y1 = num(p.y1);
+  const y2 = num(p.y2);
+  const p1 = useDerivedValue(() => ({ x: x1, y: animatedProps?.value.y1 ?? y1 }));
+  const p2 = useDerivedValue(() => ({ x: x2, y: animatedProps?.value.y2 ?? y2 }));
   return <SkLine p1={p1} p2={p2}>{paints}</SkLine>;
 }
 
