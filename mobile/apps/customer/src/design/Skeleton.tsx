@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { View, type DimensionValue, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { Easing, makeMutable, useAnimatedStyle, withRepeat, withTiming } from 'react-native-reanimated';
 import { makeStyles, useColors } from '@fonzkart/ui';
+import { DeviceSkeleton, type DeviceKind } from './DeviceSkeleton';
 import { MAX_CONTENT, radii, useDesign } from './tokens';
 
 const clock = makeMutable(0);
@@ -55,13 +56,17 @@ export function SkeletonScreen({ children, label = 'Loading', style }: { childre
 }
 
 /** A grid of picture tiles (brands, models). */
-export function SkeletonTiles({ count, width, imageHeight }: { count: number; width: number; imageHeight: number }) {
+export function SkeletonTiles({ count, width, imageHeight, kind }: { count: number; width: number; imageHeight: number; kind?: DeviceKind }) {
   const styles = useStyles();
   return (
     <View style={styles.grid}>
       {Array.from({ length: count }, (_, i) => (
         <View key={i} style={[styles.tile, { width }]}>
-          <Skeleton height={imageHeight} radius={radii.sm} />
+          {kind ? (
+            <View style={styles.center}><DeviceSkeleton kind={kind} size={imageHeight} /></View>
+          ) : (
+            <Skeleton height={imageHeight} radius={radii.sm} />
+          )}
           <Skeleton width="70%" height={12} style={styles.center} />
         </View>
       ))}
@@ -70,13 +75,13 @@ export function SkeletonTiles({ count, width, imageHeight }: { count: number; wi
 }
 
 /** Rows with a picture, two lines and a value (search results, variants, notifications, orders). */
-export function SkeletonRows({ count = 5, image = 52, trailing }: { count?: number; image?: number; trailing?: boolean }) {
+export function SkeletonRows({ count = 5, image = 52, trailing, kind }: { count?: number; image?: number; trailing?: boolean; kind?: DeviceKind }) {
   const styles = useStyles();
   return (
     <View style={styles.rows}>
       {Array.from({ length: count }, (_, i) => (
         <View key={i} style={styles.row}>
-          {image ? <Skeleton width={image} height={image} radius={radii.sm} /> : null}
+          {image ? (kind ? <DeviceSkeleton kind={kind} size={image} /> : <Skeleton width={image} height={image} radius={radii.sm} />) : null}
           <View style={styles.rowText}>
             <Skeleton width="75%" height={14} />
             <Skeleton width="45%" height={11} />

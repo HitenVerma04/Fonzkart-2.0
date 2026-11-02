@@ -19,6 +19,7 @@ import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 import {
   Canvas,
   Circle as SkCircle,
+  Fill,
   DashPathEffect,
   Group,
   Image as SkImage,
@@ -39,7 +40,7 @@ import {
   type DataSourceParam,
   type Transforms3d,
 } from '@shopify/react-native-skia';
-import { ArtActivity, MotionActivity } from './motion';
+import { ArtActivity, ArtBackground, MotionActivity } from './motion';
 
 type Num = number | string | undefined;
 type Value<T> = T | SharedValue<T>;
@@ -238,6 +239,7 @@ export default function Svg({ width, height, viewBox, preserveAspectRatio, child
   // Contexts are passed into the Canvas by hand: it renders with its own reconciler.
   const art = useContext(ArtActivity);
   const motion = useContext(MotionActivity);
+  const background = useContext(ArtBackground);
   const [vx, vy, vw, vh] = viewBox.split(/[\s,]+/).map(Number) as [number, number, number, number];
   const slice = preserveAspectRatio?.includes('slice');
   const s = slice ? Math.max(width / vw, height / vh) : Math.min(width / vw, height / vh);
@@ -247,7 +249,8 @@ export default function Svg({ width, height, viewBox, preserveAspectRatio, child
     { scale: s },
   ];
   return (
-    <Canvas style={{ width, height }} pointerEvents="none">
+    <Canvas style={{ width, height }} pointerEvents="none" android={{ surfaceType: 'TextureView' }}>
+      {background ? <Fill color={background} /> : null}
       <ArtActivity.Provider value={art}>
         <MotionActivity.Provider value={motion}>
           <Defs_.Provider value={defs}>

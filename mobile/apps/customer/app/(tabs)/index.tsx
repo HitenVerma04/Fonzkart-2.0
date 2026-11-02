@@ -1,5 +1,6 @@
-// Home: a green header with the brand, greeting, notifications and the search bar; the carousel; the sell
-// categories; Fonzkart's services; top phone brands; and how selling works.
+// Home, laid out like Blinkit's: a green header with the promise in big type, the search bar and a row of category
+// tabs; then the carousel, "Sell this phone" (Cashify's), the animated sell categories, repair & protect, top phone
+// brands as picture cards, and the Fonzkart promise in a dark card (CRED's style).
 import { useCallback } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
 import Animated, { runOnUI, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
@@ -11,24 +12,15 @@ import { Logo, makeStyles } from '@fonzkart/ui';
 import { CategoryCard } from '../../src/categoryArt/CategoryCard';
 import { ArtActivity, MotionActivity } from '../../src/categoryArt/motion';
 import {
-  Appear, ErrorState, Icon, IconBadge, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles,
-  Tile, type, useDesign, useTabBarSpace, type IconName,
+  Appear, ErrorState, Icon, IconButton, MAX_CONTENT, radii, SearchBar, SectionHeader, Skeleton, type, useDesign, useTabBarSpace,
 } from '../../src/design';
 import { HomeCarousel } from '../../src/HomeCarousel';
+import { BrandCollageCard, CategoryTabs, PromiseCard, ServiceTiles } from '../../src/home/sections';
+import { SellThisDevice } from '../../src/home/SellThisDevice';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 
-const TOP_BRANDS = 8;
+const TOP_BRANDS = 6;
 const SUGGESTIONS = ['iPhone 13', 'Galaxy S23', 'OnePlus 11', 'iPad Air', 'MacBook Air', 'Apple Watch'];
-const PERKS: { icon: IconName; label: string }[] = [
-  { icon: 'bolt', label: 'Instant cash' },
-  { icon: 'truck', label: 'Free pickup' },
-  { icon: 'shield', label: 'Safe & secure' },
-];
-const STEPS: { icon: IconName; title: string; text: string }[] = [
-  { icon: 'sparkle', title: 'Get your price', text: 'Pick your device and answer a few questions.' },
-  { icon: 'truck', title: 'Free doorstep pickup', text: 'Choose a time; our executive comes to you.' },
-  { icon: 'wallet', title: 'Get paid instantly', text: 'Cash, UPI or bank transfer on the spot.' },
-];
 
 export default function Home() {
   const styles = useStyles();
@@ -38,7 +30,8 @@ export default function Home() {
   const bottom = useTabBarSpace();
   const categoryWidth = useTileWidth(3);
   const carouselWidth = useTileWidth(1);
-  const brandWidth = useTileWidth(4);
+  const brandWidth = useTileWidth(3);
+  const serviceWidth = useTileWidth(4);
   const brands = useBrands('smartphone');
   const { session } = useSession();
   const signedIn = session.status === 'signedIn';
@@ -87,37 +80,33 @@ export default function Home() {
       <View style={[styles.hero, { backgroundImage: d.heroGradient, paddingTop: insets.top + 10 }]}>
         <View style={styles.heroInner}>
           <View style={styles.topRow}>
-            <View style={styles.brand}>
-              <View style={styles.logoChip}>
-                <Logo variant="f" height={30} />
+            <View style={styles.promise}>
+              <Text style={styles.kicker}>{firstName ? `Hi ${firstName} · your price in` : 'Fonzkart · your price in'}</Text>
+              <View style={styles.bigRow}>
+                <Text style={styles.big}>60 seconds</Text>
+                <View style={styles.chip}>
+                  <Icon name="bolt" color="#14532d" size={12} filled />
+                  <Text style={styles.chipText}>CASH</Text>
+                </View>
               </View>
-              <View>
-                <Text style={styles.hello}>{firstName ? `Hi ${firstName} 👋` : 'Welcome to'}</Text>
-                <Text style={styles.brandName}>Fonzkart</Text>
-              </View>
+              <Text style={styles.subline}>Turn your old devices into <Text style={styles.cash}>cash</Text></Text>
             </View>
             <View style={styles.actions}>
               {signedIn ? <IconButton icon="bell" label="Notifications" tint="onGreen" badge={unread} onPress={() => router.push('/notifications')} /> : null}
               <IconButton icon="profile" label="Profile" tint="onGreen" onPress={() => router.navigate('/profile')} />
             </View>
           </View>
-
-          <Text style={styles.title}>Turn your old devices into <Text style={styles.cash}>cash</Text></Text>
           <SearchBar glass placeholder="Search your device" suggestions={SUGGESTIONS} onPress={() => router.push('/search')} />
-          <View style={styles.perks}>
-            {PERKS.map(p => (
-              <View key={p.label} style={styles.perk}>
-                <Icon name={p.icon} color="#ffffff" size={15} />
-                <Text style={styles.perkText}>{p.label}</Text>
-              </View>
-            ))}
-          </View>
+          <CategoryTabs />
         </View>
       </View>
 
       <View style={styles.body} onLayout={e => { bodyTop.value = e.nativeEvent.layout.y; }}>
         <Appear index={0}>
           <HomeCarousel width={carouselWidth} />
+        </Appear>
+        <Appear index={1}>
+          <SellThisDevice />
         </Appear>
 
         <View style={styles.cards} onLayout={e => {
@@ -142,49 +131,33 @@ export default function Home() {
         </Appear>
 
         <Appear index={2} style={styles.block}>
-          <SectionHeader title="More from Fonzkart" />
+          <SectionHeader title="Repair & protect" subtitle="Fix it, guard it, or recycle it" />
           <View style={styles.grid}>
             <CategoryCard id="repair" name="Repair" width={categoryWidth} index={0} onPress={() => router.navigate('/repair')} />
             <CategoryCard id="screenguard" name="Screen Guard" width={categoryWidth} index={1} onPress={() => router.push('/screen-guard')} />
             <CategoryCard id="bulk" name="Bulk Orders" width={categoryWidth} index={2} onPress={() => router.push('/bulk')} />
           </View>
+          <ServiceTiles width={serviceWidth} />
         </Appear>
         </View>
 
         <Appear index={3} style={styles.block}>
           <SectionHeader title="Top phone brands" action={{ label: 'See all', onPress: () => router.push({ pathname: '/category/[id]', params: { id: 'smartphone' } }) }} />
           {brands.isPending ? (
-            <SkeletonTiles count={TOP_BRANDS} width={brandWidth} imageHeight={brandWidth - 30} />
+            <View style={styles.grid}>
+              {Array.from({ length: TOP_BRANDS }, (_, i) => <Skeleton key={i} width={brandWidth} height={brandWidth + 34} radius={radii.lg} />)}
+            </View>
           ) : brands.isError ? (
             <ErrorState onRetry={() => brands.refetch()} />
           ) : (
-            <View style={styles.grid}>
-              {brands.data.slice(0, TOP_BRANDS).map(brand => (
-                <Tile
-                  key={brand.id}
-                  label={brand.name}
-                  width={brandWidth}
-                  onPress={() => router.push({ pathname: '/brand/[id]', params: { id: brand.id, category: 'smartphone', name: brand.name } })}
-                  image={<ProductImage uri={brand.logo} label={brand.name} size={brandWidth - 34} />}
-                />
-              ))}
+            <View style={styles.collages}>
+              {brands.data.slice(0, TOP_BRANDS).map(brand => <BrandCollageCard key={brand.id} brand={brand} width={brandWidth} />)}
             </View>
           )}
         </Appear>
 
-        <Appear index={4} style={styles.block}>
-          <SectionHeader title="How Fonzkart works" />
-          <View style={[styles.steps, { boxShadow: d.shadow.sm }]}>
-            {STEPS.map((s, i) => (
-              <View key={s.title} style={styles.step}>
-                <IconBadge name={s.icon} size={44} />
-                <View style={styles.stepText}>
-                  <Text style={styles.stepTitle}>{i + 1}. {s.title}</Text>
-                  <Text style={styles.stepBody}>{s.text}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
+        <Appear index={4}>
+          <PromiseCard />
         </Appear>
       </View>
     </Animated.ScrollView>
@@ -195,26 +168,21 @@ export default function Home() {
 
 const useStyles = makeStyles(colors => ({
   screen: { flex: 1, backgroundColor: colors.background },
-  hero: { borderBottomLeftRadius: radii.xl, borderBottomRightRadius: radii.xl, paddingBottom: 22 },
-  heroInner: { paddingHorizontal: PAGE_PADDING, gap: 16, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  brand: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoChip: { width: 44, height: 44, borderRadius: 14, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center' },
-  hello: { ...type.small, color: 'rgba(255,255,255,0.8)', fontWeight: '600' },
-  brandName: { ...type.heading, fontSize: 20, fontWeight: '800', color: '#ffffff', letterSpacing: -0.3 },
-  actions: { flexDirection: 'row', gap: 8 },
-  title: { ...type.display, color: '#ffffff', marginTop: 4 },
-  cash: { color: '#bbf7d0' },
-  perks: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  perk: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: radii.pill, backgroundColor: 'rgba(255,255,255,0.14)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)' },
-  perkText: { ...type.small, fontSize: 12, fontWeight: '700', color: '#ffffff' },
+  hero: { borderBottomLeftRadius: radii.xl, borderBottomRightRadius: radii.xl, paddingBottom: 8 },
+  heroInner: { paddingHorizontal: PAGE_PADDING, gap: 14, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
+  topRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 },
+  promise: { flex: 1, minWidth: 0, gap: 2 },
+  kicker: { ...type.small, fontSize: 13, color: 'rgba(255,255,255,0.85)', fontWeight: '700' },
+  bigRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 8 },
+  big: { fontSize: 32, lineHeight: 38, fontWeight: '900', letterSpacing: -1, color: '#ffffff' },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#bbf7d0', borderRadius: radii.pill, paddingHorizontal: 8, paddingVertical: 3 },
+  chipText: { fontSize: 11, fontWeight: '900', letterSpacing: 0.6, color: '#14532d' },
+  subline: { ...type.label, fontSize: 15, color: '#ffffff' },
+  actions: { flexDirection: 'row', gap: 8, paddingTop: 2, flexShrink: 0 },
+  cash: { color: '#bbf7d0', fontWeight: '900' },
   body: { padding: PAGE_PADDING, gap: 22, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
   block: { gap: 12 },
   cards: { gap: 22 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
-  steps: { backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 16 },
-  step: { flexDirection: 'row', gap: 14, alignItems: 'center' },
-  stepText: { flex: 1, gap: 2 },
-  stepTitle: { ...type.label, fontSize: 15, color: colors.navy },
-  stepBody: { ...type.small, color: colors.muted },
+  collages: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP, rowGap: GRID_GAP + 6 },
 }));

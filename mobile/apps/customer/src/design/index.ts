@@ -12,5 +12,6 @@ export { Card, IconBadge, InfoRow, ListItem, SectionHeader } from './Surfaces';
 export { ChoiceCard, Chip, QuestionStepView, Segmented, YesNo } from './Choices';
 export { OrderCard, StatusBadge, Tracker } from './Orders';
 export { ProductImage, Tile } from './Media';
+export { DeviceSkeleton, deviceKindOf, type DeviceKind } from './DeviceSkeleton';
 export { ActionBar, Appear, Page, PAGE_PADDING, TAB_BAR_HEIGHT, useTabBarSpace } from './Page';
 export { AppHeader, IconButton, TabTitle } from './Header';

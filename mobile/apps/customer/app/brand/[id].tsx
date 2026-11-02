@@ -4,7 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useBrand, useModels } from '@fonzkart/api';
 import { makeStyles } from '@fonzkart/ui';
 import { modelImage } from '@fonzkart/core';
-import { EmptyState, ErrorState, MAX_CONTENT, PAGE_PADDING, ProductImage, SearchBar, SkeletonTiles, Tile } from '../../src/design';
+import { deviceKindOf, EmptyState, ErrorState, MAX_CONTENT, PAGE_PADDING, ProductImage, SearchBar, SkeletonTiles, Tile } from '../../src/design';
 import { GRID_GAP, useTileWidth } from '../../src/grid';
 
 const COLUMNS = 2;
@@ -30,7 +30,7 @@ export default function BrandModels() {
       <Stack.Screen options={{ title: brandName }} />
       {models.isPending ? (
         <View style={styles.page}>
-          <SkeletonTiles count={6} width={width} imageHeight={width - 56} />
+          <SkeletonTiles count={6} width={width} imageHeight={width - 56} kind={deviceKindOf(category)} />
         </View>
       ) : models.isError ? (
         <ErrorState onRetry={() => models.refetch()} />
@@ -59,7 +59,7 @@ export default function BrandModels() {
                 label={item.name}
                 width={width}
                 onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: img ?? '', category: category ?? item.category } })}
-                image={<ProductImage uri={img} label={item.name} size={width - 56} />}
+                image={<ProductImage uri={img} label={item.name} size={width - 56} kind={deviceKindOf(category ?? item.category)} />}
               />
             );
           }}

@@ -6,7 +6,8 @@ export type IconName =
   | 'sell' | 'buy' | 'repair' | 'orders' | 'profile' | 'shield'
   | 'search' | 'back' | 'close' | 'bell' | 'chevronRight' | 'chevronDown' | 'location' | 'check' | 'phone' | 'chat'
   | 'mail' | 'bolt' | 'truck' | 'wallet' | 'sparkle' | 'logout' | 'trash' | 'sun' | 'moon' | 'auto' | 'clock'
-  | 'cash' | 'refresh' | 'alert' | 'box' | 'user' | 'lock' | 'building';
+  | 'cash' | 'refresh' | 'alert' | 'box' | 'user' | 'lock' | 'building'
+  | 'laptop' | 'tablet' | 'watch' | 'tv' | 'gamepad' | 'camera' | 'headphones' | 'monitor' | 'recycle' | 'grid';
 
 export function Icon({ name, color, size = 24, filled = false, strokeWidth }: {
   name: IconName;
@@ -178,6 +179,72 @@ export function Icon({ name, color, size = 24, filled = false, strokeWidth }: {
         <>
           <Rect x="4" y="3.5" width="11" height="17" rx="1.5" {...f} />
           <Path d="M15 9.5h4a1 1 0 0 1 1 1v10M7.5 7.5h4M7.5 11h4M7.5 14.5h4M9.5 20.5v-2.5" {...s} />
+        </>
+      ) : null}
+      {name === 'laptop' ? (
+        <>
+          <Rect x="4.5" y="5" width="15" height="10" rx="1.5" {...f} />
+          <Path d="M2.5 18.5h19l-1.5-2.5h-16z" {...s} />
+        </>
+      ) : null}
+      {name === 'tablet' ? (
+        <>
+          <Rect x="5" y="3" width="14" height="18" rx="2.2" {...f} />
+          <Path d="M11 18h2" {...s} />
+        </>
+      ) : null}
+      {name === 'watch' ? (
+        <>
+          <Path d="M9 6.5 9.8 3h4.4l.8 3.5M9 17.5l.8 3.5h4.4l.8-3.5" {...s} />
+          <Rect x="6.5" y="6.5" width="11" height="11" rx="3" {...f} />
+          <Path d="M12 9.5V12l1.6 1" {...s} />
+        </>
+      ) : null}
+      {name === 'tv' ? (
+        <>
+          <Rect x="2.5" y="5" width="19" height="12" rx="1.6" {...f} />
+          <Path d="M8 20.5h8M12 17v3.5" {...s} />
+        </>
+      ) : null}
+      {name === 'gamepad' ? (
+        <>
+          <Path d="M7 7.5h10a4.5 4.5 0 0 1 4.4 5.4l-.7 3.5a2.3 2.3 0 0 1-3.9 1.1L14.5 15h-5l-2.3 2.5a2.3 2.3 0 0 1-3.9-1.1l-.7-3.5A4.5 4.5 0 0 1 7 7.5z" {...f} />
+          <Path d="M7.5 10.5v3M6 12h3" {...s} />
+          <Circle cx="15.5" cy="11" r="0.9" fill={color} stroke="none" />
+          <Circle cx="17.3" cy="12.8" r="0.9" fill={color} stroke="none" />
+        </>
+      ) : null}
+      {name === 'camera' ? (
+        <>
+          <Path d="M3.5 8.5a2 2 0 0 1 2-2h2.2l1.5-2h5.6l1.5 2h2.2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" {...f} />
+          <Circle cx="12" cy="13" r="3.4" {...s} />
+        </>
+      ) : null}
+      {name === 'headphones' ? (
+        <>
+          <Path d="M4 14v-2a8 8 0 0 1 16 0v2" {...s} />
+          <Rect x="3.5" y="13.5" width="4.5" height="7" rx="1.8" {...f} />
+          <Rect x="16" y="13.5" width="4.5" height="7" rx="1.8" {...f} />
+        </>
+      ) : null}
+      {name === 'monitor' ? (
+        <>
+          <Rect x="3" y="4" width="18" height="12.5" rx="1.8" {...f} />
+          <Path d="M9 20.5h6M12 16.5v4" {...s} />
+        </>
+      ) : null}
+      {name === 'recycle' ? (
+        <>
+          <Path d="M8.5 6.2 10.6 3a1.6 1.6 0 0 1 2.8 0l2.2 3.6M17.6 10.3l1.9 3.3a1.6 1.6 0 0 1-1.4 2.4h-4M10 16H5.9a1.6 1.6 0 0 1-1.4-2.4l2-3.4" {...s} />
+          <Path d="m15.6 6.6.4-3 2.7 1.4M12.6 18.2l1.5 1.8-1.5 1.8M5.6 9.4l1 2.9-2.9.6" {...s} />
+        </>
+      ) : null}
+      {name === 'grid' ? (
+        <>
+          <Rect x="3.5" y="3.5" width="7" height="7" rx="2" {...f} />
+          <Rect x="13.5" y="3.5" width="7" height="7" rx="2" {...f} />
+          <Rect x="3.5" y="13.5" width="7" height="7" rx="2" {...f} />
+          <Rect x="13.5" y="13.5" width="7" height="7" rx="2" {...f} />
         </>
       ) : null}
     </Svg>

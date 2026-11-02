@@ -7,7 +7,7 @@ import { cleanPincode, describeAnswers, formatInr, isCompletePincode, stepsForDe
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
 import {
-  Appear, Button, Card, EmptyState, ErrorState, Icon, LoadingDots, Notice, Page, ProductImage, radii, Skeleton,
+  Appear, Button, Card, EmptyState, ErrorState, Icon, LoadingDots, Notice, Page, ProductImage, deviceKindOf, radii, Skeleton,
   TextField, type, useDesign,
 } from '../../src/design';
 import { useQuoteDraft } from '../../src/quoteDraft';
@@ -57,7 +57,7 @@ export default function Offer() {
       <Appear>
         <View style={[styles.offer, { boxShadow: d.shadow.md }]}>
           <View style={styles.imageWell}>
-            <ProductImage uri={draft.img} label={draft.modelName} size={120} />
+            <ProductImage uri={draft.img} label={draft.modelName} size={120} kind={deviceKindOf(draft.category)} />
           </View>
           <Text style={styles.device}>{draft.modelName}</Text>
           <Text style={styles.variant}>{draft.variantName}</Text>

@@ -23,7 +23,7 @@ export default function CategoryBrands() {
           <Text style={styles.hint}>We'll show your device's best price next.</Text>
         </Appear>
         {brands.isPending ? (
-          <SkeletonTiles count={9} width={width} imageHeight={width - 40} />
+          <SkeletonTiles count={9} width={width} imageHeight={width - 40} kind="logo" />
         ) : brands.isError ? (
           <ErrorState onRetry={() => brands.refetch()} />
         ) : brands.data.length === 0 ? (
@@ -36,7 +36,7 @@ export default function CategoryBrands() {
                 label={brand.name}
                 width={width}
                 onPress={() => router.push({ pathname: '/brand/[id]', params: { id: brand.id, category: id, name: brand.name } })}
-                image={<ProductImage uri={brand.logo} label={brand.name} size={width - 40} />}
+                image={<ProductImage uri={brand.logo} label={brand.name} size={width - 40} kind="logo" />}
               />
             ))}
           </Appear>

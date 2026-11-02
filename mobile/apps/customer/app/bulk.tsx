@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Linking, Text, View } from 'react-native';
 import { makeStyles } from '@fonzkart/ui';
 import { CATEGORY_ART } from '../src/categoryArt/art';
+import { ArtBackground } from '../src/categoryArt/motion';
 import { BULK_MESSAGE, CONTACT } from '../src/contact';
 import { useTileWidth } from '../src/grid';
 import { Appear, Button, Card, IconBadge, Notice, Page, radii, type, useDesign, type IconName } from '../src/design';
@@ -14,6 +15,9 @@ const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: 'truck', title: 'Doorstep logistics', text: 'We collect from your premises, in any quantity.' },
   { icon: 'sparkle', title: 'Eco-friendly recycling', text: 'E-waste is recycled responsibly.' },
 ];
+
+/** The drawing's backdrop: the Bulk card's light mint, in both light and dark mode (the drawing is made for light). */
+const ART_BACKGROUND = '#ecfdf5';
 
 export default function BulkOrders() {
   const styles = useStyles();
@@ -34,8 +38,10 @@ export default function BulkOrders() {
     <Page>
       <Appear>
         <View style={[styles.hero, { boxShadow: d.shadow.md }]}>
-          <View style={[styles.art, { height: artHeight }]}>
-            <Art width={width} height={artHeight} />
+          <View style={[styles.art, { height: artHeight, backgroundColor: ART_BACKGROUND }]}>
+            <ArtBackground.Provider value={ART_BACKGROUND}>
+              <Art width={width} height={artHeight} />
+            </ArtBackground.Provider>
           </View>
           <View style={styles.heroText}>
             <Text style={styles.kicker}>Corporate & recycling</Text>

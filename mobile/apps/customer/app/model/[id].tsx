@@ -4,7 +4,7 @@ import { useVariants } from '@fonzkart/api';
 import { formatInr, sellCategoryOf } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import {
-  Appear, EmptyState, ErrorState, ListItem, Page, ProductImage, radii, SectionHeader, SkeletonRows, type, useDesign,
+  Appear, EmptyState, ErrorState, ListItem, Page, ProductImage, deviceKindOf, radii, SectionHeader, SkeletonRows, type, useDesign,
 } from '../../src/design';
 import { startQuote } from '../../src/quoteDraft';
 
@@ -24,7 +24,7 @@ export default function ModelVariants() {
         <Appear>
           <View style={[styles.hero, { boxShadow: d.shadow.md }]}>
             <View style={styles.well}>
-              <ProductImage uri={img} label={title} size={170} />
+              <ProductImage uri={img} label={title} size={170} kind={deviceKindOf(category)} />
             </View>
             <Text style={styles.name}>{title}</Text>
           </View>

@@ -6,7 +6,7 @@ import { useQuestionnaire } from '@fonzkart/api';
 import { isStepComplete, stepsForDevice, type Answers } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import {
-  ActionBar, Button, EmptyState, ErrorState, MAX_CONTENT, motion, PAGE_PADDING, ProductImage, QuestionStepView, radii,
+  ActionBar, Button, EmptyState, ErrorState, MAX_CONTENT, motion, PAGE_PADDING, ProductImage, deviceKindOf, QuestionStepView, radii,
   Skeleton, SkeletonScreen, type, useDesign,
 } from '../../src/design';
 import { saveAnswers, useQuoteDraft } from '../../src/quoteDraft';
@@ -81,7 +81,7 @@ export default function Questions() {
       <ScrollView ref={scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={[styles.device, { boxShadow: d.shadow.sm }]}>
           <View style={styles.deviceImage}>
-            <ProductImage uri={draft.img} label={draft.modelName} size={48} />
+            <ProductImage uri={draft.img} label={draft.modelName} size={48} kind={deviceKindOf(draft.category)} />
           </View>
           <View style={styles.deviceText}>
             <Text style={styles.deviceName} numberOfLines={2}>{draft.modelName}</Text>

@@ -12,7 +12,7 @@ import {
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { networkMessage } from '../src/authFlow';
 import {
-  Appear, Button, Card, ChoiceCard, Chip, EmptyState, Icon, LoadingDots, Notice, Page, ProductImage, radii, TextField,
+  Appear, Button, Card, ChoiceCard, Chip, EmptyState, Icon, LoadingDots, Notice, Page, ProductImage, deviceKindOf, radii, TextField,
   type, useDesign,
 } from '../src/design';
 import { useQuoteDraft } from '../src/quoteDraft';
@@ -126,7 +126,7 @@ export default function Book() {
       <Appear>
         <View style={[styles.summary, { backgroundImage: d.heroGradient, boxShadow: d.shadow.green }]}>
           <View style={styles.summaryImage}>
-            <ProductImage uri={draft.img} label={draft.modelName} size={44} />
+            <ProductImage uri={draft.img} label={draft.modelName} size={44} kind={deviceKindOf(draft.category)} />
           </View>
           <View style={styles.summaryText}>
             <Text style={styles.device} numberOfLines={2}>{draft.modelName}</Text>

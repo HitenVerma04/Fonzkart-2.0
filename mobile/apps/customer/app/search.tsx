@@ -5,7 +5,7 @@ import { MIN_SEARCH_LENGTH, useBrands, useModelSearch } from '@fonzkart/api';
 import { makeStyles } from '@fonzkart/ui';
 import { modelImage } from '@fonzkart/core';
 import {
-  EmptyState, ErrorState, ListItem, MAX_CONTENT, PAGE_PADDING, ProductImage, SearchBar, SkeletonRows, SkeletonScreen,
+  EmptyState, ErrorState, ListItem, MAX_CONTENT, PAGE_PADDING, ProductImage, deviceKindOf, SearchBar, SkeletonRows, SkeletonScreen,
 } from '../src/design';
 
 const DEBOUNCE_MS = 300;
@@ -32,7 +32,7 @@ export default function Search() {
         <EmptyState icon="search" title="Find your device" message="Type at least 2 letters of your device's name." />
       ) : results.isPending ? (
         <SkeletonScreen label="Searching">
-          <SkeletonRows count={6} image={52} />
+          <SkeletonRows count={6} image={52} kind="phone" />
         </SkeletonScreen>
       ) : results.isError ? (
         <ErrorState onRetry={() => results.refetch()} />
@@ -46,7 +46,7 @@ export default function Search() {
           ListEmptyComponent={<EmptyState icon="search" title="No device found" message="Try a shorter name." />}
           renderItem={({ item }) => (
             <ListItem
-              leading={<ProductImage uri={modelImage(item.img, item.category)} label={item.name} size={52} />}
+              leading={<ProductImage uri={modelImage(item.img, item.category)} label={item.name} size={52} kind={deviceKindOf(item.category)} />}
               title={item.name}
               subtitle={brandNames.get(item.brandId) ?? item.brandId}
               onPress={() => router.push({ pathname: '/model/[id]', params: { id: item.id, name: item.name, img: modelImage(item.img, item.category) ?? '', category: item.category } })}

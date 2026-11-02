@@ -31,6 +31,12 @@ export const ArtActivity = createContext<SharedValue<boolean>>(ALWAYS);
 export const MotionActivity = createContext<SharedValue<boolean>>(ALWAYS);
 
 /**
+ * The colour behind a drawing (its card). Each drawing paints it first instead of relying on a transparent canvas: on
+ * Android a transparent Skia surface inside a tilted, clipped card can composite as black.
+ */
+export const ArtBackground = createContext<string | null>(null);
+
+/**
  * 0 → 1 → 0 every `seconds`, forever: a framer-motion keyframe loop [a, b, a]. `delay` only holds the first run.
  * `scope` 'detail' (a drawing's inner parts) follows ArtActivity; 'motion' (the whole drawing or card moving as a
  * finished picture) follows MotionActivity.

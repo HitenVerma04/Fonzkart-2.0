@@ -95,7 +95,7 @@ const VIEW: Record<HomeTileId, { x: number; y: number; size: number }> = {
   console: { x: 100, y: 62, size: 0.8 },
   desktop: { x: 105, y: 62, size: 0.66 },
   earbuds: { x: 100, y: 55, size: 0.9 },
-  repair: { x: 84, y: 75, size: 0.9 },
+  repair: { x: 96, y: 75, size: 0.9 },
   screenguard: { x: 100, y: 64, size: 0.8 },
   bulk: { x: 95, y: 68, size: 0.8 },
 };
@@ -701,10 +701,13 @@ function RepairArt({ width, height }: ArtProps) {
         <Cart x={34} y={35} width={22} />
         <AnimatedLine animatedProps={scanProps} x1="4" y1="20" x2="64" y2="20" stroke={tw.cyan400} strokeWidth="2" />
       </G>
+      {/* the screwdriver, working on the phone from its right (on the website it ended up in the corner) */}
       <AnimatedG animatedProps={toolProps}>
-        <Rect x="-4" y="0" width="8" height="28" rx="2" fill={tw.orange600} stroke={tw.orange700} strokeWidth="1" />
-        <Rect x="-2" y="28" width="4" height="35" fill={tw.slate300} stroke={tw.slate400} strokeWidth="1" />
-        <Polygon points="-3,63 3,63 0,72" fill={tw.slate700} />
+        <G transform="translate(134, 24) rotate(28)">
+          <Rect x="-4" y="0" width="8" height="28" rx="2" fill={tw.orange600} stroke={tw.orange700} strokeWidth="1" />
+          <Rect x="-2" y="28" width="4" height="35" fill={tw.slate300} stroke={tw.slate400} strokeWidth="1" />
+          <Polygon points="-3,63 3,63 0,72" fill={tw.slate700} />
+        </G>
       </AnimatedG>
     </Float>
   );

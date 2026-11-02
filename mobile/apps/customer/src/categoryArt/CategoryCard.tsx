@@ -14,7 +14,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, withDelay, withTiming } from 'react-native-reanimated';
 import { radius } from '@fonzkart/ui';
 import { Tap } from '../design';
-import { useLoop } from './motion';
+import { ArtBackground, useLoop } from './motion';
 import { CATEGORY_ART } from './art';
 import type { HomeTileId } from './graphics';
 
@@ -89,7 +89,9 @@ export function CategoryCard({ id, name, width, index, onPress }: {
           numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} maxFontSizeMultiplier={1}>{name}</Text>
         <View style={styles.art} pointerEvents="none">
           <Animated.View style={tilt}>
-            <CardArt id={id} width={width} height={height - nameArea - captionArea} />
+            <ArtBackground.Provider value={look.background}>
+              <CardArt id={id} width={width} height={height - nameArea - captionArea} />
+            </ArtBackground.Provider>
           </Animated.View>
         </View>
         <Text style={[styles.caption, { color: look.text, height: captionArea, paddingHorizontal: 8 * k, paddingTop: 2 * k, fontSize: 8 * k, lineHeight: 10 * k }]}

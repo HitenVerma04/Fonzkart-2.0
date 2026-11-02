@@ -1,15 +1,22 @@
-// Catalog pictures and picture tiles. A picture shows a skeleton until it has loaded, then fades in; without one
+// Catalog pictures and picture tiles. A picture shows a placeholder shaped like the device (or a logo) until it has
+// loaded, then fades in; without one
 // (or when it fails) the item's initial is shown on a green tint.
 import { useState, type ReactNode } from 'react';
 import { Image, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { imageUrl } from '@fonzkart/core';
 import { makeStyles, useTheme } from '@fonzkart/ui';
-import { Skeleton } from './Skeleton';
+import { DeviceSkeleton, type DeviceKind } from './DeviceSkeleton';
 import { Tap } from './Tap';
 import { radii, type } from './tokens';
 
-export function ProductImage({ uri, label, size }: { uri: string | null | undefined; label: string; size: number }) {
+export function ProductImage({ uri, label, size, kind = 'phone' }: {
+  uri: string | null | undefined;
+  label: string;
+  size: number;
+  /** The placeholder's shape while loading: the device type, or 'logo' for brand logos. */
+  kind?: DeviceKind;
+}) {
   const styles = useStyles();
   const dark = useTheme().scheme === 'dark';
   const [failed, setFailed] = useState(false);
@@ -29,7 +36,7 @@ export function ProductImage({ uri, label, size }: { uri: string | null | undefi
   const inner = dark ? Math.round(size * 0.84) : size;
   return (
     <View style={[{ width: size, height: size }, dark && styles.lightBackdrop]}>
-      {!loaded ? <Skeleton width={inner} height={inner} radius={size / 5} style={styles.under} /> : null}
+      {!loaded ? <View style={styles.under}><DeviceSkeleton kind={kind} size={inner} /></View> : null}
       <Animated.View style={fade}>
         <Image
           source={{ uri: url }}
