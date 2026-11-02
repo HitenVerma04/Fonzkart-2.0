@@ -96,7 +96,7 @@ const VIEW: Record<HomeTileId, { x: number; y: number; size: number }> = {
   desktop: { x: 105, y: 62, size: 0.66 },
   earbuds: { x: 100, y: 55, size: 0.9 },
   repair: { x: 96, y: 75, size: 0.9 },
-  screenguard: { x: 100, y: 64, size: 0.8 },
+  screenguard: { x: 100, y: 72, size: 0.85 },
   bulk: { x: 95, y: 68, size: 0.8 },
 };
 
@@ -713,33 +713,71 @@ function RepairArt({ width, height }: ArtProps) {
   );
 }
 
-function GuardedPhone({ transform, glass, glow }: { transform: string; glass: string; glow: string }) {
-  return (
-    <G transform={transform}>
-      <Rect x="0" y="0" width="38" height="78" rx="8" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.2" />
-      <Rect x="2" y="2" width="34" height="74" rx="6" fill={tw.slate950} />
-      <Rect x="2" y="2" width="34" height="74" rx="6" fill={glass} fillOpacity={0.2} stroke={glow} strokeWidth="0.8" />
-      <Circle cx="19" cy="38" r="8" fill={glass === tw.cyan500 ? tw.cyan600 : tw.emerald600} />
-      <SvgText x="19" y="41" textAnchor="middle" fill="#ffffff" fontSize="6" fontWeight="bold">9H</SvgText>
-    </G>
-  );
+/** A small four-point sparkle centred on (x, y). */
+function Sparkle({ x, y, r, color }: { x: number; y: number; r: number; color: string }) {
+  return <Path d={`M ${x} ${y - r} Q ${x} ${y} ${x + r} ${y} Q ${x} ${y} ${x} ${y + r} Q ${x} ${y} ${x - r} ${y} Q ${x} ${y} ${x} ${y - r} Z`} fill={color} />;
 }
 
+/** One phone, and in front of it a sheet of tempered glass: it tilts down and lands on the screen, a glint sweeps
+ * across the glass as it settles, then it lifts off again. The 9H shield badge rides on the glass. */
 function ScreenGuardArt({ width, height }: ArtProps) {
-  const guard = useLoop(2.5);
-  const guardProps = useAnimatedProps(() => ({ y: 2 - 3 * guard.value }));
+  const land = useLoop(3.2);
+  const glint = useSpin(3.2);
+  const twinkle = useLoop(1.6);
+  // land 0 → floating above, tilted; 1 → on the screen.
+  const guardProps = useAnimatedProps(() => ({ matrix: rotateAbout(9 * (1 - land.value), 100, 72, -14 * (1 - land.value)) }));
+  const shadowProps = useAnimatedProps(() => ({ opacity: 0.12 + 0.25 * land.value }));
+  const glintProps = useAnimatedProps(() => ({ matrix: [1, 0, -0.55, 1, lerp(-50, 120, glint.value), 0] }));
+  const sparkleProps = useAnimatedProps(() => ({ opacity: 0.35 + 0.65 * twinkle.value }));
   return (
-    <Float width={width} height={height} view="screenguard" rise={4} seconds={4}>
-      <GuardedPhone transform="translate(30, 28) rotate(-16)" glass={tw.cyan500} glow={tw.cyan400} />
-      <GuardedPhone transform="translate(132, 20) rotate(16)" glass={tw.emerald500} glow={tw.emerald400} />
-      <G transform="translate(76, 14)">
-        <Rect x="0" y="0" width="48" height="96" rx="11" fill={tw.slate900} stroke={tw.emerald500} strokeWidth="2" />
-        <Rect x="3" y="3" width="42" height="90" rx="9" fill={tw.slate950} />
-        <Rect x="16" y="6" width="16" height="4" rx="2" fill={tw.black} />
-        <Circle cx="24" cy="48" r="20" fill={tw.emerald600} fillOpacity={0.3} />
-        <AnimatedRect animatedProps={guardProps} x="2" y="2" width="44" height="92" rx="8" fill={tw.cyan400} fillOpacity={0.25} stroke={tw.cyan400} strokeWidth="1.2" />
-        <Cart x={24} y={38} width={22} />
-      </G>
+    <Float width={width} height={height} view="screenguard" rise={3} seconds={4}>
+      <Defs>
+        <LinearGradient id="sg-screen" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor="#022c22" />
+          <Stop offset="1" stopColor="#064e3b" />
+        </LinearGradient>
+        <LinearGradient id="sg-glass" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor="#ecfeff" stopOpacity={0.55} />
+          <Stop offset="0.45" stopColor="#67e8f9" stopOpacity={0.18} />
+          <Stop offset="1" stopColor="#a7f3d0" stopOpacity={0.35} />
+        </LinearGradient>
+        <ClipPath id="sg-glass-clip">
+          <Rect x="68" y="16" width="64" height="114" rx="13" />
+        </ClipPath>
+      </Defs>
+      {/* the phone */}
+      <Rect x="70" y="18" width="60" height="110" rx="12" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.6" />
+      <Rect x="73.5" y="21.5" width="53" height="103" rx="9" fill="url(#sg-screen)" />
+      <Rect x="92" y="25" width="16" height="4" rx="2" fill={tw.black} />
+      <Cart x={100} y={66} width={26} />
+      <Rect x="84" y="88" width="32" height="5" rx="2.5" fill={tw.emerald400} fillOpacity={0.7} />
+      <Rect x="88" y="97" width="24" height="3.5" rx="1.75" fill={tw.white} fillOpacity={0.35} />
+      {/* the glass's shadow on the screen, darker as it lands */}
+      <AnimatedG animatedProps={shadowProps}>
+        <Rect x="73.5" y="21.5" width="53" height="103" rx="9" fill={tw.black} />
+      </AnimatedG>
+      {/* the screen guard */}
+      <AnimatedG animatedProps={guardProps}>
+        {/* edge thickness, then the glass itself */}
+        <Rect x="69.5" y="18" width="64" height="114" rx="13" fill="none" stroke={tw.cyan600} strokeOpacity={0.55} strokeWidth="2.4" />
+        <Rect x="68" y="16" width="64" height="114" rx="13" fill="url(#sg-glass)" stroke="#ffffff" strokeOpacity={0.95} strokeWidth="1.4" />
+        <G clipPath="url(#sg-glass-clip)">
+          <Path d="M 60 70 L 104 16 L 116 16 L 60 84 Z" fill={tw.white} fillOpacity={0.22} />
+          <Path d="M 60 96 L 128 16 L 133 16 L 60 102 Z" fill={tw.white} fillOpacity={0.14} />
+          <AnimatedG animatedProps={glintProps}>
+            <Rect x="0" y="0" width="14" height="140" fill={tw.white} fillOpacity={0.55} />
+          </AnimatedG>
+        </G>
+        {/* the 9H badge */}
+        <Circle cx="128" cy="22" r="11" fill={tw.emerald500} stroke="#ffffff" strokeWidth="1.6" />
+        <Path d="M 128 15 L 122.5 17.2 V 21.5 C 122.5 25.2 125 27.6 128 28.6 C 131 27.6 133.5 25.2 133.5 21.5 V 17.2 Z" fill={tw.white} fillOpacity={0.25} />
+        <SvgText x="128" y="25" textAnchor="middle" fill="#ffffff" fontSize="7.5" fontWeight="900">9H</SvgText>
+      </AnimatedG>
+      <AnimatedG animatedProps={sparkleProps}>
+        <Sparkle x={52} y={40} r={5} color={tw.cyan400} />
+        <Sparkle x={148} y={104} r={6} color={tw.emerald400} />
+        <Sparkle x={58} y={112} r={3.5} color={tw.emerald300} />
+      </AnimatedG>
     </Float>
   );
 }
