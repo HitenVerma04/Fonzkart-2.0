@@ -30,6 +30,8 @@ export default function RootLayout() {
           <Stack.Screen name="catalog/model/[id]" options={{ title: 'Variants' }} />
           <Stack.Screen name="homepage" options={{ title: 'Landing page' }} />
           <Stack.Screen name="carousel" options={{ title: 'Edit carousel view' }} />
+          <Stack.Screen name="screen-guards" options={{ title: 'Screen guard store' }} />
+          <Stack.Screen name="shop-orders" options={{ title: 'Shop orders' }} />
           <Stack.Screen name="email/index" options={{ title: 'Email' }} />
           <Stack.Screen name="email/[id]" options={{ title: 'Message' }} />
           <Stack.Screen name="email/compose" options={{ title: 'New email' }} />

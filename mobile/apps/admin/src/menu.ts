@@ -1,8 +1,8 @@
 // The Admin app's sections by role: the same as the website's admin sidebar (components/admin/AdminSidebar.tsx),
-// plus "Edit carousel view", which only the Customer app has.
+// plus "Edit carousel view" and the screen guard store, which only the Customer app has.
 export type Section = {
   href: '/orders' | '/partners' | '/riders' | '/cities' | '/zonal-heads' | '/users' | '/rm' | '/pricing' | '/catalog' | '/homepage'
-    | '/carousel' | '/email';
+    | '/carousel' | '/screen-guards' | '/shop-orders' | '/email';
   title: string;
   detail: string;
   roles: string[];
@@ -24,6 +24,8 @@ export const SECTIONS: Section[] = [
   { href: '/catalog', title: 'Catalog', detail: 'Brands, models, variants and pictures', roles: ADMINS },
   { href: '/homepage', title: 'Landing page', detail: 'Banner prices and featured cities', roles: ADMINS },
   { href: '/carousel', title: 'Edit carousel view', detail: 'Cards on the Customer app home screen', roles: ADMINS },
+  { href: '/screen-guards', title: 'Screen guard store', detail: 'Guards, prices, discounts and store switch', roles: ADMINS },
+  { href: '/shop-orders', title: 'Shop orders', detail: 'Screen guard orders, cash on delivery', roles: ADMINS },
   { href: '/email', title: 'Email', detail: 'The Fonzkart mailboxes', roles: [...ADMINS, ZH, RM] },
 ];
 
