@@ -7,6 +7,7 @@ import { customerOrdersApi, executiveApi, notificationsApi, staffOrdersApi, type
 import { ridersApi } from './riders';
 import { adminApi } from './admin';
 import { carouselApi, catalogAdminApi, emailApi } from './content';
+import { shopAdminApi, shopApi, type PlaceShopOrderInput } from './shop';
 
 export function createQueryClient() {
   return new QueryClient({
@@ -306,3 +307,30 @@ export const useEmailMessages = (account?: string) =>
   useQuery({ queryKey: contentKeys.email(account), queryFn: ({ signal }) => emailApi.messages(account, signal), staleTime: 0, refetchInterval: 60_000 });
 export const useEmailMessage = (id: string | undefined) =>
   useQuery({ queryKey: contentKeys.emailMessage(id ?? ''), queryFn: ({ signal }) => emailApi.message(id!, signal), enabled: !!id });
+
+// ------------------------------------------------------------------------------------------------ screen guard shop
+
+export const shopKeys = {
+  /** Public store (switches + active guards). */
+  store: ['shop', 'store'] as const,
+  /** The signed-in customer's shop orders. */
+  myOrders: [...ACCOUNT_KEY, 'shop-orders'] as const,
+  admin: ['staff', 'shop', 'guards'] as const,
+  adminOrders: ['staff', 'shop', 'orders'] as const,
+};
+
+export const useScreenGuardStore = () =>
+  useQuery({ queryKey: shopKeys.store, queryFn: ({ signal }) => shopApi.store(signal), staleTime: 60_000 });
+export const useMyShopOrders = (enabled: boolean) =>
+  useQuery({ queryKey: shopKeys.myOrders, queryFn: ({ signal }) => shopApi.myOrders(signal), enabled, staleTime: 0 });
+export function usePlaceShopOrder() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: PlaceShopOrderInput) => shopApi.placeOrder(input),
+    onSuccess: () => void client.invalidateQueries({ queryKey: shopKeys.myOrders }),
+  });
+}
+export const useShopAdmin = () =>
+  useQuery({ queryKey: shopKeys.admin, queryFn: ({ signal }) => shopAdminApi.overview(signal), staleTime: 0 });
+export const useShopAdminOrders = () =>
+  useQuery({ queryKey: shopKeys.adminOrders, queryFn: ({ signal }) => shopAdminApi.orders(signal), staleTime: 0, refetchInterval: 30_000 });
