@@ -87,7 +87,10 @@ function Screens() {
         <Stack.Screen name="orders/[id]" options={{ title: 'Order' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
         <Stack.Screen name="bulk" options={{ title: 'Bulk orders' }} />
-        <Stack.Screen name="screen-guard" options={{ title: 'Screen Guard' }} />
+        <Stack.Screen name="screen-guard" options={{ title: 'Screen guards' }} />
+        <Stack.Screen name="shop/cart" options={{ title: 'Cart' }} />
+        <Stack.Screen name="shop/checkout" options={{ title: 'Checkout' }} />
+        <Stack.Screen name="shop/order/[id]" options={{ title: 'Order' }} />
       </Stack>
     </NavigationThemeProvider>
   );
