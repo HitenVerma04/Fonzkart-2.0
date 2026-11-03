@@ -1,14 +1,17 @@
-// Catalog pictures and picture tiles. A picture shows a placeholder shaped like the device (or a logo) until it has
-// loaded, then fades in; without one
+// Catalog pictures and picture tiles. A picture is always shown as soon as it arrives; under it, a placeholder shaped
+// like the device (or a logo) stands in until it has loaded (at most a few seconds). The picture is never hidden while
+// waiting for a "loaded" signal: when that signal did not come, pictures stayed invisible. Without one
 // (or when it fails) the item's initial is shown on a green tint.
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Image, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { imageUrl } from '@fonzkart/core';
 import { makeStyles, useTheme } from '@fonzkart/ui';
 import { DeviceSkeleton, type DeviceKind } from './DeviceSkeleton';
 import { Tap } from './Tap';
 import { radii, type } from './tokens';
+
+/** How long the loading placeholder may stay under a picture. */
+const PLACEHOLDER_MAX_MS = 4000;
 
 export function ProductImage({ uri, label, size, kind = 'phone' }: {
   uri: string | null | undefined;
@@ -21,9 +24,13 @@ export function ProductImage({ uri, label, size, kind = 'phone' }: {
   const dark = useTheme().scheme === 'dark';
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const opacity = useSharedValue(0);
-  const fade = useAnimatedStyle(() => ({ opacity: opacity.value }));
   const url = imageUrl(uri);
+  // The placeholder goes when the picture has loaded, or after a few seconds in any case.
+  useEffect(() => {
+    setLoaded(false);
+    const timer = setTimeout(() => setLoaded(true), PLACEHOLDER_MAX_MS);
+    return () => clearTimeout(timer);
+  }, [url]);
 
   if (!url || failed) {
     return (
@@ -37,19 +44,16 @@ export function ProductImage({ uri, label, size, kind = 'phone' }: {
   return (
     <View style={[{ width: size, height: size }, dark && styles.lightBackdrop]}>
       {!loaded ? <View style={styles.under}><DeviceSkeleton kind={kind} size={inner} /></View> : null}
-      <Animated.View style={fade}>
-        <Image
+      <Image
           source={{ uri: url }}
           style={{ width: inner, height: inner }}
           resizeMode="contain"
-          onLoad={() => {
-            setLoaded(true);
-            opacity.value = withTiming(1, { duration: 280 });
-          }}
+          fadeDuration={250}
+          onLoad={() => setLoaded(true)}
+          onLoadEnd={() => setLoaded(true)}
           onError={() => setFailed(true)}
           accessibilityLabel={label}
-        />
-      </Animated.View>
+      />
     </View>
   );
 }

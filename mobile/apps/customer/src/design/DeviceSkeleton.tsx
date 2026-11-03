@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { View, type ViewStyle } from 'react-native';
 import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useColors } from '@fonzkart/ui';
-import { Skeleton } from './Skeleton';
+import { Skeleton } from './Shimmer';
 
 export type DeviceKind = 'phone' | 'tablet' | 'laptop' | 'watch' | 'tv' | 'console' | 'desktop' | 'earbuds' | 'camera' | 'logo';
 
