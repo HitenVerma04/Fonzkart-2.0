@@ -181,6 +181,47 @@ model CarouselSlide {
   updatedAt    DateTime @updatedAt
 }
 
+// The screen guard shop (Customer app store, edited in the Admin app); read and written only by the Spring Boot
+// backend (ShopService).
+model ScreenGuard {
+  id           String   @id @default(cuid())
+  name         String
+  guardType    String   // tempered | privacy | matte | clear | full | lens
+  brand        String   // phone brand it fits, e.g. "Apple"
+  model        String   // phone model it fits, e.g. "iPhone 15"
+  imageUrl     String?  // a website path (/uploads/...) or https URL
+  mrp          Int      // price before discount, whole rupees
+  price        Int      // sale price, whole rupees (<= mrp)
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Switches set in the Admin app: shop.storeEnabled and shop.discountsEnabled ("true" | "false"; missing = on).
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// A screen guard order, cash on delivery. items is JSON: [{screenGuardId, name, model, quantity, unitPrice, unitMrp}].
+model ShopOrder {
+  id            String   @id @default(cuid())
+  orderNumber   Int      @unique @default(autoincrement())
+  userId        String?
+  items         String
+  total         Int
+  name          String
+  phone         String
+  address       String
+  pincode       String
+  paymentMethod String   @default("cod")
+  status        String   @default("placed") // placed | confirmed | shipped | delivered | cancelled
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model Notification {
   id        String   @id @default(cuid())
   userId    String?  // Target user (if specific)
