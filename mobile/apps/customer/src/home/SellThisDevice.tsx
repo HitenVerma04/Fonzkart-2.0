@@ -1,16 +1,18 @@
 // "Sell this device" (as in Cashify): the phone or tablet the app runs on, by name with its photo and price. It always
 // appears on a phone or tablet, as specific as the system lets it be: the exact model ("Sell iPhone XR"), else the
-// maker ("Sell this Samsung phone", with its logo), else just "Sell this phone". Tapping opens that model with this
-// device's variant picked out, the maker's models, or the whole category. Only the web build has no device to show.
+// maker ("Sell this Samsung phone", with its logo), else just "Sell this phone". When the model and its variant are
+// known, tapping goes straight to the questions about the device's condition; otherwise it opens the variants, the
+// maker's models, or the whole category. Only the web build has no device to show.
 import { useMemo } from 'react';
 import { Image, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useBrands, useModelSearch, useVariants } from '@fonzkart/api';
-import { formatInr, imageUrl, modelImage } from '@fonzkart/core';
+import { formatInr, imageUrl, modelImage, sellCategoryOf } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import { lerp, useLoop } from '../categoryArt/motion';
 import { deviceKindOf, Icon, ProductImage, radii, Tap, type } from '../design';
+import { startQuote } from '../quoteDraft';
 import { deviceTitle, matchBrand, matchModel, matchVariant, readDeviceSpecs, searchNames } from './thisDevice';
 
 const STAGE_WIDTH = 108;
@@ -22,8 +24,7 @@ export function SellThisDevice() {
   const specs = useMemo(readDeviceSpecs, []);
   const names = specs ? searchNames(specs) : [];
   const isTablet = !!specs?.isTablet;
-  const category = isTablet ? 'tablet' : 'smartphone';
-  const word = isTablet ? 'tablet' : 'phone';
+  const expected = isTablet ? 'tablet' : 'smartphone';
 
   // Up to three names to look the device up by (a fixed number of searches, as hooks must be).
   const first = useModelSearch(names[0] ?? '');
@@ -33,12 +34,14 @@ export function SellThisDevice() {
   const match = names.map((n, i) => matchModel(searches[i]!.data, n, isTablet)).find(Boolean);
   const searching = names.some((_, i) => searches[i]!.isPending);
   const variants = useVariants(match?.id);
-  const brands = useBrands(category);
+  const brands = useBrands(expected);
   const brand = specs ? matchBrand(brands.data, specs) : undefined;
   const variant = specs ? matchVariant(variants.data, specs) : undefined;
 
   if (!specs) return null;
 
+  const category = match ? sellCategoryOf(match.category) : expected;
+  const word = category === 'tablet' ? 'tablet' : 'phone';
   const img = match ? modelImage(match.img, category) : null;
   const best = variant?.basePrice ?? (variants.data?.length ? Math.max(...variants.data.map(v => v.basePrice)) : undefined);
   const title = match?.name ?? deviceTitle(specs) ?? (brand ? `this ${brand.name} ${word}` : `this ${word}`);
@@ -48,11 +51,20 @@ export function SellThisDevice() {
     specs.osVersion ? `${specs.osName} ${specs.osVersion}` : null,
   ].filter(Boolean) as string[];
 
+  // The variant the questions are about: this device's, or the model's only one.
+  const only = variants.data?.length === 1 && variants.data[0]!.basePrice > 0 ? variants.data[0] : undefined;
+  const chosen = variant ?? only;
+
   const open = () => {
-    if (match) {
+    if (match && chosen) {
+      startQuote({
+        modelId: match.id, modelName: match.name, img: img ?? '', variantId: chosen.id, variantName: chosen.name, basePrice: chosen.basePrice, category,
+      });
+      router.push('/quote/questions');
+    } else if (match) {
       router.push({
         pathname: '/model/[id]',
-        params: { id: match.id, name: match.name, img: img ?? '', category, ...(variant ? { variant: variant.id } : {}) },
+        params: { id: match.id, name: match.name, img: img ?? '', category },
       });
     } else if (brand) {
       router.push({ pathname: '/brand/[id]', params: { id: brand.id, category, name: brand.name } });
@@ -90,7 +102,7 @@ export function SellThisDevice() {
           ) : brand ? (
             <Image source={{ uri: imageUrl(brand.logo) ?? undefined }} style={styles.logo} resizeMode="contain" accessibilityLabel={brand.name} />
           ) : (
-            <Icon name={isTablet ? 'tablet' : 'auto'} color="#16a34a" size={52} filled />
+            <Icon name={category === 'tablet' ? 'tablet' : 'auto'} color="#16a34a" size={52} filled />
           )}
         </Stage>
       </View>

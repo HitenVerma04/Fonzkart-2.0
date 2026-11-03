@@ -5,6 +5,7 @@ import * as Device from 'expo-device';
 import { Paths } from 'expo-file-system';
 import type { Brand, Model, Variant } from '@fonzkart/api';
 import { sellCategoryOf } from '@fonzkart/core';
+import androidModels from './androidModels.json';
 
 export type DeviceSpecs = {
   maker: string;
@@ -19,6 +20,11 @@ export type DeviceSpecs = {
   isTablet: boolean;
 };
 
+// Android reports a code such as "LE2101", not the name on the box. androidModels.json maps those codes to catalog
+// model names (generated from Google Play's supported devices list).
+const ANDROID_MODELS: Record<string, string> = androidModels;
+
+
 const STORAGE_SIZES = [16, 32, 64, 128, 256, 512, 1024, 2048];
 const RAM_SIZES = [1, 2, 3, 4, 6, 8, 10, 12, 16, 18, 24, 32];
 const GB = 1024 ** 3;
@@ -29,7 +35,7 @@ export function standardSize(reportedGb: number, sizes: number[]): number {
 }
 
 export function readDeviceSpecs(): DeviceSpecs | null {
-    if (Platform.OS === 'web') return null;
+        if (Platform.OS === 'web') return null;
   const maker = (Device.brand ?? Device.manufacturer ?? '').trim();
   const modelName = (Device.modelName ?? '').trim();
   if (!maker && !modelName) return null;
@@ -71,15 +77,16 @@ export function deviceTitle(specs: DeviceSpecs): string | null {
 
 /**
  * Names to look the device up by, best first, without repeats (three at most, one search each). iPhones and iPads
- * report their model name reliably, and their device name is often just "iPhone". On Android the device name is the
- * marketing name unless renamed, and the model name usually a code; the catalog often leaves out "5G".
+ * report their model name reliably, and their device name is often just "iPhone". On Android the model code gives the
+ * catalog name when it is in the table; else the device name is the marketing name unless renamed, and the catalog
+ * often leaves out "5G".
  */
 export function searchNames(specs: DeviceSpecs): string[] {
   const maker = new RegExp(`^${specs.maker.replace(/[^A-Za-z0-9]/g, '')}\\s+`, 'i');
   const plain = (name: string) => name.replace(maker, '').replace(/\s+[45]G$/i, '').trim();
   const names = specs.osName === 'iOS'
     ? [specs.modelName]
-    : [specs.deviceName, plain(specs.deviceName), specs.modelName, `${specs.maker} ${specs.modelName}`];
+    : [ANDROID_MODELS[specs.modelName.toUpperCase()] ?? '', specs.deviceName, plain(specs.deviceName), specs.modelName, `${specs.maker} ${specs.modelName}`];
   const seen = new Set<string>();
   return names.filter(n => {
     const key = normal(n);
@@ -89,15 +96,16 @@ export function searchNames(specs: DeviceSpecs): string[] {
   }).slice(0, 3);
 }
 
-/** The catalog model for one name, among phones or tablets: an exact name match, then one ending with it, then (for a specific name such as "Galaxy S23") one containing it. */
+/** The catalog model for one name: an exact name match, then among phones or tablets one ending with it, then (for a specific name such as "Galaxy S23") one containing it. */
 export function matchModel(models: Model[] | undefined, name: string, isTablet: boolean): Model | undefined {
-  const kind = isTablet ? 'tablet' : 'smartphone';
-  const fits = models?.filter(m => sellCategoryOf(m.category) === kind);
-  if (!fits?.length) return undefined;
+  if (!models?.length) return undefined;
   const want = normal(name);
+  const exact = models.find(m => normal(m.name) === want);
+  if (exact) return exact;
+  const kind = isTablet ? 'tablet' : 'smartphone';
+  const fits = models.filter(m => sellCategoryOf(m.category) === kind);
   const specific = want.includes(' ') && /\d/.test(want);
-  return fits.find(m => normal(m.name) === want)
-    ?? fits.find(m => normal(m.name).endsWith(` ${want}`))
+  return fits.find(m => normal(m.name).endsWith(` ${want}`))
     ?? (specific ? fits.find(m => normal(m.name).includes(want)) : undefined);
 }
 
