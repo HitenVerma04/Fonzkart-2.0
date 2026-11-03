@@ -2,7 +2,7 @@
 // priced from the latest store data. Checkout needs an account.
 import { Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { GUARD_TYPES, useScreenGuardStore, useSession } from '@fonzkart/api';
+import { useScreenGuardStore, useSession } from '@fonzkart/api';
 import { formatInr } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import {
@@ -56,9 +56,7 @@ export default function Cart() {
                 <ProductImage uri={item.imageUrl} label={item.name} size={60} kind="phone" />
               </View>
               <View style={styles.lineText}>
-                <Text style={styles.lineType}>{GUARD_TYPES.find(t => t.id === item.guardType)?.label ?? item.guardType}</Text>
                 <Text style={styles.lineName} numberOfLines={2}>{item.name}</Text>
-                <Text style={styles.lineModel}>For {item.model.startsWith(item.brand) ? item.model : `${item.brand} ${item.model}`}</Text>
                 <PriceBlock price={item.price * quantity} mrp={item.mrp * quantity} />
                 <View style={styles.lineActions}>
                   <View style={styles.stepper}>
@@ -121,9 +119,7 @@ const useStyles = makeStyles(colors => ({
   line: { flexDirection: 'row', gap: 12, backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, padding: 12 },
   thumb: { width: 72, height: 72, borderRadius: radii.md, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' },
   lineText: { flex: 1, gap: 3 },
-  lineType: { ...type.tiny, fontSize: 10, textTransform: 'uppercase', color: colors.green },
   lineName: { ...type.label, fontSize: 15, color: colors.navy },
-  lineModel: { ...type.small, fontSize: 12, color: colors.muted },
   lineActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 },
   stepper: { width: 120 },
   savings: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.greenSoft, borderWidth: 1, borderColor: colors.greenBorder, borderRadius: radii.md, padding: 12 },
