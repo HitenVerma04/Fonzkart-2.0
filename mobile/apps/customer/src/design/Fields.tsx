@@ -118,10 +118,11 @@ const useStyles = makeStyles(colors => ({
   prefix: { ...type.body, fontWeight: '600', color: colors.muted, marginRight: 8 },
   input: { flex: 1, ...type.body, color: colors.text, paddingVertical: 10 },
   hint: { ...type.small, fontSize: 12, color: colors.muted },
-  search: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 18 },
-  searchPlain: { backgroundColor: colors.surface, borderRadius: radii.pill, borderWidth: 1.5, borderColor: colors.border },
+  // the iOS search field: a 44-pt capsule, system gray fill, no border
+  search: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, paddingHorizontal: 14 },
+  searchPlain: { backgroundColor: 'rgba(118,118,128,0.12)', borderRadius: radii.pill },
   rotating: { flex: 1, flexDirection: 'row', alignItems: 'center', overflow: 'hidden', height: 22 },
-  placeholder: { ...type.body, color: colors.muted },
-  searchInput: { flex: 1, ...type.body, color: colors.text, paddingVertical: 12 },
+  placeholder: { fontSize: 17, lineHeight: 22, letterSpacing: -0.4, color: colors.muted },
+  searchInput: { flex: 1, fontSize: 17, letterSpacing: -0.4, color: colors.text, paddingVertical: 10 },
   clear: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.placeholder, alignItems: 'center', justifyContent: 'center' },
 }));

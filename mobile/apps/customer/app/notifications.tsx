@@ -23,7 +23,7 @@ export default function Notifications() {
       </SkeletonScreen>
     );
   }
-  if (list.isError) return <ErrorState onRetry={() => list.refetch()} />;
+  if (list.isError) return <ErrorState error={list.error} onRetry={() => list.refetch()} />;
 
   const refresh = () => void client.invalidateQueries({ queryKey: orderKeys.notifications });
   const open = async (n: AppNotification) => {

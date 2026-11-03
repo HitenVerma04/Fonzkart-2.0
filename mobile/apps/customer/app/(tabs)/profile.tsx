@@ -88,7 +88,7 @@ export default function Account() {
                 </View>
               </View>
             ) : profile.isError ? (
-              <ErrorState onRetry={() => profile.refetch()} />
+              <ErrorState error={profile.error} onRetry={() => profile.refetch()} />
             ) : (
               <View style={styles.personRow}>
                 <View style={styles.avatar}>

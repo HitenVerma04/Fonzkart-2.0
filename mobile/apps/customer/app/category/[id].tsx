@@ -25,7 +25,7 @@ export default function CategoryBrands() {
         {brands.isPending ? (
           <SkeletonTiles count={9} width={width} imageHeight={width - 40} kind="logo" />
         ) : brands.isError ? (
-          <ErrorState onRetry={() => brands.refetch()} />
+          <ErrorState error={brands.error} onRetry={() => brands.refetch()} />
         ) : brands.data.length === 0 ? (
           <EmptyState icon="box" title="No brands yet" message="No brands in this category yet." />
         ) : (

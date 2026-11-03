@@ -29,7 +29,7 @@ export default function MyOrders() {
           action={{ label: 'Sign in', onPress: () => router.push({ pathname: '/account/sign-in', params: { returnTo: '/orders' } }) }} />
       );
     }
-    if (orders.isError) return <ErrorState onRetry={() => orders.refetch()} />;
+    if (orders.isError) return <ErrorState error={orders.error} onRetry={() => orders.refetch()} />;
     return (
       <FlatList
         data={orders.data}

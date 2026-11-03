@@ -68,7 +68,7 @@ function Tab({ label, icon, focused, onPress, onLongPress }: {
   const lift = useSharedValue(focused ? 1 : 0);
   useEffect(() => {
     lift.value = withSpring(focused ? 1 : 0, motion.snappy);
-    if (focused) scale.value = withSequence(withTiming(1.12, { duration: 120 }), withSpring(1, motion.press));
+    if (focused) scale.value = withSequence(withTiming(1.06, { duration: 110 }), withSpring(1, motion.press));
   }, [focused, scale, lift]);
   const iconStyle = useAnimatedStyle(() => ({ transform: [{ translateY: -2 * lift.value }, { scale: scale.value }] }));
   const color = focused ? colors.green : colors.muted;
@@ -85,7 +85,7 @@ function Tab({ label, icon, focused, onPress, onLongPress }: {
       style={styles.tab}
     >
       <Animated.View style={iconStyle}>
-        <Icon name={icon} color={color} size={23} filled={focused} />
+        <Icon name={icon} color={color} size={24} filled={focused} />
       </Animated.View>
       <Text style={[styles.label, { color }, focused && styles.labelFocused]} numberOfLines={1}>{label}</Text>
     </Tap>
@@ -96,8 +96,9 @@ const useStyles = makeStyles(colors => ({
   wrap: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 14, alignItems: 'center' },
   bar: { flexDirection: 'row', height: TAB_BAR_HEIGHT, padding: PAD, width: '100%', maxWidth: 520 },
   pillTrack: { position: 'absolute', top: PAD, bottom: PAD, left: PAD, paddingHorizontal: 3 },
-  pill: { flex: 1, borderRadius: radii.pill, backgroundColor: colors.greenTint, borderWidth: 1, borderColor: colors.greenBorder },
+  // the iOS 26 tab bar: a soft capsule behind the selected tab, no outline
+  pill: { flex: 1, borderRadius: radii.pill, backgroundColor: colors.greenTint },
   tab: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 1 },
-  label: { fontSize: 10.5, fontWeight: '600', letterSpacing: 0.1 },
-  labelFocused: { fontWeight: '800' },
+  label: { fontSize: 10, lineHeight: 12, fontWeight: '500', letterSpacing: 0.1 },
+  labelFocused: { fontWeight: '600' },
 }));

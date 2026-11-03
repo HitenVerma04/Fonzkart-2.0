@@ -36,7 +36,7 @@ export default function ModelVariants() {
           {variants.isPending ? (
             <SkeletonRows count={3} image={0} trailing />
           ) : variants.isError ? (
-            <ErrorState onRetry={() => variants.refetch()} />
+            <ErrorState error={variants.error} onRetry={() => variants.refetch()} />
           ) : variants.data.length === 0 ? (
             <EmptyState icon="box" message="No variants listed for this model yet." />
           ) : (

@@ -64,7 +64,7 @@ export default function Questions() {
       </SkeletonScreen>
     );
   }
-  if (questionnaire.isError) return <ErrorState onRetry={() => questionnaire.refetch()} />;
+  if (questionnaire.isError) return <ErrorState error={questionnaire.error} onRetry={() => questionnaire.refetch()} />;
   if (!step) return <EmptyState icon="auto" message="No questions for this device yet." />;
 
   const set = (key: string, value: Answers[string]) => setAnswers(prev => ({ ...prev, [key]: value }));

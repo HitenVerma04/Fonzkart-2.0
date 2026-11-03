@@ -7,7 +7,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, with
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { Icon, type IconName } from './Icon';
 import { Tap } from './Tap';
-import { radii, type, useDesign } from './tokens';
+import { radii, systemFill, type, useDesign } from './tokens';
 
 type Variant = 'primary' | 'secondary' | 'outline' | 'link' | 'danger';
 
@@ -32,19 +32,20 @@ export function Button({ title, onPress, variant = 'primary', size = 'lg', icon,
     danger: colors.danger,
   }[variant];
   const frame = {
-    primary: { backgroundImage: d.greenGradient, boxShadow: inactive ? undefined : d.shadow.green },
+    // Apple's button styles: filled (solid tint), tinted (light tint), gray (system fill); no gradients or glow.
+    primary: { backgroundColor: colors.green },
     secondary: { backgroundColor: colors.greenTint },
-    outline: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+    outline: { backgroundColor: d.scheme === 'dark' ? systemFill.dark : systemFill.light },
     link: {},
     danger: {},
   }[variant];
-  const height = variant === 'link' || variant === 'danger' ? 40 : { lg: 54, md: 46, sm: 38 }[size];
+  const height = variant === 'link' || variant === 'danger' ? 44 : { lg: 50, md: 44, sm: 34 }[size];
 
   return (
     <Tap
       onPress={onPress}
       disabled={inactive}
-      scaleTo={0.96}
+      scaleTo={0.97}
       accessibilityRole="button"
       accessibilityLabel={title}
       accessibilityState={{ disabled: !!inactive, busy: !!loading }}
@@ -91,6 +92,6 @@ const useStyles = makeStyles(() => ({
   small: { paddingHorizontal: 14 },
   content: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   disabled: { opacity: 0.42 },
-  text: { ...type.label, fontSize: 16, fontWeight: '700' },
-  textSmall: { fontSize: 13 },
+  text: { fontSize: 17, lineHeight: 22, fontWeight: '600', letterSpacing: -0.4 },
+  textSmall: { fontSize: 15, lineHeight: 20, letterSpacing: -0.2 },
 }));

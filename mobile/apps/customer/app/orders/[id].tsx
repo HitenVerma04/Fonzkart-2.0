@@ -30,7 +30,7 @@ export default function OrderTracker() {
       </Page>
     );
   }
-  if (order.isError) return <ErrorState message="Could not load this order." onRetry={() => order.refetch()} />;
+  if (order.isError) return <ErrorState message="Could not load this order." error={order.error} onRetry={() => order.refetch()} />;
 
   const o = order.data;
   const answers = parseAnswers(o.answers);

@@ -7,7 +7,7 @@ import { isMultiSelect, toggleOption, type Answers, type QuestionOption, type Qu
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { Icon, type IconName } from './Icon';
 import { Tap } from './Tap';
-import { motion, radii, type, useDesign } from './tokens';
+import { motion, radii, systemFill, type, useDesign } from './tokens';
 
 /** One answer. `compact`: a half-width tile (tick-all-that-apply lists without descriptions, two per row). */
 export function ChoiceCard({ label, description, selected, multi, compact, onPress }: {
@@ -139,6 +139,7 @@ export function Chip({ label, caption, selected, wide, onPress, role = 'button',
   role?: 'button' | 'radio';
   accessibilityLabel?: string;
 }) {
+  const colors = useColors();
   const d = useDesign();
   const styles = useStyles();
   return (
@@ -148,7 +149,7 @@ export function Chip({ label, caption, selected, wide, onPress, role = 'button',
       accessibilityRole={role}
       accessibilityState={role === 'radio' ? { checked: selected } : { selected }}
       accessibilityLabel={accessibilityLabel ?? [label, caption].filter(Boolean).join(' ')}
-      style={[styles.chip, wide && styles.chipWide, selected && { backgroundImage: d.greenGradient, borderColor: 'transparent', boxShadow: d.shadow.green }]}
+      style={[styles.chip, { backgroundColor: d.scheme === 'dark' ? systemFill.dark : systemFill.light }, wide && styles.chipWide, selected && { backgroundColor: colors.green }]}
     >
       <Text style={[styles.chipLabel, selected && { color: d.onGreen }]}>{label}</Text>
       {caption ? <Text style={[styles.chipCaption, selected && { color: d.onGreen }]}>{caption}</Text> : null}
@@ -175,8 +176,8 @@ export function Segmented<T extends string>({ options, value, onChange }: {
   const thumb = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
 
   return (
-    <View style={styles.track} onLayout={e => setWidth(e.nativeEvent.layout.width - 8)} accessibilityRole="radiogroup">
-      {slot ? <Animated.View style={[styles.thumb, { width: slot, boxShadow: d.shadow.sm }, thumb]} /> : null}
+    <View style={styles.track} onLayout={e => setWidth(e.nativeEvent.layout.width - 4)} accessibilityRole="radiogroup">
+      {slot ? <Animated.View style={[styles.thumb, { width: slot }, thumb]} /> : null}
       {options.map(o => {
         const on = o.id === value;
         return (
@@ -212,12 +213,13 @@ const useStyles = makeStyles(colors => ({
   options: { gap: 10, marginTop: 14 },
   group: { gap: 10, marginBottom: 14 },
   groupTitle: { ...type.heading, fontSize: 16, color: colors.text },
-  chip: { minWidth: 64, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface, borderRadius: radii.md, paddingVertical: 8, paddingHorizontal: 14 },
+  chip: { minWidth: 64, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 12, paddingVertical: 8, paddingHorizontal: 14 },
   chipWide: { flexGrow: 1, flexBasis: 0 },
-  chipLabel: { ...type.small, fontWeight: '700', color: colors.text },
-  chipCaption: { ...type.heading, fontWeight: '800', color: colors.text },
-  track: { flexDirection: 'row', backgroundColor: colors.placeholder, borderRadius: radii.pill, padding: 4 },
-  thumb: { position: 'absolute', top: 4, bottom: 4, left: 4, borderRadius: radii.pill, backgroundColor: colors.surface },
-  segment: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', minHeight: 40 },
-  segmentText: { ...type.small, fontWeight: '700', color: colors.muted },
+  chipLabel: { fontSize: 15, lineHeight: 20, fontWeight: '600', letterSpacing: -0.2, color: colors.text },
+  chipCaption: { fontSize: 17, lineHeight: 22, fontWeight: '700', letterSpacing: -0.4, color: colors.text },
+  // the iOS segmented control: gray track, white thumb with a soft shadow
+  track: { flexDirection: 'row', backgroundColor: 'rgba(118,118,128,0.12)', borderRadius: 9, padding: 2 },
+  thumb: { position: 'absolute', top: 2, bottom: 2, left: 2, borderRadius: 7, backgroundColor: colors.surface, borderWidth: 0.5, borderColor: 'rgba(0,0,0,0.04)', boxShadow: '0px 3px 8px rgba(0,0,0,0.12), 0px 3px 1px rgba(0,0,0,0.04)' },
+  segment: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', minHeight: 34 },
+  segmentText: { fontSize: 13, lineHeight: 18, fontWeight: '600', letterSpacing: -0.1, color: colors.text },
 }));

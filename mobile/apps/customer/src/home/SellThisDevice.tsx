@@ -67,7 +67,7 @@ export function SellThisDevice() {
             <Text style={styles.price}>Get up to <Text style={styles.priceStrong}>{formatInr(best)}</Text></Text>
           ) : match ? <Skeleton width="45%" height={13} /> : null}
         </View>
-        <View style={[styles.button, { backgroundImage: d.greenGradient }]}>
+        <View style={[styles.button, { backgroundColor: colors.green }]}>
           <Text style={[styles.buttonText, { color: d.onGreen }]}>Sell now</Text>
         </View>
       </View>

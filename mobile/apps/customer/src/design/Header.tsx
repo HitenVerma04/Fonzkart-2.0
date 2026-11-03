@@ -72,15 +72,16 @@ export function IconButton({ icon, label, onPress, badge, tint }: {
 const useStyles = makeStyles(colors => ({
   wrap: { backgroundColor: colors.background, paddingBottom: 8, paddingHorizontal: 12 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, width: '100%', maxWidth: MAX_CONTENT + 8, alignSelf: 'center', minHeight: 44 },
-  title: { flex: 1, ...type.heading, fontSize: 19, color: colors.navy, textAlign: 'center' },
-  spacer: { width: 42 },
-  right: { minWidth: 42, alignItems: 'flex-end' },
+  // the iOS navigation bar: 17-pt semibold title, 44-pt round buttons
+  title: { flex: 1, fontSize: 17, lineHeight: 22, fontWeight: '600', letterSpacing: -0.4, color: colors.navy, textAlign: 'center' },
+  spacer: { width: 44 },
+  right: { minWidth: 44, alignItems: 'flex-end' },
   tabTitle: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingBottom: 10, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
   tabTitleText: { flex: 1, gap: 2 },
   big: { ...type.display, color: colors.navy },
   subtitle: { ...type.small, color: colors.muted },
-  button: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center' },
-  onGreen: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)' },
+  button: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  onGreen: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)' },
   badge: { position: 'absolute', top: 9, right: 10, width: 9, height: 9, borderRadius: 5, backgroundColor: colors.green, borderWidth: 2, borderColor: colors.surface },
   badgeOnGreen: { backgroundColor: '#bbf7d0', borderColor: '#16a34a' },
 }));

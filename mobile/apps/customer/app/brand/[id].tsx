@@ -33,7 +33,7 @@ export default function BrandModels() {
           <SkeletonTiles count={6} width={width} imageHeight={width - 56} kind={deviceKindOf(category)} />
         </View>
       ) : models.isError ? (
-        <ErrorState onRetry={() => models.refetch()} />
+        <ErrorState error={models.error} onRetry={() => models.refetch()} />
       ) : (
         <FlatList
           data={shown}

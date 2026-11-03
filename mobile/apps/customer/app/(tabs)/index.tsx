@@ -16,7 +16,7 @@ import {
   useDesign, useTabBarSpace,
 } from '../../src/design';
 import { HomeCarousel } from '../../src/HomeCarousel';
-import { CategoryTabs, PromiseCard, ServiceTiles } from '../../src/home/sections';
+import { PromiseCard, ServiceTiles } from '../../src/home/sections';
 import { SellThisDevice } from '../../src/home/SellThisDevice';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 
@@ -98,7 +98,6 @@ export default function Home() {
             </View>
           </View>
           <SearchBar glass placeholder="Search your device" suggestions={SUGGESTIONS} onPress={() => router.push('/search')} />
-          <CategoryTabs />
         </View>
       </View>
 
@@ -147,7 +146,7 @@ export default function Home() {
           {brands.isPending ? (
             <SkeletonTiles count={TOP_BRANDS} width={brandWidth} imageHeight={brandWidth - 30} kind="logo" />
           ) : brands.isError ? (
-            <ErrorState onRetry={() => brands.refetch()} />
+            <ErrorState error={brands.error} onRetry={() => brands.refetch()} />
           ) : (
             <View style={styles.grid}>
               {brands.data.slice(0, TOP_BRANDS).map(brand => (
@@ -175,7 +174,7 @@ export default function Home() {
 
 const useStyles = makeStyles(colors => ({
   screen: { flex: 1, backgroundColor: colors.background },
-  hero: { borderBottomLeftRadius: radii.xl, borderBottomRightRadius: radii.xl, paddingBottom: 8 },
+  hero: { borderBottomLeftRadius: radii.xl, borderBottomRightRadius: radii.xl, paddingBottom: 20 },
   heroInner: { paddingHorizontal: PAGE_PADDING, gap: 14, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
   topRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 },
   promise: { flex: 1, minWidth: 0, gap: 2 },

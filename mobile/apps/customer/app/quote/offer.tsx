@@ -70,7 +70,7 @@ export default function Offer() {
               </View>
             ) : quote.isError || typeof quote.data?.price !== 'number' ? (
               <View style={styles.priceError}>
-                <ErrorState message="Could not calculate the price. Check your internet connection." onRetry={() => quote.refetch()} />
+                <ErrorState message="Could not calculate the price. Check your internet connection." error={quote.error} onRetry={() => quote.refetch()} />
               </View>
             ) : (
               <Animated.Text entering={ZoomIn.springify().damping(20).stiffness(180)} style={styles.price}

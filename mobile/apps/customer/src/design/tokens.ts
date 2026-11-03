@@ -103,6 +103,9 @@ export const motion = {
 /** Width used by page content on tablets and the web; phones use the full width. */
 export const MAX_CONTENT = 640;
 
+/** iOS system fill: a translucent gray that works on light and dark surfaces (gray buttons, chips, tracks). */
+export const systemFill = { light: 'rgba(118,118,128,0.12)', dark: 'rgba(118,118,128,0.24)' };
+
 export type Design = {
   scheme: ColorScheme;
   /** Text and icons on a green fill. */

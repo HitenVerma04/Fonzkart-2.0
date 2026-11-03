@@ -35,7 +35,7 @@ export default function Search() {
           <SkeletonRows count={6} image={52} kind="phone" />
         </SkeletonScreen>
       ) : results.isError ? (
-        <ErrorState onRetry={() => results.refetch()} />
+        <ErrorState error={results.error} onRetry={() => results.refetch()} />
       ) : (
         <FlatList
           data={results.data}
