@@ -3,7 +3,8 @@
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 import { Paths } from 'expo-file-system';
-import type { Model, Variant } from '@fonzkart/api';
+import type { Brand, Model, Variant } from '@fonzkart/api';
+import { sellCategoryOf } from '@fonzkart/core';
 
 export type DeviceSpecs = {
   maker: string;
@@ -28,7 +29,7 @@ export function standardSize(reportedGb: number, sizes: number[]): number {
 }
 
 export function readDeviceSpecs(): DeviceSpecs | null {
-  if (Platform.OS === 'web') return null;
+    if (Platform.OS === 'web') return null;
   const maker = (Device.brand ?? Device.manufacturer ?? '').trim();
   const modelName = (Device.modelName ?? '').trim();
   if (!maker && !modelName) return null;
@@ -52,25 +53,52 @@ export function readDeviceSpecs(): DeviceSpecs | null {
 
 const normal = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-/** Names to look the device up by, best first, without repeats: marketing name, model name, maker + model name. */
+/** The maker without its sub-brand: the catalog lists Redmi phones under Xiaomi and HMD phones under Nokia. */
+const BRAND_ALIASES: Record<string, string> = { redmi: 'xiaomi', mi: 'xiaomi', hmd: 'nokia', 'hmd global': 'nokia' };
+
+/** The catalog brand of this device's maker. */
+export function matchBrand(brands: Brand[] | undefined, specs: DeviceSpecs): Brand | undefined {
+  const maker = normal(specs.maker);
+  if (!maker) return undefined;
+  const want = BRAND_ALIASES[maker] ?? maker;
+  return brands?.find(b => normal(b.name) === want || b.id === want);
+}
+
+/** A name the customer would recognise even when the catalog lacks it: iPhones and iPads report their real name. */
+export function deviceTitle(specs: DeviceSpecs): string | null {
+  return specs.osName === 'iOS' && specs.modelName ? specs.modelName : null;
+}
+
+/**
+ * Names to look the device up by, best first, without repeats (three at most, one search each). iPhones and iPads
+ * report their model name reliably, and their device name is often just "iPhone". On Android the device name is the
+ * marketing name unless renamed, and the model name usually a code; the catalog often leaves out "5G".
+ */
 export function searchNames(specs: DeviceSpecs): string[] {
-  const names = [specs.deviceName, specs.modelName, `${specs.maker} ${specs.modelName}`];
+  const maker = new RegExp(`^${specs.maker.replace(/[^A-Za-z0-9]/g, '')}\\s+`, 'i');
+  const plain = (name: string) => name.replace(maker, '').replace(/\s+[45]G$/i, '').trim();
+  const names = specs.osName === 'iOS'
+    ? [specs.modelName]
+    : [specs.deviceName, plain(specs.deviceName), specs.modelName, `${specs.maker} ${specs.modelName}`];
   const seen = new Set<string>();
   return names.filter(n => {
     const key = normal(n);
     if (key.length < 2 || seen.has(key)) return false;
     seen.add(key);
     return true;
-  });
+  }).slice(0, 3);
 }
 
-/** The catalog model for one name: an exact name match, then one ending with it, then one containing it. */
-export function matchModel(models: Model[] | undefined, name: string): Model | undefined {
-  if (!models?.length) return undefined;
+/** The catalog model for one name, among phones or tablets: an exact name match, then one ending with it, then (for a specific name such as "Galaxy S23") one containing it. */
+export function matchModel(models: Model[] | undefined, name: string, isTablet: boolean): Model | undefined {
+  const kind = isTablet ? 'tablet' : 'smartphone';
+  const fits = models?.filter(m => sellCategoryOf(m.category) === kind);
+  if (!fits?.length) return undefined;
   const want = normal(name);
-  return models.find(m => normal(m.name) === want)
-    ?? models.find(m => normal(m.name).endsWith(want))
-    ?? models.find(m => normal(m.name).includes(want));
+  const specific = want.includes(' ') && /\d/.test(want);
+  return fits.find(m => normal(m.name) === want)
+    ?? fits.find(m => normal(m.name).endsWith(` ${want}`))
+    ?? (specific ? fits.find(m => normal(m.name).includes(want)) : undefined);
 }
 
 /** Sizes written in a variant name: "8 GB / 128 GB" → RAM 8, storage 128; "1TB" → storage 1024. */
