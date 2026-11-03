@@ -19,6 +19,7 @@ import { HomeCarousel } from '../../src/HomeCarousel';
 import { PromiseCard, ServiceTiles } from '../../src/home/sections';
 import { SellThisDevice } from '../../src/home/SellThisDevice';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
+import { launchTarget } from '../../src/launchTargets';
 
 const TOP_BRANDS = 8;
 const SUGGESTIONS = ['iPhone 13', 'Galaxy S23', 'OnePlus 11', 'iPad Air', 'MacBook Air', 'Apple Watch'];
@@ -134,7 +135,9 @@ export default function Home() {
           <SectionHeader title="Repair & protect" subtitle="Fix it, guard it, or recycle it" />
           <View style={styles.grid}>
             <CategoryCard id="repair" name="Repair" width={categoryWidth} index={0} onPress={() => router.navigate('/repair')} />
-            <CategoryCard id="screenguard" name="Screen Guard" width={categoryWidth} index={1} onPress={() => router.push('/screen-guard')} />
+            <View ref={launchTarget('screenguard')} collapsable={false}>
+              <CategoryCard id="screenguard" name="Screen Guard" width={categoryWidth} index={1} onPress={() => router.push('/screen-guard')} />
+            </View>
             <CategoryCard id="bulk" name="Bulk Orders" width={categoryWidth} index={2} onPress={() => router.push('/bulk')} />
           </View>
           <ServiceTiles width={serviceWidth} />

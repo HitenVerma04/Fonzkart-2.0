@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { Glass, Icon, motion, radii, TAB_BAR_HEIGHT, Tap, type IconName } from '../design';
+import { launchTarget } from '../launchTargets';
 
 /** Route name → icon. Routes not listed get the Sell icon. */
 const ICONS: Record<string, IconName> = { buy: 'buy', index: 'sell', repair: 'repair', orders: 'orders', profile: 'profile' };
@@ -46,7 +47,7 @@ export function FonzkartTabBar({ state, descriptors, emitter, navigateToTab }: B
             if (!focused && !event.defaultPrevented) navigateToTab(route.key);
           };
           return (
-            <Tab key={route.key} label={label} icon={ICONS[route.name] ?? 'sell'} focused={focused} onPress={onPress}
+            <Tab key={route.key} label={label} icon={ICONS[route.name] ?? 'sell'} target={ICONS[route.name] ?? 'sell'} focused={focused} onPress={onPress}
               onLongPress={() => emitter.emit({ type: 'tabLongPress', target: route.key })} />
           );
         })}
@@ -55,9 +56,11 @@ export function FonzkartTabBar({ state, descriptors, emitter, navigateToTab }: B
   );
 }
 
-function Tab({ label, icon, focused, onPress, onLongPress }: {
+function Tab({ label, icon, target, focused, onPress, onLongPress }: {
   label: string;
   icon: IconName;
+  /** Which launch-animation icon lands here. */
+  target: string;
   focused: boolean;
   onPress: () => void;
   onLongPress: () => void;
@@ -84,9 +87,11 @@ function Tab({ label, icon, focused, onPress, onLongPress }: {
       android_ripple={{ color: colors.ripple, borderless: true, radius: 34 }}
       style={styles.tab}
     >
-      <Animated.View style={iconStyle}>
-        <Icon name={icon} color={color} size={24} filled={focused} />
-      </Animated.View>
+      <View ref={launchTarget(target)} collapsable={false}>
+        <Animated.View style={iconStyle}>
+          <Icon name={icon} color={color} size={24} filled={focused} />
+        </Animated.View>
+      </View>
       <Text style={[styles.label, { color }, focused && styles.labelFocused]} numberOfLines={1}>{label}</Text>
     </Tap>
   );

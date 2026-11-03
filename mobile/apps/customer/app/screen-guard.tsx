@@ -81,7 +81,6 @@ export default function ScreenGuardStore() {
         <View style={styles.heroIcon}>
           <Icon name="shield" color="#ffffff" size={30} filled />
         </View>
-        <Text style={styles.heroKicker}>FonzCare</Text>
         <Text style={styles.heroTitle}>Screen guards</Text>
         <View style={styles.promises}>
           {PROMISES.map(p => (
@@ -194,7 +193,6 @@ const useStyles = makeStyles(colors => ({
   header: { gap: 16, marginBottom: 4 },
   hero: { borderRadius: radii.xl, padding: 20, gap: 4, overflow: 'hidden' },
   heroIcon: { width: 52, height: 52, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  heroKicker: { ...type.tiny, textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)' },
   heroTitle: { ...type.title, fontSize: 28, lineHeight: 34, color: '#ffffff' },
   promises: { gap: 6, marginTop: 10 },
   promise: { flexDirection: 'row', alignItems: 'center', gap: 8 },
