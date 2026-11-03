@@ -58,7 +58,7 @@ export default function Cart() {
               <View style={styles.lineText}>
                 <Text style={styles.lineType}>{GUARD_TYPES.find(t => t.id === item.guardType)?.label ?? item.guardType}</Text>
                 <Text style={styles.lineName} numberOfLines={2}>{item.name}</Text>
-                <Text style={styles.lineModel}>For {item.brand} {item.model}</Text>
+                <Text style={styles.lineModel}>For {item.model.startsWith(item.brand) ? item.model : `${item.brand} ${item.model}`}</Text>
                 <PriceBlock price={item.price * quantity} mrp={item.mrp * quantity} />
                 <View style={styles.lineActions}>
                   <View style={styles.stepper}>

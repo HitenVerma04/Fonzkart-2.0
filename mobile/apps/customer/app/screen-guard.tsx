@@ -156,7 +156,7 @@ function GuardCard({ item, width, index, showDiscount, quantity, onQuantity }: {
       </View>
       <Text style={styles.typeLabel}>{typeLabel}</Text>
       <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
-      <Text style={styles.model} numberOfLines={1}>For {item.brand} {item.model}</Text>
+      <Text style={styles.model} numberOfLines={1}>For {item.model.startsWith(item.brand) ? item.model : `${item.brand} ${item.model}`}</Text>
       <PriceBlock price={item.price} mrp={item.mrp} />
       <View style={styles.action}>
         {quantity ? (
