@@ -1,6 +1,6 @@
 // Home, laid out like Blinkit's: a green header with the promise in big type, the search bar and a row of category
 // tabs; then the carousel, "Sell this phone" (Cashify's), the animated sell categories, repair & protect, top phone
-// brands as picture cards, and the Fonzkart promise in a dark card (CRED's style).
+// brands, and the Fonzkart promise in a dark card (CRED's style).
 import { useCallback } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
 import Animated, { runOnUI, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
@@ -12,14 +12,15 @@ import { Logo, makeStyles } from '@fonzkart/ui';
 import { CategoryCard } from '../../src/categoryArt/CategoryCard';
 import { ArtActivity, MotionActivity } from '../../src/categoryArt/motion';
 import {
-  Appear, ErrorState, Icon, IconButton, MAX_CONTENT, radii, SearchBar, SectionHeader, Skeleton, type, useDesign, useTabBarSpace,
+  Appear, ErrorState, Icon, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles, Tile, type,
+  useDesign, useTabBarSpace,
 } from '../../src/design';
 import { HomeCarousel } from '../../src/HomeCarousel';
-import { BrandCollageCard, CategoryTabs, PromiseCard, ServiceTiles } from '../../src/home/sections';
+import { CategoryTabs, PromiseCard, ServiceTiles } from '../../src/home/sections';
 import { SellThisDevice } from '../../src/home/SellThisDevice';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 
-const TOP_BRANDS = 6;
+const TOP_BRANDS = 8;
 const SUGGESTIONS = ['iPhone 13', 'Galaxy S23', 'OnePlus 11', 'iPad Air', 'MacBook Air', 'Apple Watch'];
 
 export default function Home() {
@@ -30,7 +31,7 @@ export default function Home() {
   const bottom = useTabBarSpace();
   const categoryWidth = useTileWidth(3);
   const carouselWidth = useTileWidth(1);
-  const brandWidth = useTileWidth(3);
+  const brandWidth = useTileWidth(4);
   const serviceWidth = useTileWidth(4);
   const brands = useBrands('smartphone');
   const { session } = useSession();
@@ -144,14 +145,20 @@ export default function Home() {
         <Appear index={3} style={styles.block}>
           <SectionHeader title="Top phone brands" action={{ label: 'See all', onPress: () => router.push({ pathname: '/category/[id]', params: { id: 'smartphone' } }) }} />
           {brands.isPending ? (
-            <View style={styles.grid}>
-              {Array.from({ length: TOP_BRANDS }, (_, i) => <Skeleton key={i} width={brandWidth} height={brandWidth + 34} radius={radii.lg} />)}
-            </View>
+            <SkeletonTiles count={TOP_BRANDS} width={brandWidth} imageHeight={brandWidth - 30} kind="logo" />
           ) : brands.isError ? (
             <ErrorState onRetry={() => brands.refetch()} />
           ) : (
-            <View style={styles.collages}>
-              {brands.data.slice(0, TOP_BRANDS).map(brand => <BrandCollageCard key={brand.id} brand={brand} width={brandWidth} />)}
+            <View style={styles.grid}>
+              {brands.data.slice(0, TOP_BRANDS).map(brand => (
+                <Tile
+                  key={brand.id}
+                  label={brand.name}
+                  width={brandWidth}
+                  onPress={() => router.push({ pathname: '/brand/[id]', params: { id: brand.id, category: 'smartphone', name: brand.name } })}
+                  image={<ProductImage uri={brand.logo} label={brand.name} size={brandWidth - 34} kind="logo" />}
+                />
+              ))}
             </View>
           )}
         </Appear>
@@ -184,5 +191,4 @@ const useStyles = makeStyles(colors => ({
   block: { gap: 12 },
   cards: { gap: 22 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
-  collages: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP, rowGap: GRID_GAP + 6 },
 }));

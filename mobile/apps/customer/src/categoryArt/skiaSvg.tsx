@@ -13,7 +13,7 @@
 //
 // The useDerivedValue callbacks below run on the UI thread (worklets): they may only use the animated value and plain
 // numbers, strings and objects worked out beforehand, never this file's helpers (calling one there stops the app).
-import { Children, createContext, isValidElement, useContext, useMemo, type ReactElement, type ReactNode } from 'react';
+import { Children, createContext, isValidElement, useContext, useMemo, type ComponentType, type ReactElement, type ReactNode } from 'react';
 import { Platform } from 'react-native';
 import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 import {
@@ -25,7 +25,6 @@ import {
   Image as SkImage,
   Line as SkLine,
   LinearGradient as SkLinearGradient,
-  Paint,
   Path as SkPath,
   RadialGradient as SkRadialGradient,
   Rect as SkRect,
@@ -169,33 +168,51 @@ type PaintAttrs = {
   strokeDashoffset?: Value<number>;
 };
 
-/** The fill and stroke paints for one shape, as Skia Paint children (a shape with both is drawn twice). */
-function usePaints(p: PaintAttrs, box: Box): ReactNode[] {
+/**
+ * How one shape is painted: a fill and/or a stroke, each as props set on the shape itself (colour, opacity, style,
+ * stroke width...) plus its children (a gradient, a dash). A shape with both is drawn twice. The paint goes on the
+ * shape, not in <Paint> children: Android's native Skia drew shapes with only <Paint> children in its default black.
+ */
+type PaintSpec = { key: string; props: Record<string, unknown>; children: ReactNode };
+
+function usePaints(p: PaintAttrs, box: Box): PaintSpec[] {
   const defs = useContext(Defs_);
-  const out: ReactNode[] = [];
+  const out: PaintSpec[] = [];
   const opacity = num(p.opacity, 1);
-  const paintFor = (color: string | undefined, alpha: number) => {
+  const paintFor = (color: string | undefined) => {
     const id = urlId(color);
     const def = id ? defs.get(id) : undefined;
-    if (def && def.kind !== 'clip') return { color: 'white', alpha, child: shader(def, box) };
-    return { color: color ?? '#000000', alpha, child: null };
+    if (def && def.kind !== 'clip') return { color: '#ffffff', child: shader(def, box) };
+    return { color: color ?? '#000000', child: null };
   };
   if (p.fill && p.fill !== 'none') {
-    const f = paintFor(p.fill, opacity * num(p.fillOpacity, 1));
-    out.push(<Paint key="fill" color={f.color} opacity={f.alpha}>{f.child}</Paint>);
+    const f = paintFor(p.fill);
+    out.push({ key: 'fill', props: { style: 'fill', color: f.color, opacity: opacity * num(p.fillOpacity, 1) }, children: f.child });
   }
   if (p.stroke && p.stroke !== 'none') {
-    const s = paintFor(p.stroke, opacity * num(p.strokeOpacity, 1));
-    const dashes = typeof p.strokeDasharray === 'string' ? p.strokeDasharray.split(/[\s,]+/).map(Number) : p.strokeDasharray;
-    out.push(
-      <Paint key="stroke" style="stroke" color={s.color} opacity={s.alpha} strokeWidth={num(p.strokeWidth, 1)}
-        strokeCap={p.strokeLinecap ?? 'butt'} strokeJoin={p.strokeLinejoin ?? 'miter'}>
-        {s.child}
-        {dashes?.length ? <DashPathEffect intervals={dashes} phase={p.strokeDashoffset ?? 0} /> : null}
-      </Paint>,
-    );
+    const st = paintFor(p.stroke);
+    const dashes = typeof p.strokeDasharray === 'string' ? p.strokeDasharray.split(/[s,]+/).map(Number) : p.strokeDasharray;
+    out.push({
+      key: 'stroke',
+      props: {
+        style: 'stroke', color: st.color, opacity: opacity * num(p.strokeOpacity, 1), strokeWidth: num(p.strokeWidth, 1),
+        strokeCap: p.strokeLinecap ?? 'butt', strokeJoin: p.strokeLinejoin ?? 'miter',
+      },
+      children: (
+        <>
+          {st.child}
+          {dashes?.length ? <DashPathEffect intervals={dashes} phase={p.strokeDashoffset ?? 0} /> : null}
+        </>
+      ),
+    });
   }
   return out;
+}
+
+/** Draws a shape once per paint (its geometry plus that paint's props). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function draw(Shape: ComponentType<any>, geometry: Record<string, unknown>, paints: PaintSpec[]) {
+  return <>{paints.map(paint => <Shape key={paint.key} {...geometry} {...paint.props}>{paint.children}</Shape>)}</>;
 }
 
 // ---- Transforms ----
@@ -303,8 +320,8 @@ export function Rect(p: RectProps) {
   const paints = usePaints(p, box);
   const r = num(p.rx ?? p.ry);
   return r > 0
-    ? <SkRoundedRect x={box.x} y={box.y} width={box.width} height={box.height} r={r}>{paints}</SkRoundedRect>
-    : <SkRect x={box.x} y={box.y} width={box.width} height={box.height}>{paints}</SkRect>;
+    ? draw(SkRoundedRect, { x: box.x, y: box.y, width: box.width, height: box.height, r }, paints)
+    : draw(SkRect, { x: box.x, y: box.y, width: box.width, height: box.height }, paints);
 }
 
 export function AnimatedRect({ animatedProps, ...p }: RectProps & Animated<{ width?: number; y?: number }>) {
@@ -313,7 +330,7 @@ export function AnimatedRect({ animatedProps, ...p }: RectProps & Animated<{ wid
   const width = useDerivedValue(() => animatedProps?.value.width ?? box.width);
   const y = useDerivedValue(() => animatedProps?.value.y ?? box.y);
   const r = num(p.rx ?? p.ry);
-  return <SkRoundedRect x={box.x} y={y} width={width} height={box.height} r={r}>{paints}</SkRoundedRect>;
+  return draw(SkRoundedRect, { x: box.x, y, width, height: box.height, r }, paints);
 }
 
 type CircleProps = PaintAttrs & { cx?: Num; cy?: Num; r?: Num };
@@ -322,7 +339,7 @@ export function Circle(p: CircleProps) {
   const r = num(p.r);
   const box = { x: num(p.cx) - r, y: num(p.cy) - r, width: r * 2, height: r * 2 };
   const paints = usePaints(p, box);
-  return <SkCircle cx={num(p.cx)} cy={num(p.cy)} r={r}>{paints}</SkCircle>;
+  return draw(SkCircle, { cx: num(p.cx), cy: num(p.cy), r }, paints);
 }
 
 export function AnimatedCircle({ animatedProps, ...p }: CircleProps & Animated<{ r?: number; opacity?: number }>) {
@@ -333,7 +350,7 @@ export function AnimatedCircle({ animatedProps, ...p }: CircleProps & Animated<{
   const opacity = useDerivedValue(() => animatedProps?.value.opacity ?? 1);
   return (
     <Group opacity={opacity}>
-      <SkCircle cx={num(p.cx)} cy={num(p.cy)} r={r}>{paints}</SkCircle>
+      {draw(SkCircle, { cx: num(p.cx), cy: num(p.cy), r }, paints)}
     </Group>
   );
 }
@@ -353,7 +370,7 @@ type PathProps = PaintAttrs & { d: string };
 
 export function Path(p: PathProps) {
   const paints = usePaints(p, pathBox(p.d));
-  return <SkPath path={p.d}>{paints}</SkPath>;
+  return draw(SkPath, { path: p.d }, paints);
 }
 
 export function AnimatedPath({ animatedProps, ...p }: PathProps & Animated<{ d?: string; strokeDashoffset?: number }>) {
@@ -365,7 +382,7 @@ export function AnimatedPath({ animatedProps, ...p }: PathProps & Animated<{ d?:
     'worklet';
     return Skia.Path.MakeFromSVGString(animatedProps?.value.d ?? d0) ?? Skia.Path.Make();
   });
-  return <SkPath path={path}>{paints}</SkPath>;
+  return draw(SkPath, { path }, paints);
 }
 
 export function Polygon({ points, ...p }: PaintAttrs & { points: string }) {
@@ -379,7 +396,7 @@ type LineProps = PaintAttrs & { x1?: Num; y1?: Num; x2?: Num; y2?: Num };
 
 export function Line(p: LineProps) {
   const paints = usePaints(p, { x: 0, y: 0, width: 1, height: 1 });
-  return <SkLine p1={vec(num(p.x1), num(p.y1))} p2={vec(num(p.x2), num(p.y2))}>{paints}</SkLine>;
+  return draw(SkLine, { p1: vec(num(p.x1), num(p.y1)), p2: vec(num(p.x2), num(p.y2)) }, paints);
 }
 
 export function AnimatedLine({ animatedProps, ...p }: LineProps & Animated<{ y1?: number; y2?: number }>) {
@@ -390,7 +407,7 @@ export function AnimatedLine({ animatedProps, ...p }: LineProps & Animated<{ y1?
   const y2 = num(p.y2);
   const p1 = useDerivedValue(() => ({ x: x1, y: animatedProps?.value.y1 ?? y1 }));
   const p2 = useDerivedValue(() => ({ x: x2, y: animatedProps?.value.y2 ?? y2 }));
-  return <SkLine p1={p1} p2={p2}>{paints}</SkLine>;
+  return draw(SkLine, { p1, p2 }, paints);
 }
 
 // ---- Image and text ----

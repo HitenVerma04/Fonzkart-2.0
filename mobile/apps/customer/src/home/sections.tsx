@@ -1,12 +1,9 @@
-// Home screen sections: the category tab row under the search bar (Blinkit's), brand cards with four model pictures
-// and "+N more" (Blinkit's bestsellers), the repair & services tiles (Cashify's "Others"), and the dark Fonzkart
+// Home screen sections: the category tab row under the search bar (Blinkit's), the repair & services tiles (Cashify's "Others"), and the dark Fonzkart
 // promise card (CRED's style).
 import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useModels, type Brand } from '@fonzkart/api';
-import { modelImage } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
-import { DeviceSkeleton, Icon, ProductImage, radii, Tap, type, useDesign, type IconName } from '../design';
+import { Icon, radii, Tap, type, type IconName } from '../design';
 import { CONTACT } from '../contact';
 
 // ---- Category tabs (on the green header) ----
@@ -40,44 +37,6 @@ export function CategoryTabs() {
         );
       })}
     </ScrollView>
-  );
-}
-
-// ---- Brand cards with four model pictures ----
-
-export function BrandCollageCard({ brand, width, category = 'smartphone' }: { brand: Brand; width: number; category?: string }) {
-  const styles = useStyles();
-  const d = useDesign();
-  const router = useRouter();
-  const models = useModels(brand.id, category);
-  const shown = (models.data ?? []).slice(0, 4);
-  const more = Math.max(0, (models.data?.length ?? 0) - shown.length);
-  const cell = Math.floor((width - 8 * 2 - 6) / 2);
-  return (
-    <Tap scaleTo={0.96} accessibilityRole="button" accessibilityLabel={`${brand.name}${models.data ? `, ${models.data.length} models` : ''}`}
-      onPress={() => router.push({ pathname: '/brand/[id]', params: { id: brand.id, category, name: brand.name } })}
-      style={[styles.collage, { width, boxShadow: d.shadow.sm }]}>
-      <View style={styles.collageGrid}>
-        {[0, 1, 2, 3].map(i => {
-          const m = shown[i];
-          return (
-            <View key={i} style={[styles.collageCell, { width: cell, height: cell }]}>
-              {m ? (
-                <ProductImage uri={modelImage(m.img, m.category)} label={m.name} size={cell - 8} kind="phone" />
-              ) : models.isPending ? (
-                <DeviceSkeleton kind="phone" size={cell - 8} />
-              ) : null}
-            </View>
-          );
-        })}
-        {more ? (
-          <View style={styles.morePill}>
-            <Text style={styles.moreText}>+{more} more</Text>
-          </View>
-        ) : null}
-      </View>
-      <Text style={styles.collageName} numberOfLines={1}>{brand.name}</Text>
-    </Tap>
   );
 }
 
@@ -162,12 +121,6 @@ const useStyles = makeStyles(colors => ({
   tabLabelOn: { color: '#ffffff', fontWeight: '800' },
   tabBar: { height: 3, width: '80%', borderRadius: 2, backgroundColor: 'transparent', marginTop: 2 },
   tabBarOn: { backgroundColor: '#ffffff' },
-  collage: { backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, padding: 8, gap: 8 },
-  collageGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  collageCell: { borderRadius: radii.sm, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  morePill: { position: 'absolute', bottom: -9, alignSelf: 'center', left: 0, right: 0, alignItems: 'center' },
-  moreText: { ...type.small, fontSize: 11, fontWeight: '700', color: colors.textSoft, backgroundColor: colors.surface, borderRadius: radii.pill, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 8, paddingVertical: 2, overflow: 'hidden' },
-  collageName: { ...type.label, fontSize: 14, color: colors.navy, textAlign: 'center', marginTop: 6 },
   services: { flexDirection: 'row', justifyContent: 'space-between' },
   service: { alignItems: 'center', gap: 6 },
   serviceIcon: { borderRadius: radii.md, backgroundColor: colors.greenSoft, borderWidth: 1, borderColor: colors.greenBorder, alignItems: 'center', justifyContent: 'center' },

@@ -11,7 +11,8 @@ import { startQuote } from '../../src/quoteDraft';
 export default function ModelVariants() {
   const styles = useStyles();
   const d = useDesign();
-  const { id, name, img, category } = useLocalSearchParams<{ id: string; name?: string; img?: string; category?: string }>();
+  // `variant`: the variant of the phone the app runs on (from "Sell this device"), shown first and marked.
+  const { id, name, img, category, variant: mine } = useLocalSearchParams<{ id: string; name?: string; img?: string; category?: string; variant?: string }>();
   const router = useRouter();
   const variants = useVariants(id);
   const title = name ?? 'Your device';
@@ -39,10 +40,12 @@ export default function ModelVariants() {
           ) : variants.data.length === 0 ? (
             <EmptyState icon="box" message="No variants listed for this model yet." />
           ) : (
-            variants.data.map(variant => (
+            [...variants.data].sort((a, b) => Number(b.id === mine) - Number(a.id === mine)).map(variant => (
               <ListItem
                 key={variant.id}
                 title={variant.name}
+                subtitle={variant.id === mine ? 'Your phone' : undefined}
+                highlighted={variant.id === mine}
                 accessibilityLabel={`${variant.name}, max value ${formatInr(variant.basePrice)}`}
                 trailing={
                   <View style={styles.price}>
