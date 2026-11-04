@@ -57,6 +57,26 @@ class ShopIntegrationTest {
     }
 
     @Test
+    void administratorsChooseTheFestiveTheme() throws Exception {
+        assertThat(json(get("/api/app/theme", null)).get("theme").asText()).isEqualTo("none");
+
+        assertThat(put("/api/app/admin/theme", null, Map.of("theme", "diwali")).statusCode()).isEqualTo(401);
+        String customer = quickRegister("Cara", "cara@example.test");
+        assertThat(put("/api/app/admin/theme", customer, Map.of("theme", "diwali")).statusCode()).isEqualTo(403);
+        assertThat(json(get("/api/app/theme", null)).get("theme").asText()).isEqualTo("none");
+
+        String admin = admin();
+        assertThat(json(put("/api/app/admin/theme", admin, Map.of("theme", "diwali"))).get("success").asBoolean()).isTrue();
+        assertThat(json(get("/api/app/theme", null)).get("theme").asText()).isEqualTo("diwali");
+
+        assertThat(put("/api/app/admin/theme", admin, Map.of("theme", "holi")).statusCode()).isEqualTo(400);
+        assertThat(json(get("/api/app/theme", null)).get("theme").asText()).isEqualTo("diwali");
+
+        assertThat(json(put("/api/app/admin/theme", admin, Map.of("theme", "none"))).get("success").asBoolean()).isTrue();
+        assertThat(json(get("/api/app/theme", null)).get("theme").asText()).isEqualTo("none");
+    }
+
+    @Test
     void onlyAdministratorsChangeTheShop() throws Exception {
         assertThat(post("/api/shop/admin/screen-guards", null, guard("Glass", 999, 499)).statusCode()).isEqualTo(401);
         assertThat(get("/api/shop/admin/screen-guards", null).statusCode()).isEqualTo(401);

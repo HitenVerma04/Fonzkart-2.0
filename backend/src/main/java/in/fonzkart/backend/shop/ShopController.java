@@ -2,6 +2,7 @@ package in.fonzkart.backend.shop;
 
 import in.fonzkart.backend.auth.session.SessionService;
 import in.fonzkart.backend.shop.ShopService.AdminOverview;
+import in.fonzkart.backend.shop.ShopService.FestiveTheme;
 import in.fonzkart.backend.shop.ShopService.PlaceOrderInput;
 import in.fonzkart.backend.shop.ShopService.ScreenGuardInput;
 import in.fonzkart.backend.shop.ShopService.SettingsInput;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** The screen guard shop: the store and orders for customers, guards, switches and orders for administrators. */
+/**
+ * The screen guard shop: the store and orders for customers, guards, switches and orders for administrators. Also the
+ * Customer app's festive theme, which shares the shop's settings table.
+ */
 @RestController
 public class ShopController {
 
@@ -29,6 +33,16 @@ public class ShopController {
     public ShopController(ShopService shop, SessionService sessions) {
         this.shop = shop;
         this.sessions = sessions;
+    }
+
+    @GetMapping("/api/app/theme")
+    public FestiveTheme festiveTheme() {
+        return shop.festiveTheme();
+    }
+
+    @PutMapping("/api/app/admin/theme")
+    public Map<String, Object> saveFestiveTheme(HttpServletRequest request, @RequestBody FestiveTheme input) {
+        return shop.saveFestiveTheme(sessions.getSession(request), input);
     }
 
     @GetMapping("/api/shop/screen-guards")

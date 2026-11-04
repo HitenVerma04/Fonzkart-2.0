@@ -76,6 +76,12 @@ public class ShopService {
     public record StatusInput(String status) {
     }
 
+    /** The Customer app's festive look. */
+    public record FestiveTheme(String theme) {
+    }
+
+    static final String FESTIVE_THEME = "app.festiveTheme";
+    static final List<String> FESTIVE_THEMES = List.of("none", "republic", "independence", "diwali", "eid", "christmas");
     static final List<String> GUARD_TYPES = List.of("tempered", "privacy", "matte", "clear", "full", "lens");
     static final List<String> STATUSES = List.of("placed", "confirmed", "shipped", "delivered", "cancelled");
     static final String STORE_ENABLED = "shop.storeEnabled";
@@ -287,6 +293,23 @@ public class ShopService {
         return result(null);
     }
 
+    /** The festive look customers see; "none" until an administrator chooses one. */
+    public FestiveTheme festiveTheme() {
+        List<String> saved = jdbc.queryForList("SELECT value FROM \"AppSetting\" WHERE key = ?", String.class, FESTIVE_THEME);
+        return new FestiveTheme(saved.isEmpty() || !FESTIVE_THEMES.contains(saved.get(0)) ? "none" : saved.get(0));
+    }
+
+    @Transactional
+    public Map<String, Object> saveFestiveTheme(Optional<SessionPayload> session, FestiveTheme input) {
+        requireAdmin(session);
+        String theme = input == null ? "" : clean(input.theme());
+        if (!FESTIVE_THEMES.contains(theme)) {
+            throw badRequest("Unknown festive theme.");
+        }
+        saveSetting(FESTIVE_THEME, theme, JsDates.nowUtc());
+        return result(null);
+    }
+
     /** Every order, newest first, with the email of the customer who placed it. */
     public List<ShopOrder> allOrders(Optional<SessionPayload> session) {
         requireAdmin(session);
@@ -335,9 +358,13 @@ public class ShopService {
     }
 
     private void saveSetting(String key, boolean value, LocalDateTime now) {
+        saveSetting(key, Boolean.toString(value), now);
+    }
+
+    private void saveSetting(String key, String value, LocalDateTime now) {
         jdbc.update("INSERT INTO \"AppSetting\" (key, value, \"updatedAt\") VALUES (?, ?, ?) "
                 + "ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, \"updatedAt\" = EXCLUDED.\"updatedAt\"",
-                key, Boolean.toString(value), now);
+                key, value, now);
     }
 
     /** The input cleaned up, or a 400 naming what is wrong. */
