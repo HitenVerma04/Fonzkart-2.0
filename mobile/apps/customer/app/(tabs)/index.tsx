@@ -3,7 +3,7 @@
 // brands, and the Fonzkart promise in a dark card (CRED's style).
 import { useCallback } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
-import Animated, { runOnUI, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import Animated, { runOnUI, useAnimatedReaction, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useBrands, useNotifications, useSession } from '@fonzkart/api';
@@ -20,7 +20,7 @@ import { HomeCarousel } from '../../src/HomeCarousel';
 import { PromiseCard, ServiceTiles } from '../../src/home/sections';
 import { SellThisDevice } from '../../src/home/SellThisDevice';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
-import { launchTarget } from '../../src/launchTargets';
+import { launchCovering, launchTarget } from '../../src/launchTargets';
 
 const TOP_BRANDS = 8;
 const SUGGESTIONS = ['iPhone 13', 'Galaxy S23', 'OnePlus 11', 'iPad Air', 'MacBook Air', 'Apple Watch'];
@@ -44,10 +44,10 @@ export default function Home() {
   const greeting = festiveGreeting(d.festive);
 
   // Every category card animates all the time (the drawings are drawn by Skia on the GPU, see categoryArt/skiaSvg),
-  // including while the list scrolls. They pause only when no one can see them: while another screen covers this one,
-  // or when the cards are scrolled completely off screen.
+  // including while the list scrolls. They pause only when no one can see them: while another screen or the launch
+  // animation covers this one, or when the cards are scrolled completely off screen.
   const { height: viewport } = useWindowDimensions();
-  const artActive = useSharedValue(true);
+  const artActive = useSharedValue(!launchCovering.value);
   const focused = useSharedValue(true);
   const scrollY = useSharedValue(0);
   const bodyTop = useSharedValue(0);
@@ -57,7 +57,7 @@ export default function Home() {
     'worklet';
     const top = bodyTop.value + cardsTop.value;
     const bottom = bodyTop.value + cardsBottom.value;
-    const visible = focused.value && scrollY.value + viewport > top && scrollY.value < bottom;
+    const visible = focused.value && !launchCovering.value && scrollY.value + viewport > top && scrollY.value < bottom;
     if (artActive.value !== visible) artActive.value = visible;
   };
   useFocusEffect(useCallback(() => {
@@ -69,6 +69,9 @@ export default function Home() {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [artActive, focused]));
+  useAnimatedReaction(() => launchCovering.value, (covering, previous) => {
+    if (previous !== null && covering !== previous) settle();
+  });
   const onScroll = useAnimatedScrollHandler({
     onScroll: e => {
       scrollY.value = e.contentOffset.y;

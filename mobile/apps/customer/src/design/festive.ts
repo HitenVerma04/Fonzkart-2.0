@@ -17,6 +17,8 @@ type Look = {
   /** Dark cards ("Sell this device", the Fonzkart promise) and the highlight on them. */
   deepGradient: string;
   deepAccent: string;
+  /** The launch animation's second aurora light, as "r,g,b" (the first is the accent). */
+  glow: string;
 };
 
 const LOOKS: Record<Exclude<FestiveThemeId, 'none'>, Look> = {
@@ -31,6 +33,7 @@ const LOOKS: Record<Exclude<FestiveThemeId, 'none'>, Look> = {
     heroOnAccent: '#7c2d12',
     deepGradient: 'linear-gradient(135deg, #060f26 0%, #0b2460 58%, #123a8c 100%)',
     deepAccent: '#fdba74',
+    glow: '59,130,246',
   },
   independence: {
     light: { accent: '#138808', deep: '#0e6b06', soft: '#f1fbef', tint: '#dcf5d8', border: '#b9e8b2', background: '#fbf7f2' },
@@ -43,6 +46,7 @@ const LOOKS: Record<Exclude<FestiveThemeId, 'none'>, Look> = {
     heroOnAccent: '#0e6b06',
     deepGradient: 'linear-gradient(135deg, #1a0d05 0%, #4a1c08 55%, #0e4d0a 100%)',
     deepAccent: '#ffd8a8',
+    glow: '249,115,22',
   },
   eid: {
     light: { accent: '#0b6b5a', deep: '#085346', soft: '#eefaf6', tint: '#d3f1e8', border: '#a9e2d2', background: '#f5f7f3' },
@@ -55,6 +59,7 @@ const LOOKS: Record<Exclude<FestiveThemeId, 'none'>, Look> = {
     heroOnAccent: '#5b4300',
     deepGradient: 'linear-gradient(135deg, #021a16 0%, #05352d 58%, #0b5d4e 100%)',
     deepAccent: '#f2d98c',
+    glow: '16,185,129',
   },
   diwali: {
     light: { accent: '#c2570c', deep: '#9a4408', soft: '#fff7ed', tint: '#ffedd5', border: '#fed7aa', background: '#faf6f1' },
@@ -67,6 +72,7 @@ const LOOKS: Record<Exclude<FestiveThemeId, 'none'>, Look> = {
     heroOnAccent: '#7c2d12',
     deepGradient: 'linear-gradient(135deg, #140418 0%, #3b0f52 58%, #7c2d12 100%)',
     deepAccent: '#fcd34d',
+    glow: '168,85,247',
   },
   christmas: {
     light: { accent: '#c81e1e', deep: '#9b1c1c', soft: '#fef2f2', tint: '#fee2e2', border: '#fecaca', background: '#f7f5f4' },
@@ -79,6 +85,7 @@ const LOOKS: Record<Exclude<FestiveThemeId, 'none'>, Look> = {
     heroOnAccent: '#14532d',
     deepGradient: 'linear-gradient(135deg, #1a0606 0%, #5c1010 55%, #14532d 100%)',
     deepAccent: '#fecaca',
+    glow: '34,197,94',
   },
 };
 
@@ -89,7 +96,7 @@ function build(id: Exclude<FestiveThemeId, 'none'>): FestiveLook {
   const { accent, deep, soft, tint, border, background } = look.light;
   const { accent: glow, bright, rgb } = look.dark;
   const note = (a: number, b: number) => ({ background: `rgba(${rgb},${a})`, border: `rgba(${rgb},${b})`, text: bright });
-  const extras = { festive: id, heroAccent: look.heroAccent, heroOnAccent: look.heroOnAccent, deepGradient: look.deepGradient, deepAccent: look.deepAccent };
+  const extras = { festive: id, heroAccent: look.heroAccent, heroOnAccent: look.heroOnAccent, deepGradient: look.deepGradient, deepAccent: look.deepAccent, launchGlow: [rgb, look.glow] as [string, string] };
   return {
     palettes: {
       light: {
@@ -104,11 +111,12 @@ function build(id: Exclude<FestiveThemeId, 'none'>): FestiveLook {
     designs: {
       light: {
         ...baseDesigns.light, ...extras, heroGradient: look.hero.light,
+        launchGradient: `linear-gradient(165deg, ${soft} 0%, ${tint} 48%, ${border} 100%)`,
         greenGradient: `linear-gradient(135deg, ${accent} 0%, ${deep} 100%)`,
         shadow: { ...baseDesigns.light.shadow, green: `0px 8px 20px ${accent}52` },
       },
       dark: {
-        ...baseDesigns.dark, ...extras, heroGradient: look.hero.dark,
+        ...baseDesigns.dark, ...extras, heroGradient: look.hero.dark, launchGradient: look.hero.dark,
         greenGradient: `linear-gradient(135deg, ${bright} 0%, ${glow} 100%)`,
         shadow: { ...baseDesigns.dark.shadow, green: `0px 8px 22px rgba(${rgb},0.28)` },
       },

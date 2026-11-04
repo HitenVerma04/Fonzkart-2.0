@@ -127,6 +127,9 @@ export type Design = {
   /** The dark cards ("Sell this device", the Fonzkart promise) and the highlight on them. */
   deepGradient: string;
   deepAccent: string;
+  /** The sky behind the launch animation, and its two aurora lights as "r,g,b". */
+  launchGradient: string;
+  launchGlow: [string, string];
 };
 
 const GREEN_EXTRAS = {
@@ -135,6 +138,7 @@ const GREEN_EXTRAS = {
   heroOnAccent: '#14532d',
   deepGradient: 'linear-gradient(135deg, #07170f 0%, #0c2c1b 58%, #14532d 100%)',
   deepAccent: '#86efac',
+  launchGlow: ['34,197,94', '16,185,129'] as [string, string],
 };
 
 const LIGHT: Design = {
@@ -156,6 +160,7 @@ const LIGHT: Design = {
   },
   shimmer: 'rgba(255,255,255,0.75)',
   ...GREEN_EXTRAS,
+  launchGradient: 'linear-gradient(165deg, #f0fdf4 0%, #dcfce7 48%, #bbf7d0 100%)',
 };
 
 const DARK: Design = {
@@ -177,6 +182,7 @@ const DARK: Design = {
   },
   shimmer: 'rgba(255,255,255,0.07)',
   ...GREEN_EXTRAS,
+  launchGradient: 'linear-gradient(165deg, #04110a 0%, #0a2a17 52%, #030806 100%)',
 };
 
 export const baseDesigns = { light: LIGHT, dark: DARK };

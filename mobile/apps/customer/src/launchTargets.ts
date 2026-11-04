@@ -1,6 +1,11 @@
 // Where the launch animation's icons land: the real buttons register themselves here, and the animation asks where
 // they are on screen just before it flies to them.
+import { makeMutable } from 'react-native-reanimated';
+
 type Measurable = { measureInWindow: (done: (x: number, y: number, width: number, height: number) => void) => void };
+
+/** True while the launch animation covers the app: the home screen's drawings wait, leaving it every frame. */
+export const launchCovering = makeMutable(true);
 
 export type LaunchSpot = { x: number; y: number; width: number; height: number };
 
