@@ -17,6 +17,7 @@ import {
   useDesign, useTabBarSpace,
 } from '../../src/design';
 import { HomeCarousel } from '../../src/HomeCarousel';
+import { FactoryBackground } from '../../src/home/FactoryBackground';
 import { PromiseCard, ServiceTiles } from '../../src/home/sections';
 import { SellThisDevice } from '../../src/home/SellThisDevice';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
@@ -49,6 +50,8 @@ export default function Home() {
   const { height: viewport } = useWindowDimensions();
   const artActive = useSharedValue(!launchCovering.value);
   const focused = useSharedValue(true);
+  const factoryActive = useSharedValue(!launchCovering.value);
+  const contentHeight = useSharedValue(0);
   const scrollY = useSharedValue(0);
   const bodyTop = useSharedValue(0);
   const cardsTop = useSharedValue(0);
@@ -57,8 +60,10 @@ export default function Home() {
     'worklet';
     const top = bodyTop.value + cardsTop.value;
     const bottom = bodyTop.value + cardsBottom.value;
-    const visible = focused.value && !launchCovering.value && scrollY.value + viewport > top && scrollY.value < bottom;
+    const shown = focused.value && !launchCovering.value;
+    const visible = shown && scrollY.value + viewport > top && scrollY.value < bottom;
     if (artActive.value !== visible) artActive.value = visible;
+    if (factoryActive.value !== shown) factoryActive.value = shown;
   };
   useFocusEffect(useCallback(() => {
     focused.value = true;
@@ -66,9 +71,10 @@ export default function Home() {
     return () => {
       focused.value = false;
       artActive.value = false;
+      factoryActive.value = false;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [artActive, focused]));
+  }, [artActive, factoryActive, focused]));
   useAnimatedReaction(() => launchCovering.value, (covering, previous) => {
     if (previous !== null && covering !== previous) settle();
   });
@@ -80,10 +86,15 @@ export default function Home() {
   });
 
   return (
+    <View style={styles.screen}>
+    <ArtActivity.Provider value={factoryActive}>
+      <FactoryBackground scrollY={scrollY} contentHeight={contentHeight} />
+    </ArtActivity.Provider>
     <ArtActivity.Provider value={artActive}>
     <MotionActivity.Provider value={artActive}>
-    <Animated.ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
+    <Animated.ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}
+      onContentSizeChange={(_, h) => { contentHeight.value = h; }}>
       <View style={[styles.hero, { backgroundImage: d.heroGradient, paddingTop: insets.top + 10 }]}>
         <FestiveDecor />
         <View style={styles.heroInner}>
@@ -178,11 +189,13 @@ export default function Home() {
     </Animated.ScrollView>
     </MotionActivity.Provider>
     </ArtActivity.Provider>
+    </View>
   );
 }
 
 const useStyles = makeStyles(colors => ({
   screen: { flex: 1, backgroundColor: colors.background },
+  scroll: { flex: 1 },
   hero: { borderBottomLeftRadius: radii.xl, borderBottomRightRadius: radii.xl, paddingBottom: 20 },
   heroInner: { paddingHorizontal: PAGE_PADDING, gap: 14, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
   topRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 },
