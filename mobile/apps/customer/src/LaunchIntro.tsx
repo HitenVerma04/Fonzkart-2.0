@@ -1,12 +1,12 @@
 // The launch animation, played once per app start over the first screen. On a themed sky of drifting aurora lights,
-// rising stardust and floating devices, the F logo appears with a burst of light and the ONZKA₹T lettering is unveiled
-// under it, while Fonzkart's services (Buy, Sell, Repair, Screen Guard, Refurbish) spiral out and circle them in 3D. When
-// the app has loaded, the sky fades away and each icon flies to its real button with a trail of stardust, landing with
+// rising stardust and floating devices, the F logo appears and the ONZKA₹T lettering is unveiled under it, while
+// Fonzkart's services (Buy, Sell, Repair, Screen Guard, Refurbish) drift around them as small round icons on one faint
+// line, nearer ones a little larger: kept quiet on purpose, the logo is the subject. When the app has loaded, the sky fades away and each icon flies to its real button with a trail of stardust, landing with
 // a ripple: Sell, Buy and Repair on the tab bar (Refurbish with Buy), Screen Guard on its card further down home.
 //
 // Smoothness rules, as this is the app's first impression: only transforms and opacity animate (never width, zIndex or
 // shadows, which redo layout or repainting every frame); one clock (`angle`) drives everything that loops; groups of
-// sparks move as one view; moving tiles are kept as ready-drawn layers, so their text does not shimmer as they scale;
+// stars move as one view; moving tiles are kept as ready-drawn layers, so they do not shimmer as they scale;
 // the home screen's drawings wait (launchCovering); and nothing starts until the first screen has been mounted.
 import { useEffect, useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
@@ -28,12 +28,12 @@ const WORDMARK_DARK = require('../../../brand/fonzkart_wordmark_dark.png');
 const RATIO = 1408 / 346; // wordmark width / height
 const PHONE = 190 / 1408; // share of the wordmark's width taken by the F-phone
 
-const SERVICES: { id: string; label: string; icon: IconName; target: string }[] = [
-  { id: 'buy', label: 'Buy', icon: 'buy', target: 'buy' },
-  { id: 'sell', label: 'Sell', icon: 'sell', target: 'sell' },
-  { id: 'repair', label: 'Repair', icon: 'repair', target: 'repair' },
-  { id: 'guard', label: 'Screen Guard', icon: 'shield', target: 'screenguard' },
-  { id: 'refurbish', label: 'Refurbish', icon: 'auto', target: 'buy' },
+const SERVICES: { id: string; icon: IconName; target: string }[] = [
+  { id: 'buy', icon: 'buy', target: 'buy' },
+  { id: 'sell', icon: 'sell', target: 'sell' },
+  { id: 'repair', icon: 'repair', target: 'repair' },
+  { id: 'guard', icon: 'shield', target: 'screenguard' },
+  { id: 'refurbish', icon: 'auto', target: 'buy' },
 ];
 
 // The faint devices floating at the edges: icon, share of the screen across and down, size, phase.
@@ -41,11 +41,11 @@ const DEVICES: [IconName, number, number, number, number][] = [
   ['auto', 0.1, 0.1, 34, 0], ['laptop', 0.82, 0.08, 38, 1.3], ['watch', 0.08, 0.86, 30, 2.4], ['tablet', 0.84, 0.88, 36, 3.6], ['headphones', 0.5, 0.92, 30, 4.8],
 ];
 
-const TILE = 78;
-const HALO = 7; // the soft edge around a tile
-const TILT = 1.42; // the orbit's height against its width: a tall ring, which keeps the logo in the middle clear
+const TILE = 54;
+const LANDING_SCALE = 0.74; // a tile's size on arrival: about the size of the tab bar's icons
+const TILT = 1.34; // the orbit's height against its width: a tall ring, which keeps the logo in the middle clear
 const LEAN = -0.1; // the orbit's slant, in radians
-const TURN_SECONDS = 9;
+const TURN_SECONDS = 16;
 const MIN_SHOW = 3200; // always long enough to be seen
 const MAX_SHOW = 6500; // never held longer, however slow the network
 const STAGGER = 95;
@@ -159,15 +159,12 @@ export function LaunchIntro() {
   const reveal = useAnimatedStyle(() => ({ transform: [{ translateX: -hidden.value }] }));
   const lettering = useAnimatedStyle(() => ({ transform: [{ translateX: hidden.value }] }));
   const light = useAnimatedStyle(() => ({ transform: [{ translateX: -full * 0.4 + sweep.value * full * 1.4 }], opacity: sweep.value < 1 ? 1 : 0 }));
-  const halo = useAnimatedStyle(() => ({ opacity: (0.75 + Math.sin(angle.value * 3) * 0.25) * sky.value * (1 - exit.value), transform: [{ scale: 1 + Math.sin(angle.value * 3) * 0.07 + exit.value * 1.6 }] }));
-  const rays = useAnimatedStyle(() => ({ opacity: sky.value * (1 - exit.value), transform: [{ rotate: `${angle.value * 0.5}rad` }] }));
-  const ring = useAnimatedStyle(() => ({ opacity: logo.value * 0.9 * (1 - exit.value) }));
-  const shock = useAnimatedStyle(() => ({ opacity: burst.value > 0 ? (1 - burst.value) * 0.9 : 0, transform: [{ scale: 0.25 + burst.value * 2.5 }] }));
-  const sparks = useAnimatedStyle(() => ({ opacity: burst.value > 0 ? 1 - burst.value : 0, transform: [{ scale: 0.3 + burst.value * 1.5 }, { rotate: `${burst.value * 0.5}rad` }] }));
+  const halo = useAnimatedStyle(() => ({ opacity: (0.6 + Math.sin(angle.value * 3) * 0.12) * sky.value * (1 - exit.value), transform: [{ scale: 1 + Math.sin(angle.value * 3) * 0.04 + exit.value * 1.6 }] }));
+  const ring = useAnimatedStyle(() => ({ opacity: logo.value * 0.55 * (1 - exit.value) }));
+  const shock = useAnimatedStyle(() => ({ opacity: burst.value > 0 ? (1 - burst.value) * 0.35 : 0, transform: [{ scale: 0.4 + burst.value * 1.5 }] }));
 
   if (done) return null;
   const orbit = { cx, cy, radius, angle };
-  const size = radius * 3;
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.root]} accessibilityLabel="Fonzkart">
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }, base]} />
@@ -181,14 +178,6 @@ export function LaunchIntro() {
       ))}
       {[0, 1, 2].map(layer => <Stardust key={layer} layer={layer} width={screen} height={tall} angle={angle} sky={sky} exit={exit} color={d.scheme === 'dark' ? '#ffffff' : colors.green} />)}
 
-      <Animated.View style={[styles.place, { left: cx - size / 2, top: cy - size / 2, width: size, height: size }, rays]}>
-        {[0, 60, 120].map(turn => (
-          <View key={turn} style={[StyleSheet.absoluteFill, {
-            borderRadius: size / 2, transform: [{ rotate: `${turn}deg` }, { scaleY: 0.1 }],
-            backgroundImage: `radial-gradient(circle, rgba(${glowA},0.3) 0%, rgba(${glowA},0.1) 40%, rgba(${glowA},0) 70%)`,
-          }]} />
-        ))}
-      </Animated.View>
       <Animated.View style={[styles.place, {
         left: cx - radius, top: cy - radius, width: radius * 2, height: radius * 2, borderRadius: radius,
         backgroundImage: `radial-gradient(circle, rgba(${glowA},0.42) 0%, rgba(${glowA},0.14) 42%, rgba(${glowA},0) 70%)`,
@@ -196,19 +185,9 @@ export function LaunchIntro() {
       <Animated.View style={[styles.ring, {
         left: cx - radius, top: cy - radius, width: radius * 2, height: radius * 2, borderRadius: radius, borderColor: colors.greenBorder,
         transform: [{ rotate: `${LEAN}rad` }, { scaleY: TILT }],
-      }, ring]} renderToHardwareTextureAndroid />
+      }, ring]} />
 
       <Animated.View style={[styles.shock, { left: cx - 70, top: cy - 70, borderColor: colors.green }, shock]} />
-      <Animated.View style={[styles.place, { left: cx, top: cy }, sparks]}>
-        {Array.from({ length: 12 }, (_, i) => {
-          const a = (i / 12) * TAU;
-          const far = 96 + scatter(i + 3) * 44;
-          return <View key={i} style={[styles.spark, { left: Math.cos(a) * far, top: Math.sin(a) * far, backgroundColor: i % 2 ? colors.green : d.heroAccent }]} />;
-        })}
-      </Animated.View>
-
-      {[0, 2.1, 4.2].map(offset => <OrbitSpark key={offset} offset={offset} orbit={orbit} logo={logo} exit={exit} color={colors.green} />)}
-
       <Animated.View style={[styles.stack, { left: cx - full / 2, top: cy - (markHeight + height + 12) / 2, width: full }, stack]}>
         <Image source={MARK} style={[{ height: markHeight, width: markHeight * MARK_RATIO }, greeting ? { tintColor: colors.green } : null]} resizeMode="contain" />
         <View style={{ height, width: full, overflow: 'hidden' }}>
@@ -223,7 +202,7 @@ export function LaunchIntro() {
       </Animated.View>
 
       {started ? SERVICES.map((service, index) => (
-        <OrbitTile key={service.id} label={service.label} icon={service.icon} index={index} orbit={orbit}
+        <OrbitTile key={service.id} icon={service.icon} index={index} orbit={orbit}
           flying={!!spots} spot={spots?.[index] ?? { x: cx, y: tall + TILE }} />
       )) : null}
     </View>
@@ -299,9 +278,8 @@ function Stardust({ layer, width, height, angle, sky, exit, color }: {
   );
 }
 
-/** One service: spirals out of the logo, circles it, and once `flying`, leaves for `spot`. */
-function OrbitTile({ label, icon, index, orbit, flying, spot }: {
-  label: string;
+/** One service: fades in on the orbit, drifts around the logo, and once `flying`, leaves for `spot`. */
+function OrbitTile({ icon, index, orbit, flying, spot }: {
   icon: IconName;
   index: number;
   orbit: Orbit;
@@ -316,10 +294,9 @@ function OrbitTile({ label, icon, index, orbit, flying, spot }: {
   const ripple = useSharedValue(0);
   const targetX = spot.x - cx;
   const targetY = spot.y - cy;
-  const box = TILE + HALO * 2;
 
   useEffect(() => {
-    spread.value = withDelay(260 + index * 120, withTiming(1, { duration: 1150, easing: Easing.bezier(0.16, 1, 0.3, 1) }));
+    spread.value = withDelay(420 + index * 140, withTiming(1, { duration: 1000, easing: Easing.bezier(0.22, 1, 0.36, 1) }));
   }, [index, spread]);
 
   useEffect(() => {
@@ -331,22 +308,18 @@ function OrbitTile({ label, icon, index, orbit, flying, spot }: {
 
   const tile = useAnimatedStyle(() => {
     const s = spread.value;
-    const a = angle.value + offset - (1 - s) * 2.2;
-    const at = place(a, radius * s);
+    const at = place(angle.value + offset - (1 - s) * 0.5, radius * (0.82 + s * 0.18));
     const near = (at.depth + 1) / 2;
     const f = flight.value;
     return {
-      opacity: Math.min(s * 2.2, 1) * (0.72 + near * 0.28) * (1 - f) + f * (f > 0.93 ? (1 - f) / 0.07 : 1),
+      opacity: s * (0.7 + near * 0.3) * (1 - f) + f * (f > 0.93 ? (1 - f) / 0.07 : 1),
       transform: [
         { translateX: at.x * (1 - f) + targetX * f },
         { translateY: at.y * (1 - f) + targetY * f - Math.sin(f * Math.PI) * 54 },
-        { perspective: 420 },
-        { rotateY: `${Math.cos(a) * -20 * (1 - f)}deg` },
-        { scale: (0.5 + s * (0.3 + near * 0.32)) * (1 - f) + 0.44 * f },
+        { scale: (0.86 + near * 0.2) * (1 - f) + LANDING_SCALE * f },
       ],
     };
   });
-  const words = useAnimatedStyle(() => ({ opacity: Math.max(0, 1 - flight.value * 3) }));
   const wave = useAnimatedStyle(() => ({
     opacity: ripple.value > 0 ? (1 - ripple.value) * 0.85 : 0,
     transform: [{ translateX: targetX }, { translateY: targetY }, { scale: 0.3 + ripple.value * 1.15 }],
@@ -358,13 +331,8 @@ function OrbitTile({ label, icon, index, orbit, flying, spot }: {
       {[0.05, 0.1, 0.16].map(lag => (
         <TrailStar key={lag} lag={lag} flight={flight} orbit={orbit} offset={offset} targetX={targetX} targetY={targetY} color={colors.green} />
       ))}
-      <Animated.View renderToHardwareTextureAndroid style={[styles.place, styles.tileBox, { left: cx - box / 2, top: cy - box / 2, width: box, height: box, backgroundColor: colors.greenTint }, tile]}>
-        <View style={[styles.tile, { backgroundColor: colors.surface, borderColor: colors.greenBorder }]}>
-          <Icon name={icon} color={colors.green} size={30} filled />
-          <Animated.View style={words}>
-            <Text style={[styles.label, { color: colors.navy }]} numberOfLines={1}>{label}</Text>
-          </Animated.View>
-        </View>
+      <Animated.View renderToHardwareTextureAndroid style={[styles.tile, { left: cx - TILE / 2, top: cy - TILE / 2, backgroundColor: colors.surface, borderColor: colors.greenBorder }, tile]}>
+        <Icon name={icon} color={colors.green} size={24} filled />
       </Animated.View>
     </>
   );
@@ -396,32 +364,15 @@ function TrailStar({ lag, flight, orbit, offset, targetX, targetY, color }: {
   return <Animated.View style={[styles.trail, { left: cx - 5, top: cy - 5, backgroundColor: color }, dust]} />;
 }
 
-/** A small spark riding just outside the orbit, the other way round. */
-function OrbitSpark({ offset, orbit, logo, exit, color }: { offset: number; orbit: Orbit; logo: SharedValue<number>; exit: SharedValue<number>; color: string }) {
-  const { cx, cy, radius, angle } = orbit;
-  const dot = useAnimatedStyle(() => {
-    const at = place(-angle.value + offset, radius * 1.16);
-    return {
-      opacity: Math.min(logo.value, 1) * (1 - exit.value) * (0.35 + (at.depth + 1) * 0.3),
-      transform: [{ translateX: at.x }, { translateY: at.y }],
-    };
-  });
-  return <Animated.View style={[styles.dot, { left: cx - 3, top: cy - 3, backgroundColor: color }, dot]} />;
-}
-
 const styles = StyleSheet.create({
   root: { zIndex: 100, overflow: 'hidden' },
   place: { position: 'absolute' },
-  ring: { position: 'absolute', borderWidth: 1.5, borderStyle: 'dashed' },
-  shock: { position: 'absolute', width: 140, height: 140, borderRadius: 70, borderWidth: 2 },
-  spark: { position: 'absolute', width: 5, height: 5, borderRadius: 3 },
+  ring: { position: 'absolute', borderWidth: StyleSheet.hairlineWidth },
+  shock: { position: 'absolute', width: 140, height: 140, borderRadius: 70, borderWidth: 1 },
   stack: { position: 'absolute', alignItems: 'center', gap: 12 },
   light: { position: 'absolute', top: 0, left: 0, backgroundImage: 'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.75) 50%, transparent 100%)' },
-  tileBox: { borderRadius: 29, alignItems: 'center', justifyContent: 'center' },
-  tile: { width: TILE, height: TILE, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', gap: 3 },
+  tile: { position: 'absolute', width: TILE, height: TILE, borderRadius: TILE / 2, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   greeting: { fontSize: 15, lineHeight: 20, fontWeight: '800', letterSpacing: -0.2 },
-  label: { fontSize: 10.5, lineHeight: 13, fontWeight: '700', letterSpacing: -0.1 },
   wave: { position: 'absolute', width: 64, height: 64, borderRadius: 32, borderWidth: 2 },
   trail: { position: 'absolute', width: 10, height: 10, borderRadius: 5 },
-  dot: { position: 'absolute', width: 6, height: 6, borderRadius: 3 },
 });
