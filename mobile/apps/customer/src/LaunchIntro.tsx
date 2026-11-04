@@ -1,8 +1,9 @@
 // The launch animation, played once per app start over the first screen. On a themed sky of drifting aurora lights,
 // rising stardust and floating devices, the F logo appears and the ONZKA₹T lettering is unveiled under it, while
 // Fonzkart's services (Sell, Buy, Repair, Screen Guard, Refurbish) turn around them like a precision dial: small round
-// icons on one faint line snap round a position at a time, smearing as they surge, and each stop lights up one service
-// and names it under the logo. Decoration stays minimal: the motion is the interest. When the app has loaded, the sky fades away and each icon flies to its real button with a trail of stardust, landing with
+// icons on one faint line snap round a position at a time, smearing as they surge. Each stop is one service's moment:
+// it pops forward, large and glowing, with a pulse ring, the others dim, and its name appears under the logo. When the
+// app has loaded, the sky fades away and each icon flies to its real button with a trail of stardust, landing with
 // a ripple: Sell, Buy and Repair on the tab bar (Refurbish with Buy), Screen Guard on its card further down home.
 //
 // Smoothness rules, as this is the app's first impression: only transforms and opacity animate (never width, zIndex or
@@ -18,6 +19,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useIsFetching } from '@tanstack/react-query';
 import { useColors, useTheme } from '@fonzkart/ui';
 import { festiveGreeting, Icon, type IconName, useDesign } from './design';
+import { ServiceGlyph, type ServiceGlyphName } from './launchGlyphs';
 import { launchCovering, measureLaunchTarget } from './launchTargets';
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -30,12 +32,12 @@ const RATIO = 1408 / 346; // wordmark width / height
 const PHONE = 190 / 1408; // share of the wordmark's width taken by the F-phone
 
 // In the order the dial shows them.
-const SERVICES: { id: string; word: string; icon: IconName; target: string }[] = [
-  { id: 'sell', word: 'Sell', icon: 'sell', target: 'sell' },
-  { id: 'buy', word: 'Buy', icon: 'buy', target: 'buy' },
-  { id: 'repair', word: 'Repair', icon: 'repair', target: 'repair' },
-  { id: 'guard', word: 'Screen Guard', icon: 'shield', target: 'screenguard' },
-  { id: 'refurbish', word: 'Refurbish', icon: 'auto', target: 'buy' },
+const SERVICES: { id: ServiceGlyphName; word: string; target: string }[] = [
+  { id: 'sell', word: 'Sell', target: 'sell' },
+  { id: 'buy', word: 'Buy', target: 'buy' },
+  { id: 'repair', word: 'Repair', target: 'repair' },
+  { id: 'guard', word: 'Screen Guard', target: 'screenguard' },
+  { id: 'refurbish', word: 'Refurbish', target: 'buy' },
 ];
 const COUNT = SERVICES.length;
 
@@ -44,21 +46,26 @@ const DEVICES: [IconName, number, number, number, number][] = [
   ['auto', 0.1, 0.1, 34, 0], ['laptop', 0.82, 0.08, 38, 1.3], ['watch', 0.08, 0.86, 30, 2.4], ['tablet', 0.84, 0.88, 36, 3.6], ['headphones', 0.5, 0.92, 30, 4.8],
 ];
 
-const TILE = 54;
-const LANDING_SCALE = 0.74; // a tile's size on arrival: about the size of the tab bar's icons
+const TILE = 56;
+const LANDING_SCALE = 0.72; // a tile's size on arrival: about the size of the tab bar's icons
 const TILT = 1.34; // the orbit's height against its width: a tall ring, which keeps the logo in the middle clear
 const LEAN = -0.1; // the orbit's slant, in radians
 const SKY_SECONDS = 14; // one slow cycle of the sky
-const BEAT = 600; // one click of the dial, in milliseconds
-const MOVE = 0.8; // the share of a beat spent moving; the rest is the stop
+const BEAT = 700; // one click of the dial, in milliseconds
+const MOVE = 0.6; // the share of a beat spent moving; the rest is the service's moment
+const SPOTLIGHT = 0.5; // how much larger the lit service grows
 const FRONT = Math.PI / 2; // the lit position: the bottom of the ring, nearest the viewer
-const WORD_HEIGHT = 18;
-const MIN_SHOW = 3650; // one full round of the dial
+const WORD_HEIGHT = 22;
+const MIN_SHOW = 4500; // one full round of the dial
 const MAX_SHOW = 6500; // never held longer, however slow the network
 const STAGGER = 95;
 const FLIGHT = 780;
 const LANDED = 460; // the ripple after the last landing
 const TAU = Math.PI * 2;
+// The light along the top of a disc.
+const GLOSS_DARK = 'linear-gradient(180deg, rgba(255,255,255,0.17) 0%, rgba(255,255,255,0) 100%)';
+const GLOSS_LIGHT = 'linear-gradient(180deg, rgba(22,163,74,0.07) 0%, rgba(22,163,74,0) 100%)';
+const GLOSS_LIT = 'linear-gradient(180deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0) 100%)';
 
 type Spot = { x: number; y: number };
 type Orbit = { cx: number; cy: number; radius: number; spin: SharedValue<number> };
@@ -90,6 +97,13 @@ function lit(spin: number, offset: number) {
   const a = dial(spin) + offset;
   const c = Math.max(0, 1 - Math.abs(Math.atan2(Math.sin(a), Math.cos(a))) / (Math.PI / COUNT));
   return c * c * (3 - 2 * c);
+}
+
+/** How long ago (in beats) the service at `index` reached the lit position. */
+function since(spin: number, index: number) {
+  'worklet';
+  const u = (spin * COUNT - index + 1 - MOVE) % COUNT;
+  return u < 0 ? u + COUNT : u;
 }
 
 /** Same numbers on every launch, so the sky is designed rather than random. */
@@ -141,7 +155,7 @@ export function LaunchIntro() {
         hidden.value = withDelay(460, withTiming(0, { duration: 680, easing: out }));
         sweep.value = withDelay(1180, withTiming(1, { duration: 720, easing: Easing.inOut(Easing.quad) }));
         angle.value = withRepeat(withTiming(angle.value + TAU, { duration: SKY_SECONDS * 1000, easing: Easing.linear }), -1, false);
-        spin.value = withDelay(650, withRepeat(withTiming(1, { duration: BEAT * COUNT, easing: Easing.linear }), -1, false));
+        spin.value = withDelay(1000, withRepeat(withTiming(1, { duration: BEAT * COUNT, easing: Easing.linear }), -1, false));
       });
     });
     return () => {
@@ -240,7 +254,7 @@ export function LaunchIntro() {
       </Animated.View>
 
       {started ? SERVICES.map((service, index) => (
-        <OrbitTile key={service.id} icon={service.icon} index={index} orbit={orbit}
+        <OrbitTile key={service.id} glyph={service.id} index={index} orbit={orbit}
           flying={!!spots} spot={spots?.[index] ?? { x: cx, y: tall + TILE }} />
       )) : null}
     </View>
@@ -326,8 +340,8 @@ function ServiceWord({ word, offset, spin, color }: { word: string; offset: numb
 }
 
 /** One service: fades in on the dial, clicks round the logo, and once `flying`, leaves for `spot`. */
-function OrbitTile({ icon, index, orbit, flying, spot }: {
-  icon: IconName;
+function OrbitTile({ glyph, index, orbit, flying, spot }: {
+  glyph: ServiceGlyphName;
   index: number;
   orbit: Orbit;
   flying: boolean;
@@ -344,7 +358,7 @@ function OrbitTile({ icon, index, orbit, flying, spot }: {
   const targetY = spot.y - cy;
 
   useEffect(() => {
-    spread.value = withDelay(420 + index * 140, withTiming(1, { duration: 1000, easing: Easing.bezier(0.22, 1, 0.36, 1) }));
+    spread.value = withDelay(180 + index * 70, withTiming(1, { duration: 720, easing: Easing.bezier(0.22, 1, 0.36, 1) }));
   }, [index, spread]);
 
   useEffect(() => {
@@ -356,19 +370,27 @@ function OrbitTile({ icon, index, orbit, flying, spot }: {
 
   const tile = useAnimatedStyle(() => {
     const s = spread.value;
-    const at = place(FRONT + dial(spin.value) + offset - (1 - s) * 0.5, radius * (0.82 + s * 0.18));
+    const on = lit(spin.value, offset);
+    const at = place(FRONT + dial(spin.value) + offset - (1 - s) * 0.5, radius * (0.82 + s * 0.18 + on * 0.08));
     const near = (at.depth + 1) / 2;
     const f = flight.value;
+    const age = since(spin.value, index);
+    const pop = spin.value > 0 && age < 0.55 ? Math.sin((age / 0.55) * Math.PI) * 0.1 : 0;
     return {
-      opacity: s * (0.62 + near * 0.38) * (1 - f) + f * (f > 0.93 ? (1 - f) / 0.07 : 1),
+      opacity: s * (0.5 + near * 0.22 + on * 0.28) * (1 - f) + f * (f > 0.93 ? (1 - f) / 0.07 : 1),
       transform: [
         { translateX: at.x * (1 - f) + targetX * f },
         { translateY: at.y * (1 - f) + targetY * f - Math.sin(f * Math.PI) * 54 },
-        { scale: (0.78 + near * 0.26 + lit(spin.value, offset) * 0.12) * (1 - f) + LANDING_SCALE * f },
+        { scale: (0.74 + near * 0.2 + on * SPOTLIGHT + pop) * (1 - f) + LANDING_SCALE * f },
       ],
     };
   });
   const fill = useAnimatedStyle(() => ({ opacity: lit(spin.value, offset) * Math.max(0, 1 - flight.value * 4) }));
+  const pulse = useAnimatedStyle(() => {
+    const p = since(spin.value, index) / 0.95;
+    const on = spin.value > 0 && p < 1 && flight.value === 0;
+    return { opacity: on ? (1 - p) * 0.7 : 0, transform: [{ scale: 1 + p * 0.85 }] };
+  });
   const wave = useAnimatedStyle(() => ({
     opacity: ripple.value > 0 ? (1 - ripple.value) * 0.85 : 0,
     transform: [{ translateX: targetX }, { translateY: targetY }, { scale: 0.3 + ripple.value * 1.15 }],
@@ -380,13 +402,19 @@ function OrbitTile({ icon, index, orbit, flying, spot }: {
       {[0.05, 0.1, 0.16].map(lag => (
         <TrailStar key={lag} lag={lag} flight={flight} orbit={orbit} offset={offset} targetX={targetX} targetY={targetY} color={colors.green} />
       ))}
-      {[[0.014, 0.08], [0.0065, 0.15]].map(([lag, strength]) => (
+      {[[0.009, 0.04], [0.006, 0.065], [0.003, 0.09]].map(([lag, strength]) => (
         <Smear key={lag} lag={lag!} strength={strength!} offset={offset} orbit={orbit} spread={spread} flight={flight} color={colors.green} />
       ))}
-      <Animated.View style={[styles.tile, { left: cx - TILE / 2, top: cy - TILE / 2, backgroundColor: colors.surface, borderColor: colors.greenBorder }, tile]}>
-        <Icon name={icon} color={colors.green} size={24} filled />
-        <Animated.View style={[styles.fill, { backgroundColor: colors.green }, fill]}>
-          <Icon name={icon} color={d.onGreen} size={24} filled />
+      <Animated.View style={[styles.tile, { left: cx - TILE / 2, top: cy - TILE / 2 }, tile]}>
+        <Animated.View style={[styles.aura, { backgroundImage: `radial-gradient(circle, rgba(${d.launchGlow[0]},0.55) 0%, rgba(${d.launchGlow[0]},0.16) 45%, rgba(${d.launchGlow[0]},0) 70%)` }, fill]} />
+        <Animated.View style={[styles.pulse, { borderColor: colors.green }, pulse]} />
+        <View style={[styles.disc, { backgroundColor: colors.surface, borderColor: colors.greenBorder }]}>
+          <View style={[styles.gloss, { backgroundImage: d.scheme === 'dark' ? GLOSS_DARK : GLOSS_LIGHT }]} />
+          <ServiceGlyph name={glyph} color={colors.green} size={28} />
+        </View>
+        <Animated.View style={[styles.disc, styles.litDisc, { backgroundImage: d.greenGradient }, fill]}>
+          <View style={[styles.gloss, { backgroundImage: GLOSS_LIT }]} />
+          <ServiceGlyph name={glyph} color={d.onGreen} size={28} />
         </Animated.View>
       </Animated.View>
     </>
@@ -448,11 +476,15 @@ const styles = StyleSheet.create({
   shock: { position: 'absolute', width: 140, height: 140, borderRadius: 70, borderWidth: 1 },
   stack: { position: 'absolute', alignItems: 'center', gap: 12 },
   light: { position: 'absolute', top: 0, left: 0, backgroundImage: 'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.75) 50%, transparent 100%)' },
-  tile: { position: 'absolute', width: TILE, height: TILE, borderRadius: TILE / 2, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  fill: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: TILE / 2, alignItems: 'center', justifyContent: 'center' },
+  tile: { position: 'absolute', width: TILE, height: TILE },
+  disc: { position: 'absolute', top: 0, left: 0, width: TILE, height: TILE, borderRadius: TILE / 2, borderWidth: 1, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  litDisc: { borderColor: 'rgba(255,255,255,0.4)' },
+  gloss: { position: 'absolute', top: 0, left: 0, right: 0, height: TILE * 0.55 },
+  aura: { position: 'absolute', top: -TILE * 0.75, left: -TILE * 0.75, width: TILE * 2.5, height: TILE * 2.5, borderRadius: TILE * 1.25 },
+  pulse: { position: 'absolute', top: 0, left: 0, width: TILE, height: TILE, borderRadius: TILE / 2, borderWidth: 1.5 },
   smear: { position: 'absolute', width: TILE, height: TILE, borderRadius: TILE / 2 },
   words: { height: WORD_HEIGHT, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' },
-  word: { position: 'absolute', fontSize: 12, lineHeight: WORD_HEIGHT, fontWeight: '800', letterSpacing: 3.5, textTransform: 'uppercase' },
+  word: { position: 'absolute', fontSize: 15, lineHeight: WORD_HEIGHT, fontWeight: '800', letterSpacing: 3.5, textTransform: 'uppercase' },
   greeting: { fontSize: 15, lineHeight: 20, fontWeight: '800', letterSpacing: -0.2 },
   wave: { position: 'absolute', width: 64, height: 64, borderRadius: 32, borderWidth: 2 },
   trail: { position: 'absolute', width: 10, height: 10, borderRadius: 5 },
