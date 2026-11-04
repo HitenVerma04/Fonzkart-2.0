@@ -6,9 +6,9 @@
 // a ripple: Sell, Buy and Repair on the tab bar (Refurbish with Buy), Screen Guard on its card further down home.
 //
 // Smoothness rules, as this is the app's first impression: only transforms and opacity animate (never width, zIndex or
-// shadows, which redo layout or repainting every frame); one clock (`angle`) drives everything that loops; groups of
-// stars move as one view;
-// the home screen's drawings wait (launchCovering); and nothing starts until the first screen has been mounted.
+// shadows, which redo layout or repainting every frame); two clocks drive everything that loops (`angle` the sky, `spin`
+// the dial); groups of stars move as one view; the home screen's drawings wait (launchCovering); and nothing starts
+// until the first screen has been mounted.
 import { useEffect, useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, {
