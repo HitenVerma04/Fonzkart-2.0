@@ -3,7 +3,7 @@
 import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { makeStyles, useColors } from '@fonzkart/ui';
-import { Icon, radii, Tap, type, type IconName } from '../design';
+import { Icon, radii, Tap, type, type IconName, useDesign } from '../design';
 import { CONTACT } from '../contact';
 
 // ---- Category tabs (on the green header) ----
@@ -84,6 +84,7 @@ const STEPS = ['Get your price', 'Book a free pickup', 'Get paid instantly'];
 
 export function PromiseCard() {
   const styles = useStyles();
+  const d = useDesign();
   return (
     <View style={styles.promise}>
       <View style={styles.promiseGlow} />
@@ -92,7 +93,7 @@ export function PromiseCard() {
       <View style={styles.steps}>
         {STEPS.map((s, i) => (
           <View key={s} style={styles.step}>
-            <Text style={styles.stepNumber}>{i + 1}</Text>
+            <Text style={[styles.stepNumber, { color: d.deepAccent }]}>{i + 1}</Text>
             <Text style={styles.stepText}>{s}</Text>
           </View>
         ))}
@@ -101,7 +102,7 @@ export function PromiseCard() {
       {PROMISES.map(p => (
         <View key={p.title} style={styles.promiseRow}>
           <View style={styles.promiseIcon}>
-            <Icon name={p.icon} color="#4ade80" size={18} filled />
+            <Icon name={p.icon} color={d.deepAccent} size={18} filled />
           </View>
           <View style={styles.promiseText}>
             <Text style={styles.promiseRowTitle}>{p.title}</Text>

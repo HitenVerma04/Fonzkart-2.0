@@ -11,7 +11,7 @@ import Animated, {
 import * as SplashScreen from 'expo-splash-screen';
 import { useIsFetching } from '@tanstack/react-query';
 import { useColors, useTheme } from '@fonzkart/ui';
-import { Icon, type IconName } from './design';
+import { festiveGreeting, Icon, type IconName, useDesign } from './design';
 import { measureLaunchTarget } from './launchTargets';
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -53,6 +53,8 @@ function place(angle: number, radius: number) {
 export function LaunchIntro() {
   const colors = useColors();
   const { scheme } = useTheme();
+  const { festive } = useDesign();
+  const greeting = festiveGreeting(festive);
   const { width: screen, height: tall } = useWindowDimensions();
   const fetching = useIsFetching();
   const [spots, setSpots] = useState<(Spot | null)[] | null>(null);
@@ -129,11 +131,12 @@ export function LaunchIntro() {
       {[0, 2.1, 4.2].map(offset => <OrbitDot key={offset} offset={offset} orbit={orbit} exit={exit} color={colors.green} />)}
 
       <Animated.View style={[styles.stack, { left: cx - full / 2, top: cy - (markHeight + height + 12) / 2, width: full }, stack]}>
-        <Image source={MARK} style={{ height: markHeight, width: markHeight * MARK_RATIO }} resizeMode="contain" />
+        <Image source={MARK} style={[{ height: markHeight, width: markHeight * MARK_RATIO }, greeting ? { tintColor: colors.green } : null]} resizeMode="contain" />
         <Animated.View style={[{ height, overflow: 'hidden', alignSelf: 'flex-start' }, clip]}>
           <Image source={scheme === 'dark' ? WORDMARK_DARK : WORDMARK} style={{ width: full, height }} resizeMode="contain" />
           <Animated.View style={[styles.light, { height, width: full * 0.28 }, light]} />
         </Animated.View>
+        {greeting ? <Text style={[styles.greeting, { color: colors.green }]} numberOfLines={1}>{greeting}</Text> : null}
       </Animated.View>
 
       {SERVICES.map((service, index) => (
@@ -229,6 +232,7 @@ const styles = StyleSheet.create({
     position: 'absolute', width: TILE, height: TILE, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', gap: 3,
     boxShadow: '0px 10px 24px rgba(22,163,74,0.22)',
   },
+  greeting: { fontSize: 15, lineHeight: 20, fontWeight: '800', letterSpacing: -0.2 },
   label: { fontSize: 10.5, lineHeight: 13, fontWeight: '700', letterSpacing: -0.1 },
   wave: { position: 'absolute', width: 64, height: 64, borderRadius: 32, borderWidth: 2, zIndex: 29 },
   dot: { position: 'absolute', width: 6, height: 6, borderRadius: 3, zIndex: 6 },

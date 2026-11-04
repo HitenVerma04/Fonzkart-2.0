@@ -10,9 +10,10 @@ import { useBrands, useNotifications, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
 import { Logo, makeStyles } from '@fonzkart/ui';
 import { CategoryCard } from '../../src/categoryArt/CategoryCard';
+import { FestiveDecor } from '../../src/festive/FestiveDecor';
 import { ArtActivity, MotionActivity } from '../../src/categoryArt/motion';
 import {
-  Appear, ErrorState, Icon, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles, Tile, type,
+  Appear, ErrorState, festiveGreeting, Icon, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles, Tile, type,
   useDesign, useTabBarSpace,
 } from '../../src/design';
 import { HomeCarousel } from '../../src/HomeCarousel';
@@ -40,6 +41,7 @@ export default function Home() {
   const inbox = useNotifications(signedIn);
   const unread = inbox.data?.some(n => !n.isRead) ?? false;
   const firstName = signedIn ? session.user.name.trim().split(/\s+/)[0] : '';
+  const greeting = festiveGreeting(d.festive);
 
   // Every category card animates all the time (the drawings are drawn by Skia on the GPU, see categoryArt/skiaSvg),
   // including while the list scrolls. They pause only when no one can see them: while another screen covers this one,
@@ -80,18 +82,19 @@ export default function Home() {
     <Animated.ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}>
       <View style={[styles.hero, { backgroundImage: d.heroGradient, paddingTop: insets.top + 10 }]}>
+        <FestiveDecor />
         <View style={styles.heroInner}>
           <View style={styles.topRow}>
             <View style={styles.promise}>
-              <Text style={styles.kicker}>{firstName ? `Hi ${firstName} · your price in` : 'Fonzkart · your price in'}</Text>
+              <Text style={styles.kicker}>{greeting ? `${greeting} · your price in` : firstName ? `Hi ${firstName} · your price in` : 'Fonzkart · your price in'}</Text>
               <View style={styles.bigRow}>
                 <Text style={styles.big}>60 seconds</Text>
-                <View style={styles.chip}>
-                  <Icon name="bolt" color="#14532d" size={12} filled />
-                  <Text style={styles.chipText}>CASH</Text>
+                <View style={[styles.chip, { backgroundColor: d.heroAccent }]}>
+                  <Icon name="bolt" color={d.heroOnAccent} size={12} filled />
+                  <Text style={[styles.chipText, { color: d.heroOnAccent }]}>CASH</Text>
                 </View>
               </View>
-              <Text style={styles.subline}>Turn your old devices into <Text style={styles.cash}>cash</Text></Text>
+              <Text style={styles.subline}>Turn your old devices into <Text style={[styles.cash, { color: d.heroAccent }]}>cash</Text></Text>
             </View>
             <View style={styles.actions}>
               {signedIn ? <IconButton icon="bell" label="Notifications" tint="onGreen" badge={unread} onPress={() => router.push('/notifications')} /> : null}

@@ -1,6 +1,8 @@
 // The Customer app's design system: Fonzkart green on white and neutral surfaces (light), or on near-black (dark).
-// Green is the only accent; red appears only for errors. The palettes keep the shared Palette names so the shared
+// Green is the only accent (a festive theme swaps it, see festive.ts); red appears only for errors. The palettes keep the shared Palette names so the shared
 // @fonzkart/ui pieces pick them up too (ThemeProvider `palettes`).
+import { createContext, useContext } from 'react';
+import type { FestiveThemeId } from '@fonzkart/api';
 import { useTheme, type ColorScheme, type Palette } from '@fonzkart/ui';
 
 type Tone = { background: string; text: string };
@@ -117,6 +119,22 @@ export type Design = {
   glass: { fill: string; strongFill: string; border: string; sheen: string };
   shadow: { sm: string; md: string; lg: string; green: string };
   shimmer: string;
+  /** The festive theme on, or "none". */
+  festive: FestiveThemeId;
+  /** Small highlights on the header: the chip's fill and the text on it. */
+  heroAccent: string;
+  heroOnAccent: string;
+  /** The dark cards ("Sell this device", the Fonzkart promise) and the highlight on them. */
+  deepGradient: string;
+  deepAccent: string;
+};
+
+const GREEN_EXTRAS = {
+  festive: 'none' as const,
+  heroAccent: '#bbf7d0',
+  heroOnAccent: '#14532d',
+  deepGradient: 'linear-gradient(135deg, #07170f 0%, #0c2c1b 58%, #14532d 100%)',
+  deepAccent: '#86efac',
 };
 
 const LIGHT: Design = {
@@ -137,6 +155,7 @@ const LIGHT: Design = {
     green: '0px 8px 20px rgba(22,163,74,0.32)',
   },
   shimmer: 'rgba(255,255,255,0.75)',
+  ...GREEN_EXTRAS,
 };
 
 const DARK: Design = {
@@ -157,9 +176,16 @@ const DARK: Design = {
     green: '0px 8px 22px rgba(34,197,94,0.28)',
   },
   shimmer: 'rgba(255,255,255,0.07)',
+  ...GREEN_EXTRAS,
 };
+
+export const baseDesigns = { light: LIGHT, dark: DARK };
+
+/** The design extras in use: the normal ones, or a festive theme's (FestiveProvider). */
+export const DesignContext = createContext(baseDesigns);
 
 /** The design extras for the current light or dark mode (colours come from useColors()). */
 export function useDesign(): Design {
-  return useTheme().scheme === 'dark' ? DARK : LIGHT;
+  const designs = useContext(DesignContext);
+  return useTheme().scheme === 'dark' ? designs.dark : designs.light;
 }

@@ -2,6 +2,7 @@ import { QueryClient, keepPreviousData, useMutation, useQuery, useQueryClient } 
 import { isCompletePincode, type Answers } from '@fonzkart/core';
 import { authApi } from './auth';
 import { MIN_SEARCH_LENGTH, catalogApi, healthApi } from './catalog';
+import { festiveApi } from './festive';
 import { quoteApi } from './quote';
 import { customerOrdersApi, executiveApi, notificationsApi, staffOrdersApi, type PlaceOrderInput } from './orders';
 import { ridersApi } from './riders';
@@ -27,6 +28,18 @@ export const catalogKeys = {
 
 /** Queries tied to the signed-in user; removed on sign-out. */
 export const ACCOUNT_KEY = ['account'] as const;
+
+export const festiveKeys = { theme: ['festive-theme'] as const };
+
+/** The festive theme chosen in the Admin app ("none" when there is none). */
+export function useFestiveTheme() {
+  return useQuery({
+    queryKey: festiveKeys.theme,
+    queryFn: ({ signal }) => festiveApi.get(signal),
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+  });
+}
 
 export function useBrands(category?: string) {
   return useQuery({

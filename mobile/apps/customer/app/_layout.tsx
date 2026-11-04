@@ -6,8 +6,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { SessionProvider, createQueryClient } from '@fonzkart/api';
-import { ThemeProvider, useRefreshOnAppFocus, useTheme } from '@fonzkart/ui';
-import { AppHeader, customerPalettes } from '../src/design';
+import { useRefreshOnAppFocus, useTheme } from '@fonzkart/ui';
+import { AppHeader } from '../src/design';
+import { FestiveProvider } from '../src/festive/FestiveProvider';
 import { LaunchIntro } from '../src/LaunchIntro';
 import { themeStorage } from '../src/themeStorage';
 import { tokenStorage } from '../src/tokenStorage';
@@ -39,10 +40,10 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider storage={tokenStorage}>
-        <ThemeProvider storage={themeStorage} palettes={customerPalettes}>
+        <FestiveProvider storage={themeStorage}>
           <Screens />
           <LaunchIntro />
-        </ThemeProvider>
+        </FestiveProvider>
       </SessionProvider>
     </QueryClientProvider>
   );

@@ -11,7 +11,7 @@ import { useBrands, useModelSearch, useVariants } from '@fonzkart/api';
 import { formatInr, imageUrl, modelImage, sellCategoryOf } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import { lerp, useLoop } from '../categoryArt/motion';
-import { deviceKindOf, Icon, ProductImage, radii, Tap, type } from '../design';
+import { deviceKindOf, Icon, ProductImage, radii, Tap, type, useDesign } from '../design';
 import { startQuote } from '../quoteDraft';
 import { deviceTitle, matchBrand, matchModel, matchVariant, readDeviceSpecs, searchNames } from './thisDevice';
 
@@ -20,6 +20,7 @@ const STAGE_HEIGHT = 128;
 
 export function SellThisDevice() {
   const styles = useStyles();
+  const d = useDesign();
   const router = useRouter();
   const specs = useMemo(readDeviceSpecs, []);
   const names = specs ? searchNames(specs) : [];
@@ -77,20 +78,20 @@ export function SellThisDevice() {
   return (
     <Tap onPress={open} scaleTo={0.98} accessibilityRole="button"
       accessibilityLabel={`Sell ${title}${best ? `, get up to ${formatInr(best)}` : ''}${specLine.length ? `, ${specLine.join(', ')}` : ''}`}
-      style={styles.card}>
+      style={[styles.card, { backgroundImage: d.deepGradient }]}>
       <View style={styles.glow} />
       <View style={styles.top}>
         <View style={styles.text}>
           <View style={styles.kickerRow}>
             <LiveDot />
-            <Text style={styles.kicker}>You're holding</Text>
+            <Text style={[styles.kicker, { color: d.deepAccent }]}>You're holding</Text>
           </View>
           <Text style={styles.title} numberOfLines={3}>Sell {title}</Text>
           {variant ? <Text style={styles.variant} numberOfLines={1}>{variant.name}</Text> : null}
           {best ? (
             <View style={styles.priceBlock}>
               <Text style={styles.upTo}>Get up to</Text>
-              <Text style={styles.price}>{formatInr(best)}</Text>
+              <Text style={[styles.price, { color: d.deepAccent }]}>{formatInr(best)}</Text>
             </View>
           ) : (
             <Text style={styles.worth}>{worth}</Text>
@@ -155,11 +156,10 @@ function LiveDot() {
   );
 }
 
-// A deep green card in both themes, so it stands apart from the bright carousel above it.
+// A deep card in both light and dark mode (green, or the festive theme's), so it stands apart from the carousel above it.
 const useStyles = makeStyles(() => ({
   card: {
     borderRadius: radii.xl, padding: 16, gap: 14, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(74,222,128,0.28)',
-    backgroundImage: 'linear-gradient(135deg, #07170f 0%, #0c2c1b 58%, #14532d 100%)',
   },
   glow: { position: 'absolute', right: -70, top: -70, width: 230, height: 230, borderRadius: 115, backgroundColor: 'rgba(34,197,94,0.14)' },
   top: { flexDirection: 'row', alignItems: 'center', gap: 14 },

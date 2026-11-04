@@ -8,7 +8,7 @@ import { useRouter } from 'expo-router';
 import { useCarousel } from '@fonzkart/api';
 import { categoryName, imageUrl } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
-import { Icon, motion, radii, Tap, type, type IconName } from './design';
+import { Icon, motion, radii, Tap, type, type IconName, useDesign } from './design';
 import { GRID_GAP } from './grid';
 
 const RATIO = 0.5;
@@ -126,6 +126,7 @@ function Dot({ active }: { active: boolean }) {
 
 function Slide({ banner, width, onPress }: { banner: Banner; width: number; onPress?: () => void }) {
   const styles = useStyles();
+  const d = useDesign();
   const height = Math.round(width * RATIO);
   const uri = imageUrl(banner.imageUrl);
   const label = [banner.title, banner.subtitle, banner.category ? `Opens ${categoryName(banner.category) ?? banner.category}` : '']
@@ -133,7 +134,7 @@ function Slide({ banner, width, onPress }: { banner: Banner; width: number; onPr
   const art = banner.art;
   return (
     <Tap onPress={onPress} disabled={!onPress} scaleTo={0.98} accessibilityRole={onPress ? 'button' : 'image'} accessibilityLabel={label}
-      style={[styles.slide, { width, height }, art && { backgroundImage: art.gradient }]}>
+      style={[styles.slide, { width, height }, art && { backgroundImage: d.festive === 'none' ? art.gradient : d.heroGradient }]}>
       {uri ? <Image source={{ uri }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
       {uri ? <View style={[StyleSheet.absoluteFill, styles.fade]} /> : null}
       {art ? (

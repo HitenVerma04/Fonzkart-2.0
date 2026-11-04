@@ -1,4 +1,5 @@
 export { ApiError, buildUrl, getJson, request, setAuthToken, uploadImage, type ApiResponse, type UploadFile } from './client';
+export { FESTIVE_THEMES, festiveApi, type FestiveThemeId } from './festive';
 export { MIN_SEARCH_LENGTH, catalogApi, healthApi, type Brand, type Model, type Variant } from './catalog';
 export { authApi, authOutcome, type AuthOutcome, type Profile, type SessionUser } from './auth';
 export { quoteApi } from './quote';
@@ -36,6 +37,8 @@ export {
   useShopAdmin,
   useShopAdminOrders,
   shopKeys,
+  festiveKeys,
+  useFestiveTheme,
   useEmailMessage,
   useEmailMessages,
   useHomepageCities,
