@@ -1,12 +1,13 @@
 // The launch animation, played once per app start over the first screen. On a themed sky of drifting aurora lights,
 // rising stardust and floating devices, the F logo appears and the ONZKA₹T lettering is unveiled under it, while
-// Fonzkart's services (Buy, Sell, Repair, Screen Guard, Refurbish) drift around them as small round icons on one faint
-// line, nearer ones a little larger: kept quiet on purpose, the logo is the subject. When the app has loaded, the sky fades away and each icon flies to its real button with a trail of stardust, landing with
+// Fonzkart's services (Sell, Buy, Repair, Screen Guard, Refurbish) turn around them like a precision dial: small round
+// icons on one faint line snap round a position at a time, smearing as they surge, and each stop lights up one service
+// and names it under the logo. Decoration stays minimal: the motion is the interest. When the app has loaded, the sky fades away and each icon flies to its real button with a trail of stardust, landing with
 // a ripple: Sell, Buy and Repair on the tab bar (Refurbish with Buy), Screen Guard on its card further down home.
 //
 // Smoothness rules, as this is the app's first impression: only transforms and opacity animate (never width, zIndex or
 // shadows, which redo layout or repainting every frame); one clock (`angle`) drives everything that loops; groups of
-// stars move as one view; moving tiles are kept as ready-drawn layers, so they do not shimmer as they scale;
+// stars move as one view;
 // the home screen's drawings wait (launchCovering); and nothing starts until the first screen has been mounted.
 import { useEffect, useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
@@ -28,13 +29,15 @@ const WORDMARK_DARK = require('../../../brand/fonzkart_wordmark_dark.png');
 const RATIO = 1408 / 346; // wordmark width / height
 const PHONE = 190 / 1408; // share of the wordmark's width taken by the F-phone
 
-const SERVICES: { id: string; icon: IconName; target: string }[] = [
-  { id: 'buy', icon: 'buy', target: 'buy' },
-  { id: 'sell', icon: 'sell', target: 'sell' },
-  { id: 'repair', icon: 'repair', target: 'repair' },
-  { id: 'guard', icon: 'shield', target: 'screenguard' },
-  { id: 'refurbish', icon: 'auto', target: 'buy' },
+// In the order the dial shows them.
+const SERVICES: { id: string; word: string; icon: IconName; target: string }[] = [
+  { id: 'sell', word: 'Sell', icon: 'sell', target: 'sell' },
+  { id: 'buy', word: 'Buy', icon: 'buy', target: 'buy' },
+  { id: 'repair', word: 'Repair', icon: 'repair', target: 'repair' },
+  { id: 'guard', word: 'Screen Guard', icon: 'shield', target: 'screenguard' },
+  { id: 'refurbish', word: 'Refurbish', icon: 'auto', target: 'buy' },
 ];
+const COUNT = SERVICES.length;
 
 // The faint devices floating at the edges: icon, share of the screen across and down, size, phase.
 const DEVICES: [IconName, number, number, number, number][] = [
@@ -45,8 +48,12 @@ const TILE = 54;
 const LANDING_SCALE = 0.74; // a tile's size on arrival: about the size of the tab bar's icons
 const TILT = 1.34; // the orbit's height against its width: a tall ring, which keeps the logo in the middle clear
 const LEAN = -0.1; // the orbit's slant, in radians
-const TURN_SECONDS = 16;
-const MIN_SHOW = 3200; // always long enough to be seen
+const SKY_SECONDS = 14; // one slow cycle of the sky
+const BEAT = 600; // one click of the dial, in milliseconds
+const MOVE = 0.8; // the share of a beat spent moving; the rest is the stop
+const FRONT = Math.PI / 2; // the lit position: the bottom of the ring, nearest the viewer
+const WORD_HEIGHT = 18;
+const MIN_SHOW = 3650; // one full round of the dial
 const MAX_SHOW = 6500; // never held longer, however slow the network
 const STAGGER = 95;
 const FLIGHT = 780;
@@ -54,13 +61,35 @@ const LANDED = 460; // the ripple after the last landing
 const TAU = Math.PI * 2;
 
 type Spot = { x: number; y: number };
-type Orbit = { cx: number; cy: number; radius: number; angle: SharedValue<number> };
+type Orbit = { cx: number; cy: number; radius: number; spin: SharedValue<number> };
 
 function place(angle: number, radius: number) {
   'worklet';
   const x = Math.cos(angle) * radius;
   const y = Math.sin(angle) * radius * TILT;
   return { x: x * Math.cos(LEAN) - y * Math.sin(LEAN), y: x * Math.sin(LEAN) + y * Math.cos(LEAN), depth: Math.sin(angle) };
+}
+
+/** How far through the current click: 0 at a stop, surging to 1 at the next one. */
+function click(spin: number) {
+  'worklet';
+  const beats = spin * COUNT;
+  const t = Math.min(1, (beats - Math.floor(beats)) / MOVE);
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+/** The dial's turn for `spin` (0 to 1 is one round at a steady speed), moving in clicks. */
+function dial(spin: number) {
+  'worklet';
+  return (-(Math.floor(spin * COUNT) + click(spin)) / COUNT) * TAU;
+}
+
+/** 1 while the service at `offset` is at the lit position, fading to 0 half a click away. */
+function lit(spin: number, offset: number) {
+  'worklet';
+  const a = dial(spin) + offset;
+  const c = Math.max(0, 1 - Math.abs(Math.atan2(Math.sin(a), Math.cos(a))) / (Math.PI / COUNT));
+  return c * c * (3 - 2 * c);
 }
 
 /** Same numbers on every launch, so the sky is designed rather than random. */
@@ -90,7 +119,8 @@ export function LaunchIntro() {
   const cx = screen / 2;
   const cy = tall * 0.46;
 
-  const angle = useSharedValue(-Math.PI / 2); // the clock behind everything that loops
+  const angle = useSharedValue(-Math.PI / 2); // the sky's slow clock
+  const spin = useSharedValue(0); // the dial's clock
   const sky = useSharedValue(0);
   const logo = useSharedValue(0);
   const hidden = useSharedValue(full - phone); // how much of the wordmark is still covered
@@ -110,14 +140,16 @@ export function LaunchIntro() {
         burst.value = withDelay(220, withTiming(1, { duration: 1050, easing: out }));
         hidden.value = withDelay(460, withTiming(0, { duration: 680, easing: out }));
         sweep.value = withDelay(1180, withTiming(1, { duration: 720, easing: Easing.inOut(Easing.quad) }));
-        angle.value = withRepeat(withTiming(angle.value + TAU, { duration: TURN_SECONDS * 1000, easing: Easing.linear }), -1, false);
+        angle.value = withRepeat(withTiming(angle.value + TAU, { duration: SKY_SECONDS * 1000, easing: Easing.linear }), -1, false);
+        spin.value = withDelay(650, withRepeat(withTiming(1, { duration: BEAT * COUNT, easing: Easing.linear }), -1, false));
       });
     });
     return () => {
       cancelAnimationFrame(frame);
       cancelAnimation(angle);
+      cancelAnimation(spin);
     };
-  }, [sky, logo, burst, hidden, sweep, angle]);
+  }, [sky, logo, burst, hidden, sweep, angle, spin]);
 
   useEffect(() => {
     if (!started) return undefined;
@@ -141,19 +173,22 @@ export function LaunchIntro() {
     void Promise.all(SERVICES.map(s => measureLaunchTarget(s.target))).then(found => {
       setSpots(found.map(spot => (spot ? { x: spot.x + spot.width / 2, y: Math.min(spot.y + spot.height / 2, tall + TILE) } : null)));
       exit.value = withTiming(1, { duration: 620, easing: Easing.inOut(Easing.quad) });
+      // The dial finishes its click and stops.
+      const next = (Math.floor(spin.value * COUNT) + 1) / COUNT;
+      spin.value = withTiming(next, { duration: (next - spin.value) * BEAT * COUNT, easing: Easing.linear });
       setTimeout(() => {
         launchCovering.value = false;
         setDone(true);
-      }, STAGGER * (SERVICES.length - 1) + FLIGHT + LANDED);
+      }, STAGGER * (COUNT - 1) + FLIGHT + LANDED);
     });
-  }, [spots, gaveUp, waited, fetching, tall, exit]);
+  }, [spots, gaveUp, waited, fetching, tall, exit, spin]);
 
   const [glowA, glowB] = d.launchGlow;
   const base = useAnimatedStyle(() => ({ opacity: 1 - exit.value }));
   const gradient = useAnimatedStyle(() => ({ opacity: sky.value * (1 - exit.value) }));
   const stack = useAnimatedStyle(() => ({
     opacity: Math.min(logo.value, 1) * (1 - exit.value),
-    transform: [{ scale: (0.72 + logo.value * 0.28) * (1 + Math.sin(angle.value * 2) * 0.012) * (1 + exit.value * 0.3) }],
+    transform: [{ scale: (0.72 + logo.value * 0.28) * (1 + Math.sin(click(spin.value) * Math.PI) * 0.014) * (1 + exit.value * 0.3) }],
   }));
   // The window slides left and the lettering right by the same amount: it stays put while being uncovered.
   const reveal = useAnimatedStyle(() => ({ transform: [{ translateX: -hidden.value }] }));
@@ -164,7 +199,7 @@ export function LaunchIntro() {
   const shock = useAnimatedStyle(() => ({ opacity: burst.value > 0 ? (1 - burst.value) * 0.35 : 0, transform: [{ scale: 0.4 + burst.value * 1.5 }] }));
 
   if (done) return null;
-  const orbit = { cx, cy, radius, angle };
+  const orbit = { cx, cy, radius, spin };
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.root]} accessibilityLabel="Fonzkart">
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: colors.background }, base]} />
@@ -188,7 +223,7 @@ export function LaunchIntro() {
       }, ring]} />
 
       <Animated.View style={[styles.shock, { left: cx - 70, top: cy - 70, borderColor: colors.green }, shock]} />
-      <Animated.View style={[styles.stack, { left: cx - full / 2, top: cy - (markHeight + height + 12) / 2, width: full }, stack]}>
+      <Animated.View style={[styles.stack, { left: cx - full / 2, top: cy - (markHeight + height + WORD_HEIGHT + 24) / 2, width: full }, stack]}>
         <Image source={MARK} style={[{ height: markHeight, width: markHeight * MARK_RATIO }, greeting ? { tintColor: colors.green } : null]} resizeMode="contain" />
         <View style={{ height, width: full, overflow: 'hidden' }}>
           <Animated.View style={[{ height, width: full, overflow: 'hidden' }, reveal]}>
@@ -197,6 +232,9 @@ export function LaunchIntro() {
               <Animated.View style={[styles.light, { height, width: full * 0.28 }, light]} />
             </Animated.View>
           </Animated.View>
+        </View>
+        <View style={styles.words}>
+          {SERVICES.map((service, index) => <ServiceWord key={service.id} word={service.word} offset={(index / COUNT) * TAU} spin={spin} color={colors.greenDark} />)}
         </View>
         {greeting ? <Text style={[styles.greeting, { color: colors.green }]} numberOfLines={1}>{greeting}</Text> : null}
       </Animated.View>
@@ -278,7 +316,16 @@ function Stardust({ layer, width, height, angle, sky, exit, color }: {
   );
 }
 
-/** One service: fades in on the orbit, drifts around the logo, and once `flying`, leaves for `spot`. */
+/** The name of the service at the lit position, rising in as it arrives. */
+function ServiceWord({ word, offset, spin, color }: { word: string; offset: number; spin: SharedValue<number>; color: string }) {
+  const style = useAnimatedStyle(() => {
+    const on = lit(spin.value, offset);
+    return { opacity: on, transform: [{ translateY: (1 - on) * 7 }] };
+  });
+  return <Animated.Text style={[styles.word, { color }, style]} numberOfLines={1}>{word}</Animated.Text>;
+}
+
+/** One service: fades in on the dial, clicks round the logo, and once `flying`, leaves for `spot`. */
 function OrbitTile({ icon, index, orbit, flying, spot }: {
   icon: IconName;
   index: number;
@@ -287,8 +334,9 @@ function OrbitTile({ icon, index, orbit, flying, spot }: {
   spot: Spot;
 }) {
   const colors = useColors();
-  const { cx, cy, radius, angle } = orbit;
-  const offset = (index / SERVICES.length) * TAU;
+  const d = useDesign();
+  const { cx, cy, radius, spin } = orbit;
+  const offset = (index / COUNT) * TAU;
   const spread = useSharedValue(0);
   const flight = useSharedValue(0);
   const ripple = useSharedValue(0);
@@ -308,18 +356,19 @@ function OrbitTile({ icon, index, orbit, flying, spot }: {
 
   const tile = useAnimatedStyle(() => {
     const s = spread.value;
-    const at = place(angle.value + offset - (1 - s) * 0.5, radius * (0.82 + s * 0.18));
+    const at = place(FRONT + dial(spin.value) + offset - (1 - s) * 0.5, radius * (0.82 + s * 0.18));
     const near = (at.depth + 1) / 2;
     const f = flight.value;
     return {
-      opacity: s * (0.7 + near * 0.3) * (1 - f) + f * (f > 0.93 ? (1 - f) / 0.07 : 1),
+      opacity: s * (0.62 + near * 0.38) * (1 - f) + f * (f > 0.93 ? (1 - f) / 0.07 : 1),
       transform: [
         { translateX: at.x * (1 - f) + targetX * f },
         { translateY: at.y * (1 - f) + targetY * f - Math.sin(f * Math.PI) * 54 },
-        { scale: (0.86 + near * 0.2) * (1 - f) + LANDING_SCALE * f },
+        { scale: (0.78 + near * 0.26 + lit(spin.value, offset) * 0.12) * (1 - f) + LANDING_SCALE * f },
       ],
     };
   });
+  const fill = useAnimatedStyle(() => ({ opacity: lit(spin.value, offset) * Math.max(0, 1 - flight.value * 4) }));
   const wave = useAnimatedStyle(() => ({
     opacity: ripple.value > 0 ? (1 - ripple.value) * 0.85 : 0,
     transform: [{ translateX: targetX }, { translateY: targetY }, { scale: 0.3 + ripple.value * 1.15 }],
@@ -331,11 +380,39 @@ function OrbitTile({ icon, index, orbit, flying, spot }: {
       {[0.05, 0.1, 0.16].map(lag => (
         <TrailStar key={lag} lag={lag} flight={flight} orbit={orbit} offset={offset} targetX={targetX} targetY={targetY} color={colors.green} />
       ))}
-      <Animated.View renderToHardwareTextureAndroid style={[styles.tile, { left: cx - TILE / 2, top: cy - TILE / 2, backgroundColor: colors.surface, borderColor: colors.greenBorder }, tile]}>
+      {[[0.014, 0.08], [0.0065, 0.15]].map(([lag, strength]) => (
+        <Smear key={lag} lag={lag!} strength={strength!} offset={offset} orbit={orbit} spread={spread} flight={flight} color={colors.green} />
+      ))}
+      <Animated.View style={[styles.tile, { left: cx - TILE / 2, top: cy - TILE / 2, backgroundColor: colors.surface, borderColor: colors.greenBorder }, tile]}>
         <Icon name={icon} color={colors.green} size={24} filled />
+        <Animated.View style={[styles.fill, { backgroundColor: colors.green }, fill]}>
+          <Icon name={icon} color={d.onGreen} size={24} filled />
+        </Animated.View>
       </Animated.View>
     </>
   );
+}
+
+/** Motion blur: a faint copy of the tile a moment behind it. It stretches away as the dial surges and closes up at each stop. */
+function Smear({ lag, strength, offset, orbit, spread, flight, color }: {
+  lag: number;
+  strength: number;
+  offset: number;
+  orbit: Orbit;
+  spread: SharedValue<number>;
+  flight: SharedValue<number>;
+  color: string;
+}) {
+  const { cx, cy, radius, spin } = orbit;
+  const smear = useAnimatedStyle(() => {
+    const s = spread.value;
+    const at = place(FRONT + dial(spin.value + 1 - lag) + offset - (1 - s) * 0.5, radius * (0.82 + s * 0.18));
+    return {
+      opacity: strength * s * Math.max(0, 1 - flight.value * 6),
+      transform: [{ translateX: at.x }, { translateY: at.y }, { scale: 0.78 + ((at.depth + 1) / 2) * 0.26 }],
+    };
+  });
+  return <Animated.View style={[styles.smear, { left: cx - TILE / 2, top: cy - TILE / 2, backgroundColor: color }, smear]} />;
 }
 
 /** Stardust following a flying tile: the tile's own path, a moment behind. */
@@ -348,10 +425,10 @@ function TrailStar({ lag, flight, orbit, offset, targetX, targetY, color }: {
   targetY: number;
   color: string;
 }) {
-  const { cx, cy, radius, angle } = orbit;
+  const { cx, cy, radius, spin } = orbit;
   const dust = useAnimatedStyle(() => {
     const f = Math.max(0, flight.value - lag);
-    const at = place(angle.value + offset, radius);
+    const at = place(FRONT + dial(spin.value) + offset, radius);
     return {
       opacity: f > 0 && f < 0.97 ? Math.sin(f * Math.PI) * (1 - lag * 3.5) : 0,
       transform: [
@@ -372,6 +449,10 @@ const styles = StyleSheet.create({
   stack: { position: 'absolute', alignItems: 'center', gap: 12 },
   light: { position: 'absolute', top: 0, left: 0, backgroundImage: 'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.75) 50%, transparent 100%)' },
   tile: { position: 'absolute', width: TILE, height: TILE, borderRadius: TILE / 2, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  fill: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: TILE / 2, alignItems: 'center', justifyContent: 'center' },
+  smear: { position: 'absolute', width: TILE, height: TILE, borderRadius: TILE / 2 },
+  words: { height: WORD_HEIGHT, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' },
+  word: { position: 'absolute', fontSize: 12, lineHeight: WORD_HEIGHT, fontWeight: '800', letterSpacing: 3.5, textTransform: 'uppercase' },
   greeting: { fontSize: 15, lineHeight: 20, fontWeight: '800', letterSpacing: -0.2 },
   wave: { position: 'absolute', width: 64, height: 64, borderRadius: 32, borderWidth: 2 },
   trail: { position: 'absolute', width: 10, height: 10, borderRadius: 5 },
