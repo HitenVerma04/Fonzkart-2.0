@@ -3,7 +3,7 @@
 // own banners are shown instead, so the home screen always has its carousel.
 import { useEffect, useRef, useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
-import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useCarousel } from '@fonzkart/api';
 import { categoryName, imageUrl } from '@fonzkart/core';
@@ -13,6 +13,7 @@ import { GRID_GAP } from './grid';
 
 const RATIO = 0.5;
 const AUTO_ADVANCE_MS = 4000;
+const DOT_STEP = 14;
 
 type Banner = {
   id: string;
@@ -103,7 +104,7 @@ export function HomeCarousel({ width }: { width: number }) {
       />
       {slides.length > 1 ? (
         <View style={styles.dots} accessibilityLabel={`Card ${index + 1} of ${slides.length}`}>
-          {slides.map((s, i) => <Dot key={s.id} active={i === index} />)}
+          <Dots count={slides.length} index={index} />
         </View>
       ) : null}
     </View>
@@ -114,14 +115,20 @@ function Gap() {
   return <View style={{ width: GRID_GAP }} />;
 }
 
-/** A page dot that stretches into a green pill when its card is showing. */
-function Dot({ active }: { active: boolean }) {
+/** The page dots, with one green pill sliding over the dot of the card showing (a transform, so no layout work). */
+function Dots({ count, index }: { count: number; index: number }) {
   const colors = useColors();
-  const style = useAnimatedStyle(() => ({
-    width: withSpring(active ? 20 : 6, motion.snappy),
-    backgroundColor: active ? colors.green : colors.track,
-  }));
-  return <Animated.View style={[{ height: 6, borderRadius: 3 }, style]} />;
+  const x = useSharedValue(index * DOT_STEP);
+  useEffect(() => {
+    x.value = withSpring(index * DOT_STEP, motion.snappy);
+  }, [index, x]);
+  const pill = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
+  return (
+    <View style={{ flexDirection: 'row', gap: DOT_STEP - 6 }}>
+      {Array.from({ length: count }, (_, i) => <View key={i} style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.track }} />)}
+      <Animated.View style={[{ position: 'absolute', left: -6, width: 18, height: 6, borderRadius: 3, backgroundColor: colors.green }, pill]} />
+    </View>
+  );
 }
 
 function Slide({ banner, width, onPress }: { banner: Banner; width: number; onPress?: () => void }) {

@@ -32,7 +32,8 @@ export default function Questions() {
   useEffect(() => {
     if (steps.length) progress.value = withSpring((index + 1) / steps.length, motion.gentle);
   }, [index, steps.length, progress]);
-  const fill = useAnimatedStyle(() => ({ width: trackWidth * progress.value }));
+  // Slides along the track: animating its width would redo the layout on every frame.
+  const fill = useAnimatedStyle(() => ({ transform: [{ translateX: -trackWidth * (1 - progress.value) }] }));
 
   const goTo = (next: number) => {
     setIndex(next);
@@ -134,7 +135,7 @@ const useStyles = makeStyles(colors => ({
   progressLabel: { ...type.small, fontWeight: '700', color: colors.green },
   progressPercent: { ...type.small, fontWeight: '700', color: colors.muted },
   track: { height: 8, borderRadius: 4, backgroundColor: colors.placeholder, overflow: 'hidden' },
-  fill: { height: 8, borderRadius: 4 },
+  fill: { width: '100%', height: 8, borderRadius: 4 },
   back: { flex: 1 },
   continue: { flex: 2 },
 }));

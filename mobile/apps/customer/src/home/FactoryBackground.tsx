@@ -3,13 +3,14 @@
 // the content, reaching the last station at the end of the page; scrolling back returns to the first.
 //
 // Kept light on purpose: the stations are still drawings, the only moving parts are a few small views (transforms and
-// opacity on one clock), and scrolling moves the whole layer as one view on the UI thread.
-import { memo, type ReactNode } from 'react';
+// opacity), a station's parts run only while it is on screen, and scrolling moves the whole layer as one view on the UI
+// thread.
+import { memo, useContext, type ReactNode } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import Animated, { useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedReaction, useAnimatedStyle, useDerivedValue, useSharedValue, type SharedValue } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useColors } from '@fonzkart/ui';
-import { useSpin } from '../categoryArt/motion';
+import { ArtActivity, useSpin } from '../categoryArt/motion';
 
 const WIDTH = 390; // the drawings' design size
 const STATION = 320;
@@ -44,69 +45,115 @@ export const FactoryBackground = memo(function FactoryBackground({ scrollY, cont
   const total = TOP + station * STATIONS + BOTTOM;
 
   // The page's whole scroll range maps onto the whole factory.
-  const travel = useAnimatedStyle(() => {
+  const shift = useDerivedValue(() => {
     const range = Math.max(1, contentHeight.value - viewport);
     const y = Math.min(Math.max(scrollY.value, 0), range);
-    return { transform: [{ translateY: (-y / range) * Math.max(0, total - viewport) }] };
+    return (-y / range) * Math.max(0, total - viewport);
   });
+  const travel = useAnimatedStyle(() => ({ transform: [{ translateY: shift.value }] }));
 
-  const part = { clock, ink: `${colors.green}2b`, k };
-  const place = { size: scene, left: (width - scene) / 2, color: colors.green };
+  const ink = `${colors.green}2b`;
+  const place = { size: scene, left: (width - scene) / 2, color: colors.green, ink, shift, viewport };
 
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.clip]} accessible={false} importantForAccessibility="no-hide-descendants">
       <Animated.View style={[styles.scene, { height: total }, travel]}>
-        <Pipe left={6} height={total} {...part} />
-        <Pipe left={width - 10} height={total} reverse {...part} />
+        <Pipe left={6} height={total} clock={clock} ink={ink} />
+        <Pipe left={width - 10} height={total} reverse clock={clock} ink={ink} />
 
         {/* Collection: devices come down the chute onto the belt */}
         <Station {...place} index={0} d={`${BELT} M40 118h72l-18 62h-36z M60 180v38 M240 70h136v132H240z`}>
-          <Gear part={part} x={252} y={84} r={44} teeth={12} turns={1} color={colors.green} />
-          <Gear part={part} x={326} y={140} r={22} teeth={6} turns={-2} color={colors.green} />
-          <Riders part={part} shape="phone" count={3} />
+          {part => (
+            <>
+              <Gear part={part} x={252} y={84} r={44} teeth={12} turns={1} color={colors.green} />
+              <Gear part={part} x={326} y={140} r={22} teeth={6} turns={-2} color={colors.green} />
+              <Riders part={part} shape="phone" count={3} />
+            </>
+          )}
         </Station>
 
         {/* Testing: a scanner reads each device, an arm sorts it */}
         <Station {...place} index={1} d={`${BELT} M126 232V96h132v136 M116 96h152 M176 96v22h32V96 M316 232h48v-14h-48z`}>
-          <Beam part={part} />
-          <Arm part={part} x={340} y={218} color={colors.green} />
-          <Riders part={part} shape="phone" count={3} offset={0.15} />
+          {part => (
+            <>
+              <Beam part={part} />
+              <Arm part={part} x={340} y={218} color={colors.green} />
+              <Riders part={part} shape="phone" count={3} offset={0.15} />
+            </>
+          )}
         </Station>
 
         {/* Repair: the workshop's big gears */}
         <Station {...place} index={2} d="M24 290H366 M22 52h118v62h54 M368 40v92h-84 M210 40h40v32h-40z">
-          <Gear part={part} x={78} y={132} r={72} teeth={16} turns={1} color={colors.green} />
-          <Gear part={part} x={208} y={150} r={45} teeth={10} turns={-1.6} color={colors.green} />
-          <Arm part={part} x={346} y={288} color={colors.green} slow />
+          {part => (
+            <>
+              <Gear part={part} x={78} y={132} r={72} teeth={16} turns={1} color={colors.green} />
+              <Gear part={part} x={208} y={150} r={45} teeth={10} turns={-1.6} color={colors.green} />
+              <Arm part={part} x={346} y={288} color={colors.green} slow />
+            </>
+          )}
         </Station>
 
         {/* Packing: a press closes each box */}
         <Station {...place} index={3} d={`${BELT} M152 232V78h82v154 M142 78h102 M306 218v-46h60v46z M318 172v-38h40v38z`}>
-          <Press part={part} />
-          <Riders part={part} shape="box" count={3} offset={0.3} />
+          {part => (
+            <>
+              <Press part={part} />
+              <Riders part={part} shape="box" count={3} offset={0.3} />
+            </>
+          )}
         </Station>
 
         {/* Dispatch: out to the customer */}
         <Station {...place} index={4} d="M24 130l50-38v38l50-38v38l50-38v38h60V54h26v76h156 M24 292H366 M60 272v-66h122v66 M182 228h52l26 24v20h-78">
-          <Smoke part={part} x={250} y={46} />
-          <Wheel part={part} x={84} y={260} color={colors.green} />
-          <Wheel part={part} x={206} y={260} color={colors.green} />
+          {part => (
+            <>
+              <Smoke part={part} x={250} y={46} />
+              <Wheel part={part} x={84} y={260} color={colors.green} />
+              <Wheel part={part} x={206} y={260} color={colors.green} />
+            </>
+          )}
         </Station>
       </Animated.View>
     </View>
   );
 });
 
-function Station({ index, d, size, left, color, children }: { index: number; d: string; size: number; left: number; color: string; children?: ReactNode }) {
-  const height = (size / WIDTH) * STATION;
+function Station({ index, d, size, left, color, ink, shift, viewport, children }: {
+  index: number;
+  d: string;
+  size: number;
+  left: number;
+  color: string;
+  ink: string;
+  shift: SharedValue<number>;
+  viewport: number;
+  children: (part: Part) => ReactNode;
+}) {
+  const k = size / WIDTH;
+  const height = k * STATION;
+  const top = TOP + index * height;
+  const factory = useContext(ArtActivity);
+  const active = useSharedValue(true);
+  useAnimatedReaction(() => factory.value && top + shift.value < viewport && top + height + shift.value > 0, (on, previous) => {
+    if (on !== previous) active.value = on;
+  });
   return (
-    <View style={{ position: 'absolute', top: TOP + index * height, left, width: size, height }}>
+    <View style={{ position: 'absolute', top, left, width: size, height }}>
       <Svg width={size} height={height} viewBox={`0 0 ${WIDTH} ${STATION}`}>
         <Path d={d} stroke={color} strokeOpacity={INK} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </Svg>
-      {children}
+      <ArtActivity.Provider value={active}>
+        <MovingParts ink={ink} k={k}>{children}</MovingParts>
+      </ArtActivity.Provider>
     </View>
   );
+}
+
+/** A station's moving parts, on a clock that stops when the station is off screen. */
+function MovingParts({ ink, k, children }: { ink: string; k: number; children: (part: Part) => ReactNode }) {
+  const clock = useSpin(CYCLE);
+  return <>{children({ clock, ink, k })}</>;
 }
 
 const BELT = 'M24 232H366 M24 244H366 M60 244v48 M330 244v48 M44 292h32 M314 292h32';
@@ -209,7 +256,7 @@ function Puff({ part, x, y, phase }: { part: Part; x: number; y: number; phase: 
 }
 
 /** A pipe down the side of the page, in the screen's margin, with packets flowing along it. */
-function Pipe({ left, height, reverse, clock, ink }: Part & { left: number; height: number; reverse?: boolean }) {
+function Pipe({ left, height, reverse, clock, ink }: { left: number; height: number; reverse?: boolean; clock: SharedValue<number>; ink: string }) {
   const gap = 120;
   const flow = useAnimatedStyle(() => ({ transform: [{ translateY: ((clock.value * 7) % 1) * gap * (reverse ? -1 : 1) }] }));
   const dots = Math.ceil(height / gap) + 2;

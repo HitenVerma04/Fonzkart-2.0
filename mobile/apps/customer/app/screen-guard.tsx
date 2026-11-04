@@ -147,7 +147,7 @@ export default function ScreenGuardStore() {
         contentContainerStyle={[styles.page, { paddingBottom: totals.count ? 120 : 40 }]}
         initialNumToRender={6}
         maxToRenderPerBatch={6}
-        windowSize={5}
+        windowSize={3}
         removeClippedSubviews
       />
       <CartBar count={totals.count} total={totals.payTotal} savings={totals.savings} onPress={() => router.push('/shop/cart')} />
