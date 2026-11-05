@@ -15,7 +15,7 @@ import {
 import { GRID_GAP, useTileWidth } from '../src/grid';
 import { readDeviceSpecs } from '../src/home/thisDevice';
 import { MAX_QUANTITY, priceCart, pruneCart, setQuantity, useCart } from '../src/shop/cart';
-import { GuardShowcase } from '../src/shop/GuardShowcase';
+import { GuardShowcase, hasGuardPhoto } from '../src/shop/GuardShowcase';
 import { CartBar, DiscountBadge, PriceBlock, Stepper } from '../src/shop/ShopBits';
 
 const PROMISES = ['Confirmed fit for your exact model', 'Cash on delivery', 'Installation guide included'];
@@ -169,8 +169,8 @@ const GuardCard = memo(function GuardCard({ item, width, index, showDiscount, qu
   const content = (
     <>
       {showDiscount ? <DiscountBadge percent={discountPercent(item.mrp, item.price)} /> : null}
-      <View style={styles.well}>
-        <GuardShowcase model={item.model} size={width - 22} clock={clock} />
+      <View style={[styles.well, hasGuardPhoto(item.imageUrl) && styles.stage]}>
+        <GuardShowcase model={item.model} photo={item.imageUrl} size={width - 22} clock={clock} />
       </View>
       <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
       <PriceBlock price={item.price} mrp={item.mrp} />
@@ -205,6 +205,7 @@ const useStyles = makeStyles(colors => ({
   row: { gap: GRID_GAP },
   card: { backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, padding: 10, gap: 4 },
   well: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, borderRadius: radii.md, paddingVertical: 4, marginBottom: 6 },
+  stage: { backgroundColor: '#ffffff' },
   name: { ...type.label, fontSize: 14, lineHeight: 18, color: colors.navy, minHeight: 36 },
   action: { marginTop: 8 },
 }));
