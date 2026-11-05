@@ -1,8 +1,9 @@
-// The picture on a screen guard card: the model's real photo, turned a little, and its guard floating in front of it,
-// drifting towards and away from the screen while a glint crosses the glass. The guard is that model's own: its
-// proportions, corners and camera opening come from guardPhotos.json, which also says where the front of the phone is
-// in the catalog photo (most show the back and front side by side). A model without a photo gets a plain drawing until
-// one is added. Only transforms animate, all from one clock owned by the screen, so the list stays smooth.
+// The picture on a screen guard card. Where a photo already shows the model with its guard (f in guardPhotos.json) it is
+// shown as it is, floating gently. Otherwise it is the model's real photo, turned a little, with the guard floating in
+// front of it, drifting towards and away from the screen while a glint crosses the glass. That guard is the model's
+// own: its proportions, corners and camera opening come from guardPhotos.json, which also says where the front of the
+// phone is in the photo. A model without a photo gets a plain drawing until one is added. Only transforms animate, all
+// from one clock owned by the screen, so the list stays smooth.
 import { memo, useMemo } from 'react';
 import { Image, View } from 'react-native';
 import Animated, { useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
@@ -38,8 +39,8 @@ function seedOf(text: string) {
 const TURN = '17deg';
 const DEPTH = 420;
 
-/** Where a model's front is in its photo (c: x, y, width, height as shares) and its guard's shape. */
-type Fit = { c: number[]; a: number; g: number; r: number; gr: number; cut: string };
+/** Where a model's front is in its photo (c: x, y, width, height as shares) and its guard's shape; f: the photo already shows the guard. */
+type Fit = { c: number[]; a: number; g: number; r: number; gr: number; cut: string; f?: number };
 const FITS = guardPhotos as Record<string, Fit>;
 /** A photo added later (Admin app), not yet measured: shown whole, with a typical guard. */
 const WHOLE_PHOTO: Fit = { c: [0, 0, 1, 1], a: 0.8, g: 0.47, r: 0, gr: 0.13, cut: 'hole' };
@@ -62,10 +63,28 @@ export const GuardShowcase = memo(function GuardShowcase({ model, photo, size, c
   clock: SharedValue<number>;
 }) {
   const uri = usablePhoto(photo);
-  return uri
-    ? <PhotoShowcase uri={uri} fit={FITS[model] ?? WHOLE_PHOTO} seed={seedOf(model)} size={size} clock={clock} />
-    : <DrawnShowcase model={model} size={size} clock={clock} />;
+  if (!uri) return <DrawnShowcase model={model} size={size} clock={clock} />;
+  const fit = FITS[model] ?? WHOLE_PHOTO;
+  return fit.f
+    ? <FinishedPhoto uri={uri} ratio={fit.a} seed={seedOf(model)} size={size} clock={clock} />
+    : <PhotoShowcase uri={uri} fit={fit} seed={seedOf(model)} size={size} clock={clock} />;
 });
+
+/** A photo of the model with its guard already on show. */
+function FinishedPhoto({ uri, ratio, seed, size, clock }: { uri: string; ratio: number; seed: number; size: number; clock: SharedValue<number> }) {
+  const phase = (seed % 12) / 12;
+  const height = Math.round(size * 0.98);
+  const fitHeight = Math.min(height * 0.94, (size * 0.94) / ratio);
+  const reach = size * 0.012;
+  const float = useAnimatedStyle(() => ({ transform: [{ translateY: Math.sin((clock.value + phase) * Math.PI * 2) * reach }] }));
+  return (
+    <View style={{ width: size, height, alignItems: 'center', justifyContent: 'center' }} accessible={false} importantForAccessibility="no-hide-descendants">
+      <Animated.View style={float}>
+        <Image source={{ uri }} resizeMode="contain" style={{ width: fitHeight * ratio, height: fitHeight, borderRadius: 8 }} />
+      </Animated.View>
+    </View>
+  );
+}
 
 function PhotoShowcase({ uri, fit, seed, size, clock }: { uri: string; fit: Fit; seed: number; size: number; clock: SharedValue<number> }) {
   const phase = (seed % 12) / 12;
