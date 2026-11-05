@@ -222,6 +222,83 @@ model ShopOrder {
   updatedAt     DateTime @updatedAt
 }
 
+// A refurbished device for sale. grade: superb | good | fair. The order takes one from stock.
+model RefurbishedDevice {
+  id             String   @id @default(cuid())
+  name           String
+  brand          String
+  storage        String
+  grade          String
+  warrantyMonths Int      @default(6)
+  imageUrl       String?
+  mrp            Int
+  price          Int
+  stock          Int      @default(1)
+  isActive       Boolean  @default(true)
+  displayOrder   Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// A refurbished device order, cash on delivery, with its own copy of what was bought.
+model RefurbishedOrder {
+  id             String   @id @default(cuid())
+  orderNumber    Int      @unique @default(autoincrement())
+  userId         String?
+  deviceId       String
+  deviceName     String
+  storage        String
+  grade          String
+  warrantyMonths Int
+  imageUrl       String?
+  price          Int
+  mrp            Int
+  name           String
+  phone          String
+  address        String
+  pincode        String
+  paymentMethod  String   @default("cod")
+  status         String   @default("placed") // placed | confirmed | shipped | delivered | cancelled
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// The fixed price of one repair for one phone. issue: screen | battery | charging | camera | speaker | back.
+model RepairPrice {
+  id           String   @id @default(cuid())
+  brand        String
+  model        String
+  issue        String
+  price        Int
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([brand, model, issue])
+}
+
+// A doorstep repair visit, paid after the repair, with its own copy of the price. slot: morning | afternoon | evening.
+model RepairBooking {
+  id            String   @id @default(cuid())
+  bookingNumber Int      @unique @default(autoincrement())
+  userId        String?
+  repairPriceId String
+  brand         String
+  model         String
+  issue         String
+  price         Int
+  visitDate     String
+  slot          String
+  name          String
+  phone         String
+  address       String
+  pincode       String
+  status        String   @default("booked") // booked | confirmed | completed | cancelled
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model Notification {
   id        String   @id @default(cuid())
   userId    String?  // Target user (if specific)

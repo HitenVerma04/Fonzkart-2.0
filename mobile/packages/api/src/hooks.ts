@@ -9,6 +9,7 @@ import { ridersApi } from './riders';
 import { adminApi } from './admin';
 import { carouselApi, catalogAdminApi, emailApi } from './content';
 import { shopAdminApi, shopApi, type PlaceShopOrderInput } from './shop';
+import { buyAdminApi, buyApi, repairAdminApi, repairApi, type BookRepairInput, type PlaceRefurbishedOrderInput } from './buyRepair';
 
 export function createQueryClient() {
   return new QueryClient({
@@ -320,6 +321,57 @@ export const useEmailMessages = (account?: string) =>
   useQuery({ queryKey: contentKeys.email(account), queryFn: ({ signal }) => emailApi.messages(account, signal), staleTime: 0, refetchInterval: 60_000 });
 export const useEmailMessage = (id: string | undefined) =>
   useQuery({ queryKey: contentKeys.emailMessage(id ?? ''), queryFn: ({ signal }) => emailApi.message(id!, signal), enabled: !!id });
+
+// ------------------------------------------------------------------------------------------------ buy and repair
+
+export const buyKeys = {
+  store: ['buy', 'store'] as const,
+  myOrders: [...ACCOUNT_KEY, 'buy-orders'] as const,
+  admin: ['staff', 'buy', 'devices'] as const,
+  adminOrders: ['staff', 'buy', 'orders'] as const,
+};
+
+export const useRefurbishedStore = () =>
+  useQuery({ queryKey: buyKeys.store, queryFn: ({ signal }) => buyApi.store(signal), staleTime: 60_000 });
+export const useMyRefurbishedOrders = (enabled: boolean) =>
+  useQuery({ queryKey: buyKeys.myOrders, queryFn: ({ signal }) => buyApi.myOrders(signal), enabled, staleTime: 0 });
+export function usePlaceRefurbishedOrder() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: PlaceRefurbishedOrderInput) => buyApi.placeOrder(input),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: buyKeys.myOrders });
+      void client.invalidateQueries({ queryKey: buyKeys.store });
+    },
+  });
+}
+export const useBuyAdmin = () =>
+  useQuery({ queryKey: buyKeys.admin, queryFn: ({ signal }) => buyAdminApi.overview(signal), staleTime: 0 });
+export const useBuyAdminOrders = () =>
+  useQuery({ queryKey: buyKeys.adminOrders, queryFn: ({ signal }) => buyAdminApi.orders(signal), staleTime: 0 });
+
+export const repairKeys = {
+  prices: ['repair', 'prices'] as const,
+  myBookings: [...ACCOUNT_KEY, 'repair-bookings'] as const,
+  admin: ['staff', 'repair', 'prices'] as const,
+  adminBookings: ['staff', 'repair', 'bookings'] as const,
+};
+
+export const useRepairPrices = () =>
+  useQuery({ queryKey: repairKeys.prices, queryFn: ({ signal }) => repairApi.prices(signal), staleTime: 60_000 });
+export const useMyRepairBookings = (enabled: boolean) =>
+  useQuery({ queryKey: repairKeys.myBookings, queryFn: ({ signal }) => repairApi.myBookings(signal), enabled, staleTime: 0 });
+export function useBookRepair() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: BookRepairInput) => repairApi.book(input),
+    onSuccess: () => void client.invalidateQueries({ queryKey: repairKeys.myBookings }),
+  });
+}
+export const useRepairAdmin = () =>
+  useQuery({ queryKey: repairKeys.admin, queryFn: ({ signal }) => repairAdminApi.overview(signal), staleTime: 0 });
+export const useRepairAdminBookings = () =>
+  useQuery({ queryKey: repairKeys.adminBookings, queryFn: ({ signal }) => repairAdminApi.bookings(signal), staleTime: 0 });
 
 // ------------------------------------------------------------------------------------------------ screen guard shop
 

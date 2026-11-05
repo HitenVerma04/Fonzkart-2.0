@@ -33,6 +33,10 @@ export default function RootLayout() {
           <Stack.Screen name="festive-theme" options={{ title: 'Festive theme' }} />
           <Stack.Screen name="screen-guards" options={{ title: 'Screen guard store' }} />
           <Stack.Screen name="shop-orders" options={{ title: 'Shop orders' }} />
+          <Stack.Screen name="refurbished" options={{ title: 'Refurbished devices' }} />
+          <Stack.Screen name="buy-orders" options={{ title: 'Device orders' }} />
+          <Stack.Screen name="repair-prices" options={{ title: 'Repair prices' }} />
+          <Stack.Screen name="repair-bookings" options={{ title: 'Repair bookings' }} />
           <Stack.Screen name="email/index" options={{ title: 'Email' }} />
           <Stack.Screen name="email/[id]" options={{ title: 'Message' }} />
           <Stack.Screen name="email/compose" options={{ title: 'New email' }} />

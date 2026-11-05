@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useMyOrders, useMyShopOrders, useSession, type ShopOrder } from '@fonzkart/api';
+import {
+  REPAIR_ISSUES, useMyOrders, useMyRefurbishedOrders, useMyRepairBookings, useMyShopOrders, useSession, type RefurbishedOrder, type RepairBooking,
+  type ShopOrder,
+} from '@fonzkart/api';
 import { formatInr } from '@fonzkart/core';
 import { formatDateTime, makeStyles, useColors } from '@fonzkart/ui';
 import {
   EmptyState, ErrorState, Icon, MAX_CONTENT, OrderCard, PAGE_PADDING, radii, Segmented, SkeletonRows, SkeletonScreen, TabTitle, Tap,
   type, useDesign, useTabBarSpace,
 } from '../../src/design';
-import { ShopStatusBadge } from '../../src/shop/ShopBits';
+import { RepairStatusBadge, ShopStatusBadge } from '../../src/shop/ShopBits';
+import { visitDay } from '../../src/shop/visitDay';
 
-type Kind = 'pickups' | 'shop';
+type Kind = 'pickups' | 'shop' | 'bought' | 'repairs';
 
 export default function MyOrders() {
   const colors = useColors();
@@ -22,7 +26,9 @@ export default function MyOrders() {
   const signedIn = session.status === 'signedIn';
   const orders = useMyOrders(signedIn);
   const shopOrders = useMyShopOrders(signedIn && kind === 'shop');
-  const active = kind === 'shop' ? shopOrders : orders;
+  const boughtOrders = useMyRefurbishedOrders(signedIn && kind === 'bought');
+  const repairBookings = useMyRepairBookings(signedIn && kind === 'repairs');
+  const active = kind === 'shop' ? shopOrders : kind === 'bought' ? boughtOrders : kind === 'repairs' ? repairBookings : orders;
   const count = active.data?.length;
   const refresh = <RefreshControl refreshing={active.isRefetching} onRefresh={() => void active.refetch()} colors={[colors.green]} tintColor={colors.green} />;
 
@@ -41,6 +47,42 @@ export default function MyOrders() {
       );
     }
     if (active.isError) return <ErrorState error={active.error} onRetry={() => active.refetch()} />;
+    if (kind === 'bought') {
+      return (
+        <FlatList
+          data={boughtOrders.data}
+          keyExtractor={o => o.id}
+          contentContainerStyle={[styles.list, { paddingBottom: bottom }]}
+          showsVerticalScrollIndicator={false}
+          refreshControl={refresh}
+          ListEmptyComponent={
+            <EmptyState icon="buy" title="No devices bought yet" message="Refurbished devices you buy show up here."
+              action={{ label: 'Browse devices', onPress: () => router.navigate('/buy') }} />
+          }
+          renderItem={({ item }) => (
+            <BoughtCard order={item} onPress={() => router.push({ pathname: '/refurbished/order/[id]', params: { id: item.id } })} />
+          )}
+        />
+      );
+    }
+    if (kind === 'repairs') {
+      return (
+        <FlatList
+          data={repairBookings.data}
+          keyExtractor={b => b.id}
+          contentContainerStyle={[styles.list, { paddingBottom: bottom }]}
+          showsVerticalScrollIndicator={false}
+          refreshControl={refresh}
+          ListEmptyComponent={
+            <EmptyState icon="repair" title="No repairs booked yet" message="Repairs you book show up here."
+              action={{ label: 'Book a repair', onPress: () => router.navigate('/repair') }} />
+          }
+          renderItem={({ item }) => (
+            <RepairCard booking={item} onPress={() => router.push({ pathname: '/repairs/booking/[id]', params: { id: item.id } })} />
+          )}
+        />
+      );
+    }
     if (kind === 'shop') {
       return (
         <FlatList
@@ -91,11 +133,60 @@ export default function MyOrders() {
       {signedIn ? (
         <View style={styles.switcher}>
           <Segmented<Kind> value={kind} onChange={setKind}
-            options={[{ id: 'pickups', label: 'Device pickups', icon: 'truck' }, { id: 'shop', label: 'Shop orders', icon: 'shield' }]} />
+            options={[{ id: 'pickups', label: 'Pickups', icon: 'truck' }, { id: 'shop', label: 'Guards', icon: 'shield' }, { id: 'bought', label: 'Bought', icon: 'buy' }, { id: 'repairs', label: 'Repairs', icon: 'repair' }]} />
         </View>
       ) : null}
       {body()}
     </View>
+  );
+}
+
+function BoughtCard({ order, onPress }: { order: RefurbishedOrder; onPress: () => void }) {
+  const colors = useColors();
+  const d = useDesign();
+  const styles = useStyles();
+  return (
+    <Tap onPress={onPress} scaleTo={0.98} accessibilityRole="button" accessibilityLabel={`Order ${order.orderNumber}, ${order.deviceName}, ${formatInr(order.price)}`}
+      style={[styles.card, { boxShadow: d.shadow.sm }]}>
+      <View style={styles.cardIcon}>
+        <Icon name="buy" color={colors.green} size={22} filled />
+      </View>
+      <View style={styles.cardText}>
+        <View style={styles.cardTop}>
+          <Text style={styles.cardNumber}>Order #{order.orderNumber}</Text>
+          <ShopStatusBadge status={order.status} />
+        </View>
+        <Text style={styles.cardSummary} numberOfLines={1}>{order.deviceName}, {order.storage}</Text>
+        <Text style={styles.cardMeta}>{formatDateTime(order.createdAt)}</Text>
+        <Text style={styles.cardTotal}>{formatInr(order.price)}</Text>
+      </View>
+      <Icon name="chevronRight" color={colors.muted} size={18} />
+    </Tap>
+  );
+}
+
+function RepairCard({ booking, onPress }: { booking: RepairBooking; onPress: () => void }) {
+  const colors = useColors();
+  const d = useDesign();
+  const styles = useStyles();
+  const issue = REPAIR_ISSUES.find(i => i.id === booking.issue)?.label ?? booking.issue;
+  return (
+    <Tap onPress={onPress} scaleTo={0.98} accessibilityRole="button" accessibilityLabel={`Booking ${booking.bookingNumber}, ${issue}, ${booking.model}`}
+      style={[styles.card, { boxShadow: d.shadow.sm }]}>
+      <View style={styles.cardIcon}>
+        <Icon name="repair" color={colors.green} size={22} filled />
+      </View>
+      <View style={styles.cardText}>
+        <View style={styles.cardTop}>
+          <Text style={styles.cardNumber}>Booking #{booking.bookingNumber}</Text>
+          <RepairStatusBadge status={booking.status} />
+        </View>
+        <Text style={styles.cardSummary} numberOfLines={1}>{issue} · {booking.model}</Text>
+        <Text style={styles.cardMeta}>Visit on {visitDay(booking.visitDate)}</Text>
+        <Text style={styles.cardTotal}>{formatInr(booking.price)}</Text>
+      </View>
+      <Icon name="chevronRight" color={colors.muted} size={18} />
+    </Tap>
   );
 }
 

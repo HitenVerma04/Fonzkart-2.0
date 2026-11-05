@@ -241,6 +241,89 @@ CREATE TABLE "Notification" (
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "RefurbishedDevice" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "brand" TEXT NOT NULL,
+    "storage" TEXT NOT NULL,
+    "grade" TEXT NOT NULL,
+    "warrantyMonths" INTEGER NOT NULL DEFAULT 6,
+    "imageUrl" TEXT,
+    "mrp" INTEGER NOT NULL,
+    "price" INTEGER NOT NULL,
+    "stock" INTEGER NOT NULL DEFAULT 1,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "displayOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "RefurbishedDevice_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RefurbishedOrder" (
+    "id" TEXT NOT NULL,
+    "orderNumber" SERIAL NOT NULL,
+    "userId" TEXT,
+    "deviceId" TEXT NOT NULL,
+    "deviceName" TEXT NOT NULL,
+    "storage" TEXT NOT NULL,
+    "grade" TEXT NOT NULL,
+    "warrantyMonths" INTEGER NOT NULL,
+    "imageUrl" TEXT,
+    "price" INTEGER NOT NULL,
+    "mrp" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "pincode" TEXT NOT NULL,
+    "paymentMethod" TEXT NOT NULL DEFAULT 'cod',
+    "status" TEXT NOT NULL DEFAULT 'placed',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "RefurbishedOrder_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RepairPrice" (
+    "id" TEXT NOT NULL,
+    "brand" TEXT NOT NULL,
+    "model" TEXT NOT NULL,
+    "issue" TEXT NOT NULL,
+    "price" INTEGER NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "displayOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "RepairPrice_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RepairBooking" (
+    "id" TEXT NOT NULL,
+    "bookingNumber" SERIAL NOT NULL,
+    "userId" TEXT,
+    "repairPriceId" TEXT NOT NULL,
+    "brand" TEXT NOT NULL,
+    "model" TEXT NOT NULL,
+    "issue" TEXT NOT NULL,
+    "price" INTEGER NOT NULL,
+    "visitDate" TEXT NOT NULL,
+    "slot" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "pincode" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'booked',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "RepairBooking_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -298,3 +381,11 @@ ALTER TABLE "Model" ADD CONSTRAINT "Model_brandId_fkey" FOREIGN KEY ("brandId") 
 -- AddForeignKey
 ALTER TABLE "Variant" ADD CONSTRAINT "Variant_modelId_fkey" FOREIGN KEY ("modelId") REFERENCES "Model"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- CreateIndex
+CREATE UNIQUE INDEX "RefurbishedOrder_orderNumber_key" ON "RefurbishedOrder"("orderNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RepairPrice_brand_model_issue_key" ON "RepairPrice"("brand", "model", "issue");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RepairBooking_bookingNumber_key" ON "RepairBooking"("bookingNumber");

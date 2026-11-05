@@ -2,7 +2,7 @@
 // plus "Edit carousel view", the festive theme and the screen guard store, which only the Customer app has.
 export type Section = {
   href: '/orders' | '/partners' | '/riders' | '/cities' | '/zonal-heads' | '/users' | '/rm' | '/pricing' | '/catalog' | '/homepage'
-    | '/carousel' | '/festive-theme' | '/screen-guards' | '/shop-orders' | '/email';
+    | '/carousel' | '/festive-theme' | '/screen-guards' | '/shop-orders' | '/refurbished' | '/buy-orders' | '/repair-prices' | '/repair-bookings' | '/email';
   title: string;
   detail: string;
   roles: string[];
@@ -27,6 +27,10 @@ export const SECTIONS: Section[] = [
   { href: '/festive-theme', title: 'Festive theme', detail: 'Republic Day, Independence Day, Eid, Diwali, Christmas', roles: ADMINS },
   { href: '/screen-guards', title: 'Screen guard store', detail: 'Guards, prices, discounts and store switch', roles: ADMINS },
   { href: '/shop-orders', title: 'Shop orders', detail: 'Screen guard orders, cash on delivery', roles: ADMINS },
+  { href: '/refurbished', title: 'Refurbished devices', detail: 'Devices for sale, grades, prices and stock', roles: ADMINS },
+  { href: '/buy-orders', title: 'Device orders', detail: 'Refurbished devices ordered, cash on delivery', roles: ADMINS },
+  { href: '/repair-prices', title: 'Repair prices', detail: 'Fixed prices per phone and repair', roles: ADMINS },
+  { href: '/repair-bookings', title: 'Repair bookings', detail: 'Doorstep repair visits', roles: ADMINS },
   { href: '/email', title: 'Email', detail: 'The Fonzkart mailboxes', roles: [...ADMINS, ZH, RM] },
 ];
 

@@ -3,7 +3,7 @@
 import { Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { discountPercent, SHOP_ORDER_STATUSES, type ShopOrderStatus } from '@fonzkart/api';
+import { discountPercent, REPAIR_STATUSES, SHOP_ORDER_STATUSES, type RepairStatus, type ShopOrderStatus } from '@fonzkart/api';
 import { formatInr } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { Icon, MAX_CONTENT, radii, Tap, type, useDesign } from '../design';
@@ -56,6 +56,19 @@ export function ShopStatusBadge({ status }: { status: ShopOrderStatus }) {
   const styles = useStyles();
   const label = SHOP_ORDER_STATUSES.find(s => s.id === status)?.label ?? status;
   const tone = status === 'cancelled' ? colors.tones.red : status === 'delivered' ? colors.tones.green : status === 'placed' ? colors.tones.gray : colors.tones.blue;
+  return (
+    <View style={[styles.status, { backgroundColor: tone.background }]}>
+      <View style={[styles.statusDot, { backgroundColor: tone.text }]} />
+      <Text style={[styles.statusText, { color: tone.text }]}>{label}</Text>
+    </View>
+  );
+}
+
+export function RepairStatusBadge({ status }: { status: RepairStatus }) {
+  const colors = useColors();
+  const styles = useStyles();
+  const label = REPAIR_STATUSES.find(s => s.id === status)?.label ?? status;
+  const tone = status === 'cancelled' ? colors.tones.red : status === 'completed' ? colors.tones.green : status === 'booked' ? colors.tones.gray : colors.tones.blue;
   return (
     <View style={[styles.status, { backgroundColor: tone.background }]}>
       <View style={[styles.statusDot, { backgroundColor: tone.text }]} />

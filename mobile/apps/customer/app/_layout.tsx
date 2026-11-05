@@ -92,6 +92,11 @@ function Screens() {
         <Stack.Screen name="shop/cart" options={{ title: 'Cart' }} />
         <Stack.Screen name="shop/checkout" options={{ title: 'Checkout' }} />
         <Stack.Screen name="shop/order/[id]" options={{ title: 'Order' }} />
+        <Stack.Screen name="refurbished/[id]" options={{ title: 'Device' }} />
+        <Stack.Screen name="refurbished/checkout" options={{ title: 'Checkout' }} />
+        <Stack.Screen name="refurbished/order/[id]" options={{ title: 'Order' }} />
+        <Stack.Screen name="repairs/book" options={{ title: 'Book a repair' }} />
+        <Stack.Screen name="repairs/booking/[id]" options={{ title: 'Repair booking' }} />
       </Stack>
     </NavigationThemeProvider>
   );

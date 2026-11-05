@@ -45,7 +45,6 @@ export function CategoryTabs() {
 type Service = { label: string; icon: IconName; to: 'repair' | 'screen-guard' | 'bulk' | 'call' };
 const SERVICES: Service[] = [
   { label: 'Repair phone', icon: 'repair', to: 'repair' },
-  { label: 'Repair laptop', icon: 'laptop', to: 'repair' },
   { label: 'Screen guard', icon: 'shield', to: 'screen-guard' },
   { label: 'Recycle', icon: 'recycle', to: 'bulk' },
 ];
