@@ -20,13 +20,14 @@ interface SellWizardProps {
     initialBrands: Brand[];
     initialCategory?: string;
     initialBrandId?: string;
+    initialModel?: Model | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     user?: any; // Session User
 }
 
 import { fetchBrands } from '@/actions/catalog';
 
-export default function SellWizard({ initialBrands, initialCategory, initialBrandId, user: initialUser }: SellWizardProps) {
+export default function SellWizard({ initialBrands, initialCategory, initialBrandId, initialModel, user: initialUser }: SellWizardProps) {
     const router = useRouter();
     // If a category is provided via info, we start at 'brand' selection (skipping category select)
     // Exception: If category is 'repair', we treat it as smartphone but set isRepair=true
@@ -43,7 +44,7 @@ export default function SellWizard({ initialBrands, initialCategory, initialBran
     const preSelectedBrand = initialBrandId ? initialBrands.find(b => b.id === initialBrandId) : null;
 
     const [step, setStep] = useState<Step>(
-        preSelectedBrand ? 'model' : (initialCategory ? 'brand' : 'category')
+        preSelectedBrand ? (initialModel ? 'variant' : 'model') : (initialCategory ? 'brand' : 'category')
     );
     const [category, setCategory] = useState<string>(resolvedCategory);
     const [isRepair, setIsRepair] = useState(initialCategory === 'repair' || initialCategory === 'unbreakable-screenguard');
@@ -52,7 +53,7 @@ export default function SellWizard({ initialBrands, initialCategory, initialBran
     const [brands, setBrands] = useState<Brand[]>(initialBrands);
 
     const [selectedBrand, setSelectedBrand] = useState<Brand | null>(preSelectedBrand || null);
-    const [selectedModel, setSelectedModel] = useState<Model | null>(null);
+    const [selectedModel, setSelectedModel] = useState<Model | null>(preSelectedBrand ? initialModel ?? null : null);
     const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
     const [skippedVariant, setSkippedVariant] = useState(false);
     const [answers, setAnswers] = useState<Record<string, unknown>>({});

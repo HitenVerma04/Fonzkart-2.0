@@ -23,6 +23,7 @@ import InitialLoader from "@/components/ui/InitialLoader";
 import { ThemeProvider } from "@/components/theme-provider";
 import HeaderVisibility from "@/components/HeaderVisibility";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import { FestiveSync } from "@/components/festive/festive-client";
 
 
 export default function RootLayout({
@@ -33,6 +34,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Before the first paint: the last festive theme, and whether the launch animation has played in this tab. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var d=document.documentElement,f=localStorage.getItem('fz-festive');if(f&&f!=='none')d.dataset.festive=f;if(sessionStorage.getItem('fz-boot')||/^\\/(admin|executive|partner|zonal|rm|login|signup)/.test(location.pathname)||matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('fz-booted')}catch(e){}`,
+          }}
+        />
         {/* Google tag (gtag.js) */}
         {/* eslint-disable-next-line @next/next/next-script-for-ga */}
         <script
@@ -62,6 +69,7 @@ export default function RootLayout({
         >
           {/* Initial Splash Loader for first visit/refresh */}
           <InitialLoader />
+          <FestiveSync />
 
           <HeaderVisibility>
             <Header />

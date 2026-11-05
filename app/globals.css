@@ -260,3 +260,257 @@
 .animate-pulse-slow {
   animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+/* ---- The look shared with the Customer app: gradients, and the festive themes (admin: /admin/festive) ---- */
+:root {
+  --hero: linear-gradient(170deg, #0f7a37 0%, #16a34a 55%, #1fb257 100%);
+  --deep: linear-gradient(135deg, #07170f 0%, #0c2c1b 58%, #14532d 100%);
+  --deep-accent: #86efac;
+  --launch: linear-gradient(165deg, #f0fdf4 0%, #dcfce7 48%, #bbf7d0 100%);
+  --lit: linear-gradient(135deg, #22c55e 0%, #16a34a 55%, #15803d 100%);
+  --on-lit: #ffffff;
+  --glow-a: 34, 197, 94;
+  --glow-b: 16, 185, 129;
+}
+
+.dark {
+  --hero: linear-gradient(170deg, #0a2a17 0%, #0b3a1f 45%, #060a08 100%);
+  --launch: linear-gradient(165deg, #04110a 0%, #0a2a17 52%, #030806 100%);
+  --lit: linear-gradient(135deg, #4ade80 0%, #22c55e 55%, #16a34a 100%);
+  --on-lit: #052e16;
+}
+
+/* Everything drawn in the greens of the site follows the theme's accent. */
+html[data-festive] {
+  --color-green-50: color-mix(in srgb, var(--fest) 6%, white);
+  --color-green-100: color-mix(in srgb, var(--fest) 13%, white);
+  --color-green-200: color-mix(in srgb, var(--fest) 26%, white);
+  --color-green-300: color-mix(in srgb, var(--fest) 45%, white);
+  --color-green-400: color-mix(in srgb, var(--fest) 75%, white);
+  --color-green-500: var(--fest);
+  --color-green-600: var(--fest);
+  --color-green-700: color-mix(in srgb, var(--fest) 85%, black);
+  --color-green-800: color-mix(in srgb, var(--fest) 70%, black);
+  --color-green-900: color-mix(in srgb, var(--fest) 50%, black);
+  --color-emerald-400: color-mix(in srgb, var(--fest) 75%, white);
+  --color-emerald-500: var(--fest);
+  --color-emerald-600: var(--fest);
+  --color-teal-400: color-mix(in srgb, var(--fest) 75%, white);
+  --color-teal-500: var(--fest);
+  --color-lime-400: color-mix(in srgb, var(--fest) 75%, white);
+}
+
+html[data-festive].dark {
+  --primary-foreground: 0 0% 5%;
+  --on-lit: #111111;
+}
+
+html[data-festive='republic'] {
+  --fest: #d9480f;
+  --primary: 17 87% 45%;
+  --ring: 17 87% 45%;
+  --hero: linear-gradient(170deg, #08245e 0%, #0f3a94 55%, #1c4fb8 100%);
+  --deep: linear-gradient(135deg, #060f26 0%, #0b2460 58%, #123a8c 100%);
+  --deep-accent: #fdba74;
+  --launch: linear-gradient(165deg, #fff4ec 0%, #ffe3d1 48%, #ffc9a8 100%);
+  --lit: linear-gradient(135deg, #d9480f 0%, #b93a0a 100%);
+  --glow-a: 251, 146, 60;
+  --glow-b: 59, 130, 246;
+}
+
+html[data-festive='republic'].dark {
+  --fest: #fb923c;
+  --primary: 27 96% 61%;
+  --ring: 27 96% 61%;
+  --hero: linear-gradient(170deg, #07163a 0%, #0b2460 50%, #05070d 100%);
+  --launch: var(--hero);
+  --lit: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
+}
+
+html[data-festive='independence'] {
+  --fest: #138808;
+  --primary: 115 89% 28%;
+  --ring: 115 89% 28%;
+  --hero: linear-gradient(170deg, #c2410c 0%, #e8590c 50%, #f08c00 100%);
+  --deep: linear-gradient(135deg, #1a0d05 0%, #4a1c08 55%, #0e4d0a 100%);
+  --deep-accent: #ffd8a8;
+  --launch: linear-gradient(165deg, #f1fbef 0%, #dcf5d8 48%, #b9e8b2 100%);
+  --lit: linear-gradient(135deg, #138808 0%, #0e6b06 100%);
+  --glow-a: 74, 222, 128;
+  --glow-b: 249, 115, 22;
+}
+
+html[data-festive='independence'].dark {
+  --fest: #4ade80;
+  --primary: 142 69% 58%;
+  --ring: 142 69% 58%;
+  --hero: linear-gradient(170deg, #5c1f06 0%, #7c2d12 50%, #0a0705 100%);
+  --launch: var(--hero);
+  --lit: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+}
+
+html[data-festive='eid'] {
+  --fest: #0b6b5a;
+  --primary: 169 81% 23%;
+  --ring: 169 81% 23%;
+  --hero: linear-gradient(170deg, #04342c 0%, #0b5d4e 60%, #128271 100%);
+  --deep: linear-gradient(135deg, #021a16 0%, #05352d 58%, #0b5d4e 100%);
+  --deep-accent: #f2d98c;
+  --launch: linear-gradient(165deg, #eefaf6 0%, #d3f1e8 48%, #a9e2d2 100%);
+  --lit: linear-gradient(135deg, #0b6b5a 0%, #085346 100%);
+  --glow-a: 230, 195, 92;
+  --glow-b: 16, 185, 129;
+}
+
+html[data-festive='eid'].dark {
+  --fest: #e6c35c;
+  --primary: 45 73% 63%;
+  --ring: 45 73% 63%;
+  --hero: linear-gradient(170deg, #03261f 0%, #06403a 50%, #040807 100%);
+  --launch: var(--hero);
+  --lit: linear-gradient(135deg, #f2d98c 0%, #e6c35c 100%);
+}
+
+html[data-festive='diwali'] {
+  --fest: #c2570c;
+  --primary: 25 88% 40%;
+  --ring: 25 88% 40%;
+  --hero: linear-gradient(170deg, #2b0a3d 0%, #5b1a6b 55%, #a8431a 100%);
+  --deep: linear-gradient(135deg, #140418 0%, #3b0f52 58%, #7c2d12 100%);
+  --deep-accent: #fcd34d;
+  --launch: linear-gradient(165deg, #fff7ed 0%, #ffedd5 48%, #fed7aa 100%);
+  --lit: linear-gradient(135deg, #c2570c 0%, #9a4408 100%);
+  --glow-a: 251, 191, 36;
+  --glow-b: 168, 85, 247;
+}
+
+html[data-festive='diwali'].dark {
+  --fest: #fbbf24;
+  --primary: 43 96% 56%;
+  --ring: 43 96% 56%;
+  --hero: linear-gradient(170deg, #1e072b 0%, #3b0f52 50%, #0a0507 100%);
+  --launch: var(--hero);
+  --lit: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+}
+
+html[data-festive='christmas'] {
+  --fest: #c81e1e;
+  --primary: 0 74% 45%;
+  --ring: 0 74% 45%;
+  --hero: linear-gradient(170deg, #6b1414 0%, #991b1b 55%, #c81e1e 100%);
+  --deep: linear-gradient(135deg, #1a0606 0%, #5c1010 55%, #14532d 100%);
+  --deep-accent: #fecaca;
+  --launch: linear-gradient(165deg, #fef2f2 0%, #fee2e2 48%, #fecaca 100%);
+  --lit: linear-gradient(135deg, #c81e1e 0%, #9b1c1c 100%);
+  --glow-a: 248, 113, 113;
+  --glow-b: 34, 197, 94;
+}
+
+html[data-festive='christmas'].dark {
+  --fest: #f87171;
+  --primary: 0 91% 71%;
+  --ring: 0 91% 71%;
+  --hero: linear-gradient(170deg, #3a0a0a 0%, #5c1010 50%, #0a0505 100%);
+  --launch: var(--hero);
+  --lit: linear-gradient(135deg, #fca5a5 0%, #f87171 100%);
+}
+
+/* Festive decorations: only transforms and opacity move. */
+@keyframes fz-sway { from { transform: rotate(var(--sway)); } to { transform: rotate(calc(var(--sway) * -1)); } }
+@keyframes fz-twinkle { from { opacity: 0.25; transform: scale(0.8); } to { opacity: 1; transform: scale(1.1); } }
+@keyframes fz-turn { to { transform: rotate(360deg); } }
+@keyframes fz-flame { from { opacity: 0.8; transform: scale(1.05, 0.86); } to { opacity: 1; transform: scale(0.92, 1.14); } }
+@keyframes fz-bob { from { transform: translateY(-2px); } to { transform: translateY(2px); } }
+@keyframes fz-fall {
+  from { transform: translate(0, -10px); }
+  25% { transform: translate(6px, 30px); }
+  75% { transform: translate(-6px, 90px); }
+  to { transform: translate(0, 130px); }
+}
+.fz-sway { transform-origin: top; animation: fz-sway var(--t, 2s) ease-in-out infinite alternate; }
+.fz-twinkle { animation: fz-twinkle var(--t, 1.2s) ease-in-out infinite alternate; }
+.fz-turn { animation: fz-turn 26s linear infinite; }
+.fz-flame { transform-origin: bottom; animation: fz-flame 0.45s ease-in-out infinite alternate; }
+.fz-bob { animation: fz-bob 2s ease-in-out infinite alternate; }
+.fz-fall { animation: fz-fall 8s linear infinite; }
+
+/* Screen guard pictures */
+@keyframes guard-float { from { transform: translateY(-2%); } to { transform: translateY(2%); } }
+@keyframes guard-drift { from { transform: translateX(-3%) rotateY(-14deg); } to { transform: translateX(3%) rotateY(-14deg); } }
+@keyframes guard-glint { from { transform: translateX(-260%) rotate(18deg); } 45%, to { transform: translateX(360%) rotate(18deg); } }
+.guard-float { animation: guard-float 2.6s ease-in-out infinite alternate; }
+.guard-drift { animation: guard-drift 2.6s ease-in-out infinite alternate; }
+.guard-glint { animation: guard-glint 4.2s ease-in-out infinite; }
+
+/* The factory behind the home page */
+.fac { fill: none; stroke: hsl(var(--primary)); stroke-opacity: 0.17; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.fac-station:not([data-on]) * { animation-play-state: paused !important; }
+@keyframes fac-ride { from { transform: translateX(30px); opacity: 0; } 12%, 88% { opacity: 1; } to { transform: translateX(340px); opacity: 0; } }
+@keyframes fac-beam { from { transform: translateX(-48px); } to { transform: translateX(48px); } }
+@keyframes fac-arm { from { transform: rotate(-24deg); } to { transform: rotate(8deg); } }
+@keyframes fac-press { from { transform: translateY(0); } to { transform: translateY(52px); } }
+@keyframes fac-puff { from { transform: translate(0, 0) scale(0.6); opacity: 0; } 50% { opacity: 1; } to { transform: translate(16px, -44px) scale(1.5); opacity: 0; } }
+@keyframes fac-flow { to { transform: translateY(120px); } }
+.fac-spin { animation: fz-turn var(--t, 14s) linear infinite; animation-direction: var(--d, normal); }
+.fac-ride { animation: fac-ride 7s linear infinite; }
+.fac-beam { animation: fac-beam 1.75s ease-in-out infinite alternate; }
+.fac-arm { animation: fac-arm var(--t, 2.33s) ease-in-out infinite alternate; }
+.fac-press { animation: fac-press 1.17s ease-in-out infinite alternate; }
+.fac-puff { animation: fac-puff 4.67s linear infinite; }
+.fac-flow { animation: fac-flow 2s linear infinite; animation-direction: var(--d, normal); }
+
+/* The launch animation (components/ui/InitialLoader.tsx). The script in the head of the page adds fz-booted when it has
+   already played in this tab, on staff pages, and for people who ask for less motion. */
+.fz-booted .fz-boot { display: none; }
+@keyframes fz-boot-failsafe { to { opacity: 0; visibility: hidden; } }
+@keyframes fz-drift-a { from { transform: translate(-8%, -6%) scale(0.96); } to { transform: translate(8%, 6%) scale(1.06); } }
+@keyframes fz-drift-b { from { transform: translate(8%, 6%) scale(1.06); } to { transform: translate(-8%, -6%) scale(0.96); } }
+@keyframes fz-stars { from { opacity: 0.3; transform: translateY(8px); } to { opacity: 0.9; transform: translateY(-12px); } }
+@keyframes fz-device { from { transform: translateY(-12px) rotate(-8deg); } to { transform: translateY(12px) rotate(8deg); } }
+@keyframes fz-halo { from { opacity: 0.5; transform: scale(0.97); } to { opacity: 0.72; transform: scale(1.04); } }
+.fz-boot {
+  --fz-r: min(36.5vw, 180px, 29vh);
+  --fz-h: min(46px, 12.3vw);
+  position: fixed; inset: 0; z-index: 9999; overflow: hidden; cursor: pointer;
+  animation: fz-boot-failsafe 0.3s 9s forwards;
+}
+.fz-boot-sky { position: absolute; inset: 0; background: var(--launch); }
+.fz-boot-aurora { position: absolute; width: 120vmax; height: 120vmax; border-radius: 50%; }
+.fz-boot-aurora.a { left: -48vmax; top: -44vmax; background: radial-gradient(circle, rgba(var(--glow-a), 0.34) 0%, rgba(var(--glow-a), 0.1) 45%, rgba(var(--glow-a), 0) 70%); animation: fz-drift-a 7s ease-in-out infinite alternate; }
+.fz-boot-aurora.b { right: -48vmax; bottom: -44vmax; background: radial-gradient(circle, rgba(var(--glow-b), 0.34) 0%, rgba(var(--glow-b), 0.1) 45%, rgba(var(--glow-b), 0) 70%); animation: fz-drift-b 8s ease-in-out infinite alternate; }
+.fz-boot-stars { position: absolute; inset: 0; color: hsl(var(--primary)); animation: fz-stars 2.6s ease-in-out infinite alternate; }
+.dark .fz-boot-stars { color: #ffffff; }
+.fz-boot-stars i { position: absolute; border-radius: 50%; background: currentColor; }
+.fz-boot-device { position: absolute; color: hsl(var(--primary)); opacity: 0.3; animation: fz-device 5s ease-in-out infinite alternate; }
+.fz-boot-center { position: absolute; left: 50%; top: 46%; width: 0; height: 0; }
+.fz-boot-halo { position: absolute; left: calc(var(--fz-r) * -1); top: calc(var(--fz-r) * -1); width: calc(var(--fz-r) * 2); height: calc(var(--fz-r) * 2); border-radius: 50%; background: radial-gradient(circle, rgba(var(--glow-a), 0.42) 0%, rgba(var(--glow-a), 0.14) 42%, rgba(var(--glow-a), 0) 70%); animation: fz-halo 2.4s ease-in-out infinite alternate; }
+.fz-boot-ring { position: absolute; left: calc(var(--fz-r) * -1); top: calc(var(--fz-r) * -1); width: calc(var(--fz-r) * 2); height: calc(var(--fz-r) * 2); border-radius: 50%; border: 1px solid hsl(var(--primary) / 0.35); transform: rotate(-0.1rad) scaleY(1.34); opacity: 0; }
+.fz-boot-shock { position: absolute; left: -70px; top: -70px; width: 140px; height: 140px; border-radius: 50%; border: 1px solid hsl(var(--primary)); opacity: 0; }
+.fz-boot-stack { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; width: calc(var(--fz-h) * 4.07); transform: translate(-50%, -50%); opacity: 0; will-change: transform, opacity; }
+.fz-boot-mark { height: calc(var(--fz-h) * 1.75); aspect-ratio: 450 / 675; }
+.fz-boot-mark img { width: 100%; height: 100%; object-fit: contain; }
+html[data-festive] .fz-boot-mark { background: hsl(var(--primary)); -webkit-mask: url(/brand/fonzkart_f_mark.png) center / contain no-repeat; mask: url(/brand/fonzkart_f_mark.png) center / contain no-repeat; }
+html[data-festive] .fz-boot-mark img { opacity: 0; }
+.fz-boot-window { width: 100%; height: var(--fz-h); overflow: hidden; }
+.fz-boot-window > div { width: 100%; height: 100%; overflow: hidden; }
+.fz-boot-letters { position: relative; width: 100%; height: 100%; }
+.fz-boot-letters img { width: 100%; height: 100%; object-fit: contain; }
+.fz-boot-light { position: absolute; left: 0; top: 0; width: 28%; height: 100%; opacity: 0; background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.75) 50%, transparent 100%); }
+.fz-boot-words { position: relative; width: 100%; height: 22px; color: hsl(var(--primary)); }
+.fz-boot-words span { position: absolute; inset: 0; text-align: center; font-size: 15px; line-height: 22px; font-weight: 800; letter-spacing: 3.5px; text-transform: uppercase; white-space: nowrap; opacity: 0; }
+.fz-boot-greeting { font-size: 15px; line-height: 20px; font-weight: 800; color: hsl(var(--primary)); white-space: nowrap; }
+.fz-boot-tile { position: absolute; left: -28px; top: -28px; width: 56px; height: 56px; opacity: 0; will-change: transform, opacity; }
+.fz-boot-aura { position: absolute; left: -42px; top: -42px; width: 140px; height: 140px; border-radius: 50%; opacity: 0; background: radial-gradient(circle, rgba(var(--glow-a), 0.55) 0%, rgba(var(--glow-a), 0.16) 45%, rgba(var(--glow-a), 0) 70%); }
+.fz-boot-pulse { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid hsl(var(--primary)); opacity: 0; }
+.fz-boot-disc { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; border: 1px solid hsl(var(--primary) / 0.3); background: hsl(var(--card)); color: hsl(var(--primary)); }
+.fz-boot-disc::before { content: ""; position: absolute; inset: 0 0 45% 0; background: linear-gradient(180deg, hsl(var(--primary) / 0.08) 0%, transparent 100%); }
+.fz-boot-disc.lit { opacity: 0; background: var(--lit); color: var(--on-lit); border-color: rgba(255, 255, 255, 0.4); }
+.fz-boot-disc.lit::before { background: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, transparent 100%); }
+.fz-boot-disc svg { position: relative; }
+.fz-boot-smear { position: absolute; left: -28px; top: -28px; width: 56px; height: 56px; border-radius: 50%; background: hsl(var(--primary)); opacity: 0; will-change: transform, opacity; }
+.fz-boot-trail { position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: hsl(var(--primary)); opacity: 0; }
+.fz-boot-wave { position: absolute; left: -32px; top: -32px; width: 64px; height: 64px; border-radius: 50%; border: 2px solid hsl(var(--primary)); opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fz-sway, .fz-twinkle, .fz-turn, .fz-flame, .fz-bob, .fz-fall, .guard-float, .guard-drift, .guard-glint,
+  .fac-spin, .fac-ride, .fac-beam, .fac-arm, .fac-press, .fac-puff, .fac-flow { animation: none; }
+}

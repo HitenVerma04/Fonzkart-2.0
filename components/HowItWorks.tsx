@@ -46,7 +46,7 @@ export default function HowItWorks() {
     }, [])
 
     return (
-        <section className="py-24 bg-gradient-to-b from-white to-slate-50 dark:from-black dark:to-black dark:bg-black relative overflow-hidden">
+        <section className="py-24 bg-gradient-to-b from-white/50 to-slate-50/50 dark:from-transparent dark:to-transparent relative overflow-hidden">
             {/* Decorative Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-1/4 -left-20 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />

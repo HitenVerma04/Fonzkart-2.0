@@ -15,6 +15,9 @@ import { DynamicLogo } from '@/components/DynamicLogo';
 import { useRouter } from 'next/navigation';
 import { PriceGraphic, SpeedGraphic, SecurityGraphic } from '@/components/icons/FeatureIcons';
 import { Brand } from '@/lib/store';
+import { FestiveBanner } from '@/components/festive/FestiveBanner';
+import { FactoryBackground } from '@/components/home/FactoryBackground';
+import { SellThisDevice } from '@/components/home/SellThisDevice';
 
 export function HomeClient({ initialBrands, activeCities = [], displayPrices = [] }: { initialBrands: Brand[], activeCities?: string[], displayPrices?: any[] }) {
     const router = useRouter();
@@ -37,10 +40,12 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
 
     return (
         <div className="flex flex-col min-h-screen overflow-x-hidden">
+            <FactoryBackground />
+            <FestiveBanner />
             {/* Hero Section */}
-            <section className="relative pt-0 pb-32 md:pt-40 md:pb-52 overflow-hidden bg-background w-full">
+            <section className="relative pt-0 pb-32 md:pt-40 md:pb-52 overflow-hidden w-full">
                 {/* Background FX */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 bg-slate-50 dark:bg-slate-950/20">
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
                     <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-green-500/10 rounded-full blur-[120px] opacity-60" />
                     <div className="absolute top-[20%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[100px] opacity-40" />
                     <div className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-r from-transparent via-green-500/20 to-transparent" />
@@ -96,6 +101,7 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
                                 <div className="relative z-20 bg-background/80 backdrop-blur-sm pt-2 rounded-xl w-full max-w-full overflow-hidden">
                                     <div className="px-1"><HomeSearch /></div>
                                     <div className="mt-6 w-full overflow-hidden"><BrandRail initialBrands={initialBrands} /></div>
+                                    <SellThisDevice brands={initialBrands} />
                                 </div>
                             </div>
 
@@ -155,7 +161,7 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
             </section>
 
             {/* Category Selection Section (unchanged) */}
-            <section className="py-20 bg-slate-50/50 dark:bg-black border-y border-slate-100 dark:border-slate-800/50">
+            <section className="py-20 bg-slate-50/50 dark:bg-transparent border-y border-slate-100 dark:border-slate-800/50">
                 <div className="container mx-auto px-6">
                     <div className="max-w-4xl mx-auto">
                         <CategorySelector onSelect={handleCategorySelect} />
@@ -203,7 +209,7 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
             <HowItWorks />
 
             {/* Reviews Section */}
-            <section className="py-24 overflow-hidden w-full dark:bg-black">
+            <section className="py-24 overflow-hidden w-full">
                 <div className="container mx-auto px-6">
                     <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
                         <div className="space-y-4 max-w-2xl">

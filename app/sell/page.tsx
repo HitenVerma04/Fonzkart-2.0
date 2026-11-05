@@ -6,10 +6,10 @@ export const metadata = {
     description: "Select your device and get the best price.",
 };
 
-import { fetchBrands } from "@/actions/catalog";
+import { fetchBrands, fetchModels } from "@/actions/catalog";
 import { getSession } from "@/lib/session";
 
-export default async function SellPage(props: { searchParams: Promise<{ category?: string; brandId?: string }> }) {
+export default async function SellPage(props: { searchParams: Promise<{ category?: string; brandId?: string; modelId?: string }> }) {
     const searchParams = await props.searchParams;
     const category = searchParams.category;
     const brandId = searchParams.brandId;
@@ -29,6 +29,11 @@ export default async function SellPage(props: { searchParams: Promise<{ category
     // Fetch user session for auth-dependent flows (e.g., skip phone number step)
     const session = await getSession();
 
+    // "Sell this device" knows the exact model, so the flow starts at its variants.
+    const model = searchParams.modelId && brandId
+        ? (await fetchModels(brandId, fetchCategory)).find(m => m.id === searchParams.modelId) ?? null
+        : null;
+
     return (
         <div className="container mx-auto py-10 px-4">
             <SellWizard
@@ -36,6 +41,7 @@ export default async function SellPage(props: { searchParams: Promise<{ category
                 initialBrands={brands}
                 initialCategory={category}
                 initialBrandId={brandId}
+                initialModel={model}
                 user={session?.user}
             />
         </div>

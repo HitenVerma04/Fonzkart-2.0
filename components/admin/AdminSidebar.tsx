@@ -25,7 +25,9 @@ import {
     Camera,
     Monitor,
     Headphones,
-    Banknote
+    Banknote,
+    ShieldCheck,
+    Sparkles
 } from 'lucide-react';
 
 import Image from 'next/image';
@@ -219,6 +221,8 @@ export default function AdminSidebar({ role = 'SUPER_ADMIN' }: { role?: string }
                             {renderSectionTitle('System')}
                             {renderLink('/admin/admins', 'Users', Users, pathname.includes('/admin/admins'))}
                             {renderLink('/admin/homepage', 'Landing Page', LayoutDashboard, pathname.includes('/admin/homepage'))}
+                            {renderLink('/admin/shop', 'Screen Guards', ShieldCheck, pathname.includes('/admin/shop'))}
+                            {renderLink('/admin/festive', 'Festive Theme', Sparkles, pathname.includes('/admin/festive'))}
                         </>
                     )}
 
