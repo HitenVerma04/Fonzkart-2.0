@@ -1,0 +1,13 @@
+# What EAS uploads for an app build: only the mobile workspace, not the website, backend or their 1.8 GB of public files.
+# An .easignore replaces .gitignore for the upload, so the mobile folder's ignored files are listed here too.
+/*
+!/mobile
+
+/mobile/builds/
+/mobile/apps/*/public/
+/mobile/apps/*/android/
+/mobile/apps/*/ios/
+/mobile/apps/*/dist/
+**/node_modules/
+**/.expo/
+**/.env*
