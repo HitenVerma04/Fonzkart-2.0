@@ -16,8 +16,9 @@ const FEATURES: { icon: IconName; title: string; text: string }[] = [
   { icon: 'sparkle', title: 'Eco-friendly recycling', text: 'E-waste is recycled responsibly.' },
 ];
 
-/** The drawing's backdrop: the Bulk card's light mint, in both light and dark mode (the drawing is made for light). */
-const ART_BACKGROUND = '#ecfdf5';
+/** The drawing's backdrop: the Bulk card's light cardboard cream, in both light and dark mode (the drawing is made for
+ * light). */
+const ART_BACKGROUND = '#fff8eb';
 
 export default function BulkOrders() {
   const styles = useStyles();

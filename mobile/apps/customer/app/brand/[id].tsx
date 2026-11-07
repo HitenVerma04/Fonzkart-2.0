@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useBrand, useModels } from '@fonzkart/api';
@@ -6,6 +6,7 @@ import { makeStyles } from '@fonzkart/ui';
 import { modelImage } from '@fonzkart/core';
 import { deviceKindOf, EmptyState, ErrorState, MAX_CONTENT, PAGE_PADDING, ProductImage, SearchBar, SkeletonTiles, Tile } from '../../src/design';
 import { GRID_GAP, useTileWidth } from '../../src/grid';
+import { recordSellStep } from '../../src/sellProgress';
 
 const COLUMNS = 2;
 
@@ -18,6 +19,12 @@ export default function BrandModels() {
   const brand = useBrand(name ? undefined : id); // the name normally comes with the link
   const models = useModels(id, category);
   const brandName = name ?? brand.data?.name ?? 'Models';
+  const knownName = name ?? brand.data?.name;
+
+  // Saved for "Pick up where you left off" on Home.
+  useEffect(() => {
+    recordSellStep({ stage: 'models', category: category ?? 'smartphone', brandId: id, brandName: knownName });
+  }, [id, category, knownName]);
 
   const shown = useMemo(() => {
     const words = filter.trim().toLowerCase().split(/\s+/).filter(Boolean);

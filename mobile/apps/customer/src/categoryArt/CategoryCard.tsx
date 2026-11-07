@@ -35,7 +35,7 @@ const LOOK: Record<HomeTileId, { background: string; text: string; caption: stri
   earbuds: { background: '#fdf4ff', text: '#701a75', caption: 'Instant quote and fast money' },
   repair: { background: '#fef2f2', text: '#7f1d1d', caption: 'Quick, reliable, affordable' },
   screenguard: { background: '#f0fdfa', text: '#083344', caption: 'Unbreakable • 3-hr doorstep' },
-  bulk: { background: '#ecfdf5', text: '#064e3b', caption: 'Corporate & recycling' },
+  bulk: { background: '#fff8eb', text: '#78350f', caption: 'Any quantity · we collect' },
 };
 
 /** The website's entrance: opacity 0 → 1 and scale 0.95 → 1 over 0.4 s, 0.1 s after the card before. */

@@ -47,14 +47,19 @@ export function IconButton({ icon, label, onPress, badge, tint }: {
   label: string;
   onPress: () => void;
   badge?: boolean;
-  /** For use on the green home header. */
-  tint?: 'onGreen';
+  /** `onGreen` for a coloured (festive) home header, `outline` for the plain one: a ring with no fill. */
+  tint?: 'onGreen' | 'outline';
 }) {
   const colors = useColors();
   const styles = useStyles();
   return (
     <Tap onPress={onPress} scaleTo={0.9} hitSlop={6} accessibilityRole="button" accessibilityLabel={label}>
-      {tint ? (
+      {tint === 'outline' ? (
+        <View style={styles.outline}>
+          <Icon name={icon} color={colors.navy} size={21} strokeWidth={1.9} />
+          {badge ? <View style={[styles.badge, styles.badgeOutline]} /> : null}
+        </View>
+      ) : tint ? (
         <View style={styles.onGreen}>
           <Icon name={icon} color={colors.white} size={21} />
           {badge ? <View style={[styles.badge, styles.badgeOnGreen]} /> : null}
@@ -84,4 +89,9 @@ const useStyles = makeStyles(colors => ({
   onGreen: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)' },
   badge: { position: 'absolute', top: 9, right: 10, width: 9, height: 9, borderRadius: 5, backgroundColor: colors.green, borderWidth: 2, borderColor: colors.surface },
   badgeOnGreen: { backgroundColor: '#bbf7d0', borderColor: '#16a34a' },
+  outline: {
+    width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(127,127,127,0.06)', borderWidth: 1, borderColor: colors.border,
+  },
+  badgeOutline: { top: 8, right: 9, width: 10, height: 10, backgroundColor: '#22c55e', borderColor: colors.surface },
 }));

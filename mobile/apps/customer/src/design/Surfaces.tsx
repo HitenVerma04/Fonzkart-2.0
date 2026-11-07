@@ -34,18 +34,25 @@ export function Card({ title, icon, right, children, style }: {
   );
 }
 
-export function SectionHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: { label: string; onPress: () => void } }) {
+/** A section's title, an optional line under it, and an optional "See all" link. `big` is the home screen's size. */
+export function SectionHeader({ title, subtitle, action, big }: {
+  title: string;
+  subtitle?: string;
+  action?: { label: string; onPress: () => void };
+  big?: boolean;
+}) {
   const colors = useColors();
   const styles = useStyles();
   return (
     <View style={styles.section}>
       <View style={styles.sectionText}>
-        <Text style={styles.sectionTitle} accessibilityRole="header">{title}</Text>
+        <Text style={[styles.sectionTitle, big && styles.sectionTitleBig]} accessibilityRole="header">{title}</Text>
         {subtitle ? <Text style={styles.sectionSubtitle}>{subtitle}</Text> : null}
       </View>
       {action ? (
-        <Tap onPress={action.onPress} accessibilityRole="button" hitSlop={8} style={styles.sectionAction}>
-          <Text style={styles.sectionActionText}>{action.label}</Text>
+        <Tap onPress={action.onPress} accessibilityRole="button" hitSlop={8} style={styles.sectionAction}
+          accessibilityLabel={`${action.label}: ${title}`}>
+          <Text style={[styles.sectionActionText, big && styles.sectionActionBig]}>{action.label}</Text>
           <Icon name="chevronRight" color={colors.green} size={16} strokeWidth={2.4} />
         </Tap>
       ) : null}
@@ -121,6 +128,8 @@ const useStyles = makeStyles(colors => ({
   sectionSubtitle: { ...type.small, color: colors.muted },
   sectionAction: { flexDirection: 'row', alignItems: 'center', gap: 2, paddingVertical: 4 },
   sectionActionText: { ...type.small, fontWeight: '700', color: colors.green },
+  sectionTitleBig: { fontSize: 21, lineHeight: 26, fontWeight: '800', letterSpacing: -0.4 },
+  sectionActionBig: { fontSize: 14 },
   info: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   infoText: { flex: 1, gap: 2 },
   infoLabel: { ...type.small, fontSize: 12, color: colors.muted },

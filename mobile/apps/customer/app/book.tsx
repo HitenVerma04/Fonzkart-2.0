@@ -16,6 +16,7 @@ import {
   type, useDesign,
 } from '../src/design';
 import { useQuoteDraft } from '../src/quoteDraft';
+import { clearSellProgress } from '../src/sellProgress';
 
 export default function Book() {
   const colors = useColors();
@@ -114,6 +115,7 @@ export default function Book() {
         location,
         answers: bookingAnswers(draft.answers ?? {}, details),
       });
+      clearSellProgress(); // booked: nothing left to pick up on Home
       router.dismissAll();
       router.push({ pathname: '/orders/[id]', params: { id: placed.id, placed: '1' } });
     } catch (e) {

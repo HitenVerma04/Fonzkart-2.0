@@ -35,7 +35,7 @@ export function standardSize(reportedGb: number, sizes: number[]): number {
 }
 
 export function readDeviceSpecs(): DeviceSpecs | null {
-        if (Platform.OS === 'web') return null;
+  if (Platform.OS === 'web') return browserSpecs();
   const maker = (Device.brand ?? Device.manufacturer ?? '').trim();
   const modelName = (Device.modelName ?? '').trim();
   if (!maker && !modelName) return null;
@@ -54,6 +54,28 @@ export function readDeviceSpecs(): DeviceSpecs | null {
     ramGb: Device.totalMemory ? standardSize(Device.totalMemory / GB, RAM_SIZES) : null,
     storageGb: storage ? standardSize(storage / GB, STORAGE_SIZES) : null,
     isTablet: Device.deviceType === Device.DeviceType.TABLET,
+  };
+}
+
+/**
+ * In a browser (the web build) only the user agent is known, and browsers hide the model, so the card stays general:
+ * "Sell this Apple phone" on an iPhone, "Sell this phone" elsewhere, opening the category or the maker's models.
+ */
+function browserSpecs(): DeviceSpecs {
+  const agent = typeof navigator === 'undefined' ? '' : navigator.userAgent;
+  const apple = /iPhone|iPad|iPod/.test(agent) || (/Macintosh/.test(agent) && typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1);
+  const isTablet = /iPad/.test(agent) || (/Android/.test(agent) && !/Mobile/.test(agent)) || (apple && /Macintosh/.test(agent));
+  const android = /Android\s([\d.]+)/.exec(agent)?.[1] ?? '';
+  const ios = /OS (\d+)[._](\d+)/.exec(agent);
+  return {
+    maker: apple ? 'Apple' : '',
+    modelName: '',
+    deviceName: '',
+    osName: apple ? 'iOS' : 'Android',
+    osVersion: apple ? (ios ? `${ios[1]}.${ios[2]}` : '') : android,
+    ramGb: null,
+    storageGb: null,
+    isTablet,
   };
 }
 

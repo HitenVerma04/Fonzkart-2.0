@@ -10,6 +10,7 @@ import {
   Skeleton, SkeletonScreen, type, useDesign,
 } from '../../src/design';
 import { saveAnswers, useQuoteDraft } from '../../src/quoteDraft';
+import { recordSellStep } from '../../src/sellProgress';
 
 export default function Questions() {
   const styles = useStyles();
@@ -17,8 +18,9 @@ export default function Questions() {
   const router = useRouter();
   const draft = useQuoteDraft();
   const questionnaire = useQuestionnaire();
-  const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<Answers>(() => draft?.answers ?? {});
+  // A check put back by "Pick up where you left off" opens on the question the customer had reached.
+  const [index, setIndex] = useState(() => draft?.resume?.step ?? 0);
+  const [answers, setAnswers] = useState<Answers>(() => draft?.answers ?? draft?.resume?.answers ?? {});
   const scroll = useRef<ScrollViewInstance>(null);
   const [trackWidth, setTrackWidth] = useState(0);
   const progress = useSharedValue(0);
@@ -28,6 +30,21 @@ export default function Questions() {
     [questionnaire.data, draft],
   );
   const step = steps[index];
+
+  // Saved progress from an older questionnaire can point past its end: open its last question instead.
+  useEffect(() => {
+    if (steps.length && index >= steps.length) setIndex(steps.length - 1);
+  }, [steps.length, index]);
+
+  // Every answer and every move between questions is saved for "Pick up where you left off" on Home.
+  useEffect(() => {
+    if (!draft || !steps.length) return;
+    const { answers: _done, resume: _old, ...device } = draft;
+    recordSellStep({
+      stage: 'questions', category: draft.category, modelId: draft.modelId, modelName: draft.modelName, img: draft.img,
+      draft: { ...device, resume: { step: Math.min(index, steps.length - 1), answers } }, stepCount: steps.length,
+    });
+  }, [draft, steps.length, index, answers]);
 
   useEffect(() => {
     if (steps.length) progress.value = withSpring((index + 1) / steps.length, motion.gentle);

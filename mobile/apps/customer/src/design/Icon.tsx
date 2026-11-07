@@ -7,7 +7,7 @@ export type IconName =
   | 'search' | 'back' | 'close' | 'bell' | 'chevronRight' | 'chevronDown' | 'location' | 'check' | 'phone' | 'chat'
   | 'mail' | 'bolt' | 'truck' | 'wallet' | 'sparkle' | 'logout' | 'trash' | 'sun' | 'moon' | 'auto' | 'clock'
   | 'cash' | 'refresh' | 'alert' | 'box' | 'user' | 'lock' | 'building'
-  | 'laptop' | 'tablet' | 'watch' | 'tv' | 'gamepad' | 'camera' | 'headphones' | 'monitor' | 'recycle' | 'grid';
+  | 'laptop' | 'tablet' | 'watch' | 'tv' | 'gamepad' | 'camera' | 'headphones' | 'monitor' | 'recycle' | 'grid' | 'home';
 
 export function Icon({ name, color, size = 24, filled = false, strokeWidth }: {
   name: IconName;
@@ -238,6 +238,9 @@ export function Icon({ name, color, size = 24, filled = false, strokeWidth }: {
           <Path d="M8.5 6.2 10.6 3a1.6 1.6 0 0 1 2.8 0l2.2 3.6M17.6 10.3l1.9 3.3a1.6 1.6 0 0 1-1.4 2.4h-4M10 16H5.9a1.6 1.6 0 0 1-1.4-2.4l2-3.4" {...s} />
           <Path d="m15.6 6.6.4-3 2.7 1.4M12.6 18.2l1.5 1.8-1.5 1.8M5.6 9.4l1 2.9-2.9.6" {...s} />
         </>
+      ) : null}
+      {name === 'home' ? (
+        <Path d="M3.6 10.4 12 3.4l8.4 7v8.9a1.7 1.7 0 0 1-1.7 1.7h-3.9v-5.6a1.4 1.4 0 0 0-1.4-1.4h-2.8a1.4 1.4 0 0 0-1.4 1.4V21H5.3a1.7 1.7 0 0 1-1.7-1.7z" {...f} />
       ) : null}
       {name === 'grid' ? (
         <>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useVariants } from '@fonzkart/api';
@@ -7,6 +8,7 @@ import {
   Appear, EmptyState, ErrorState, ListItem, Page, ProductImage, deviceKindOf, radii, SectionHeader, SkeletonRows, type, useDesign,
 } from '../../src/design';
 import { startQuote } from '../../src/quoteDraft';
+import { recordSellStep } from '../../src/sellProgress';
 
 export default function ModelVariants() {
   const styles = useStyles();
@@ -16,6 +18,11 @@ export default function ModelVariants() {
   const router = useRouter();
   const variants = useVariants(id);
   const title = name ?? 'Your device';
+
+  // Saved for "Pick up where you left off" on Home.
+  useEffect(() => {
+    recordSellStep({ stage: 'variants', category: category ?? 'smartphone', modelId: id, modelName: title, img: img ?? '' });
+  }, [id, category, title, img]);
 
   return (
     <>

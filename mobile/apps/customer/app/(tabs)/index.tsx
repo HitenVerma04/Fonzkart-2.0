@@ -1,24 +1,27 @@
-// Home, laid out like Blinkit's: a green header with the promise in big type, the search bar and a row of category
-// tabs; then the carousel, "Sell this phone" (Cashify's), the animated sell categories, repair & protect, top phone
-// brands, and the Fonzkart promise in a dark card (CRED's style).
+// Home, laid out like Blinkit's: a header (white, or near-black in dark mode) with the animated Fonzkart "F", the name,
+// "Buy • Sell • Repair • Refurbish", the bell, profile and the search bar; then "Pick up where you left off" (when a valuation was left part-way), the
+// carousel, "Sell this phone" (Cashify's), the animated sell categories, Repair & Protect, a row of top phone brands,
+// and the Fonzkart promise in a dark card (CRED's style).
 import { useCallback } from 'react';
-import { Text, useWindowDimensions, View } from 'react-native';
+import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { runOnUI, useAnimatedReaction, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useBrands, useNotifications, useSession } from '@fonzkart/api';
 import { SELL_CATEGORIES } from '@fonzkart/core';
-import { Logo, makeStyles } from '@fonzkart/ui';
+import { makeStyles, useColors, useTheme } from '@fonzkart/ui';
 import { CategoryCard } from '../../src/categoryArt/CategoryCard';
 import { FestiveDecor } from '../../src/festive/FestiveDecor';
 import { ArtActivity, MotionActivity } from '../../src/categoryArt/motion';
 import {
-  Appear, ErrorState, festiveGreeting, Icon, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, SkeletonTiles, Tile, type,
-  useDesign, useTabBarSpace,
+  Appear, ErrorState, festiveGreeting, IconButton, MAX_CONTENT, ProductImage, radii, SearchBar, SectionHeader, Tap, type, useDesign,
+  useTabBarSpace,
 } from '../../src/design';
 import { HomeCarousel } from '../../src/HomeCarousel';
 import { FactoryBackground } from '../../src/home/FactoryBackground';
-import { PromiseCard, ServiceTiles } from '../../src/home/sections';
+import { HeroLogo } from '../../src/home/HeroLogo';
+import { ResumeCard } from '../../src/home/ResumeCard';
+import { PromiseCard } from '../../src/home/sections';
 import { SellThisDevice } from '../../src/home/SellThisDevice';
 import { GRID_GAP, PAGE_PADDING, useTileWidth } from '../../src/grid';
 import { launchCovering, launchTarget } from '../../src/launchTargets';
@@ -34,8 +37,7 @@ export default function Home() {
   const bottom = useTabBarSpace();
   const categoryWidth = useTileWidth(3);
   const carouselWidth = useTileWidth(1);
-  const brandWidth = useTileWidth(4);
-  const serviceWidth = useTileWidth(4);
+  const brandWidth = useTileWidth(5);
   const brands = useBrands('smartphone');
   const { session } = useSession();
   const signedIn = session.status === 'signedIn';
@@ -43,6 +45,10 @@ export default function Home() {
   const unread = inbox.data?.some(n => !n.isRead) ?? false;
   const firstName = signedIn ? session.user.name.trim().split(/\s+/)[0] : '';
   const greeting = festiveGreeting(d.festive);
+  const colors = useColors();
+  const dark = useTheme().scheme === 'dark';
+  const festive = d.festive !== 'none';
+  const onDark = festive || dark;
 
   // Every category card animates all the time (the drawings are drawn by Skia on the GPU, see categoryArt/skiaSvg),
   // including while the list scrolls. They pause only when no one can see them: while another screen or the launch
@@ -95,31 +101,28 @@ export default function Home() {
     <Animated.ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: bottom }} showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled" onScroll={onScroll} scrollEventThrottle={16}
       onContentSizeChange={(_, h) => { contentHeight.value = h; }}>
-      <View style={[styles.hero, { backgroundImage: d.heroGradient, paddingTop: insets.top + 10 }]}>
+      <View style={[styles.hero, festive ? styles.heroFestive : dark ? styles.heroDark : styles.heroLight,
+        festive && { backgroundImage: d.heroGradient }, { paddingTop: insets.top + 12 }]}>
         <FestiveDecor />
         <View style={styles.heroInner}>
+          {greeting || firstName ? (
+            <Text style={[styles.kicker, { color: onDark ? d.heroAccent : colors.greenDark }]} numberOfLines={1}>{greeting || `Hi ${firstName}`}</Text>
+          ) : null}
           <View style={styles.topRow}>
-            <View style={styles.promise}>
-              <Text style={styles.kicker}>{greeting ? `${greeting} · your price in` : firstName ? `Hi ${firstName} · your price in` : 'Fonzkart · your price in'}</Text>
-              <View style={styles.bigRow}>
-                <Text style={styles.big}>60 seconds</Text>
-                <View style={[styles.chip, { backgroundColor: d.heroAccent }]}>
-                  <Icon name="bolt" color={d.heroOnAccent} size={12} filled />
-                  <Text style={[styles.chipText, { color: d.heroOnAccent }]}>CASH</Text>
-                </View>
-              </View>
-              <Text style={styles.subline}>Turn your old devices into <Text style={[styles.cash, { color: d.heroAccent }]}>cash</Text></Text>
-            </View>
+            <HeroLogo onDark={onDark} accent={festive ? d.heroAccent : '#22c55e'} />
             <View style={styles.actions}>
-              {signedIn ? <IconButton icon="bell" label="Notifications" tint="onGreen" badge={unread} onPress={() => router.push('/notifications')} /> : null}
-              <IconButton icon="profile" label="Profile" tint="onGreen" onPress={() => router.navigate('/profile')} />
+              <IconButton icon="bell" label="Notifications" tint={festive ? 'onGreen' : 'outline'} badge={signedIn && unread}
+                onPress={() => router.push('/notifications')} />
+              <IconButton icon="profile" label="Profile" tint={festive ? 'onGreen' : 'outline'} onPress={() => router.navigate('/profile')} />
             </View>
           </View>
-          <SearchBar glass placeholder="Search your device" suggestions={SUGGESTIONS} onPress={() => router.push('/search')} />
+          <SearchBar glass={festive} placeholder="Search for devices, brands or services" suggestions={SUGGESTIONS}
+            onPress={() => router.push('/search')} />
         </View>
       </View>
 
       <View style={styles.body} onLayout={e => { bodyTop.value = e.nativeEvent.layout.y; }}>
+        <ResumeCard />
         <Appear index={0}>
           <HomeCarousel width={carouselWidth} />
         </Appear>
@@ -133,7 +136,8 @@ export default function Home() {
           cardsBottom.value = y + height;
         }}>
         <Appear index={1} style={styles.block}>
-          <SectionHeader title="Sell your device" subtitle="Choose a category to see your price" />
+          <SectionHeader big title="Sell Your Device" subtitle="Choose a category to see your price"
+            action={{ label: 'See all', onPress: () => router.navigate('/sell') }} />
           <View style={styles.grid}>
             {SELL_CATEGORIES.map((category, index) => (
               <CategoryCard
@@ -149,7 +153,8 @@ export default function Home() {
         </Appear>
 
         <Appear index={2} style={styles.block}>
-          <SectionHeader title="Repair & protect" subtitle="Fix it, guard it, or recycle it" />
+          <SectionHeader big title="Repair & Protect" subtitle="Fix, guard or extend your device life"
+            action={{ label: 'See all', onPress: () => router.navigate('/repair') }} />
           <View style={styles.grid}>
             <CategoryCard id="repair" name="Repair" width={categoryWidth} index={0} onPress={() => router.navigate('/repair')} />
             <View ref={launchTarget('screenguard')} collapsable={false}>
@@ -157,28 +162,28 @@ export default function Home() {
             </View>
             <CategoryCard id="bulk" name="Bulk Orders" width={categoryWidth} index={2} onPress={() => router.push('/bulk')} />
           </View>
-          <ServiceTiles width={serviceWidth} />
         </Appear>
         </View>
 
         <Appear index={3} style={styles.block}>
-          <SectionHeader title="Top phone brands" action={{ label: 'See all', onPress: () => router.push({ pathname: '/category/[id]', params: { id: 'smartphone' } }) }} />
+          <SectionHeader big title="Top Phone Brands" subtitle="Pick your brand to get a price"
+            action={{ label: 'See all', onPress: () => router.push({ pathname: '/category/[id]', params: { id: 'smartphone' } }) }} />
           {brands.isPending ? (
-            <SkeletonTiles count={TOP_BRANDS} width={brandWidth} imageHeight={brandWidth - 30} kind="logo" />
+            <View style={styles.brandRow}>
+              {Array.from({ length: 5 }, (_, i) => <View key={i} style={[styles.brandTile, styles.brandSkeleton, { width: brandWidth, height: brandWidth }]} />)}
+            </View>
           ) : brands.isError ? (
             <ErrorState error={brands.error} onRetry={() => brands.refetch()} />
           ) : (
-            <View style={styles.grid}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.brandScroll} contentContainerStyle={styles.brandRow}>
               {brands.data.slice(0, TOP_BRANDS).map(brand => (
-                <Tile
-                  key={brand.id}
-                  label={brand.name}
-                  width={brandWidth}
+                <Tap key={brand.id} scaleTo={0.92} accessibilityRole="button" accessibilityLabel={brand.name}
                   onPress={() => router.push({ pathname: '/brand/[id]', params: { id: brand.id, category: 'smartphone', name: brand.name } })}
-                  image={<ProductImage uri={brand.logo} label={brand.name} size={brandWidth - 34} kind="logo" />}
-                />
+                  style={[styles.brandTile, { width: brandWidth, height: brandWidth, boxShadow: d.shadow.sm }]}>
+                  <ProductImage uri={brand.logo} label={brand.name} size={Math.round(brandWidth * 0.6)} kind="logo" />
+                </Tap>
               ))}
-            </View>
+            </ScrollView>
           )}
         </Appear>
 
@@ -198,18 +203,23 @@ const useStyles = makeStyles(colors => ({
   scroll: { flex: 1 },
   hero: { borderBottomLeftRadius: radii.xl, borderBottomRightRadius: radii.xl, paddingBottom: 20 },
   heroInner: { paddingHorizontal: PAGE_PADDING, gap: 14, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
-  topRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 },
-  promise: { flex: 1, minWidth: 0, gap: 2 },
-  kicker: { ...type.small, fontSize: 13, color: 'rgba(255,255,255,0.85)', fontWeight: '700' },
-  bigRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 8 },
-  big: { fontSize: 32, lineHeight: 38, fontWeight: '900', letterSpacing: -1, color: '#ffffff' },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#bbf7d0', borderRadius: radii.pill, paddingHorizontal: 8, paddingVertical: 3 },
-  chipText: { fontSize: 11, fontWeight: '900', letterSpacing: 0.6, color: '#14532d' },
-  subline: { ...type.label, fontSize: 15, color: '#ffffff' },
-  actions: { flexDirection: 'row', gap: 8, paddingTop: 2, flexShrink: 0 },
-  cash: { color: '#bbf7d0', fontWeight: '900' },
-  body: { padding: PAGE_PADDING, gap: 22, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
+  // the header: white with a hint of green in light mode, near-black with a hint of green in dark mode, the festive
+  // theme's gradient while one is on
+  heroLight: { backgroundImage: 'linear-gradient(180deg, #ffffff 0%, #f1faf4 100%)', borderBottomWidth: 1, borderColor: colors.border },
+  heroDark: { backgroundImage: 'linear-gradient(180deg, #050a07 0%, #0b1610 100%)', borderBottomWidth: 1, borderColor: 'rgba(74,222,128,0.14)' },
+  heroFestive: {},
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  kicker: { ...type.small, fontSize: 13, fontWeight: '700', marginBottom: -6 },
+  actions: { flexDirection: 'row', gap: 8, flexShrink: 0 },
+  body: { padding: PAGE_PADDING, gap: 24, width: '100%', maxWidth: MAX_CONTENT, alignSelf: 'center' },
   block: { gap: 12 },
-  cards: { gap: 22 },
+  cards: { gap: 24 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
+  brandScroll: { marginHorizontal: -PAGE_PADDING },
+  brandRow: { flexDirection: 'row', gap: GRID_GAP, paddingHorizontal: PAGE_PADDING, paddingVertical: 2 },
+  brandTile: {
+    borderRadius: radii.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+  },
+  brandSkeleton: { backgroundColor: colors.placeholder, borderWidth: 0 },
 }));

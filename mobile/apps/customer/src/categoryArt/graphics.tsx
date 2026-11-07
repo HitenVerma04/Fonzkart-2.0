@@ -97,7 +97,7 @@ const VIEW: Record<HomeTileId, { x: number; y: number; size: number }> = {
   earbuds: { x: 100, y: 55, size: 0.9 },
   repair: { x: 96, y: 75, size: 0.9 },
   screenguard: { x: 100, y: 72, size: 0.85 },
-  bulk: { x: 95, y: 68, size: 0.8 },
+  bulk: { x: 104, y: 80, size: 0.82 },
 };
 
 function viewBox(view: HomeTileId) {
@@ -782,64 +782,119 @@ function ScreenGuardArt({ width, height }: ArtProps) {
   );
 }
 
-function BulkArt({ width, height }: ArtProps) {
-  // On the website the badge's translate is replaced by its spin, so the ring turns around the drawing's corner
-  // while the ♻ centre stays at (144, 88).
-  const spin = useSpin(24);
-  const ringProps = useAnimatedProps(() => ({ matrix: rotateAbout(360 * spin.value, 0, 0) }));
+// Kraft cardboard and pallet wood for the bulk drawing.
+const kraft = { front: '#e2b373', top: '#efca94', side: '#c7965a', edge: '#a87a43', inside: '#9c6c35', tape: '#f6e2b8' };
+const wood = { plank: '#c98f4e', edge: '#94622c', block: '#a9733a' };
+const BOX_DEPTH = 6;
+
+/** A closed shipping carton in light 3D: its front at (x, y), the top and right side receding up and right. */
+function Carton({ x, y, w, h, logo }: { x: number; y: number; w: number; h: number; logo?: boolean }) {
+  const k = BOX_DEPTH;
   return (
-    <Float width={width} height={height} view="bulk" rise={4} seconds={4}>
+    <G>
+      <Path d={`M ${x} ${y} L ${x + k} ${y - k} L ${x + w + k} ${y - k} L ${x + w} ${y} Z`} fill={kraft.top} stroke={kraft.edge} strokeWidth="1" strokeLinejoin="round" />
+      <Path d={`M ${x + w} ${y} L ${x + w + k} ${y - k} L ${x + w + k} ${y + h - k} L ${x + w} ${y + h} Z`} fill={kraft.side} stroke={kraft.edge} strokeWidth="1" strokeLinejoin="round" />
+      <Rect x={x} y={y} width={w} height={h} rx="1.5" fill={kraft.front} stroke={kraft.edge} strokeWidth="1.1" />
+      {/* packing tape over the lid and down the front */}
+      <Path d={`M ${x + w / 2 - 4} ${y} L ${x + w / 2 - 4 + k} ${y - k} L ${x + w / 2 + 4 + k} ${y - k} L ${x + w / 2 + 4} ${y} Z`} fill={kraft.tape} />
+      <Rect x={x + w / 2 - 4} y={y} width="8" height={Math.min(12, h / 3)} fill={kraft.tape} />
+      {/* shipping label, with the cart logo on the marked cartons */}
+      <Rect x={x + 5} y={y + h - 17} width="20" height="12" rx="1.5" fill={tw.white} stroke={kraft.edge} strokeOpacity={0.5} strokeWidth="0.6" />
+      {logo ? <Cart x={x + 15} y={y + h - 11} width={14} /> : (
+        <G>
+          <Rect x={x + 8} y={y + h - 14} width="14" height="2" rx="1" fill={tw.slate400} />
+          <Rect x={x + 8} y={y + h - 10} width="10" height="2" rx="1" fill={tw.slate300} />
+        </G>
+      )}
+      {/* "this way up" arrows */}
+      <Path d={`M ${x + w - 14} ${y + h - 6} L ${x + w - 14} ${y + h - 14} M ${x + w - 17} ${y + h - 11} L ${x + w - 14} ${y + h - 14} L ${x + w - 11} ${y + h - 11}`}
+        fill="none" stroke={kraft.edge} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      <Path d={`M ${x + w - 7} ${y + h - 6} L ${x + w - 7} ${y + h - 14} M ${x + w - 10} ${y + h - 11} L ${x + w - 7} ${y + h - 14} L ${x + w - 4} ${y + h - 11}`}
+        fill="none" stroke={kraft.edge} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </G>
+  );
+}
+
+/** A phone standing in the open carton, rotated `tilt` degrees around its bottom centre. */
+function CratePhone({ x, y, tilt }: { x: number; y: number; tilt: number }) {
+  return (
+    <G transform={`rotate(${tilt}, ${x + 7}, ${y + 30})`}>
+      <Rect x={x} y={y} width="14" height="30" rx="3" fill={tw.slate900} stroke={tw.emerald500} strokeWidth="1.1" />
+      <Rect x={x + 1.6} y={y + 1.6} width="10.8" height="26.8" rx="2" fill="url(#bulk-screen)" />
+      <Rect x={x + 5} y={y + 3} width="4" height="1.4" rx="0.7" fill={tw.black} />
+    </G>
+  );
+}
+
+/**
+ * Bulk orders: a pallet stacked with shipping cartons. Every few seconds an open carton full of phones drops onto the
+ * stack with a small bounce, stays, and fades out for the next one; a "BULK ORDER" badge pulses beside it.
+ */
+function BulkArt({ width, height }: ArtProps) {
+  const drop = useSpin(3.8);
+  const pulse = useLoop(1.8);
+  const twinkle = useLoop(1.4);
+  const boxProps = useAnimatedProps(() => {
+    const p = drop.value;
+    let dy = 0;
+    let opacity = 1;
+    if (p < 0.26) {
+      const t = p / 0.26;
+      dy = -44 * (1 - t * t);
+      opacity = Math.min(1, t * 2.5);
+    } else if (p < 0.36) {
+      dy = -4 * Math.sin((Math.PI * (p - 0.26)) / 0.1);
+    } else if (p > 0.84) {
+      opacity = 1 - (p - 0.84) / 0.16;
+    }
+    return { matrix: moveDown(dy), opacity };
+  });
+  const badgeProps = useAnimatedProps(() => {
+    const s = 1 + 0.08 * pulse.value;
+    return { matrix: [s, 0, 0, s, 160 - s * 160, 38 - s * 38] };
+  });
+  const sparkleProps = useAnimatedProps(() => ({ opacity: 0.3 + 0.7 * twinkle.value }));
+  return (
+    <Float width={width} height={height} view="bulk" rise={2.5} seconds={4}>
       <Defs>
-        <LinearGradient id="bulk-laptop-screen" x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#022c22" />
-          <Stop offset="50%" stopColor="#064e3b" />
-          <Stop offset="100%" stopColor="#020617" />
+        <LinearGradient id="bulk-screen" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor="#022c22" />
+          <Stop offset="1" stopColor="#059669" />
         </LinearGradient>
       </Defs>
-      <G transform="translate(32, 18)">
-        <Rect x="0" y="0" width="104" height="68" rx="6" fill={tw.slate900} stroke={tw.slate700} strokeWidth="1.5" />
-        <Rect x="4" y="4" width="96" height="60" rx="4" fill="url(#bulk-laptop-screen)" />
-        <G transform="translate(10, 12)">
-          <Rect x="0" y="24" width="7" height="20" rx="2" fill="#10b981" opacity={0.6} />
-          <Rect x="10" y="16" width="7" height="28" rx="2" fill="#10b981" opacity={0.8} />
-          <Rect x="20" y="6" width="7" height="38" rx="2" fill="#34d399" />
-          <Rect x="30" y="18" width="7" height="26" rx="2" fill="#059669" opacity={0.7} />
-          <Rect x="45" y="10" width="36" height="5" rx="2" fill="#ffffff" opacity={0.3} />
-          <Rect x="45" y="20" width="26" height="4" rx="2" fill="#34d399" opacity={0.7} />
-          <Rect x="45" y="28" width="30" height="4" rx="2" fill="#ffffff" opacity={0.2} />
-          <Rect x="45" y="36" width="20" height="4" rx="2" fill="#10b981" opacity={0.5} />
-        </G>
-        <Path d="M -12 68 L 116 68 L 106 76 L -2 76 Z" fill={tw.slate800} stroke={tw.slate700} strokeWidth="1.2" />
-        <Rect x="42" y="68" width="22" height="2.5" rx="1" fill="#475569" />
-      </G>
-      <G transform="translate(98, 42) rotate(8)">
-        <Rect x="0" y="0" width="46" height="64" rx="6" fill={tw.slate900} stroke={tw.emerald600} strokeOpacity={0.7} strokeWidth="1.5" />
-        <Rect x="2.5" y="2.5" width="41" height="59" rx="4" fill={tw.slate950} />
-        <Rect x="6" y="8" width="34" height="20" rx="3" fill="#10b981" fillOpacity={0.15} />
-        <Circle cx="23" cy="18" r="6" fill="#10b981" fillOpacity={0.3} />
-      </G>
-      <G transform="translate(72, 50) rotate(-6)">
-        <Rect x="0" y="0" width="36" height="68" rx="8" fill={tw.slate950} stroke={tw.emerald500} strokeWidth="1.8" />
-        <Rect x="2" y="2" width="32" height="64" rx="6" fill={tw.slate950} />
-        <Rect x="12" y="4.5" width="12" height="3" rx="1.5" fill="#000000" />
-        <Circle cx="18" cy="34" r="12" fill="#10b981" fillOpacity={0.2} />
-        <Cart x={18} y={32} width={18} />
-      </G>
-      <AnimatedG animatedProps={ringProps}>
-        <Circle cx="0" cy="0" r="18" fill="#064e3b" stroke="#10b981" strokeWidth="2" />
-        <Path d="M 0 -11 L 3 -6 L -3 -6 Z" fill="#34d399" />
-        <Path d="M 0 -10 A 10 10 0 0 1 9 4" fill="none" stroke="#34d399" strokeWidth="1.8" strokeLinecap="round" />
-        <Path d="M 9 4 L 11 -1 L 6 1 Z" fill="#34d399" />
-        <Path d="M 9 4 A 10 10 0 0 1 -9 4" fill="none" stroke="#34d399" strokeWidth="1.8" strokeLinecap="round" />
-        <Path d="M -9 4 L -6 9 L -4 4 Z" fill="#34d399" />
-        <Path d="M -9 4 A 10 10 0 0 1 0 -10" fill="none" stroke="#34d399" strokeWidth="1.8" strokeLinecap="round" />
+      {/* floor shadow and the pallet */}
+      <Rect x="30" y="139" width="140" height="7" rx="3.5" fill={tw.black} fillOpacity={0.08} />
+      <Rect x="36" y="124" width="128" height="6" rx="1.5" fill={wood.plank} stroke={wood.edge} strokeWidth="1" />
+      <Rect x="40" y="130" width="13" height="7" fill={wood.block} stroke={wood.edge} strokeWidth="0.8" />
+      <Rect x="93.5" y="130" width="13" height="7" fill={wood.block} stroke={wood.edge} strokeWidth="0.8" />
+      <Rect x="147" y="130" width="13" height="7" fill={wood.block} stroke={wood.edge} strokeWidth="0.8" />
+      <Rect x="36" y="136" width="128" height="4" rx="1" fill={wood.plank} stroke={wood.edge} strokeWidth="0.8" />
+      {/* the two cartons on the pallet */}
+      <Carton x={40} y={88} w={56} h={36} logo />
+      <Carton x={100} y={88} w={56} h={36} />
+      {/* the open carton of phones that lands on top */}
+      <AnimatedG animatedProps={boxProps}>
+        <Path d="M 68 54 L 74 48 L 132 48 L 126 54 Z" fill={kraft.inside} stroke={kraft.edge} strokeWidth="1" strokeLinejoin="round" />
+        <Path d="M 68 54 L 56 44 L 66 40 L 74 48 Z" fill={kraft.top} stroke={kraft.edge} strokeWidth="1" strokeLinejoin="round" />
+        <Path d="M 132 48 L 142 39 L 146 46 L 132 54 Z" fill={kraft.top} stroke={kraft.edge} strokeWidth="1" strokeLinejoin="round" />
+        <CratePhone x={76} y={30} tilt={-10} />
+        <CratePhone x={91} y={26} tilt={0} />
+        <CratePhone x={106} y={30} tilt={10} />
+        <Path d="M 126 54 L 132 48 L 132 82 L 126 88 Z" fill={kraft.side} stroke={kraft.edge} strokeWidth="1" strokeLinejoin="round" />
+        <Rect x="68" y="54" width="58" height="34" rx="1.5" fill={kraft.front} stroke={kraft.edge} strokeWidth="1.1" />
+        <Cart x={97} y={71} width={20} />
       </AnimatedG>
-      <G transform="translate(144, 88)">
-        <Circle cx="0" cy="0" r="7" fill="#10b981" />
-        {/* The recycling mark, drawn (a font may not have the ♻ symbol). */}
-        <Path d="M -3.4 -1.6 A 3.6 3.6 0 1 1 -1.2 3.4" stroke="#022c22" strokeWidth="1.3" strokeLinecap="round" fill="none" />
-        <Path d="M -3.6 -3.6 L -3.6 0 L -0.4 -1.4 Z" fill="#022c22" />
-      </G>
+      {/* quantity badge */}
+      <AnimatedG animatedProps={badgeProps}>
+        <Circle cx="160" cy="38" r="17" fill={tw.emerald500} stroke={tw.white} strokeWidth="2" />
+        <SvgText x="160" y="39.5" textAnchor="middle" fill={tw.white} fontSize="9" fontWeight="900">BULK</SvgText>
+        <SvgText x="160" y="47" textAnchor="middle" fill={tw.white} opacity={0.9} fontSize="5.2" fontWeight="800">ORDER</SvgText>
+      </AnimatedG>
+      <AnimatedG animatedProps={sparkleProps}>
+        <Sparkle x={40} y={62} r={5} color={tw.emerald400} />
+        <Sparkle x={178} y={70} r={4} color={tw.amber500} />
+        <Sparkle x={146} y={14} r={3} color={tw.emerald300} />
+      </AnimatedG>
     </Float>
   );
 }

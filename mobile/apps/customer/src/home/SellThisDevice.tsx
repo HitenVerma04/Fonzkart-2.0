@@ -2,7 +2,7 @@
 // appears on a phone or tablet, as specific as the system lets it be: the exact model ("Sell iPhone XR"), else the
 // maker ("Sell this Samsung phone", with its logo), else just "Sell this phone". When the model and its variant are
 // known, tapping goes straight to the questions about the device's condition; otherwise it opens the variants, the
-// maker's models, or the whole category. Only the web build has no device to show.
+// maker's models, or the whole category. In the web build the browser hides the model, so it shows the general card.
 import { useMemo } from 'react';
 import { Image, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';

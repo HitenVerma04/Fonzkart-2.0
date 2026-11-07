@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
@@ -11,6 +11,7 @@ import {
   TextField, type, useDesign,
 } from '../../src/design';
 import { useQuoteDraft } from '../../src/quoteDraft';
+import { recordSellStep } from '../../src/sellProgress';
 
 export default function Offer() {
   const styles = useStyles();
@@ -31,6 +32,15 @@ export default function Offer() {
     if (!draft?.answers || !questionnaire.data) return [];
     return describeAnswers(stepsForDevice(questionnaire.data, draft.category, draft.modelName), draft.answers);
   }, [draft, questionnaire.data]);
+
+  // Saved for "Pick up where you left off" on Home: the price is ready, only the pickup is left to book.
+  useEffect(() => {
+    if (!draft?.answers) return;
+    recordSellStep({
+      stage: 'offer', category: draft.category, modelId: draft.modelId, modelName: draft.modelName, img: draft.img,
+      draft: { ...draft, resume: undefined },
+    });
+  }, [draft]);
 
   if (!draft?.answers) return <EmptyState icon="auto" message="Choose a device and answer the questions first." />;
 
