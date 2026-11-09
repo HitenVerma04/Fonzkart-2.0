@@ -1,6 +1,6 @@
-// The Customer app's bottom tabs (Home, Buy, Sell, Repair, Orders): a floating glass bar with rounded corners. A soft
-// green tile slides behind the chosen tab, whose icon fills in, lifts and pops; presses also ripple in green on
-// Android. Profile is a tab route too, but it opens from the home header, so it has no button here.
+// The Customer app's bottom tabs (Sell, Buy, Repair, Orders, Profile): a floating glass bar with rounded corners. A
+// soft green tile slides behind the chosen tab, whose icon fills in, lifts and pops; presses also ripple in green on
+// Android.
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
@@ -10,10 +10,10 @@ import { makeStyles, useColors } from '@fonzkart/ui';
 import { Glass, Icon, motion, TAB_BAR_HEIGHT, Tap, type IconName } from '../design';
 import { launchTarget } from '../launchTargets';
 
-/** Route name → icon. Routes not listed get the Home icon. */
-const ICONS: Record<string, IconName> = { index: 'home', buy: 'buy', sell: 'sell', repair: 'repair', orders: 'orders' };
+/** Route name → icon. Routes not listed get the Sell icon. */
+const ICONS: Record<string, IconName> = { index: 'sell', buy: 'buy', repair: 'repair', orders: 'orders', profile: 'profile' };
 /** Tab routes without a button in the bar. */
-const HIDDEN = new Set(['profile']);
+const HIDDEN = new Set<string>();
 const PAD = 6;
 const TILE = 62;
 
@@ -53,7 +53,7 @@ export function FonzkartTabBar({ state, descriptors, emitter, navigateToTab }: B
             const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
             if (!focused && !event.defaultPrevented) navigateToTab(route.key);
           };
-          const icon = ICONS[route.name] ?? 'home';
+          const icon = ICONS[route.name] ?? 'sell';
           return (
             <Tab key={route.key} label={label} icon={icon} target={icon} focused={focused} onPress={onPress}
               onLongPress={() => emitter.emit({ type: 'tabLongPress', target: route.key })} />

@@ -22,7 +22,7 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api-v2.fonzkart.in",
-        "EXPO_PUBLIC_WEB_URL": "https://v2.fonzkart.in"
+        "EXPO_PUBLIC_WEB_URL": "https://fonzkart.in"
       }
     }
   },

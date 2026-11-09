@@ -10,6 +10,7 @@ import { useRefreshOnAppFocus, useTheme } from '@fonzkart/ui';
 import { AppHeader } from '../src/design';
 import { FestiveProvider } from '../src/festive/FestiveProvider';
 import { LaunchIntro } from '../src/LaunchIntro';
+import { usePushNotifications } from '../src/push';
 import { themeStorage } from '../src/themeStorage';
 import { tokenStorage } from '../src/tokenStorage';
 
@@ -51,6 +52,7 @@ export default function RootLayout() {
 
 function Screens() {
   const { scheme, colors } = useTheme();
+  usePushNotifications();
   // The native window behind every screen: without this it stays white and flashes through while a screen slides
   // in or out in dark mode.
   useEffect(() => {

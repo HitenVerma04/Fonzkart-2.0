@@ -4,7 +4,9 @@
 // and the Fonzkart promise in a dark card (CRED's style).
 import { useCallback } from 'react';
 import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
-import Animated, { runOnUI, useAnimatedReaction, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  runOnUI, useAnimatedReaction, useAnimatedScrollHandler, useSharedValue, withDelay, withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useBrands, useNotifications, useSession } from '@fonzkart/api';
@@ -50,13 +52,17 @@ export default function Home() {
   const festive = d.festive !== 'none';
   const onDark = festive || dark;
 
-  // Every category card animates all the time (the drawings are drawn by Skia on the GPU, see categoryArt/skiaSvg),
-  // including while the list scrolls. They pause only when no one can see them: while another screen or the launch
-  // animation covers this one, or when the cards are scrolled completely off screen.
+  // The category cards (drawn by Skia on the GPU, see categoryArt/skiaSvg) and the other drawings animate while the
+  // page is still. They hold still while it scrolls (a finger on it, or the fling after), so every frame goes to moving
+  // the page, and pick up again where they stopped once it rests. They also pause while nobody can see them: another
+  // screen or the launch animation covers this one, or the cards are scrolled completely off screen.
   const { height: viewport } = useWindowDimensions();
   const artActive = useSharedValue(!launchCovering.value);
   const focused = useSharedValue(true);
   const factoryActive = useSharedValue(!launchCovering.value);
+  const scrolling = useSharedValue(false);
+  const flinging = useSharedValue(false);
+  const restTimer = useSharedValue(0);
   const contentHeight = useSharedValue(0);
   const scrollY = useSharedValue(0);
   const bodyTop = useSharedValue(0);
@@ -67,9 +73,16 @@ export default function Home() {
     const top = bodyTop.value + cardsTop.value;
     const bottom = bodyTop.value + cardsBottom.value;
     const shown = focused.value && !launchCovering.value;
-    const visible = shown && scrollY.value + viewport > top && scrollY.value < bottom;
+    const still = shown && !scrolling.value;
+    const visible = still && scrollY.value + viewport > top && scrollY.value < bottom;
     if (artActive.value !== visible) artActive.value = visible;
-    if (factoryActive.value !== shown) factoryActive.value = shown;
+    if (factoryActive.value !== still) factoryActive.value = still;
+  };
+  const setScrolling = (on: boolean) => {
+    'worklet';
+    if (scrolling.value === on) return;
+    scrolling.value = on;
+    settle();
   };
   useFocusEffect(useCallback(() => {
     focused.value = true;
@@ -87,7 +100,30 @@ export default function Home() {
   const onScroll = useAnimatedScrollHandler({
     onScroll: e => {
       scrollY.value = e.contentOffset.y;
-      settle();
+      if (!scrolling.value) settle();
+    },
+    onBeginDrag: () => {
+      flinging.value = false;
+      setScrolling(true);
+    },
+    onMomentumBegin: () => {
+      flinging.value = true;
+      setScrolling(true);
+    },
+    // A slow release has no fling after it, so the page rests already. Otherwise the fling's end resumes them; if no
+    // fling starts after all (a release at the end of the page), they resume shortly anyway.
+    onEndDrag: e => {
+      if (Math.abs(e.velocity?.y ?? 0) < 0.05) setScrolling(false);
+      else {
+        restTimer.value = 0;
+        restTimer.value = withDelay(400, withTiming(1, { duration: 0 }, done => {
+          if (done && !flinging.value) setScrolling(false);
+        }));
+      }
+    },
+    onMomentumEnd: () => {
+      flinging.value = false;
+      setScrolling(false);
     },
   });
 
@@ -136,8 +172,7 @@ export default function Home() {
           cardsBottom.value = y + height;
         }}>
         <Appear index={1} style={styles.block}>
-          <SectionHeader big title="Sell Your Device" subtitle="Choose a category to see your price"
-            action={{ label: 'See all', onPress: () => router.navigate('/sell') }} />
+          <SectionHeader big title="Sell Your Device" subtitle="Choose a category to see your price" />
           <View style={styles.grid}>
             {SELL_CATEGORIES.map((category, index) => (
               <CategoryCard

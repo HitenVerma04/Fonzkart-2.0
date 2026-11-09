@@ -96,6 +96,17 @@ export const customerOrdersApi = {
     (await request<{ success: boolean }>('POST', '/api/orders/service-area-requests', { body: { pincode, phone, address } })).data,
 };
 
+/**
+ * This phone's Expo push token, saved for whoever is signed in (an account, or the executive in rider mode), so their
+ * notifications also arrive as phone notifications; removed again at sign-out.
+ */
+export const pushApi = {
+  register: async (token: string, platform: 'ios' | 'android', app: 'customer' | 'partner' | 'admin') =>
+    (await request<{ success: boolean }>('POST', '/api/push-tokens', { body: { token, platform, app } })).data,
+  unregister: async (token: string) =>
+    (await request<{ success: boolean }>('DELETE', '/api/push-tokens', { body: { token } })).data,
+};
+
 export const notificationsApi = {
   list: async (signal?: AbortSignal) =>
     (await request<NotificationList>('GET', '/api/notifications', { signal })).data.notifications ?? [],

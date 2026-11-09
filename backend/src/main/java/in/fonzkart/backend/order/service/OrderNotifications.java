@@ -4,6 +4,7 @@ import in.fonzkart.backend.auth.rules.Roles;
 import in.fonzkart.backend.order.entity.Notification;
 import in.fonzkart.backend.order.repository.NotificationRepository;
 import in.fonzkart.backend.order.repository.OrderPeopleRepository;
+import in.fonzkart.backend.push.PushService;
 import in.fonzkart.backend.shared.id.Cuid;
 import in.fonzkart.backend.shared.text.JsText;
 import in.fonzkart.backend.shared.time.JsDates;
@@ -11,7 +12,9 @@ import in.fonzkart.backend.user.entity.User;
 import in.fonzkart.backend.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -34,11 +37,14 @@ public class OrderNotifications {
     private final NotificationRepository notifications;
     private final OrderPeopleRepository people;
     private final UserRepository users;
+    private final PushService push;
 
-    public OrderNotifications(NotificationRepository notifications, OrderPeopleRepository people, UserRepository users) {
+    public OrderNotifications(NotificationRepository notifications, OrderPeopleRepository people, UserRepository users,
+                              PushService push) {
         this.notifications = notifications;
         this.people = people;
         this.users = users;
+        this.push = push;
     }
 
     /** notifyUsers(userIds, title, message, type, orderId): one notification per distinct id. */
@@ -57,6 +63,7 @@ public class OrderNotifications {
         } catch (RuntimeException e) {
             log.error("Order notification failed: {}", e.getMessage());
         }
+        push.toUsers(ids, title, message, data(type, orderId));
     }
 
     /** notifyRider(riderId, ...): nothing when there is no executive. */
@@ -70,12 +77,31 @@ public class OrderNotifications {
         } catch (RuntimeException e) {
             log.error("Rider notification failed: {}", e.getMessage());
         }
+        push.toRider(riderId, title, message, data(type, orderId));
     }
 
     /** A broadcast to everyone with a role (addOrder's "New Order Placed" for ADMIN). */
     public void notifyRole(String role, String title, String message, String type, String orderId) {
         notifications.save(Notification.create(Cuid.next(), null, role, null, title, message, type, orderId,
                 JsDates.nowUtc()));
+        try {
+            push.toUsers(people.findByRoleIn(List.of(role)).stream().map(User::getId).toList(), title, message,
+                    data(type, orderId));
+        } catch (RuntimeException e) {
+            log.warn("Role push failed: {}", e.getMessage());
+        }
+    }
+
+    /** What the app needs to open the right screen when the notification is tapped. */
+    private static Map<String, Object> data(String type, String orderId) {
+        Map<String, Object> data = new HashMap<>();
+        if (JsText.truthy(type)) {
+            data.put("type", type);
+        }
+        if (JsText.truthy(orderId)) {
+            data.put("orderId", orderId);
+        }
+        return data;
     }
 
     /** An update for the customer's own inbox (Customer app). Never fails the order change. */
@@ -89,6 +115,7 @@ public class OrderNotifications {
         } catch (RuntimeException e) {
             log.error("Customer notification failed: {}", e.getMessage());
         }
+        push.toUsers(List.of(userId), title, message, data(CUSTOMER_UPDATE, orderId));
     }
 
     /** orderCaretakers(partnerId): the partner, the partner's RM and zonal head; all RMs when unrouted. */

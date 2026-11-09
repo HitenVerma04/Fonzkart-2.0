@@ -3,13 +3,13 @@
     "name": "Fonzkart",
     "slug": "fonzkart-customer",
     "scheme": "fonzkart",
-    "version": "0.7.5",
+    "version": "0.7.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "android": {
       "package": "in.fonzkart.customer",
-      "versionCode": 26,
+      "versionCode": 27,
       "blockedPermissions": [
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -60,7 +60,13 @@
         }
       ],
       "expo-secure-store",
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-notifications",
+        {
+          "color": "#16a34a"
+        }
+      ]
     ],
     "extra": {
       "router": {

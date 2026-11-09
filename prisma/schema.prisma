@@ -299,6 +299,21 @@ model RepairBooking {
   updatedAt     DateTime @updatedAt
 }
 
+// A phone that receives push notifications (Expo push token from the Customer, Partner or Admin app). Belongs to a
+// signed-in user (userId) or a field executive (riderId); a token moves to whoever signs in on that phone last.
+model PushToken {
+  token     String   @id
+  userId    String?
+  riderId   String?
+  platform  String   // ios, android
+  app       String   // customer, partner, admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([riderId])
+}
+
 model Notification {
   id        String   @id @default(cuid())
   userId    String?  // Target user (if specific)
