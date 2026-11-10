@@ -92,9 +92,18 @@ export function matchBrand(brands: Brand[] | undefined, specs: DeviceSpecs): Bra
   return brands?.find(b => normal(b.name) === want || b.id === want);
 }
 
+/**
+ * The model an iPhone or iPad reports. The iOS Simulator reports "Simulator iOS" as its model and the simulated
+ * device ("iPhone 18 Pro") as its device name, which is the name Repair matches on too.
+ */
+function appleModel(specs: DeviceSpecs): string {
+  return /simulator/i.test(specs.modelName) && specs.deviceName ? specs.deviceName : specs.modelName;
+}
+
 /** A name the customer would recognise even when the catalog lacks it: iPhones and iPads report their real name. */
 export function deviceTitle(specs: DeviceSpecs): string | null {
-  return specs.osName === 'iOS' && specs.modelName ? specs.modelName : null;
+  const model = appleModel(specs);
+  return specs.osName === 'iOS' && model ? model : null;
 }
 
 /**
@@ -107,7 +116,7 @@ export function searchNames(specs: DeviceSpecs): string[] {
   const maker = new RegExp(`^${specs.maker.replace(/[^A-Za-z0-9]/g, '')}\\s+`, 'i');
   const plain = (name: string) => name.replace(maker, '').replace(/\s+[45]G$/i, '').trim();
   const names = specs.osName === 'iOS'
-    ? [specs.modelName]
+    ? [appleModel(specs)]
     : [ANDROID_MODELS[specs.modelName.toUpperCase()] ?? '', specs.deviceName, plain(specs.deviceName), specs.modelName, `${specs.maker} ${specs.modelName}`];
   const seen = new Set<string>();
   return names.filter(n => {

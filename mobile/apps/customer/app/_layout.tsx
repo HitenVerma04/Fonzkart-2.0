@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, type ErrorBoundaryProps, type NativeStackHeaderProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -64,7 +64,10 @@ function Screens() {
     header: (props: NativeStackHeaderProps) => <AppHeader {...props} />,
     animation: 'ios_from_right' as const,
     contentStyle: { backgroundColor: colors.background },
-  }), [colors]);
+    // iOS draws the status bar per screen (UIViewControllerBasedStatusBarAppearance in app.json): newer iOS ignores
+    // an app-wide style, so the clock stayed black in dark mode. Android keeps expo-status-bar below.
+    ...(Platform.OS === 'ios' ? { statusBarStyle: scheme === 'dark' ? 'light' as const : 'dark' as const } : {}),
+  }), [colors, scheme]);
   // React Navigation's own colours (behind screens while they slide) follow the same palette.
   const navigationTheme = useMemo(() => {
     const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
@@ -76,7 +79,7 @@ function Screens() {
 
   return (
     <NavigationThemeProvider value={navigationTheme}>
-      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      {Platform.OS === 'ios' ? null : <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />}
       <Stack screenOptions={screenOptions}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Home' }} />
         <Stack.Screen name="search" options={{ title: 'Search', animation: 'fade_from_bottom' }} />

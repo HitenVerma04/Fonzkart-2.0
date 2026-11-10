@@ -1,5 +1,5 @@
 // A home-screen category card like the website's (components/sell/CategorySelector.tsx): a tinted card with its name,
-// the animated drawing and a small caption under it, looking the same in light and dark mode. Cards fade and grow in
+// the animated drawing and a small caption under it; pastel in light mode, a deep shade of the same hue in dark mode. Cards fade and grow in
 // one after another. Depth: the drawing tilts slowly in 3D (a native view transform) and the card has a glossy
 // highlight.
 //
@@ -12,7 +12,7 @@
 import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, withDelay, withTiming } from 'react-native-reanimated';
-import { radius } from '@fonzkart/ui';
+import { radius, useTheme } from '@fonzkart/ui';
 import { Tap } from '../design';
 import { ArtBackground, useLoop } from './motion';
 import { CATEGORY_ART } from './art';
@@ -36,6 +36,22 @@ const LOOK: Record<HomeTileId, { background: string; text: string; caption: stri
   repair: { background: '#fef2f2', text: '#7f1d1d', caption: 'Quick, reliable, affordable' },
   screenguard: { background: '#f0fdfa', text: '#083344', caption: 'Unbreakable • 3-hr doorstep' },
   bulk: { background: '#fff8eb', text: '#78350f', caption: 'Any quantity · we collect' },
+};
+
+/** Dark mode: the same hue, deep instead of pastel, with light text. */
+const DARK: Record<HomeTileId, { background: string; text: string }> = {
+  smartphone: { background: '#0f1d3a', text: '#bfdbfe' },
+  tablet: { background: '#22123a', text: '#e9d5ff' },
+  camera: { background: '#2d1018', text: '#fecdd3' },
+  laptop: { background: '#0b2630', text: '#a5f3fc' },
+  watch: { background: '#2e1a0c', text: '#fed7aa' },
+  smarttv: { background: '#0a2a1f', text: '#a7f3d0' },
+  console: { background: '#171a3d', text: '#c7d2fe' },
+  desktop: { background: '#0c2416', text: '#bbf7d0' },
+  earbuds: { background: '#2a1030', text: '#f5d0fe' },
+  repair: { background: '#2e1111', text: '#fecaca' },
+  screenguard: { background: '#082a28', text: '#99f6e4' },
+  bulk: { background: '#2e1f08', text: '#fde68a' },
 };
 
 /** The website's entrance: opacity 0 → 1 and scale 0.95 → 1 over 0.4 s, 0.1 s after the card before. */
@@ -66,7 +82,8 @@ export function CategoryCard({ id, name, width, index, onPress }: {
   index: number;
   onPress: () => void;
 }) {
-  const look = LOOK[id];
+  const dark = useTheme().scheme === 'dark';
+  const look = dark ? { ...LOOK[id], ...DARK[id] } : LOOK[id];
   const sway = useLoop(7, (index % 3) * 0.6, 'motion');
   const tilt = useAnimatedStyle(() => ({
     transform: [{ perspective: 600 }, { rotateX: '6deg' }, { rotateY: `${-9 + sway.value * 18}deg` }],
@@ -82,9 +99,9 @@ export function CategoryCard({ id, name, width, index, onPress }: {
         scaleTo={0.94}
         accessibilityRole="button"
         accessibilityLabel={name}
-        style={[styles.card, { width, height, backgroundColor: look.background }]}
+        style={[styles.card, dark && styles.cardDark, { width, height, backgroundColor: look.background }]}
       >
-        <View pointerEvents="none" style={styles.gloss} />
+        <View pointerEvents="none" style={[styles.gloss, dark && styles.glossDark]} />
         <Text style={[styles.name, { color: look.text, height: nameArea, paddingTop: 8 * k, paddingHorizontal: 8 * k, fontSize: (name.length > 10 ? 13.5 : 15) * k, lineHeight: 20 * k }]}
           numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} maxFontSizeMultiplier={1}>{name}</Text>
         <View style={styles.art} pointerEvents="none">
@@ -105,7 +122,9 @@ const styles = StyleSheet.create({
   card: { borderRadius: radius.lg, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(15,31,23,0.08)' },
   name: { fontWeight: '900', letterSpacing: -0.4 },
   art: { flex: 1, alignItems: 'center', overflow: 'hidden' },
+  cardDark: { borderColor: 'rgba(255,255,255,0.1)' },
   gloss: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 40%)' },
+  glossDark: { backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 40%)' },
   caption: {
     textAlign: 'center', fontWeight: '700', letterSpacing: 0.4, textTransform: 'uppercase', opacity: 0.8,
   },
