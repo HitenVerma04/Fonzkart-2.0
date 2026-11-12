@@ -226,6 +226,41 @@ CREATE TABLE "ShopOrder" (
 );
 
 -- CreateTable
+CREATE TABLE "PushToken" (
+    "token" TEXT NOT NULL,
+    "userId" TEXT,
+    "riderId" TEXT,
+    "platform" TEXT NOT NULL,
+    "app" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PushToken_pkey" PRIMARY KEY ("token")
+);
+CREATE INDEX "PushToken_userId_idx" ON "PushToken"("userId");
+CREATE INDEX "PushToken_riderId_idx" ON "PushToken"("riderId");
+
+-- CreateTable
+CREATE TABLE "PincodeRequest" (
+    "id" TEXT NOT NULL,
+    "partnerId" TEXT NOT NULL,
+    "cityId" TEXT,
+    "pincodes" TEXT[],
+    "note" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "approved" TEXT[],
+    "reviewNote" TEXT,
+    "reviewedById" TEXT,
+    "reviewedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PincodeRequest_pkey" PRIMARY KEY ("id")
+);
+CREATE INDEX "PincodeRequest_partnerId_idx" ON "PincodeRequest"("partnerId");
+CREATE INDEX "PincodeRequest_status_idx" ON "PincodeRequest"("status");
+
+-- CreateTable
 CREATE TABLE "Notification" (
     "id" TEXT NOT NULL,
     "userId" TEXT,
