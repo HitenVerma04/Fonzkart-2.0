@@ -18,6 +18,7 @@ export default function RootLayout() {
           <Stack.Screen name="orders/index" options={{ title: 'Orders' }} />
           <Stack.Screen name="orders/[id]" options={{ title: 'Order' }} />
           <Stack.Screen name="partners" options={{ title: 'Partners' }} />
+          <Stack.Screen name="pincode-requests" options={{ title: 'Pincode requests' }} />
           <Stack.Screen name="riders" options={{ title: 'Field executives' }} />
           <Stack.Screen name="cities" options={{ title: 'Cities' }} />
           <Stack.Screen name="zonal-heads" options={{ title: 'Zonal heads' }} />

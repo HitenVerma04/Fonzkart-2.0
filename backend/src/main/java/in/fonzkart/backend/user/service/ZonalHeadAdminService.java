@@ -58,10 +58,11 @@ public class ZonalHeadAdminService {
     public Map<String, Object> create(Optional<SessionPayload> session, String name, String email, String phone,
                                       String password) {
         access.requireRole(session, StaffAccess.ADMINS); // zonal heads are managed by administrators
-        if (!(truthy(name) && truthy(email) && truthy(password))) {
-            return Map.of("created", false);
+        Optional<String> problem = NewAccounts.problem(users, name, email, phone, password);
+        if (problem.isPresent()) {
+            return Map.of("created", false, "error", problem.get());
         }
-        User zonalHead = User.newUser(Cuid.next(), name, email, phone, passwords.hash(password), Roles.ZONAL_HEAD,
+        User zonalHead = User.newUser(Cuid.next(), name, email, NewAccounts.phoneOrNull(phone), passwords.hash(password), Roles.ZONAL_HEAD,
                 JsDates.nowUtc());
         users.saveAndFlush(zonalHead);
         return Map.of("created", true);

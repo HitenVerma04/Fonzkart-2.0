@@ -21,19 +21,23 @@ export default function ZonalHeads() {
     setMessage(null);
     try {
       const r = await task();
-      if (r && r.error) setMessage({ tone: 'error', text: r.error });
-      else {
-        setMessage({ tone: 'success', text: done });
-        await client.invalidateQueries({ queryKey: ['staff'] });
+      if (r && r.error) {
+        setMessage({ tone: 'error', text: r.error });
+        return false;
       }
+      setMessage({ tone: 'success', text: done });
+      await client.invalidateQueries({ queryKey: ['staff'] });
+      return true;
     } catch (e) {
-      setMessage({ tone: 'error', text: e instanceof Error ? e.message : 'Something went wrong.' });
+      setMessage({ tone: 'error', text: e instanceof Error ? e.message : 'Something went wrong. Please try again.' });
+      return false;
     }
   };
 
+  // The form keeps what was typed when creating fails, so it can be corrected.
   const create = () => run(() => adminApi.createZonalHead({
     name: form.name.trim(), email: form.email.trim(), phone: form.phone ? `+91${form.phone}` : '', password: form.password,
-  }), `${form.name.trim()} created.`).then(() => setForm({ name: '', email: '', phone: '', password: '' }));
+  }), `${form.name.trim()} created.`).then(ok => { if (ok) setForm({ name: '', email: '', phone: '', password: '' }); });
 
   return (
     <>

@@ -66,20 +66,25 @@ public class PartnerAdminService {
                 relationshipManagers);
     }
 
-    /** Inline action "create partner". Returns {created:false} where the original silently does nothing. */
+    /**
+     * Inline action "create partner". Where the original silently does nothing it returns {created:false}, now with
+     * an {error} saying why (missing field, account already exists, city outside a zonal head's territory).
+     */
     public Map<String, Object> createPartner(Optional<SessionPayload> session, String name, String email,
                                              String phone, String password, String cityId, String managerId,
                                              String relationshipManagerId) {
         Viewer viewer = viewer(session);
-        if (!(truthy(name) && truthy(email) && truthy(password))) {
-            return Map.of("created", false);
+        Optional<String> problem = NewAccounts.problem(users, name, email, phone, password);
+        if (problem.isPresent()) {
+            return Map.of("created", false, "error", problem.get());
         }
+        phone = NewAccounts.phoneOrNull(phone);
         String passwordHash = passwords.hash(password);
         String finalCityId = viewer.isZonalHead()
                 ? (viewer.managedCityIds().contains(cityId) ? cityId : null)
                 : (truthy(cityId) ? cityId : null);
         if (viewer.isZonalHead() && finalCityId == null) {
-            return Map.of("created", false);
+            return Map.of("created", false, "error", "Choose one of your own cities for this partner.");
         }
         // If a zonal head creates, they are the manager. If an admin creates, they can pick.
         String finalManagerId = viewer.isZonalHead() ? viewer.user().getId() : ("none".equals(managerId) ? null : managerId);

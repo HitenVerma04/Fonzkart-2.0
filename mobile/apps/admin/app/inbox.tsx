@@ -19,6 +19,7 @@ export default function AdminInbox() {
       onOpen={item => {
         if (!item.isRead) void notificationsApi.markRead(item.id).catch(() => undefined).then(refresh);
         if (item.orderId) router.push({ pathname: '/orders/[id]', params: { id: item.orderId } });
+        else if (/pincode/i.test(item.title)) router.push('/pincode-requests');
       }}
     />
   );

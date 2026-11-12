@@ -1,12 +1,13 @@
 // Every order the signed-in staff member may see (scope: lib/order-access.ts on the server), by status, with search.
 import { useMemo, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useStaffOrders, type AppOrder } from '@fonzkart/api';
 import { ORDER_STATUS, isFailed, normalizeStatus } from '@fonzkart/core';
 import { EmptyState, ErrorState, Loading, OrderCard, SearchField, Segmented, colors, font, spacing } from '@fonzkart/ui';
 
 type Filter = 'all' | 'new' | 'review' | 'active' | 'picked' | 'hub' | 'failed';
+const FILTERS: Filter[] = ['all', 'new', 'review', 'active', 'picked', 'hub', 'failed'];
 
 const filterOf = (o: AppOrder): Exclude<Filter, 'all'> => {
   const s = normalizeStatus(o.status);
@@ -21,7 +22,9 @@ const filterOf = (o: AppOrder): Exclude<Filter, 'all'> => {
 export default function Orders() {
   const router = useRouter();
   const page = useStaffOrders(true);
-  const [filter, setFilter] = useState<Filter>('new');
+  // A dashboard tile opens the list on its status (/orders?filter=review).
+  const params = useLocalSearchParams<{ filter?: string }>();
+  const [filter, setFilter] = useState<Filter>(FILTERS.includes(params.filter as Filter) ? params.filter as Filter : 'new');
   const [query, setQuery] = useState('');
 
   const visible = useMemo(() => {

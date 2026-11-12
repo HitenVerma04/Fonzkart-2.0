@@ -48,7 +48,7 @@ public class CityAccess {
         }
     }
 
-    void requirePartner(Optional<SessionPayload> session, String partnerId) {
+    public void requirePartner(Optional<SessionPayload> session, String partnerId) {
         Staff staff = requireRole(session, CITY_STAFF_ROLES);
         if (!staff.isZonalHead()) {
             return;

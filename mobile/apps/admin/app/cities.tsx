@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Switch, Text, View } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { adminApi, useCitiesOverview, type CityWithUsers } from '@fonzkart/api';
-import { Button, Card, EmptyState, ErrorState, Loading, Notice, TextField, TextPrompt, colors, font, spacing } from '@fonzkart/ui';
+import { Button, Card, EmptyState, ErrorState, Loading, Notice, TextField, colors, font, spacing } from '@fonzkart/ui';
+import { PincodeEditor } from '../src/PincodeEditor';
 
 export default function Cities() {
   const client = useQueryClient();
@@ -16,14 +17,21 @@ export default function Cities() {
   if (data.isPending) return <Loading />;
   if (data.isError) return <ErrorState message="Could not load cities." onRetry={() => data.refetch()} />;
 
+  /** Runs one change; true when it worked. */
   const run = async (task: () => Promise<unknown>, done: string) => {
     setMessage(null);
     try {
-      await task();
+      const r = await task() as { error?: string } | null | undefined;
+      if (r && typeof r === 'object' && r.error) {
+        setMessage({ tone: 'error', text: r.error });
+        return false;
+      }
       setMessage({ tone: 'success', text: done });
       await client.invalidateQueries({ queryKey: ['staff'] });
+      return true;
     } catch (e) {
-      setMessage({ tone: 'error', text: e instanceof Error ? e.message : 'Something went wrong.' });
+      setMessage({ tone: 'error', text: e instanceof Error ? e.message : 'Something went wrong. Please try again.' });
+      return false;
     }
   };
 
@@ -41,7 +49,7 @@ export default function Cities() {
               <Card title="Register a hub city">
                 <TextField label="City name" value={newCity} onChangeText={setNewCity} />
                 <Button title="Register" disabled={!newCity.trim()}
-                  onPress={() => void run(() => adminApi.registerHub(newCity.trim()), `${newCity.trim()} registered.`).then(() => setNewCity(''))} />
+                  onPress={() => void run(() => adminApi.registerHub(newCity.trim()), `${newCity.trim()} registered.`).then(ok => { if (ok) setNewCity(''); })} />
               </Card>
             ) : null}
             {message ? <Notice tone={message.tone} text={message.text} /> : null}
@@ -62,7 +70,7 @@ export default function Cities() {
                   onValueChange={v => void run(() => adminApi.setCityFeatured(c.id, v), `${c.name} ${v ? 'featured' : 'no longer featured'}.`)} />
               </View>
             ) : null}
-            <Text style={styles.muted}>Pincodes: {c.pincodes.join(', ') || 'none'}</Text>
+            <Text style={styles.muted} numberOfLines={3}>Pincodes ({c.pincodes.length}): {c.pincodes.join(', ') || 'none'}</Text>
             <Text style={styles.muted}>
               Zonal heads: {c.zonalHeads.map(z => z.name).join(', ') || 'none'} · Partners: {c.partners.map(p => p.name).join(', ') || 'none'}
             </Text>
@@ -70,18 +78,17 @@ export default function Cities() {
           </Card>
         )}
       />
-      <TextPrompt
+      <PincodeEditor
         visible={editing !== null}
         title={`Pincodes of ${editing?.name ?? ''}`}
-        message={`Now: ${editing?.pincodes.join(', ') || 'none'}. Enter the full list, separated by commas.`}
-        label="Pincodes"
-        confirmLabel="Save"
+        note="The city's serviceable pincodes. Partners can only be given pincodes from this list."
+        initial={editing?.pincodes ?? []}
+        cityName={editing?.name}
         onClose={() => setEditing(null)}
-        onSubmit={text => {
+        onSave={pincodes => {
           const c = editing!;
           setEditing(null);
-          const pincodes = [...new Set(text.split(/[\s,]+/).filter(x => /^\d{6}$/.test(x)))];
-          void run(() => adminApi.setCityPincodes(c.id, pincodes), `Pincodes of ${c.name} saved.`);
+          void run(() => adminApi.setCityPincodes(c.id, pincodes), `Pincodes of ${c.name} saved (${pincodes.length}).`);
         }}
       />
     </>

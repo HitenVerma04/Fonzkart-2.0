@@ -55,7 +55,14 @@ export default function PartnerOrders() {
       ListHeaderComponent={
         <View style={styles.head}>
           <Text style={styles.hello}>{session.user.name}</Text>
-          <Text style={styles.muted}>Your pincodes: {page.data.pincodes.join(', ') || 'none yet'}</Text>
+          <Pressable onPress={() => router.push('/partner/areas')} accessibilityRole="button" style={styles.areas}
+            accessibilityLabel={`Service areas: ${page.data.pincodes.length} pincodes. Ask for more.`}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.areasTitle}>Service areas · {page.data.pincodes.length} pincode{page.data.pincodes.length === 1 ? '' : 's'}</Text>
+              <Text style={styles.muted} numberOfLines={1}>{page.data.pincodes.join(', ') || 'None yet'}</Text>
+            </View>
+            <Text style={styles.areasAction}>Ask for more ›</Text>
+          </Pressable>
           <Segmented<Queue>
             value={queue}
             onChange={setQueue}
@@ -85,6 +92,9 @@ const styles = StyleSheet.create({
   head: { gap: spacing.sm, marginBottom: spacing.xs },
   hello: { fontSize: font.title, fontWeight: '800', color: colors.navy },
   muted: { fontSize: font.small, color: colors.muted },
+  areas: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border, padding: spacing.md },
+  areasTitle: { fontSize: font.body, fontWeight: '700', color: colors.text },
+  areasAction: { fontSize: font.small, fontWeight: '800', color: colors.green },
   headerActions: { flexDirection: 'row', gap: spacing.lg, marginRight: spacing.sm },
   headerLink: { fontSize: font.small, fontWeight: '700', color: colors.green },
 });

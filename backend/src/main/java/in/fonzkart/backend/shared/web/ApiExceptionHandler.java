@@ -36,12 +36,13 @@ public class ApiExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> integrity(DataIntegrityViolationException e) {
         log.warn("Constraint violation: {}", e.getMostSpecificCause().getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "Unique or foreign key constraint failed"));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ConstraintMessages.friendly(e)));
     }
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<Map<String, String>> dataAccess(DataAccessException e) {
         log.error("Database error", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Internal error"));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Something went wrong on our side. Please try again in a minute."));
     }
 }

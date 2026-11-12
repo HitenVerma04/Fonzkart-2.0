@@ -22,6 +22,7 @@ export default function RootLayout() {
           <Stack.Screen name="partner/index" options={{ title: 'Orders', headerBackVisible: false }} />
           <Stack.Screen name="partner/order/[id]" options={{ title: 'Order' }} />
           <Stack.Screen name="partner/team" options={{ title: 'My field executives' }} />
+          <Stack.Screen name="partner/areas" options={{ title: 'Service areas' }} />
           <Stack.Screen name="partner/inbox" options={{ title: 'Notifications' }} />
         </Stack>
       </PartnerSessionProvider>

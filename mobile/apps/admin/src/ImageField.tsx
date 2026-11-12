@@ -1,12 +1,13 @@
 // A catalog picture: a website path or URL typed in, or a photo uploaded from the phone (stored by the backend under
 // /uploads, which the website serves too).
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { uploadImage } from '@fonzkart/api';
-import { Button, Notice, RemoteImage, TextField, spacing } from '@fonzkart/ui';
+import { Button, Notice, RemoteImage, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
 
-export function ImageField({ label, value, onChange }: { label: string; value: string; onChange: (path: string) => void }) {
+/** `hint`: the picture format this place needs, shown next to the upload button. */
+export function ImageField({ label, value, onChange, hint }: { label: string; value: string; onChange: (path: string) => void; hint?: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -38,7 +39,13 @@ export function ImageField({ label, value, onChange }: { label: string; value: s
           <TextField label={label} value={value} onChangeText={onChange} autoCapitalize="none" placeholder="/models/brand/x.png or https://…" />
         </View>
       </View>
-      <Button title="Upload a picture" variant="secondary" loading={busy} onPress={() => void pick()} />
+      <Button title={value ? 'Upload a different picture' : 'Upload a picture'} variant="secondary" loading={busy} onPress={() => void pick()} />
+      {hint ? (
+        <View style={styles.hint}>
+          <Text style={styles.hintTitle}>Photo format</Text>
+          <Text style={styles.hintText}>{hint}</Text>
+        </View>
+      ) : null}
       {error ? <Notice tone="error" text={error} /> : null}
     </View>
   );
@@ -48,4 +55,7 @@ const styles = StyleSheet.create({
   box: { gap: spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   flex: { flex: 1 },
+  hint: { borderRadius: radius.sm, borderWidth: 1, borderColor: colors.info.border, backgroundColor: colors.info.background, padding: spacing.sm, gap: 2 },
+  hintTitle: { fontSize: font.small, fontWeight: '800', color: colors.info.text },
+  hintText: { fontSize: font.small, color: colors.info.text, lineHeight: 18 },
 });

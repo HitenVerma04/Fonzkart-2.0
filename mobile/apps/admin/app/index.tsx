@@ -1,12 +1,12 @@
 // Sign-in, then the dashboard: live order counts for the signed-in role and its sections (as the website's sidebar).
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { authApi, useSession, useStaffInbox, useStaffOrders, useUnassignedCount } from '@fonzkart/api';
+import { authApi, usePincodeRequests, useSession, useStaffInbox, useStaffOrders, useUnassignedCount } from '@fonzkart/api';
 import { ORDER_STATUS, isFailed, normalizeStatus } from '@fonzkart/core';
-import { Button, Loading, Logo, Notice, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
-import { ADMIN_APP_ROLES, sectionsFor } from '../src/menu';
+import { Button, Loading, Logo, Notice, SearchField, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
+import { ADMIN_APP_ROLES, GROUPS, sectionsFor } from '../src/menu';
 
 const ROLE_NAMES: Record<string, string> = {
   SUPER_ADMIN: 'Super admin', ADMIN: 'Admin', ZONAL_HEAD: 'Zonal head', RELATIONSHIP_MANAGER: 'Relationship manager',
@@ -77,18 +77,30 @@ function Dashboard({ name, role }: { name: string; role: string }) {
   const page = useStaffOrders(true);
   const unassigned = useUnassignedCount(true);
   const inbox = useStaffInbox(true);
+  // Partners waiting for pincodes: a count on the menu item (admins and zonal heads decide them).
+  const pincodeRequests = usePincodeRequests('pending', role !== 'RELATIONSHIP_MANAGER');
+  const waiting: Record<string, number> = { '/pincode-requests': pincodeRequests.data?.length ?? 0 };
   const unread = inbox.data?.filter(n => !n.isRead).length ?? 0;
   const orders = page.data?.orders ?? [];
   const count = (pred: (status: string, riderId: string | null) => boolean) =>
     orders.filter(o => pred(normalizeStatus(o.status), o.riderId)).length;
+  // Each tile opens the orders list on its own status.
   const tiles = [
-    { label: 'Waiting for executive', value: unassigned.data ?? count((s, r) => s === normalizeStatus(ORDER_STATUS.PENDING) && !r) },
-    { label: 'Price approvals', value: count(s => s === ORDER_STATUS.PRICE_REVIEW) },
-    { label: 'Out for pickup', value: count(s => s === ORDER_STATUS.ASSIGNED) },
-    { label: 'Picked up', value: count(s => s === ORDER_STATUS.PICKED_UP) },
-    { label: 'At hub', value: count(s => s === ORDER_STATUS.COMPLETED) },
-    { label: 'Failed', value: count(s => isFailed(s)) },
+    { label: 'Waiting for executive', filter: 'new', value: unassigned.data ?? count((s, r) => s === normalizeStatus(ORDER_STATUS.PENDING) && !r) },
+    { label: 'Price approvals', filter: 'review', value: count(s => s === ORDER_STATUS.PRICE_REVIEW) },
+    { label: 'Out for pickup', filter: 'active', value: count(s => s === ORDER_STATUS.ASSIGNED) },
+    { label: 'Picked up', filter: 'picked', value: count(s => s === ORDER_STATUS.PICKED_UP) },
+    { label: 'At hub', filter: 'hub', value: count(s => s === ORDER_STATUS.COMPLETED) },
+    { label: 'Failed', filter: 'failed', value: count(s => isFailed(s)) },
   ];
+  const [query, setQuery] = useState('');
+  const groups = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const found = sectionsFor(role).filter(s => !q || `${s.title} ${s.detail} ${s.group}`.toLowerCase().includes(q));
+    return GROUPS.map(g => ({ title: g, sections: found.filter(s => s.group === g) })).filter(g => g.sections.length);
+  }, [role, query]);
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -105,28 +117,37 @@ function Dashboard({ name, role }: { name: string; role: string }) {
             </Pressable>
           </View>
         </View>
-        <Text style={styles.hello}>{name}</Text>
+        <Text style={styles.hello}>{greeting}, {name.split(' ')[0]}</Text>
         <Text style={styles.role}>{ROLE_NAMES[role] ?? role}</Text>
 
         <View style={styles.tiles}>
           {tiles.map(t => (
-            <Pressable key={t.label} style={styles.tile} onPress={() => router.push('/orders')} accessibilityRole="button"
-              accessibilityLabel={`${t.label}: ${t.value}`}>
+            <Pressable key={t.label} style={({ pressed }) => [styles.tile, t.value > 0 && t.filter !== 'hub' && styles.tileBusy, pressed && styles.pressed]}
+              onPress={() => router.push({ pathname: '/orders', params: { filter: t.filter } })} accessibilityRole="button"
+              accessibilityLabel={`${t.label}: ${t.value}. Opens these orders.`}>
               <Text style={styles.tileValue}>{page.isPending ? '…' : t.value}</Text>
               <Text style={styles.tileLabel}>{t.label}</Text>
             </Pressable>
           ))}
         </View>
 
-        <View style={styles.sections}>
-          {sectionsFor(role).map(s => (
-            <Pressable key={s.href} onPress={() => router.push(s.href)} accessibilityRole="button"
-              style={({ pressed }) => [styles.section, pressed && styles.pressed]}>
-              <Text style={styles.sectionTitle}>{s.title}</Text>
-              <Text style={styles.sectionDetail}>{s.detail}</Text>
-            </Pressable>
-          ))}
-        </View>
+        <SearchField placeholder="Find a section (e.g. pincodes, carousel, roles)" value={query} onChangeText={setQuery} />
+        {groups.length ? groups.map(g => (
+          <View key={g.title} style={styles.sections}>
+            <Text style={styles.groupTitle}>{g.title}</Text>
+            {g.sections.map(s => (
+              <Pressable key={s.href} onPress={() => router.push(s.href)} accessibilityRole="button" accessibilityLabel={`${s.title}. ${s.detail}`}
+                style={({ pressed }) => [styles.section, pressed && styles.pressed]}>
+                <View style={styles.flex}>
+                  <Text style={styles.sectionTitle}>{s.title}</Text>
+                  <Text style={styles.sectionDetail}>{s.detail}</Text>
+                </View>
+                {waiting[s.href] ? <Text style={styles.badge}>{waiting[s.href]}</Text> : null}
+                <Text style={styles.chevron}>›</Text>
+              </Pressable>
+            ))}
+          </View>
+        )) : <Text style={styles.sectionDetail}>No section matches "{query.trim()}".</Text>}
       </ScrollView>
     </SafeAreaView>
   );
@@ -147,9 +168,14 @@ const styles = StyleSheet.create({
   tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   tile: { flexGrow: 1, flexBasis: '30%', minWidth: 100, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.md, gap: 2 },
   tileValue: { fontSize: 26, fontWeight: '800', color: colors.navy },
+  tileBusy: { borderColor: colors.green },
   tileLabel: { fontSize: font.tiny, fontWeight: '700', color: colors.muted, textTransform: 'uppercase' },
   sections: { gap: spacing.sm, marginTop: spacing.sm },
-  section: { backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: 2 },
+  groupTitle: { fontSize: font.tiny, fontWeight: '800', color: colors.muted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: spacing.xs },
+  flex: { flex: 1 },
+  chevron: { fontSize: 26, color: colors.muted, marginLeft: spacing.sm },
+  badge: { minWidth: 24, textAlign: 'center', fontSize: font.small, fontWeight: '800', color: colors.white, backgroundColor: colors.danger, borderRadius: 12, paddingHorizontal: 7, paddingVertical: 2, overflow: 'hidden' },
+  section: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   pressed: { borderColor: colors.green, backgroundColor: colors.greenSoft },
   sectionTitle: { fontSize: font.heading, fontWeight: '700', color: colors.text },
   sectionDetail: { fontSize: font.small, color: colors.muted },

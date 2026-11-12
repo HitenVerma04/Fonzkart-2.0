@@ -314,6 +314,26 @@ model PushToken {
   @@index([riderId])
 }
 
+/// A partner asking to serve more pincodes (Partner app); an admin or the city's zonal head approves all or some of
+/// them (Admin app), which adds them to the partner's pincodes.
+model PincodeRequest {
+  id           String    @id @default(cuid())
+  partnerId    String
+  cityId       String?
+  pincodes     String[]
+  note         String?
+  status       String    @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  approved     String[]  // the pincodes the reviewer added (all or some of pincodes)
+  reviewNote   String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([partnerId])
+  @@index([status])
+}
+
 model Notification {
   id        String   @id @default(cuid())
   userId    String?  // Target user (if specific)

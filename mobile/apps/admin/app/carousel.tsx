@@ -101,7 +101,8 @@ export default function CarouselEditor() {
             {message ? <Notice tone={message.tone} text={message.text} /> : null}
             {editing ? (
               <Card title={editing === 'new' ? 'New card' : 'Edit card'}>
-                <ImageField label="Picture (wide, about 16:9)" value={form.imageUrl} onChange={imageUrl => setForm(f => ({ ...f, imageUrl }))} />
+                <ImageField label="Picture" value={form.imageUrl} onChange={imageUrl => setForm(f => ({ ...f, imageUrl }))}
+                  hint={'Landscape, 2:1 (twice as wide as tall), e.g. 1600 × 800 px or at least 1200 × 600 px.\nJPG, PNG or WebP, up to 10 MB.\nKeep words and faces away from the edges: they can be cropped, and the bottom-left holds the title.'} />
                 {form.imageUrl.trim() ? <Preview slide={form} /> : null}
                 <TextField label="Title" value={form.title} maxLength={MAX_TITLE} hint={`${form.title.length}/${MAX_TITLE}`}
                   onChangeText={title => setForm(f => ({ ...f, title }))} />
@@ -164,7 +165,7 @@ function Thumb({ uri }: { uri: string }) {
   return url ? <Image source={{ uri: url }} style={styles.thumb} resizeMode="cover" /> : <View style={styles.thumb} />;
 }
 
-/** Roughly how the card looks in the Customer app. */
+/** Roughly how the card looks in the Customer app (2:1, as in HomeCarousel there). */
 function Preview({ slide }: { slide: CarouselSlideInput }) {
   const url = imageUrl(slide.imageUrl);
   return (
@@ -188,11 +189,11 @@ const styles = StyleSheet.create({
   switchRow: { flexDirection: 'row', alignItems: 'center' },
   slide: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.sm, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.sm },
   hidden: { opacity: 0.6 },
-  thumb: { width: 96, height: 54, borderRadius: radius.sm, backgroundColor: colors.placeholder },
+  thumb: { width: 96, height: 48, borderRadius: radius.sm, backgroundColor: colors.placeholder },
   name: { fontSize: font.body, fontWeight: '700', color: colors.text },
   muted: { fontSize: font.small, color: colors.muted },
   actions: { flexDirection: 'row', flexWrap: 'wrap' },
-  preview: { width: '100%', aspectRatio: 16 / 9, borderRadius: radius.lg, overflow: 'hidden', backgroundColor: colors.navy, justifyContent: 'flex-end' },
+  preview: { width: '100%', aspectRatio: 2, borderRadius: radius.lg, overflow: 'hidden', backgroundColor: colors.navy, justifyContent: 'flex-end' },
   previewShade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.25)' },
   previewText: { padding: spacing.md, gap: 2 },
   previewTitle: { fontSize: font.heading, fontWeight: '800', color: colors.white },

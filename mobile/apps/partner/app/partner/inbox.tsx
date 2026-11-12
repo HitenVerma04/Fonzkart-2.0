@@ -19,6 +19,7 @@ export default function PartnerInbox() {
       onOpen={item => {
         if (!item.isRead) void notificationsApi.markRead(item.id).catch(() => undefined).then(refresh);
         if (item.orderId) router.push({ pathname: '/partner/order/[id]', params: { id: item.orderId } });
+        else if (/pincode/i.test(item.title)) router.push('/partner/areas');
       }}
     />
   );

@@ -87,6 +87,14 @@ const enc = encodeURIComponent;
 const get = async <T>(path: string, signal?: AbortSignal) => (await request<T>('GET', path, { signal })).data;
 const post = async (path: string, body?: unknown) => (await request<ActionResult>('POST', path, { body: body ?? {} })).data ?? {};
 const put = async (path: string, body: unknown) => (await request<ActionResult>('PUT', path, { body })).data ?? {};
+/** Create actions answer {created:false} when nothing was made; older servers give no reason, so say the likely ones. */
+const create = async (path: string, body: unknown, what: string): Promise<ActionResult> => {
+  const r = (await request<ActionResult & { created?: boolean }>('POST', path, { body })).data ?? {};
+  if (r.created === false && !r.error) {
+    return { error: `The ${what} was not created. Check the name, email and password, and that no account already uses this email or phone number.` };
+  }
+  return r;
+};
 
 export const adminApi = {
   // Users and roles (app/admin/admins)
@@ -101,7 +109,7 @@ export const adminApi = {
   partners: (signal?: AbortSignal) => get<PartnersOverview>('/api/staff/partners/overview', signal),
   grantPartner: (email: string, cityId?: string, managerId?: string) => post('/api/staff/partners/grant', { email, cityId, managerId }),
   createPartner: (input: { name: string; email: string; phone: string; password: string; cityId?: string; managerId?: string; relationshipManagerId?: string }) =>
-    post('/api/staff/partners', input),
+    create('/api/staff/partners', input, 'partner'),
   updatePartnerAssignment: (partnerId: string, input: { cityId?: string | null; managerId?: string | null; relationshipManagerId?: string | null }) =>
     put(`/api/staff/partners/${enc(partnerId)}/assignment`, input),
   updatePartnerPincodes: (partnerId: string, pincodes: string[]) => put(`/api/cities/partners/${enc(partnerId)}/pincodes`, { pincodes }),
@@ -109,7 +117,7 @@ export const adminApi = {
 
   // Zonal heads (app/admin/zonal-heads)
   zonalHeads: (signal?: AbortSignal) => get<ZonalHead[]>('/api/staff/zonal-heads', signal),
-  createZonalHead: (input: { name: string; email: string; phone: string; password: string; cityId?: string }) => post('/api/staff/zonal-heads', input),
+  createZonalHead: (input: { name: string; email: string; phone: string; password: string; cityId?: string }) => create('/api/staff/zonal-heads', input, 'zonal head'),
   assignCity: async (zonalHeadId: string, cityId: string) => {
     await request<null>('POST', `/api/staff/zonal-heads/${enc(zonalHeadId)}/cities`, { body: { cityId } });
   },

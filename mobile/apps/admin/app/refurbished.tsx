@@ -5,7 +5,7 @@ import { FlatList, RefreshControl, StyleSheet, Switch, Text, View } from 'react-
 import { useQueryClient } from '@tanstack/react-query';
 import { DEVICE_GRADES, buyAdminApi, buyKeys, useBuyAdmin, type RefurbishedDevice, type RefurbishedDeviceInput } from '@fonzkart/api';
 import { formatInr } from '@fonzkart/core';
-import { Button, Card, EmptyState, ErrorState, Loading, Notice, Segmented, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
+import { Button, Card, EmptyState, ErrorState, Loading, Notice, RemoteImage, Segmented, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
 import { ImageField } from '../src/ImageField';
 
 const EMPTY: RefurbishedDeviceInput = { name: '', brand: '', storage: '', grade: 'good', warrantyMonths: 6, imageUrl: null, mrp: 0, price: 0, stock: 1, isActive: true };
@@ -96,7 +96,8 @@ export default function RefurbishedEditor() {
               </View>
               <Text style={styles.label}>Condition</Text>
               <Segmented options={DEVICE_GRADES} value={form.grade} onChange={grade => setForm(f => ({ ...f, grade }))} />
-              <ImageField label="Picture (optional)" value={form.imageUrl ?? ''} onChange={url => setForm(f => ({ ...f, imageUrl: url || null }))} />
+              <ImageField label="Phone photo" value={form.imageUrl ?? ''} onChange={url => setForm(f => ({ ...f, imageUrl: url || null }))}
+                hint={'Portrait, the whole phone in view, on a white or transparent background (PNG).\nAt least 800 × 1000 px: small photos look blurry on the device page.\nJPG, PNG or WebP, up to 10 MB.'} />
               <View style={styles.row}>
                 <View style={styles.flex}><TextField label="MRP (₹)" value={form.mrp ? String(form.mrp) : ''} keyboardType="number-pad" onChangeText={t => setForm(f => ({ ...f, mrp: digits(t, 7) }))} /></View>
                 <View style={styles.flex}><TextField label="Sale price (₹)" value={form.price ? String(form.price) : ''} keyboardType="number-pad" onChangeText={t => setForm(f => ({ ...f, price: digits(t, 7) }))} /></View>
@@ -121,6 +122,9 @@ export default function RefurbishedEditor() {
       ListEmptyComponent={<EmptyState message="No devices yet. Customers see an empty Buy tab until you add one." />}
       renderItem={({ item }) => (
         <View style={[styles.item, !item.isActive && styles.hidden]}>
+          <View style={styles.photo}>
+            <RemoteImage uri={item.imageUrl} label={item.name} size={56} style={styles.photoImage} />
+          </View>
           <View style={styles.flex}>
             <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
             <Text style={styles.muted}>{item.brand} · {item.storage} · {gradeLabel(item.grade)}</Text>
@@ -145,8 +149,11 @@ const styles = StyleSheet.create({
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   label: { fontSize: font.small, fontWeight: '700', color: colors.text },
   muted: { fontSize: font.small, color: colors.muted, fontWeight: '400' },
-  item: { flexDirection: 'row', gap: spacing.sm, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.md },
+  item: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: spacing.md },
   hidden: { opacity: 0.6 },
+  // Fits beside the four lines of text, so the row is no taller than before.
+  photo: { width: 60, height: 76, borderRadius: radius.sm, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  photoImage: { width: 56, height: 72 },
   name: { fontSize: font.body, fontWeight: '700', color: colors.text },
   price: { fontSize: font.body, fontWeight: '800', color: colors.green },
   actions: { alignItems: 'flex-end', justifyContent: 'center' },

@@ -8,6 +8,40 @@ export class ApiError extends Error {
 }
 
 const TIMEOUT_MS = 15_000;
+const OFFLINE = 'Could not reach Fonzkart. Check your internet connection and try again.';
+
+/**
+ * Raw server messages people can't act on, said plainly. The backend now sends clear messages itself; this also
+ * covers servers not yet updated and errors that come without a message.
+ */
+const RAW: [RegExp, string][] = [
+  [/unique or foreign key constraint failed/i, 'This clashes with something that already exists (for example, the email or phone number is already used by another account).'],
+  [/^internal error$/i, 'Something went wrong on our side. Please try again in a minute.'],
+  [/^unauthori[sz]ed$/i, 'Your session has ended. Please sign in again.'],
+  [/^forbidden$/i, 'Your role does not allow this.'],
+  [/^(record )?not found$/i, 'This could not be found. It may have been removed; refresh and try again.'],
+];
+
+const BY_STATUS: Record<number, string> = {
+  400: 'Some of the details are not right. Check the form and try again.',
+  401: 'Your session has ended. Please sign in again.',
+  403: 'Your role does not allow this.',
+  404: 'This could not be found. It may have been removed; refresh and try again.',
+  409: 'This clashes with something that already exists. Refresh and try again.',
+  413: 'The file is too large (max 10 MB).',
+  429: 'Too many tries. Wait a minute and try again.',
+};
+
+/** The message to show for a failed request. */
+export function friendlyError(message: string | null, status: number): string {
+  const raw = message?.trim();
+  if (raw) {
+    const known = RAW.find(([pattern]) => pattern.test(raw));
+    return known ? known[1] : raw;
+  }
+  if (BY_STATUS[status]) return BY_STATUS[status];
+  return status >= 500 ? 'Something went wrong on our side. Please try again in a minute.' : `Something went wrong (${status}). Please try again.`;
+}
 
 type Query = Record<string, string | undefined>;
 
@@ -59,14 +93,14 @@ export async function request<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path
     });
     if (!response.ok) {
       const detail = await response.json().catch(() => null) as { error?: unknown } | null;
-      const message = typeof detail?.error === 'string' ? detail.error : `Server answered ${response.status}`;
-      throw new ApiError(message, response.status);
+      throw new ApiError(friendlyError(typeof detail?.error === 'string' ? detail.error : null, response.status), response.status);
     }
     const text = await response.text();
     return { data: (text ? JSON.parse(text) : null) as T, authToken: response.headers.get('X-Auth-Token') };
   } catch (error) {
     if (error instanceof ApiError) throw error;
-    if (controller.signal.aborted && !signal?.aborted) throw new ApiError('The server took too long to answer', 0);
+    if (controller.signal.aborted && !signal?.aborted) throw new ApiError('Fonzkart took too long to answer. Check your connection and try again.', 0);
+    if (error instanceof TypeError && !signal?.aborted) throw new ApiError(OFFLINE, 0);
     throw error;
   } finally {
     clearTimeout(timer);
@@ -104,7 +138,7 @@ export async function uploadImage(file: UploadFile, signal?: AbortSignal): Promi
   const response = await fetch(buildUrl(config.apiUrl, '/api/uploads'), { method: 'POST', headers, body: form, signal });
   if (!response.ok) {
     const detail = await response.json().catch(() => null) as { error?: unknown } | null;
-    throw new ApiError(typeof detail?.error === 'string' ? detail.error : `Upload failed (${response.status})`, response.status);
+    throw new ApiError(friendlyError(typeof detail?.error === 'string' ? detail.error : null, response.status), response.status);
   }
   return ((await response.json()) as { url: string }).url;
 }
