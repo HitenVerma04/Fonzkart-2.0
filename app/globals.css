@@ -167,10 +167,38 @@
     transition: all 0.3s ease;
   }
 
+  /* Admin pages: no frosted glass. Text inside many stacked backdrop-filter layers in a scrolling panel renders soft in
+     Chromium, which made the admin look blurry; solid, slightly lighter cards read sharply. */
+  .dark .admin-shell .bg-card,
+  .dark .admin-shell .bg-muted {
+    background-color: rgb(24 24 27) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .dark .admin-shell .bg-muted {
+    background-color: rgb(39 39 42) !important;
+  }
+
+  .admin-shell [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .admin-shell {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   .dark .bg-card:hover {
     background-color: rgba(255, 255, 255, 0.06) !important;
     box-shadow: 0 0 30px hsl(var(--primary) / 0.15) !important;
     border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .dark .admin-shell .bg-card:hover {
+    background-color: rgb(30 30 34) !important;
   }
 }
 

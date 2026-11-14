@@ -27,7 +27,10 @@ import {
     Headphones,
     Banknote,
     ShieldCheck,
-    Sparkles
+    Sparkles,
+    Recycle,
+    Images,
+    MapPinned
 } from 'lucide-react';
 
 import Image from 'next/image';
@@ -223,6 +226,10 @@ export default function AdminSidebar({ role = 'SUPER_ADMIN' }: { role?: string }
                             {renderLink('/admin/homepage', 'Landing Page', LayoutDashboard, pathname.includes('/admin/homepage'))}
                             {renderLink('/admin/shop', 'Screen Guards', ShieldCheck, pathname.includes('/admin/shop'))}
                             {renderLink('/admin/festive', 'Festive Theme', Sparkles, pathname.includes('/admin/festive'))}
+                            {renderLink('/admin/carousel', 'App Carousel', Images, pathname.includes('/admin/carousel'))}
+                            {renderSectionTitle('Buy & Repair')}
+                            {renderLink('/admin/refurbished', 'Refurbished Devices', Recycle, pathname.includes('/admin/refurbished'))}
+                            {renderLink('/admin/repairs', 'Repairs', Wrench, pathname.includes('/admin/repairs'))}
                         </>
                     )}
 
@@ -237,6 +244,7 @@ export default function AdminSidebar({ role = 'SUPER_ADMIN' }: { role?: string }
                         <>
                             {renderSectionTitle('Hierarchy')}
                             {renderLink('/admin/cities', 'Cities Workspace', MapPin, pathname.includes('/admin/cities'))}
+                            {renderLink('/admin/pincode-requests', 'Pincode Requests', MapPinned, pathname.includes('/admin/pincode-requests'))}
                         </>
                     )}
 
@@ -250,6 +258,7 @@ export default function AdminSidebar({ role = 'SUPER_ADMIN' }: { role?: string }
 
                     {renderSectionTitle('Logistics')}
                     {(isPrivileged || isZonal || isRM || isPartner) && renderLink('/admin/riders', 'Field Executives', Users, pathname.includes('riders'))}
+                    {isPartner && renderLink('/admin/service-areas', 'Service Areas', MapPinned, pathname.includes('/admin/service-areas'))}
                     {renderLink('/admin/orders', (isRider ? 'My Pickups' : 'Orders'), ShoppingCart, pathname.includes('orders'))}
 
                     {(isPrivileged || isZonal || isRM || isPartner || isRider) && (

@@ -7,6 +7,8 @@ import Link from 'next/link';
 import OrderCard from '@/components/orders/OrderCard';
 import { ShopOrders } from '@/components/shop/ShopOrders';
 import { fetchMyShopOrders } from '@/actions/shop';
+import { fetchMyRefurbishedOrders, fetchMyRepairBookings } from '@/actions/buyRepair';
+import { BuyRepairOrders } from '@/components/buy/BuyRepairOrders';
 
 export default async function OrdersPage() {
     const session = await getSession();
@@ -14,15 +16,17 @@ export default async function OrdersPage() {
         redirect('/login');
     }
 
-    const [orders, shopOrders] = await Promise.all([getUserOrders(), fetchMyShopOrders()]);
+    const [orders, shopOrders, deviceOrders, repairBookings] = await Promise.all([getUserOrders(), fetchMyShopOrders(), fetchMyRefurbishedOrders(), fetchMyRepairBookings()]);
+    const otherOrders = shopOrders.length + deviceOrders.length + repairBookings.length;
 
     return (
         <div className="container mx-auto py-10 px-4">
             <h1 className="text-3xl font-bold mb-8">My Orders</h1>
 
+            <BuyRepairOrders orders={deviceOrders} bookings={repairBookings} />
             <ShopOrders orders={shopOrders} />
 
-            {orders.length === 0 && shopOrders.length > 0 ? null : orders.length === 0 ? (
+            {orders.length === 0 && otherOrders > 0 ? null : orders.length === 0 ? (
                 <div className="text-center py-20 bg-accent/20 rounded-2xl">
                     <Smartphone className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
                     <p className="text-lg font-medium">No orders yet</p>

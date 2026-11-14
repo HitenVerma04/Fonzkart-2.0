@@ -2,7 +2,7 @@
 // Add, edit (name, type, phone it fits, picture, MRP, sale price), show or hide, delete. The Customer app reads the
 // same data from the backend, so a change shows there within a minute or when the app is reopened.
 import { useState } from 'react';
-import { FlatList, Image, RefreshControl, StyleSheet, Switch, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Switch, Text, View } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   GUARD_TYPES, discountPercent, shopAdminApi, shopKeys, useShopAdmin, type ScreenGuard, type ScreenGuardInput, type ShopSettings,
@@ -16,6 +16,9 @@ const MAX_PHONE = 40;
 const EMPTY: ScreenGuardInput = { name: '', guardType: 'tempered', brand: '', model: '', imageUrl: null, mrp: 0, price: 0, isActive: true };
 const typeLabel = (id: string) => GUARD_TYPES.find(t => t.id === id)?.label ?? id;
 const toRupees = (text: string) => Number(text.replace(/\D/g, '').slice(0, 7)) || 0;
+/** The sale price for a percent off the MRP, rounded down to whole rupees so the shown "% off" is never less than asked. */
+const priceFor = (mrp: number, percent: number) => Math.max(1, Math.floor((mrp * (100 - Math.min(Math.max(percent, 0), 99))) / 100));
+const QUICK_PERCENTS = [0, 10, 15, 20, 25, 30, 40, 50];
 
 export default function ScreenGuardStoreEditor() {
   const client = useQueryClient();
@@ -25,6 +28,9 @@ export default function ScreenGuardStoreEditor() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [message, setMessage] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  // The discount percent as typed; empty when the sale price was typed instead (then the percent is worked out).
+  const [pctText, setPctText] = useState('');
+  const [bulkPct, setBulkPct] = useState('');
 
   if (shop.isPending) return <Loading />;
   if (shop.isError) return <ErrorState onRetry={() => shop.refetch()} />;
@@ -34,6 +40,7 @@ export default function ScreenGuardStoreEditor() {
     setEditing(g);
     setMessage(null);
     setDeleting(null);
+    setPctText('');
     setForm(g === 'new' ? EMPTY : {
       name: g.name, guardType: g.guardType, brand: g.brand, model: g.model, imageUrl: g.imageUrl, mrp: g.mrp, price: g.price, isActive: g.isActive,
       displayOrder: g.displayOrder,
@@ -76,6 +83,31 @@ export default function ScreenGuardStoreEditor() {
       isActive: !g.isActive, displayOrder: g.displayOrder,
     };
     void run(() => shopAdminApi.update(g.id, input), `"${g.name}" ${input.isActive ? 'shown in the store' : 'hidden'}.`);
+  };
+
+  /** One percent off every guard's own MRP; stops at the first failure and says how far it got. */
+  const applyToAll = async (percent: number) => {
+    setBusy(true);
+    setMessage(null);
+    let done = 0;
+    try {
+      for (const g of items) {
+        const r = await shopAdminApi.update(g.id, {
+          name: g.name, guardType: g.guardType, brand: g.brand, model: g.model, imageUrl: g.imageUrl, mrp: g.mrp,
+          price: priceFor(g.mrp, percent), isActive: g.isActive, displayOrder: g.displayOrder,
+        });
+        if (r.error) throw new Error(`${g.name}: ${r.error}`);
+        done++;
+      }
+      setMessage({ tone: 'success', text: percent ? `${percent}% off applied to all ${done} guards.` : `Discount removed: all ${done} guards sell at MRP.` });
+      setBulkPct('');
+    } catch (e) {
+      setMessage({ tone: 'error', text: `Updated ${done} of ${items.length}. ${e instanceof Error ? e.message : 'Something went wrong.'}` });
+    } finally {
+      await client.invalidateQueries({ queryKey: shopKeys.admin });
+      await client.invalidateQueries({ queryKey: shopKeys.store });
+      setBusy(false);
+    }
   };
 
   const remove = (g: ScreenGuard) => {
@@ -121,6 +153,29 @@ export default function ScreenGuardStoreEditor() {
                 onValueChange={discountsEnabled => saveSettings({ ...settings, discountsEnabled }, discountsEnabled ? 'Discounts are on.' : 'Discounts are off: guards sell at MRP.')} />
             </View>
           </Card>
+          {items.length ? (
+            <Card title="Discount on every guard">
+              <Text style={styles.muted}>Sets each guard's sale price to this percent off its own MRP. You can still change single guards afterwards.</Text>
+              <View style={styles.quick}>
+                {QUICK_PERCENTS.map(p => (
+                  <Pressable key={p} onPress={() => setBulkPct(String(p))} style={[styles.quickChip, bulkPct === String(p) && styles.quickChipOn]}
+                    accessibilityRole="button" accessibilityLabel={p ? `${p}% off every guard` : 'No discount on any guard'}>
+                    <Text style={[styles.quickText, bulkPct === String(p) && styles.quickTextOn]}>{p ? `${p}%` : 'None'}</Text>
+                  </Pressable>
+                ))}
+              </View>
+              <View style={styles.row}>
+                <View style={styles.flex}>
+                  <TextField label="Discount (%)" value={bulkPct} keyboardType="number-pad" placeholder="e.g. 20"
+                    onChangeText={t => setBulkPct(t.replace(/\D/g, '').slice(-2))} />
+                </View>
+                <View style={[styles.flex, styles.bottom]}>
+                  <Button title={bulkPct === '' ? 'Apply to all' : `Apply ${bulkPct}% to all ${items.length}`} loading={busy} disabled={bulkPct === '' || busy}
+                    onPress={() => void applyToAll(Number(bulkPct))} />
+                </View>
+              </View>
+            </Card>
+          ) : null}
           {message ? <Notice tone={message.tone} text={message.text} /> : null}
           {editing ? (
             <Card title={editing === 'new' ? 'New guard' : 'Edit guard'}>
@@ -142,13 +197,39 @@ export default function ScreenGuardStoreEditor() {
               <View style={styles.row}>
                 <View style={styles.flex}>
                   <TextField label="MRP (₹)" value={form.mrp ? String(form.mrp) : ''} keyboardType="number-pad" placeholder="949"
-                    onChangeText={t => setForm(f => ({ ...f, mrp: toRupees(t) }))} />
+                    onChangeText={t => {
+                      const mrp = toRupees(t);
+                      // A discount typed as a percent keeps that percent when the MRP changes.
+                      setForm(f => ({ ...f, mrp, price: pctText !== '' ? priceFor(mrp, Number(pctText)) : f.price }));
+                    }} />
                 </View>
                 <View style={styles.flex}>
-                  <TextField label="Sale price (₹)" value={form.price ? String(form.price) : ''} keyboardType="number-pad" placeholder="749"
-                    onChangeText={t => setForm(f => ({ ...f, price: toRupees(t) }))} />
+                  <TextField label="Discount (%)" value={pctText !== '' ? pctText : off ? String(off) : ''} keyboardType="number-pad" placeholder="0"
+                    hint="Sets the sale price"
+                    onChangeText={t => {
+                      const digits = t.replace(/\D/g, '').slice(-2);
+                      setPctText(digits);
+                      setForm(f => ({ ...f, price: digits === '' ? f.mrp : priceFor(f.mrp, Number(digits)) }));
+                    }} />
                 </View>
               </View>
+              <TextField label="Sale price (₹)" value={form.price ? String(form.price) : ''} keyboardType="number-pad" placeholder="749"
+                hint={form.mrp && form.price && form.price <= form.mrp ? `${formatInr(form.mrp - form.price)} off the MRP` : 'What the customer pays'}
+                onChangeText={t => {
+                  setPctText('');
+                  setForm(f => ({ ...f, price: toRupees(t) }));
+                }} />
+              {form.mrp > 0 ? (
+                <View style={styles.quick}>
+                  <Text style={styles.muted}>Quick discount:</Text>
+                  {QUICK_PERCENTS.map(p => (
+                    <Pressable key={p} onPress={() => { setPctText(p ? String(p) : ''); setForm(f => ({ ...f, price: priceFor(f.mrp, p) })); }}
+                      style={[styles.quickChip, off === p && styles.quickChipOn]} accessibilityRole="button" accessibilityLabel={p ? `${p}% off` : 'No discount'}>
+                      <Text style={[styles.quickText, off === p && styles.quickTextOn]}>{p ? `${p}%` : 'None'}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              ) : null}
               {priceProblem && (form.mrp || form.price) ? <Notice tone="error" text={priceProblem} /> : null}
               {!priceProblem ? (
                 <View style={styles.previewPrice}>
@@ -223,4 +304,10 @@ const styles = StyleSheet.create({
   badgeOn: { backgroundColor: colors.greenTint, color: colors.greenDark },
   badgeOff: { backgroundColor: colors.placeholder, color: colors.muted },
   actions: { flexDirection: 'row', flexWrap: 'wrap' },
+  bottom: { justifyContent: 'flex-end' },
+  quick: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
+  quickChip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
+  quickChipOn: { backgroundColor: colors.green, borderColor: colors.green },
+  quickText: { fontSize: font.small, fontWeight: '700', color: colors.text },
+  quickTextOn: { color: colors.white },
 });

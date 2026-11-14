@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addAdmin, addZonalHead, addRelationshipManager, addPartner, addFieldExecutive, removeAdmin, removeUserRole, deleteRider } from '@/actions/admin';
 import { Trash2, Plus, Loader2, ShieldCheck, Mail, Briefcase, Building2, Users, Crown, Phone, UserCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -23,6 +23,14 @@ export default function AdminManager({
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    // Removing a role can be undone for a short while (as in the Admin app): Undo gives the same role back. Removing
+    // a role changes only the role, so a partner keeps its city, pincodes and managers.
+    const [removed, setRemoved] = useState<{ email: string; roleName: string; restore: () => Promise<{ success?: boolean; error?: string }> } | null>(null);
+    useEffect(() => {
+        if (!removed) return;
+        const timer = setTimeout(() => setRemoved(null), 15000);
+        return () => clearTimeout(timer);
+    }, [removed]);
     const [activeTab, setActiveTab] = useState<'superAdmins' | 'admins' | 'zonalHeads' | 'relationshipManagers' | 'partners' | 'riders'>('superAdmins');
 
     const handleAddAdmin = async (e: React.FormEvent) => {
@@ -107,10 +115,10 @@ export default function AdminManager({
     };
 
     const handleRemoveAdmin = async (adminEmail: string) => {
-        if (!confirm(`Remove admin privileges from ${adminEmail}?`)) return;
         try {
             const result = await removeAdmin(adminEmail);
             if (result.success) {
+                setRemoved({ email: adminEmail, roleName: 'Admin', restore: () => addAdmin(adminEmail) });
                 router.refresh();
             } else {
                 alert(result.error || 'Failed to remove admin');
@@ -120,17 +128,32 @@ export default function AdminManager({
         }
     };
 
-    const handleRemoveRole = async (email: string, roleName: string) => {
-        if (!confirm(`Remove ${roleName} privileges from ${email}?`)) return;
+    /** `restore` gives the role back (Undo); without one (super admins) the removal is confirmed first instead. */
+    const handleRemoveRole = async (email: string, roleName: string, restore?: () => Promise<{ success?: boolean; error?: string }>) => {
+        if (!restore && !confirm(`Remove ${roleName} privileges from ${email}?`)) return;
         try {
             const result = await removeUserRole(email);
             if (result.success) {
+                if (restore) setRemoved({ email, roleName, restore });
                 router.refresh();
             } else {
                 alert(result.error || `Failed to remove ${roleName}`);
             }
         } catch {
             alert(`Failed to remove ${roleName}`);
+        }
+    };
+
+    const undo = async () => {
+        const r = removed;
+        if (!r) return;
+        setRemoved(null);
+        try {
+            const result = await r.restore();
+            if (result.success === false || result.error) alert(result.error || `Could not give the ${r.roleName} role back.`);
+            router.refresh();
+        } catch {
+            alert(`Could not give the ${r.roleName} role back.`);
         }
     };
 
@@ -159,6 +182,12 @@ export default function AdminManager({
 
     return (
         <div className="space-y-6">
+            {removed ? (
+                <div role="status" className="flex items-center justify-between gap-4 rounded-xl bg-zinc-900 px-4 py-3 text-sm text-white dark:bg-zinc-800">
+                    <span>{removed.email} is no longer {removed.roleName === 'Admin' ? 'an' : 'a'} {removed.roleName.toLowerCase()} (now a customer account).</span>
+                    <button type="button" onClick={undo} className="shrink-0 font-black tracking-wide text-green-400 hover:text-green-300">UNDO</button>
+                </div>
+            ) : null}
             <div className="flex overflow-x-auto border-b border-border/50 pb-px gap-6 hide-scrollbar">
                 {tabs.map(tab => (
                     <button
@@ -312,7 +341,7 @@ export default function AdminManager({
                                 </div>
                                 <div className="self-end sm:self-auto w-full sm:w-auto flex justify-end sm:justify-start">
                                     <button
-                                        onClick={() => handleRemoveRole(zh.email, 'Zonal Head')}
+                                        onClick={() => handleRemoveRole(zh.email, 'Zonal Head', () => addZonalHead(zh.email))}
                                         className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors focus:opacity-100 shrink-0"
                                         title="Revoke Zonal Head Access"
                                     >
@@ -369,7 +398,7 @@ export default function AdminManager({
                                 </div>
                                 <div className="self-end sm:self-auto w-full sm:w-auto flex justify-end sm:justify-start">
                                     <button
-                                        onClick={() => handleRemoveRole(rm.email, 'Relationship Manager')}
+                                        onClick={() => handleRemoveRole(rm.email, 'Relationship Manager', () => addRelationshipManager(rm.email))}
                                         className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors focus:opacity-100 shrink-0"
                                         title="Revoke RM Access"
                                     >
@@ -426,7 +455,7 @@ export default function AdminManager({
                                 </div>
                                 <div className="self-end sm:self-auto w-full sm:w-auto flex justify-end sm:justify-start">
                                     <button
-                                        onClick={() => handleRemoveRole(partner.email, 'Partner')}
+                                        onClick={() => handleRemoveRole(partner.email, 'Partner', () => addPartner(partner.email, partner.cityId ?? undefined, partner.managerId ?? undefined))}
                                         className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors focus:opacity-100 shrink-0"
                                         title="Revoke Partner Access"
                                     >

@@ -21,7 +21,7 @@ export default async function AdminLayout({
 
     return (
         <NotificationProvider userId={session.user.id} userRole={session.user.role}>
-            <div className="flex min-h-[100dvh] bg-muted/20 dark:bg-black flex-row">
+            <div className="admin-shell flex min-h-[100dvh] bg-muted/20 dark:bg-black flex-row">
                 {/* Sidebar */}
                 <AdminSidebar role={session.user.role} />
 

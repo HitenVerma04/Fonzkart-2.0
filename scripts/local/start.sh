@@ -45,11 +45,28 @@ SECRET_FILE="$HERE/.local-secret"
 [ -s "$SECRET_FILE" ] || head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n' > "$SECRET_FILE"
 SECRET="$(cat "$SECRET_FILE")"
 
+# The Spring Boot backend, when it has been built (cd backend && mvn -o package -DskipTests): the website's pages that
+# only exist on the backend (Buy, Repair, screen guards, carousel, pincode requests) then work locally too. It shares
+# the database and the session secret, so a website sign-in is a backend sign-in.
+BACKEND_ENV=""
+JAR="$(ls "$ROOT"/backend/target/fonzkart-backend-*.jar 2>/dev/null | head -1)"
+docker rm -f fz-local-backend >/dev/null 2>&1 || true
+if [ -n "$JAR" ]; then
+  if command -v cygpath >/dev/null 2>&1; then JAR_MOUNT="$(cygpath -w "$JAR")"; else JAR_MOUNT="$JAR"; fi
+  echo "[local] starting the backend on http://localhost:8080..."
+  MSYS_NO_PATHCONV=1 docker run -d --name fz-local-backend --network "$NET" -p 8080:8080 \
+    -e DB_URL="jdbc:postgresql://$DB:5432/fonzkart" -e DB_USERNAME=postgres -e DB_PASSWORD=local \
+    -e AUTH_SECRET="$SECRET" -e UPLOAD_DIR=/uploads -v fz-local-uploads:/uploads \
+    -v "$JAR_MOUNT:/jar/app.jar:ro" eclipse-temurin:17-jre java -jar /jar/app.jar >/dev/null
+  BACKEND_ENV="http://fz-local-backend:8080"
+fi
+
 echo "[local] starting the website on http://localhost:3000 (first start installs dependencies: a few minutes)..."
 exec docker run --rm --name "$APP" --network "$NET" -p 3000:3000 \
   -v "$ROOT_MOUNT:/work:ro" -v "$PUBLIC_MOUNT:/app/public:ro" -v "$DEPS:/app/node_modules" \
   -e DATABASE_URL="postgresql://postgres:local@$DB:5432/fonzkart" \
   -e AUTH_SECRET="$SECRET" \
+  -e BACKEND_URL="$BACKEND_ENV" \
   -e NEXT_PUBLIC_APP_URL=http://localhost:3000 \
   -e SMTP_HOST="$MAIL" -e SMTP_PORT=1025 -e SMTP_SECURE=false -e SMTP_USER=noreply@fonzkart.in -e SMTP_PASS=local \
   -e NEXT_TELEMETRY_DISABLED=1 \

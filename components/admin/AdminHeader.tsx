@@ -74,7 +74,7 @@ export function AdminHeader({ user }: { user?: { name: string; email: string; ro
     const roleLabel = (user?.role || 'SUPER_ADMIN').replace(/_/g, ' ');
 
     return (
-        <header className="h-16 border-b border-border/70 bg-background/85 dark:bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <header className="h-16 border-b border-border/70 bg-background dark:bg-zinc-950 sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
             {/* Left Area: Title / Context + Search Bar */}
             <div className="flex items-center gap-4 sm:gap-6 min-w-0 flex-1 max-w-2xl">
                 <Link 

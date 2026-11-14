@@ -32,6 +32,8 @@ export function NavLinks({ session, isAdminUser }: { session: { user?: NavLinksS
 
     const primaryLinks = [
         { href: '/sell', label: 'Check Price' },
+        { href: '/buy', label: 'Buy' },
+        { href: '/repair', label: 'Repair' },
         { href: '/screen-guard', label: 'Screen Guards' },
         { href: '/orders', label: 'My Orders' },
         {
