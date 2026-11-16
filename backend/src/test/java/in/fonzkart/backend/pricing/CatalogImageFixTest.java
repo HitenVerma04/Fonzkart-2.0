@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import in.fonzkart.backend.catalog.rules.CatalogModelRules;
 import in.fonzkart.backend.pricing.service.CatalogImageFix;
 import in.fonzkart.backend.support.PostgresTestBase;
 import java.nio.file.Files;
@@ -40,6 +41,8 @@ class CatalogImageFixTest {
     private CatalogImageFix fix;
     @Autowired
     private JdbcTemplate jdbc;
+    @Autowired
+    private CatalogModelRules rules;
 
     @Test
     void replacesOnlyTheListedWrongPicturesOncePerVersion() throws Exception {
@@ -76,7 +79,26 @@ class CatalogImageFixTest {
         file.path("brands").forEach(b -> paths.add(b.path("logo").asText()));
         Path publicDir = Path.of("..", "public").toAbsolutePath().normalize();
         assertThat(paths).isNotEmpty().allSatisfy(p -> assertThat(Files.exists(publicDir.resolve(p.substring(1)))).as(p).isTrue());
+        // and the catalog shows each new picture as it is (no phone render matched by name takes its place)
+        file.path("models").forEach(m -> assertThat(rules.resolveModelImage(m.path("brandId").asText(), m.path("name").asText(),
+                m.path("img").asText())).as(m.path("name").asText()).isEqualTo(m.path("img").asText()));
         assertThat(fix.apply().version()).isNotBlank();
+    }
+
+    @Test
+    void alsoFixesCopiesWithNoPictureTheCatalogWouldShow() throws Exception {
+        jdbc.update("INSERT INTO \"Brand\" (id, name, logo, categories, priority) VALUES ('sy', 'SY', '/sy.png', '{watch}', 1)");
+        jdbc.update("INSERT INTO \"Model\" (id, \"brandId\", name, img, category, priority) VALUES "
+                + "('y-empty', 'sy', 'Watch Y', '', 'watch', 10), ('y-logo', 'sy', 'Watch Y', '/models/sy/logo.png', 'smartwatch', 10), "
+                + "('y-photo', 'sy', 'Watch Y', '/uploads/real.png', 'watch', 10)");
+        JsonNode file = new ObjectMapper().readTree("""
+                {"version": "i2", "models": [
+                  {"brandId": "sy", "category": "watch", "name": "Watch Y", "img": "/models/sy-smartwatch/Y.png", "replaces": ["/models/sy/Phone.png"]}
+                ]}""");
+        assertThat(fix.apply(file).modelsUpdated()).isEqualTo(2);
+        assertThat(img("y-empty")).isEqualTo("/models/sy-smartwatch/Y.png");
+        assertThat(img("y-logo")).isEqualTo("/models/sy-smartwatch/Y.png");
+        assertThat(img("y-photo")).isEqualTo("/uploads/real.png");
     }
 
     private String img(String id) {

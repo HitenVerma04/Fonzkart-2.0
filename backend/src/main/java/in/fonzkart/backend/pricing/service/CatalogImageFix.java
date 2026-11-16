@@ -17,8 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Applies catalog/model-images.json once per version: a model gets its listed picture only while its picture is still
- * one the file names in "replaces" (a phone photo standing in for a watch, a path with no file behind it), and a brand
- * its listed logo the same way. A picture an admin sets afterwards is never overwritten.
+ * one the file names in "replaces" (a phone photo standing in for a watch, a path with no file behind it) or none the
+ * catalog would show (empty, a logo: the catalog then shows the brand's flagship phone), and a brand its listed logo
+ * the same way. Every copy of the model is fixed. A photo an admin sets afterwards is never overwritten.
  */
 @Service
 public class CatalogImageFix {
@@ -26,6 +27,12 @@ public class CatalogImageFix {
     /** "AppSetting" key holding the version of model-images.json last applied. */
     public static final String VERSION_KEY = "catalog.modelImages.version";
     private static final Logger LOG = LoggerFactory.getLogger(CatalogImageFix.class);
+    /**
+     * A stored picture the catalog does not show as a photo (CatalogModelRules.resolveModelImage): none, an SVG, a
+     * logo. The catalog shows the brand's flagship phone instead, so these count as wrong pictures too.
+     */
+    static final String NO_PHOTO = "img IS NULL OR trim(img) = '' OR img LIKE '%.svg%' OR img LIKE '%wikimedia%' "
+            + "OR img LIKE '%Wikipedia%' OR img LIKE '%Logo%' OR img LIKE '%logo.png%'";
 
     /** What one run did. */
     public record Result(String version, boolean applied, int modelsUpdated, int brandsUpdated) {
@@ -66,7 +73,8 @@ public class CatalogImageFix {
             args.add(m.path("name").asText());
             args.addAll(replaces);
             models += jdbc.update("UPDATE \"Model\" SET img = ? WHERE \"brandId\" = ? AND lower(category) IN (" + marks(categories.size())
-                    + ") AND lower(trim(name)) = lower(trim(?)) AND img IN (" + marks(replaces.size()) + ")", args.toArray());
+                    + ") AND lower(trim(name)) = lower(trim(?)) AND (img IN (" + marks(replaces.size()) + ") OR " + NO_PHOTO + ")",
+                    args.toArray());
         }
         int brands = 0;
         for (JsonNode b : file.path("brands")) {
