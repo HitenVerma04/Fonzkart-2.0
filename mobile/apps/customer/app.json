@@ -3,13 +3,13 @@
     "name": "Fonzkart",
     "slug": "fonzkart-customer",
     "scheme": "fonzkart",
-    "version": "0.7.8",
+    "version": "0.7.9",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "android": {
       "package": "in.fonzkart.customer",
-      "versionCode": 29,
+      "versionCode": 30,
       "blockedPermissions": [
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.READ_EXTERNAL_STORAGE",
