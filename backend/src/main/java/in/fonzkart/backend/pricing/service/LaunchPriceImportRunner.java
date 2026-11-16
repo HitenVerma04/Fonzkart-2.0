@@ -22,10 +22,12 @@ class LaunchPriceImportRunner implements ApplicationRunner {
     private static final Logger LOG = LoggerFactory.getLogger(LaunchPriceImportRunner.class);
     private final LaunchPriceImport importer;
     private final MaxValueService maxValues;
+    private final CatalogImageFix images;
 
-    LaunchPriceImportRunner(LaunchPriceImport importer, MaxValueService maxValues) {
+    LaunchPriceImportRunner(LaunchPriceImport importer, MaxValueService maxValues, CatalogImageFix images) {
         this.importer = importer;
         this.maxValues = maxValues;
+        this.images = images;
     }
 
     @Override
@@ -34,6 +36,11 @@ class LaunchPriceImportRunner implements ApplicationRunner {
             importer.apply(YearMonth.now(ZoneId.of("Asia/Kolkata")));
         } catch (RuntimeException e) {
             LOG.error("[catalog] launch prices were not applied", e);
+        }
+        try {
+            images.apply();
+        } catch (RuntimeException e) {
+            LOG.error("[catalog] model pictures were not fixed", e);
         }
         try {
             int n = maxValues.syncLaunchFile(importer.bundled());

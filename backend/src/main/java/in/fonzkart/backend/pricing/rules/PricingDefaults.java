@@ -134,8 +134,10 @@ public final class PricingDefaults {
                 .build());
 
         all.put("earbuds", new Builder()
-                .question("power", SINGLE, "false", 40)
-                .question("charging", SINGLE, "false", 25)
+                // Earbuds are not repaired: dead ones are worth their case and parts, a case that will not charge
+                // needs a new case.
+                .question("power", SINGLE, "false", 70)
+                .question("charging", SINGLE, "false", 35)
                 .question("anc", SINGLE, "false", 10)
                 .question("physical_condition", SINGLE, "good", 4, "average", 10, "damaged", 25)
                 .question("accessories", 12, "!box", 3, "!bill", 4, "!charging_cable", 2)

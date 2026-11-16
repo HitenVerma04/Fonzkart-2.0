@@ -207,8 +207,10 @@ public class MaxValueService {
         return n;
     }
 
+    /** Brand, category (watch and smartwatch alike, as the catalog reads them) and name, for matching the launch file. */
     private static String key(String brand, String category, String name) {
-        return (brand + "|" + category + "|" + name).toLowerCase(Locale.ROOT);
+        String canonical = LaunchPriceImport.aliases(category).get(0);
+        return (brand + "|" + canonical + "|" + (name == null ? "" : name.trim())).toLowerCase(Locale.ROOT);
     }
 
     static double clamp(double v, double low, double high) {

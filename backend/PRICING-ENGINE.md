@@ -80,9 +80,19 @@ max value = MaxValueRule(launch price, age) × market factor
 ```
 
 Each month moves a price by at most 8%, and every change is kept in `PriceHistory`. An admin's catalog edit makes the
-variant **manual**, and the engine never touches it again. The 463 models in `catalog/launch-prices.json` start as
-auto. Any other variant becomes auto once its launch price is entered: Admin app → Pricing engine, or
-`PUT /api/pricing/engine/variants/{id}`.
+variant **manual**, and the engine never touches it again. The models in `catalog/launch-prices.json` (492 since
+version 2026-11-16, which added the Apple Watches still on placeholder prices) start as auto. Any other variant becomes
+auto once its launch price is entered: Admin app → Pricing engine, or `PUT /api/pricing/engine/variants/{id}`.
+
+A new version of `launch-prices.json` is applied once on startup. A listed model matches every catalog model of that
+brand and name under any name of its category (watch / smartwatch, tv / smarttv), duplicates included; a manual
+variant keeps its price. What the run did is saved in `AppSetting` `catalog.launchPrices.lastResult`.
+`catalog/model-images.json` is applied the same way for pictures: a model gets its listed picture only while it still
+shows the wrong one the file names (a phone photo standing in for a watch, a missing file).
+
+Watches whose brands keep no launch price on record for them (Samsung, Pixel, OnePlus, Xiaomi, boAt) keep the prices
+the team set; the age curve has not been checked against watch resale prices outside Apple's. Earbuds are not
+repaired, so a dead pair takes 70% of the max value and a case that will not charge 35%.
 
 ## Learning from Fonzkart's own data
 

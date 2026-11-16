@@ -83,6 +83,35 @@ class LaunchPriceImportTest {
     }
 
     @Test
+    void pricesEveryCopyOfAModelUnderAnyCategoryNameButKeepsAnAdminsPrice() throws Exception {
+        jdbc.update("INSERT INTO \"Brand\" (id, name, logo, categories, priority) VALUES ('tw', 'Test Watches', '/tw.png', '{watch}', 1)");
+        // the same watch twice (one filed under "smartwatch", with a stray space in its name), and a third one an admin priced
+        jdbc.update("INSERT INTO \"Model\" (id, \"brandId\", name, img, category, priority) VALUES "
+                + "('dup-a', 'tw', 'Series X (GPS + Cellular)', '/a.png', 'watch', 10), "
+                + "('dup-b', 'tw', 'Series X (GPS + Cellular) ', '/b.png', 'smartwatch', 10), "
+                + "('pinned', 'tw', 'Series Y', '/c.png', 'watch', 10)");
+        jdbc.update("INSERT INTO \"Variant\" (id, \"modelId\", name, \"basePrice\") VALUES "
+                + "('dup-a-base', 'dup-a', 'Base', 15000), ('dup-b-base', 'dup-b', 'Base', 15000), ('pinned-base', 'pinned', 'Base', 12345)");
+        jdbc.update("INSERT INTO \"VariantPricing\" (\"variantId\", mode, \"updatedAt\") VALUES ('pinned-base', 'manual', now())");
+
+        JsonNode file = new ObjectMapper().readTree("""
+                {"version": "t2", "models": [
+                  {"brandId": "tw", "category": "watch", "name": "Series X (GPS + Cellular)", "launched": "2024-09", "variants": [{"name": "Base", "launchPrice": 56900}]},
+                  {"brandId": "tw", "category": "watch", "name": "Series Y", "launched": "2024-09", "variants": [{"name": "Base", "launchPrice": 46900}]}
+                ]}""");
+        LaunchPriceImport.Result result = importer.apply(file, NOW);
+
+        long expected = MaxValueRule.suggest(56_900, YearMonth.of(2024, 9), "watch", "tw", NOW).maxValue();
+        assertThat(price("dup-a", "Base")).isEqualTo(expected);
+        assertThat(price("dup-b", "Base")).isEqualTo(expected);
+        assertThat(price("pinned", "Base")).isEqualTo(12345);
+        assertThat(result.variantsRepriced()).isEqualTo(2);
+        assertThat(result.skipped()).isEmpty();
+        assertThat(jdbc.queryForObject("SELECT value FROM \"AppSetting\" WHERE key = ?", String.class, LaunchPriceImport.RESULT_KEY))
+                .contains("\"version\":\"t2\"").contains("\"variantsRepriced\":2");
+    }
+
+    @Test
     void theBundledFileIsValid() {
         LaunchPriceImport.Result result = importer.apply(YearMonth.of(2026, 11));
         assertThat(result.version()).isNotBlank();
