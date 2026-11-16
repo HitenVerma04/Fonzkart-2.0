@@ -227,28 +227,28 @@ export const questionnaireSteps = {
             subtitle: 'Select any issues your device has (Check if applicable)',
             type: 'multi-select-grid',
             options: [
-                { id: 'wifi', label: 'WiFi', icon: 'Wifi' },
-                { id: 'sim1', label: 'Sim 1', icon: 'Smartphone' },
-                { id: 'sim2', label: 'Sim 2', icon: 'Smartphone' },
-                { id: 'bluetooth', label: 'Bluetooth', icon: 'Bluetooth' },
-                { id: 'front_camera', label: 'Front Camera', icon: 'Camera' },
-                { id: 'back_camera', label: 'Back Camera', icon: 'Camera' },
-                { id: 'camera_glass', label: 'Camera Glass Broken', icon: 'CameraOff' },
-                { id: 'finger_sensor', label: 'Finger Touch Sensor', icon: 'Fingerprint' },
-                { id: 'face_sensor', label: 'Face Sensor', icon: 'User' },
-                { id: 'power_button', label: 'Power Button', icon: 'Power' },
-                { id: 'volume_button', label: 'Volume Button', icon: 'Volume2' },
-                { id: 'silent_button', label: 'Silent Button', icon: 'BellOff' },
-                { id: 'speaker', label: 'Speaker', icon: 'Speaker' },
-                { id: 'earpiece', label: 'Ear Piece', icon: 'Phone' },
-                { id: 'microphone', label: 'Microphone', icon: 'Mic' },
-                { id: 'audio_ic', label: 'Audio IC', icon: 'Music' },
-                { id: 'charging_port', label: 'Charging Port', icon: 'Plug' },
-                { id: 'proximity', label: 'Proximity Sensor', icon: 'Move' },
-                { id: 'vibrator', label: 'Vibrator', icon: 'Vibrate' },
-                { id: 'battery', label: 'Battery', icon: 'Battery' },
-                { id: 'front_camera_blur', label: 'Front Camera Image Blur', icon: 'Image' },
-                { id: 'back_camera_blur', label: 'Back Camera Image Blur', icon: 'Image' },
+                { id: 'wifi', label: 'WiFi', icon: 'Wifi', group: 'Network & connectivity' },
+                { id: 'sim1', label: 'Sim 1', icon: 'Smartphone', group: 'Network & connectivity' },
+                { id: 'sim2', label: 'Sim 2', icon: 'Smartphone', group: 'Network & connectivity' },
+                { id: 'bluetooth', label: 'Bluetooth', icon: 'Bluetooth', group: 'Network & connectivity' },
+                { id: 'front_camera', label: 'Front Camera', icon: 'Camera', group: 'Camera' },
+                { id: 'back_camera', label: 'Back Camera', icon: 'Camera', group: 'Camera' },
+                { id: 'camera_glass', label: 'Camera Glass Broken', icon: 'CameraOff', group: 'Camera' },
+                { id: 'front_camera_blur', label: 'Front Camera Image Blur', icon: 'Image', group: 'Camera' },
+                { id: 'back_camera_blur', label: 'Back Camera Image Blur', icon: 'Image', group: 'Camera' },
+                { id: 'finger_sensor', label: 'Finger Touch Sensor', icon: 'Fingerprint', group: 'Sensors' },
+                { id: 'face_sensor', label: 'Face Sensor', icon: 'User', group: 'Sensors' },
+                { id: 'proximity', label: 'Proximity Sensor', icon: 'Move', group: 'Sensors' },
+                { id: 'power_button', label: 'Power Button', icon: 'Power', group: 'Buttons & controls' },
+                { id: 'volume_button', label: 'Volume Button', icon: 'Volume2', group: 'Buttons & controls' },
+                { id: 'silent_button', label: 'Silent Button', icon: 'BellOff', group: 'Buttons & controls' },
+                { id: 'speaker', label: 'Speaker', icon: 'Speaker', group: 'Sound & vibration' },
+                { id: 'earpiece', label: 'Ear Piece', icon: 'Phone', group: 'Sound & vibration' },
+                { id: 'microphone', label: 'Microphone', icon: 'Mic', group: 'Sound & vibration' },
+                { id: 'audio_ic', label: 'Audio IC', icon: 'Music', group: 'Sound & vibration' },
+                { id: 'vibrator', label: 'Vibrator', icon: 'Vibrate', group: 'Sound & vibration' },
+                { id: 'charging_port', label: 'Charging Port', icon: 'Plug', group: 'Battery & charging' },
+                { id: 'battery', label: 'Battery', icon: 'Battery', group: 'Battery & charging' },
             ]
         },
         {
@@ -278,13 +278,13 @@ export const questionnaireSteps = {
                 },
                 {
                     id: 'warranty',
-                    title: 'Warranty Period',
+                    title: 'Device age',
                     type: 'single-select',
                     options: [
-                        { id: '0_3_months', label: '0 - 3 Months', description: 'Valid for 0 to 3 months', icon: 'Clock' },
-                        { id: '3_6_months', label: '3 - 6 Months', description: 'Valid for 3 to 6 months', icon: 'Clock' },
-                        { id: '6_11_months', label: '6 - 11 Months', description: 'Valid for 6 to 11 months', icon: 'Clock' },
-                        { id: 'no', label: 'No Warranty', description: 'Above 11 months or expired', icon: 'XCircle' },
+                        { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
+                        { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
+                        { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
+                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]
@@ -331,16 +331,16 @@ export const questionnaireSteps = {
             subtitle: 'Select any issues your device has (Check if applicable)',
             type: 'multi-select-grid',
             options: [
-                { id: 'bluetooth', label: 'Bluetooth', icon: 'Bluetooth' },
-                { id: 'front_camera', label: 'Front Camera', icon: 'Camera' },
-                { id: 'back_camera', label: 'Back Camera', icon: 'Camera' },
-                { id: 'camera_glass', label: 'Camera Glass Broken', icon: 'CameraOff' },
-                { id: 'power_button', label: 'Power Button', icon: 'Power' },
-                { id: 'volume_button', label: 'Volume Button', icon: 'Volume2' },
-                { id: 'speaker', label: 'Speaker', icon: 'Speaker' },
-                { id: 'microphone', label: 'Microphone', icon: 'Mic' },
-                { id: 'charging_port', label: 'Charging Port', icon: 'Plug' },
-                { id: 'battery', label: 'Battery', icon: 'Battery' },
+                { id: 'bluetooth', label: 'Bluetooth', icon: 'Bluetooth', group: 'Network & connectivity' },
+                { id: 'front_camera', label: 'Front Camera', icon: 'Camera', group: 'Camera' },
+                { id: 'back_camera', label: 'Back Camera', icon: 'Camera', group: 'Camera' },
+                { id: 'camera_glass', label: 'Camera Glass Broken', icon: 'CameraOff', group: 'Camera' },
+                { id: 'power_button', label: 'Power Button', icon: 'Power', group: 'Buttons & controls' },
+                { id: 'volume_button', label: 'Volume Button', icon: 'Volume2', group: 'Buttons & controls' },
+                { id: 'speaker', label: 'Speaker', icon: 'Speaker', group: 'Sound & vibration' },
+                { id: 'microphone', label: 'Microphone', icon: 'Mic', group: 'Sound & vibration' },
+                { id: 'charging_port', label: 'Charging Port', icon: 'Plug', group: 'Battery & charging' },
+                { id: 'battery', label: 'Battery', icon: 'Battery', group: 'Battery & charging' },
             ]
         },
         {
@@ -370,13 +370,13 @@ export const questionnaireSteps = {
                 },
                 {
                     id: 'warranty',
-                    title: 'Warranty Period',
+                    title: 'Device age',
                     type: 'single-select',
                     options: [
-                        { id: '0_3_months', label: '0 - 3 Months', description: 'Valid for 0 to 3 months', icon: 'Clock' },
-                        { id: '3_6_months', label: '3 - 6 Months', description: 'Valid for 3 to 6 months', icon: 'Clock' },
-                        { id: '6_11_months', label: '6 - 11 Months', description: 'Valid for 6 to 11 months', icon: 'Clock' },
-                        { id: 'no', label: 'No Warranty', description: 'Above 11 months or expired', icon: 'XCircle' },
+                        { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
+                        { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
+                        { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
+                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]
@@ -423,13 +423,13 @@ export const questionnaireSteps = {
             subtitle: 'Select if applicable (Check if applicable)',
             type: 'multi-select-grid',
             options: [
-                { id: 'battery_low', label: 'Battery Health < 85%', icon: 'Battery' },
-                { id: 'wifi', label: 'WiFi/GPS Faulty', icon: 'Wifi' },
-                { id: 'speaker', label: 'Speakers Faulty', icon: 'Speaker' },
-                { id: 'crown', label: 'Digital Crown Issues', icon: 'Settings' },
-                { id: 'buttons', label: 'Side Buttons Faulty', icon: 'Power' },
-                { id: 'heart_sensor', label: 'Heart Sensor Faulty', icon: 'Activity' },
-                { id: 'bluetooth', label: 'Bluetooth Faulty', icon: 'Bluetooth' },
+                { id: 'wifi', label: 'WiFi/GPS Faulty', icon: 'Wifi', group: 'Network & connectivity' },
+                { id: 'bluetooth', label: 'Bluetooth Faulty', icon: 'Bluetooth', group: 'Network & connectivity' },
+                { id: 'heart_sensor', label: 'Heart Sensor Faulty', icon: 'Activity', group: 'Sensors' },
+                { id: 'crown', label: 'Digital Crown Issues', icon: 'Settings', group: 'Buttons & controls' },
+                { id: 'buttons', label: 'Side Buttons Faulty', icon: 'Power', group: 'Buttons & controls' },
+                { id: 'speaker', label: 'Speakers Faulty', icon: 'Speaker', group: 'Sound & vibration' },
+                { id: 'battery_low', label: 'Battery Health < 85%', icon: 'Battery', group: 'Battery & charging' },
             ]
         },
         {
@@ -460,13 +460,13 @@ export const questionnaireSteps = {
                 },
                 {
                     id: 'warranty',
-                    title: 'Warranty Period',
+                    title: 'Device age',
                     type: 'single-select',
                     options: [
-                        { id: '0_3_months', label: '0 - 3 Months', description: 'Valid for 0 to 3 months', icon: 'Clock' },
-                        { id: '3_6_months', label: '3 - 6 Months', description: 'Valid for 3 to 6 months', icon: 'Clock' },
-                        { id: '6_11_months', label: '6 - 11 Months', description: 'Valid for 6 to 11 months', icon: 'Clock' },
-                        { id: 'no', label: 'No Warranty', description: 'Above 11 months or expired', icon: 'XCircle' },
+                        { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
+                        { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
+                        { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
+                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]
@@ -525,13 +525,13 @@ export const questionnaireSteps = {
             subtitle: 'Select any issues your TV has (Check if applicable)',
             type: 'multi-select-grid',
             options: [
-                { id: 'wifi', label: 'WiFi / Smart features Faulty', icon: 'Wifi' },
-                { id: 'bluetooth', label: 'Bluetooth Faulty', icon: 'Bluetooth' },
-                { id: 'ports', label: 'HDMI / USB Ports Faulty', icon: 'Plug' },
-                { id: 'sound', label: 'Speakers / Sound Faulty', icon: 'VolumeX' },
-                { id: 'remote_sensor', label: 'Remote Sensor Not Responding', icon: 'Tv' },
-                { id: 'power_fault', label: 'Power Supply / Auto Shutdown Issues', icon: 'PowerOff' },
-                { id: 'display_flicker', label: 'Screen Flicker / Dim Display', icon: 'SunDim' },
+                { id: 'wifi', label: 'WiFi / Smart features Faulty', icon: 'Wifi', group: 'Network & connectivity' },
+                { id: 'bluetooth', label: 'Bluetooth Faulty', icon: 'Bluetooth', group: 'Network & connectivity' },
+                { id: 'remote_sensor', label: 'Remote Sensor Not Responding', icon: 'Tv', group: 'Sensors' },
+                { id: 'sound', label: 'Speakers / Sound Faulty', icon: 'VolumeX', group: 'Sound & vibration' },
+                { id: 'power_fault', label: 'Power Supply / Auto Shutdown Issues', icon: 'PowerOff', group: 'Display & power' },
+                { id: 'display_flicker', label: 'Screen Flicker / Dim Display', icon: 'SunDim', group: 'Display & power' },
+                { id: 'ports', label: 'HDMI / USB Ports Faulty', icon: 'Plug', group: 'Ports & slots' },
             ]
         },
         {
@@ -563,13 +563,13 @@ export const questionnaireSteps = {
                 },
                 {
                     id: 'warranty',
-                    title: 'Warranty Period',
+                    title: 'Device age',
                     type: 'single-select',
                     options: [
-                        { id: '0_3_months', label: '0 - 3 Months', description: 'Valid for 0 to 3 months', icon: 'Clock' },
-                        { id: '3_6_months', label: '3 - 6 Months', description: 'Valid for 3 to 6 months', icon: 'Clock' },
-                        { id: '6_11_months', label: '6 - 11 Months', description: 'Valid for 6 to 11 months', icon: 'Clock' },
-                        { id: 'no', label: 'No Warranty', description: 'Above 11 months or expired', icon: 'XCircle' },
+                        { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
+                        { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
+                        { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
+                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]
@@ -651,12 +651,12 @@ export const questionnaireSteps = {
             subtitle: 'Select any issues your camera has (Check if applicable)',
             type: 'multi-select-grid',
             options: [
-                { id: 'buttons', label: 'Buttons/Dial Not Working', icon: 'MousePointer2' },
-                { id: 'card_slot', label: 'Memory Card Slot Issue', icon: 'CreditCard' },
-                { id: 'hdmi_usb', label: 'HDMI/USB Port Damaged', icon: 'Plug' },
-                { id: 'battery_door', label: 'Battery Door Broken/Loose', icon: 'Battery' },
-                { id: 'mode_dial', label: 'Mode Dial Faulty', icon: 'Settings' },
-                { id: 'mic_jack', label: 'Mic/Audio Jack Not Working', icon: 'Mic' },
+                { id: 'buttons', label: 'Buttons/Dial Not Working', icon: 'MousePointer2', group: 'Buttons & controls' },
+                { id: 'mode_dial', label: 'Mode Dial Faulty', icon: 'Settings', group: 'Buttons & controls' },
+                { id: 'card_slot', label: 'Memory Card Slot Issue', icon: 'CreditCard', group: 'Ports & slots' },
+                { id: 'hdmi_usb', label: 'HDMI/USB Port Damaged', icon: 'Plug', group: 'Ports & slots' },
+                { id: 'mic_jack', label: 'Mic/Audio Jack Not Working', icon: 'Mic', group: 'Ports & slots' },
+                { id: 'battery_door', label: 'Battery Door Broken/Loose', icon: 'Battery', group: 'Miscellaneous' },
             ]
         },
         {
@@ -689,13 +689,13 @@ export const questionnaireSteps = {
                 },
                 {
                     id: 'warranty',
-                    title: 'Warranty Period',
+                    title: 'Device age',
                     type: 'single-select',
                     options: [
-                        { id: '0_3_months', label: '0 - 3 Months', description: 'Valid for 0 to 3 months', icon: 'Clock' },
-                        { id: '3_6_months', label: '3 - 6 Months', description: 'Valid for 3 to 6 months', icon: 'Clock' },
-                        { id: '6_11_months', label: '6 - 11 Months', description: 'Valid for 6 to 11 months', icon: 'Clock' },
-                        { id: 'no', label: 'No Warranty', description: 'Above 11 months or expired', icon: 'XCircle' },
+                        { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
+                        { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
+                        { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
+                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]

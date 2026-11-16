@@ -1,0 +1,467 @@
+{
+  "about" : "Price sheets and answers with the offer each must give. Checked by the backend (PriceSheetGoldenTest) and the phone (mobile/packages/core/src/priceSheet.test.ts); -Dgolden.write=true rewrites the prices.",
+  "sheets" : {
+    "phone" : {
+      "engineVersion" : "golden",
+      "category" : "smartphone",
+      "maxValue" : 51239,
+      "floor" : 7685,
+      "labourFirst" : 300,
+      "labourExtra" : 150,
+      "lines" : [ {
+        "question" : "physical_condition",
+        "answer" : "good",
+        "kind" : "value",
+        "share" : 0.04,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "physical_condition",
+        "answer" : "average",
+        "kind" : "value",
+        "share" : 0.12,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "physical_condition",
+        "answer" : "below_average",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "display",
+        "cost" : 14870,
+        "confidence" : 0.27,
+        "source" : "prior"
+      }, {
+        "question" : "body_condition",
+        "answer" : "good",
+        "kind" : "value",
+        "share" : 0.03,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "body_condition",
+        "answer" : "average",
+        "kind" : "value",
+        "share" : 0.08,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "body_condition",
+        "answer" : "below_average",
+        "kind" : "value",
+        "share" : 0.18,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "functional_issues",
+        "answer" : "wifi",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "board",
+        "cost" : 4130,
+        "confidence" : 0.27,
+        "source" : "prior"
+      }, {
+        "question" : "functional_issues",
+        "answer" : "sim2",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "board",
+        "cost" : 1770,
+        "confidence" : 0.27,
+        "source" : "prior"
+      }, {
+        "question" : "functional_issues",
+        "answer" : "back_camera",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "rear_camera",
+        "cost" : 6300,
+        "confidence" : 0.65,
+        "source" : "official"
+      }, {
+        "question" : "functional_issues",
+        "answer" : "back_camera_blur",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "rear_camera",
+        "cost" : 4410,
+        "confidence" : 0.65,
+        "source" : "official"
+      }, {
+        "question" : "functional_issues",
+        "answer" : "battery_health_low",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "battery",
+        "cost" : 4400,
+        "confidence" : 0.27,
+        "source" : "prior"
+      }, {
+        "question" : "functional_issues",
+        "answer" : "face_sensor",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "face_id",
+        "cost" : 7050,
+        "confidence" : 0.27,
+        "source" : "prior"
+      }, {
+        "question" : "purchase_location",
+        "answer" : "global",
+        "kind" : "value",
+        "share" : 0.1,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "accessories",
+        "answer" : "!charger",
+        "kind" : "value",
+        "share" : 0.01,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "accessories",
+        "answer" : "!box",
+        "kind" : "value",
+        "share" : 0.02,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "accessories",
+        "answer" : "!bill",
+        "kind" : "value",
+        "share" : 0.04,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "warranty",
+        "answer" : "3_6_months",
+        "kind" : "value",
+        "share" : 0.03,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "warranty",
+        "answer" : "no",
+        "kind" : "value",
+        "share" : 0.08,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      } ],
+      "caps" : {
+        "physical_condition" : 0.9,
+        "body_condition" : 0.9,
+        "functional_issues" : 0.5,
+        "purchase_location" : 0.9,
+        "accessories" : 0.1,
+        "warranty" : 0.9
+      },
+      "profitGuard" : null,
+      "confidence" : 0.8,
+      "maxValueSource" : "auto"
+    },
+    "guarded" : {
+      "engineVersion" : "golden",
+      "category" : "smartphone",
+      "maxValue" : 30000,
+      "floor" : 4500,
+      "labourFirst" : 300,
+      "labourExtra" : 150,
+      "lines" : [ {
+        "question" : "physical_condition",
+        "answer" : "average",
+        "kind" : "value",
+        "share" : 0.12,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "physical_condition",
+        "answer" : "below_average",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "display",
+        "cost" : 9000,
+        "confidence" : 0.8,
+        "source" : "observed"
+      }, {
+        "question" : "functional_issues",
+        "answer" : "charging_port",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "charging_port",
+        "cost" : 900,
+        "confidence" : 0.8,
+        "source" : "observed"
+      } ],
+      "caps" : {
+        "physical_condition" : 0.9,
+        "functional_issues" : 0.5
+      },
+      "profitGuard" : {
+        "payable" : 27720,
+        "logistics" : 250,
+        "confidence" : 0.62,
+        "sales" : 6
+      },
+      "confidence" : 0.8,
+      "maxValueSource" : "auto"
+    },
+    "tablet" : {
+      "engineVersion" : "golden",
+      "category" : "tablet",
+      "maxValue" : 42000,
+      "floor" : 6300,
+      "labourFirst" : 400,
+      "labourExtra" : 200,
+      "lines" : [ {
+        "question" : "power",
+        "answer" : "false",
+        "kind" : "value",
+        "share" : 0.6,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "touch",
+        "answer" : "false",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "display",
+        "cost" : 16800,
+        "confidence" : 0.3,
+        "source" : "prior"
+      }, {
+        "question" : "physical_condition",
+        "answer" : "below_average",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "display",
+        "cost" : 16800,
+        "confidence" : 0.3,
+        "source" : "prior"
+      }, {
+        "question" : "wifi",
+        "answer" : "false",
+        "kind" : "repair",
+        "share" : 0,
+        "part" : "board",
+        "cost" : 3600,
+        "confidence" : 0.3,
+        "source" : "prior"
+      }, {
+        "question" : "accessories",
+        "answer" : "!charger",
+        "kind" : "value",
+        "share" : 0.02,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.5,
+        "source" : "builtin"
+      }, {
+        "question" : "extra_admin_question",
+        "answer" : "true",
+        "kind" : "value",
+        "share" : 0.95,
+        "part" : null,
+        "cost" : 0,
+        "confidence" : 0.7,
+        "source" : "admin"
+      } ],
+      "caps" : {
+        "power" : 0.9,
+        "accessories" : 0.1,
+        "extra_admin_question" : 0.9
+      },
+      "profitGuard" : null,
+      "confidence" : 0.6,
+      "maxValueSource" : "manual"
+    },
+    "unpriced" : {
+      "engineVersion" : "golden",
+      "category" : "smartphone",
+      "maxValue" : 0,
+      "floor" : 0,
+      "labourFirst" : 300,
+      "labourExtra" : 150,
+      "lines" : [ ],
+      "caps" : { },
+      "profitGuard" : null,
+      "confidence" : 0,
+      "maxValueSource" : "manual"
+    }
+  },
+  "cases" : [ {
+    "name" : "flawless",
+    "sheet" : "phone",
+    "answers" : {
+      "physical_condition" : "flawless",
+      "body_condition" : "flawless",
+      "functional_issues" : [ ],
+      "purchase_location" : "india",
+      "accessories" : [ "charger", "box", "bill" ],
+      "warranty" : "0_3_months"
+    },
+    "price" : 51239
+  }, {
+    "name" : "nothing answered (no box, no bill, no charger)",
+    "sheet" : "phone",
+    "answers" : { },
+    "price" : 47720
+  }, {
+    "name" : "scratches and age",
+    "sheet" : "phone",
+    "answers" : {
+      "physical_condition" : "good",
+      "body_condition" : "average",
+      "functional_issues" : [ ],
+      "accessories" : [ "charger", "box", "bill" ],
+      "warranty" : "no"
+    },
+    "price" : 41630
+  }, {
+    "name" : "cracked screen",
+    "sheet" : "phone",
+    "answers" : {
+      "physical_condition" : "below_average",
+      "body_condition" : "good",
+      "functional_issues" : [ ],
+      "accessories" : [ "charger", "box", "bill" ]
+    },
+    "price" : 34530
+  }, {
+    "name" : "board faults overlap",
+    "sheet" : "phone",
+    "answers" : {
+      "physical_condition" : "flawless",
+      "functional_issues" : [ "wifi", "sim2" ],
+      "accessories" : [ "charger", "box", "bill" ]
+    },
+    "price" : 46800
+  }, {
+    "name" : "camera and blurry camera",
+    "sheet" : "phone",
+    "answers" : {
+      "functional_issues" : [ "back_camera", "back_camera_blur" ],
+      "accessories" : [ "charger", "box", "bill" ]
+    },
+    "price" : 44630
+  }, {
+    "name" : "everything wrong hits the floor",
+    "sheet" : "phone",
+    "answers" : {
+      "physical_condition" : "below_average",
+      "body_condition" : "below_average",
+      "functional_issues" : [ "wifi", "back_camera", "battery_health_low", "face_sensor" ],
+      "purchase_location" : "global",
+      "accessories" : [ ],
+      "warranty" : "no"
+    },
+    "price" : 7680
+  }, {
+    "name" : "missing accessories capped",
+    "sheet" : "phone",
+    "answers" : {
+      "accessories" : [ "charger" ]
+    },
+    "price" : 48200
+  }, {
+    "name" : "bought abroad",
+    "sheet" : "phone",
+    "answers" : {
+      "purchase_location" : "global",
+      "accessories" : [ "charger", "box", "bill" ]
+    },
+    "price" : 46110
+  }, {
+    "name" : "guard: flawless resells",
+    "sheet" : "guarded",
+    "answers" : {
+      "physical_condition" : "flawless"
+    },
+    "price" : 27470
+  }, {
+    "name" : "guard: screen repair limited by resale",
+    "sheet" : "guarded",
+    "answers" : {
+      "physical_condition" : "below_average"
+    },
+    "price" : 18170
+  }, {
+    "name" : "guard: scratches and port",
+    "sheet" : "guarded",
+    "answers" : {
+      "physical_condition" : "average",
+      "functional_issues" : [ "charging_port" ]
+    },
+    "price" : 22940
+  }, {
+    "name" : "tablet: touch and cracked are one display",
+    "sheet" : "tablet",
+    "answers" : {
+      "touch" : false,
+      "physical_condition" : "below_average",
+      "accessories" : [ "charger" ]
+    },
+    "price" : 24800
+  }, {
+    "name" : "tablet: dead and no wifi",
+    "sheet" : "tablet",
+    "answers" : {
+      "power" : false,
+      "wifi" : false,
+      "accessories" : [ "charger" ]
+    },
+    "price" : 12800
+  }, {
+    "name" : "tablet: share above 90% is held at 90%",
+    "sheet" : "tablet",
+    "answers" : {
+      "extra_admin_question" : true,
+      "accessories" : [ "charger" ]
+    },
+    "price" : 6300
+  }, {
+    "name" : "tablet: yes/no answered well",
+    "sheet" : "tablet",
+    "answers" : {
+      "power" : true,
+      "touch" : true,
+      "wifi" : true,
+      "accessories" : [ "charger" ]
+    },
+    "price" : 42000
+  }, {
+    "name" : "no max value",
+    "sheet" : "unpriced",
+    "answers" : {
+      "physical_condition" : "good"
+    },
+    "price" : 0
+  } ]
+}

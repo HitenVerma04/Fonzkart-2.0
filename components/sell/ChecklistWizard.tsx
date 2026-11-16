@@ -56,8 +56,8 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                 const newOptions = step.options.flatMap((opt: any) => {
                     if (opt.id === 'battery') {
                         return [
-                            { id: 'battery_health_low', label: 'Battery Health < 85%', icon: 'Battery' },
-                            { id: 'battery_health_high', label: 'Battery Health > 85%', icon: 'Battery' }
+                            { id: 'battery_health_low', label: 'Battery Health < 85%', icon: 'Battery', group: opt.group },
+                            { id: 'battery_health_high', label: 'Battery Health > 85%', icon: 'Battery', group: opt.group }
                         ];
                     }
                     return opt;
@@ -174,9 +174,9 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                             </div>
                         ))}
 
-                        {(currentStep.type === 'multi-select' || currentStep.type === 'multi-select-grid' || currentStep.type === 'single-select') && (
-                            <div className={`grid gap-4 ${currentStep.type === 'multi-select-grid' || currentStep.type === 'single-select' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2' : 'grid-cols-1 md:grid-cols-2'}`}>
-                                {currentStep.options?.map((opt: { id: string; label: string; description?: string; icon?: string }) => {
+                        {(currentStep.type === 'multi-select' || currentStep.type === 'multi-select-grid' || currentStep.type === 'single-select') && (() => {
+                            const gridClass = `grid gap-4 ${currentStep.type === 'multi-select-grid' || currentStep.type === 'single-select' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2' : 'grid-cols-1 md:grid-cols-2'}`;
+                            const renderOption = (opt: { id: string; label: string; description?: string; icon?: string; group?: string }) => {
                                     const isMulti = currentStep.type !== 'single-select';
                                     const isSelected = isMulti
                                         ? (answers[currentStep.id] as string[])?.includes(opt.id)
@@ -216,9 +216,30 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                                             </div>
                                         </button>
                                     );
-                                })}
-                            </div>
-                        )}
+                            };
+                            // Problem lists come under headings (Camera, Buttons & controls, ...), like the sections of Device Details.
+                            const options: { id: string; label: string; description?: string; icon?: string; group?: string }[] = currentStep.options ?? [];
+                            if (!options.some(opt => opt.group)) return <div className={gridClass}>{options.map(renderOption)}</div>;
+                            // Problems that fit no group (or have none) go last, under Miscellaneous.
+                            const MISC = 'Miscellaneous';
+                            const groups = options.reduce<{ title: string; options: typeof options }[]>((list, opt) => {
+                                const title = opt.group || MISC;
+                                const found = list.find(g => g.title === title);
+                                if (found) found.options.push(opt);
+                                else list.push({ title, options: [opt] });
+                                return list;
+                            }, []).sort((a, b) => Number(a.title === MISC) - Number(b.title === MISC));
+                            return (
+                                <div className="space-y-8">
+                                    {groups.map(g => (
+                                        <div key={g.title} className="space-y-4">
+                                            <h3 className="font-semibold text-lg border-b pb-2">{g.title}</h3>
+                                            <div className={gridClass}>{g.options.map(renderOption)}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })()}
 
                         {currentStep.type === 'combined-step' && (
                             <div className="space-y-10">

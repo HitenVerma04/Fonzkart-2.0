@@ -59,6 +59,14 @@ export {
   useCitiesOverview,
   usePartnersOverview,
   usePricingRules,
+  usePricingSettings,
+  engineKeys,
+  useDeviceSales,
+  useEngineOverview,
+  useEngineSuggestions,
+  usePriceSheet,
+  useRepairCosts,
+  useVariantPricing,
   useRmDashboard,
   useStaffDirectory,
   useZonalHeads,
@@ -90,6 +98,18 @@ export {
   useServerHealth,
   useVariants,
 } from './hooks';
+export {
+  pricingEngineApi,
+  type DeviceSale,
+  type EngineOverview,
+  type PriceBreakdownItem,
+  type RecordSaleInput,
+  type RepairCostInput,
+  type RepairCostRow,
+  type RunResult,
+  type Suggestion,
+  type VariantPricingInfo,
+} from './pricingEngine';
 export { SessionProvider, tokenUser, useSession, type SessionState, type TokenStorage } from './session';
 export { ridersApi, type RidersOverview, type TeamRider } from './riders';
 export {
@@ -98,6 +118,8 @@ export {
   type City,
   type CityWithUsers,
   type EvaluationRule,
+  type PricingSettings,
+  type MaxValueSuggestion,
   type PartnerOverviewItem,
   type PartnersOverview,
   type RmPartner,

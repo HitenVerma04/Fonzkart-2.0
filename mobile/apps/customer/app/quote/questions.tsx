@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Platform, ScrollView, Text, View, type ScrollViewInstance } from 'react-native';
 import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useQuestionnaire } from '@fonzkart/api';
-import { isStepComplete, stepsForDevice, type Answers } from '@fonzkart/core';
+import { usePriceSheet, useQuestionnaire } from '@fonzkart/api';
+import { formatInr, isStepComplete, priceFromSheet, stepQuestionIds, stepsForDevice, type Answers } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import {
   ActionBar, Button, EmptyState, ErrorState, MAX_CONTENT, motion, PAGE_PADDING, ProductImage, deviceKindOf, QuestionStepView, radii,
@@ -30,6 +30,13 @@ export default function Questions() {
     [questionnaire.data, draft],
   );
   const step = steps[index];
+
+  // The live price: the device's price sheet comes once, then every tick and untick is priced here at once. Only the
+  // questions reached so far count, so accessories not asked about yet do not count as missing. Hidden if the sheet
+  // cannot be had (offline): the offer screen still has the server's price.
+  const sheet = usePriceSheet(draft?.modelName, draft?.variantName);
+  const reached = useMemo(() => new Set(steps.slice(0, index + 1).flatMap(stepQuestionIds)), [steps, index]);
+  const live = useMemo(() => (sheet.data ? priceFromSheet(sheet.data, answers, reached) : null), [sheet.data, answers, reached]);
 
   // Saved progress from an older questionnaire can point past its end: open its last question instead.
   useEffect(() => {
@@ -118,6 +125,20 @@ export default function Questions() {
           </View>
         </View>
 
+        {live && sheet.data && sheet.data.maxValue > 0 ? (
+          <View style={styles.live} accessibilityLiveRegion="polite" accessibilityLabel={`Estimated price ${formatInr(live.price)}`}>
+            <View style={styles.liveText}>
+              <Text style={styles.liveLabel}>Estimated price</Text>
+              <Text style={styles.liveHint}>
+                {live.price < sheet.data.maxValue
+                  ? `${formatInr(sheet.data.maxValue - live.price)} off the max value`
+                  : 'Nothing taken off yet'}
+              </Text>
+            </View>
+            <Animated.Text key={live.price} entering={FadeIn.duration(220)} style={styles.livePrice}>{formatInr(live.price)}</Animated.Text>
+          </View>
+        ) : null}
+
         <Animated.View key={step.id} entering={FadeIn.duration(260)}>
           <QuestionStepView step={step} answers={answers} onChange={set} />
         </Animated.View>
@@ -153,6 +174,14 @@ const useStyles = makeStyles(colors => ({
   progressPercent: { ...type.small, fontWeight: '700', color: colors.muted },
   track: { height: 8, borderRadius: 4, backgroundColor: colors.placeholder, overflow: 'hidden' },
   fill: { width: '100%', height: 8, borderRadius: 4 },
+  live: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.greenTint, borderRadius: radii.lg,
+    borderWidth: 1, borderColor: colors.border, paddingVertical: 10, paddingHorizontal: 14,
+  },
+  liveText: { flex: 1, gap: 2 },
+  liveLabel: { ...type.small, fontWeight: '700', color: colors.navy },
+  liveHint: { ...type.tiny, color: colors.muted },
+  livePrice: { fontSize: 22, lineHeight: 28, fontWeight: '800', color: colors.green, fontVariant: ['tabular-nums'] },
   back: { flex: 1 },
   continue: { flex: 2 },
 }));

@@ -663,6 +663,53 @@ export async function upsertEvaluationRule(data: { category: string, questionKey
     return { success: true };
 }
 
+/** How offers are priced for a category (the backend's formula): the lowest offer and each answer's built-in share. */
+export type PricingSettings = {
+    category: string;
+    minOfferPercent: number;
+    defaultMinOfferPercent: number;
+    defaults: { questionKey: string; answerKey: string; percent: number }[];
+    caps: Record<string, number>;
+};
+
+export async function getPricingSettings(category: string) {
+    const { data } = await backendRequest<PricingSettings>('GET', '/api/pricing/settings', { query: { category } });
+    return data;
+}
+
+/** Removes an admin's rule (administrators only): the answer takes its built-in share again. */
+export async function deleteEvaluationRule(category: string, questionKey: string, answerKey: string) {
+    try {
+        await backendRequest('DELETE', '/api/pricing/rules', { query: { category, questionKey, answerKey } });
+    } catch (e) {
+        return { error: e instanceof Error ? e.message : 'Could not change it.' };
+    }
+    revalidatePath(`/admin/category/${category}`);
+    return { success: true };
+}
+
+/** The max value the backend's rule suggests for a launch price (₹) and launch month (YYYY-MM). */
+export async function suggestMaxValue(launchPrice: number, launched: string, category: string, brand: string) {
+    try {
+        const { data } = await backendRequest<{ maxValue: number; ageMonths: number; keptPercent: number; tier: string }>('GET', '/api/pricing/max-value',
+            { query: { launchPrice: String(launchPrice), launched, category, brand } });
+        return { success: true as const, ...data! };
+    } catch (e) {
+        return { error: e instanceof Error ? e.message : 'Could not work it out.' };
+    }
+}
+
+/** The lowest offer, in percent of the max value, for every category (administrators only). */
+export async function savePricingMinOffer(minOfferPercent: number) {
+    try {
+        await backendRequest('PUT', '/api/pricing/settings', { body: { minOfferPercent } });
+    } catch (e) {
+        return { error: e instanceof Error ? e.message : 'Could not save.' };
+    }
+    revalidatePath('/admin/category', 'layout');
+    return { success: true };
+}
+
 import { fetchAllBannerPrices, saveBannerPriceItem } from '@/lib/banner-prices';
 
 // --- Device Display Prices ---

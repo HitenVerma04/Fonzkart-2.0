@@ -6,8 +6,8 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useQueryClient } from '@tanstack/react-query';
-import { executiveApi, executiveKeys, uploadImage, useExecutiveOrder, useQuestionnaire, useQuote } from '@fonzkart/api';
-import { formatInr, imageUrl, parseAnswers, splitDevice, stepsForDevice, type Answers } from '@fonzkart/core';
+import { executiveApi, executiveKeys, uploadImage, useExecutiveOrder, usePriceSheet, useQuestionnaire, useQuote } from '@fonzkart/api';
+import { formatInr, imageUrl, parseAnswers, priceFromSheet, splitDevice, stepsForDevice, type Answers } from '@fonzkart/core';
 import { Button, Card, EmptyState, ErrorState, Loading, Notice, QuestionStepView, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
 import { ImeiScanner } from '../../../src/ImeiScanner';
 
@@ -23,6 +23,9 @@ export default function DeviceCheck() {
   const [answers, setAnswers] = useState<Answers | null>(null);
   const current = answers ?? (order.data ? (parseAnswers(order.data.answers) as Answers) : undefined);
   const quote = useQuote(device?.model, device?.variant, current);
+  // The same price at once from the device's price sheet while the server's price for the new answers is on its way.
+  const sheet = usePriceSheet(device?.model, device?.variant);
+  const category = quote.data?.category ?? sheet.data?.category;
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [imei, setImei] = useState('');
@@ -34,8 +37,8 @@ export default function DeviceCheck() {
   const [error, setError] = useState('');
 
   const steps = useMemo(
-    () => (questionnaire.data && device && quote.data ? stepsForDevice(questionnaire.data, quote.data.category, device.model) : []),
-    [questionnaire.data, device, quote.data],
+    () => (questionnaire.data && device && category ? stepsForDevice(questionnaire.data, category, device.model) : []),
+    [questionnaire.data, device, category],
   );
 
   if (order.isPending || questionnaire.isPending) return <Loading />;
@@ -43,7 +46,8 @@ export default function DeviceCheck() {
   if (!device) return <EmptyState message="This device can't be checked in the app. Use the website." />;
 
   const o = order.data;
-  const computed = quote.data?.price;
+  const instant = sheet.data && current ? priceFromSheet(sheet.data, current).price : undefined;
+  const computed = quote.data?.price ?? instant;
   const offered = offer !== null ? Number(offer.replace(/\D/g, '')) : computed;
   const set = (key: string, value: Answers[string]) => setAnswers(prev => ({ ...(prev ?? (parseAnswers(o.answers) as Answers)), [key]: value }));
 
@@ -130,7 +134,7 @@ export default function DeviceCheck() {
       </Card>
 
       <Card title="Price">
-        {quote.isPending ? <Loading label="Calculating…" /> : null}
+        {quote.isPending && instant === undefined ? <Loading label="Calculating…" /> : null}
         {typeof computed === 'number' ? <Text style={styles.muted}>Price for the checked answers: {formatInr(computed)}</Text> : null}
         <TextField label="Your offer (₹)" value={offer ?? (computed !== undefined ? String(computed) : '')}
           onChangeText={setOffer} keyboardType="number-pad" />

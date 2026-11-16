@@ -54,7 +54,10 @@ export default function VerificationModal({ order, onClose, onSubmit }: { order:
         setIsCalculating(true);
         try {
             const startPrice = basePrice || order.price;
-            const calculated = await calculatePrice(startPrice, newAnswers, deviceCategory);
+            // "iPhone 13 (128GB)": the model and variant, so the device is priced from its own repair costs
+            const named = /^(.*) \(([^()]*)\)$/.exec(order.device);
+            const calculated = await calculatePrice(startPrice, newAnswers, deviceCategory,
+                named ? { name: named[1], variant: named[2] } : undefined);
             setFinalPrice(calculated);
             setStep('imei');
         } catch {

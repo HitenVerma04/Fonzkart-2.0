@@ -6,6 +6,7 @@ import ModelManager from './ModelManager';
 // VariantManager is removed as it's merged into ModelManager
 import PricingRulesManager from './PricingRulesManager';
 import { Brand, Model, Variant } from '@/lib/store';
+import type { PricingSettings } from '@/actions/admin';
 
 interface Props {
     category: string;
@@ -14,11 +15,12 @@ interface Props {
     variants: Variant[];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rules?: any[];
+    pricing?: PricingSettings | null;
 }
 
 type Tab = 'brands' | 'models' | 'rules';
 
-export default function ClientCategoryManager({ category, brands, models, variants, rules }: Props) {
+export default function ClientCategoryManager({ category, brands, models, variants, rules, pricing }: Props) {
     const [activeTab, setActiveTab] = useState<Tab>('models');
     const [selectedBrandId, setSelectedBrandId] = useState<string>('all');
 
@@ -156,10 +158,10 @@ export default function ClientCategoryManager({ category, brands, models, varian
                     <div className="space-y-8">
                         <div>
                             <div className="mb-4">
-                                <h2 className="text-xl font-bold">Condition Rules</h2>
-                                <p className="text-sm text-muted-foreground">Configure global deductions for specific defects.</p>
+                                <h2 className="text-xl font-bold">Condition Pricing</h2>
+                                <p className="text-sm text-muted-foreground">How much each answer takes off the max value, and the lowest offer.</p>
                             </div>
-                            <PricingRulesManager category={category} initialRules={rules || []} />
+                            <PricingRulesManager category={category} initialRules={rules || []} pricing={pricing ?? null} />
                         </div>
                     </div>
                 )}

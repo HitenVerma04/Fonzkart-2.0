@@ -146,7 +146,7 @@
        "phone": "+916000000001"
       },
       "device": "Galaxy S21 (8GB + 128GB)",
-      "price": 11750,
+      "price": 13460,
       "date": "<date>",
       "status": "Pending Pickup",
       "address": "4 Temple St, Madurai",
@@ -186,7 +186,7 @@
        "phone": "+916000000001"
       },
       "device": "iPhone 13 (128GB)",
-      "price": 25966,
+      "price": 25460,
       "date": "<date>",
       "status": "Pending Pickup",
       "address": "9 Beach Rd, Chennai",
@@ -441,7 +441,7 @@
         "phone": "+917000000009"
        },
        "device": "Galaxy S21 (8GB + 256GB)",
-       "price": 6650,
+       "price": 9390,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "Far away",
@@ -473,7 +473,7 @@
         "phone": "+916000000001"
        },
        "device": "Galaxy S21 (8GB + 128GB)",
-       "price": 11750,
+       "price": 13460,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "4 Temple St, Madurai",
@@ -512,7 +512,7 @@
         "phone": "+916000000001"
        },
        "device": "iPhone 13 (128GB)",
-       "price": 25966,
+       "price": 25460,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "9 Beach Rd, Chennai",
@@ -875,7 +875,7 @@
         "phone": "+917000000009"
        },
        "device": "Galaxy S21 (8GB + 256GB)",
-       "price": 6650,
+       "price": 9390,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "Far away",
@@ -907,7 +907,7 @@
         "phone": "+916000000001"
        },
        "device": "Galaxy S21 (8GB + 128GB)",
-       "price": 11750,
+       "price": 13460,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "4 Temple St, Madurai",
@@ -946,7 +946,7 @@
         "phone": "+916000000001"
        },
        "device": "iPhone 13 (128GB)",
-       "price": 25966,
+       "price": 25460,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "9 Beach Rd, Chennai",
@@ -1270,7 +1270,7 @@
         "phone": "+916000000001"
        },
        "device": "iPhone 13 (128GB)",
-       "price": 25966,
+       "price": 25460,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "9 Beach Rd, Chennai",
@@ -1416,7 +1416,7 @@
         "phone": "+916000000001"
        },
        "device": "Galaxy S21 (8GB + 128GB)",
-       "price": 11750,
+       "price": 13460,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "4 Temple St, Madurai",
@@ -1599,7 +1599,7 @@
         "phone": "+916000000001"
        },
        "device": "iPhone 13 (128GB)",
-       "price": 25966,
+       "price": 25460,
        "date": "<date>",
        "status": "Pending Pickup",
        "address": "9 Beach Rd, Chennai",
@@ -1920,7 +1920,7 @@
        "phone": "+917000000009"
       },
       "device": "Galaxy S21 (8GB + 256GB)",
-      "price": 6650,
+      "price": 9390,
       "date": "<date>",
       "status": "assigned",
       "address": "Far away",
@@ -1961,7 +1961,7 @@
        "phone": "+916000000001"
       },
       "device": "iPhone 13 (128GB)",
-      "price": 25966,
+      "price": 25460,
       "date": "<date>",
       "status": "assigned",
       "address": "9 Beach Rd, Chennai",
@@ -2013,7 +2013,7 @@
        "phone": "+916000000001"
       },
       "device": "Galaxy S21 (8GB + 128GB)",
-      "price": 11750,
+      "price": 13460,
       "date": "<date>",
       "status": "assigned",
       "address": "4 Temple St, Madurai",
@@ -2279,7 +2279,7 @@
      "status": 200,
      "body": {
       "success": true,
-      "price": 6650
+      "price": 9390
      }
     }
    }
@@ -2497,7 +2497,7 @@
        "userId": "<user:p1@example.test>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#1>",
        "riderId": null,
@@ -2507,7 +2507,7 @@
        "userId": "<user:p1@example.test>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#3>",
        "riderId": null,
@@ -2577,7 +2577,7 @@
        "userId": "<user:rm@example.test>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#1>",
        "riderId": null,
@@ -2587,7 +2587,7 @@
        "userId": "<user:rm@example.test>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#3>",
        "riderId": null,
@@ -2637,7 +2637,7 @@
        "userId": "<user:admin@fonzkart.in>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#1>",
        "riderId": null,
@@ -2647,7 +2647,7 @@
        "userId": "<user:admin@fonzkart.in>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#3>",
        "riderId": null,
@@ -2727,7 +2727,7 @@
        "userId": "<user:ops@example.test>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#1>",
        "riderId": null,
@@ -2737,7 +2737,7 @@
        "userId": "<user:ops@example.test>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#3>",
        "riderId": null,
@@ -2785,7 +2785,7 @@
        "userId": "<user:p1@example.test>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+       "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#1>",
        "riderId": null,
@@ -2795,7 +2795,7 @@
        "userId": "<user:p1@example.test>",
        "role": null,
        "title": "Price approval needed",
-       "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+       "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
        "type": "order_price_review",
        "orderId": "<order:#3>",
        "riderId": null,
@@ -2887,7 +2887,7 @@
        "upiId": "cust@upi",
        "imei": "356789012345678",
        "priceReview": {
-        "quotedPrice": 25966,
+        "quotedPrice": 25460,
         "requestedPrice": 1234,
         "requestedAt": "<date>",
         "decision": "approved",
@@ -2895,7 +2895,7 @@
         "decidedBy": "RELATIONSHIP_MANAGER",
         "approvedPrice": 1500
        },
-       "quotedPrice": 25966,
+       "quotedPrice": 25460,
        "hubStatus": "handed_over",
        "payout": {
         "status": "paid",
@@ -3122,7 +3122,7 @@
        "phone": "+917000000009"
       },
       "device": "Galaxy S21 (8GB + 256GB)",
-      "price": 6650,
+      "price": 9390,
       "date": "<date>",
       "status": "failed",
       "address": "Far away",
@@ -3145,7 +3145,7 @@
         }
        ],
        "priceReview": {
-        "quotedPrice": 6650,
+        "quotedPrice": 9390,
         "requestedPrice": 999,
         "requestedAt": "<date>",
         "decision": "rejected",
@@ -3251,7 +3251,7 @@
        "phone": "+917000000009"
       },
       "device": "Galaxy S21 (8GB + 256GB)",
-      "price": 6650,
+      "price": 9390,
       "date": "<date>",
       "status": "failed",
       "address": "Far away",
@@ -3274,7 +3274,7 @@
         }
        ],
        "priceReview": {
-        "quotedPrice": 6650,
+        "quotedPrice": 9390,
         "requestedPrice": 999,
         "requestedAt": "<date>",
         "decision": "rejected",
@@ -3370,7 +3370,7 @@
        "upiId": "cust@upi",
        "imei": "356789012345678",
        "priceReview": {
-        "quotedPrice": 25966,
+        "quotedPrice": 25460,
         "requestedPrice": 1234,
         "requestedAt": "<date>",
         "decision": "approved",
@@ -3378,7 +3378,7 @@
         "decidedBy": "RELATIONSHIP_MANAGER",
         "approvedPrice": 1500
        },
-       "quotedPrice": 25966,
+       "quotedPrice": 25460,
        "hubStatus": "handed_over",
        "payout": {
         "status": "paid",
@@ -3455,7 +3455,7 @@
         "phone": "+917000000009"
        },
        "device": "Galaxy S21 (8GB + 256GB)",
-       "price": 6650,
+       "price": 9390,
        "date": "<date>",
        "status": "failed",
        "address": "Far away",
@@ -3478,7 +3478,7 @@
          }
         ],
         "priceReview": {
-         "quotedPrice": 6650,
+         "quotedPrice": 9390,
          "requestedPrice": 999,
          "requestedAt": "<date>",
          "decision": "rejected",
@@ -3574,7 +3574,7 @@
         "upiId": "cust@upi",
         "imei": "356789012345678",
         "priceReview": {
-         "quotedPrice": 25966,
+         "quotedPrice": 25460,
          "requestedPrice": 1234,
          "requestedAt": "<date>",
          "decision": "approved",
@@ -3582,7 +3582,7 @@
          "decidedBy": "RELATIONSHIP_MANAGER",
          "approvedPrice": 1500
         },
-        "quotedPrice": 25966,
+        "quotedPrice": 25460,
         "hubStatus": "handed_over",
         "payout": {
          "status": "paid",
@@ -3948,7 +3948,7 @@
         "phone": "+917000000009"
        },
        "device": "Galaxy S21 (8GB + 256GB)",
-       "price": 6650,
+       "price": 9390,
        "date": "<date>",
        "status": "failed",
        "address": "Far away",
@@ -3971,7 +3971,7 @@
          }
         ],
         "priceReview": {
-         "quotedPrice": 6650,
+         "quotedPrice": 9390,
          "requestedPrice": 999,
          "requestedAt": "<date>",
          "decision": "rejected",
@@ -4067,7 +4067,7 @@
         "upiId": "cust@upi",
         "imei": "356789012345678",
         "priceReview": {
-         "quotedPrice": 25966,
+         "quotedPrice": 25460,
          "requestedPrice": 1234,
          "requestedAt": "<date>",
          "decision": "approved",
@@ -4075,7 +4075,7 @@
          "decidedBy": "RELATIONSHIP_MANAGER",
          "approvedPrice": 1500
         },
-        "quotedPrice": 25966,
+        "quotedPrice": 25460,
         "hubStatus": "handed_over",
         "payout": {
          "status": "paid",
@@ -4246,7 +4246,7 @@
      "upiId": "cust@upi",
      "imei": "356789012345678",
      "priceReview": {
-      "quotedPrice": 25966,
+      "quotedPrice": 25460,
       "requestedPrice": 1234,
       "requestedAt": "<date>",
       "decision": "approved",
@@ -4254,7 +4254,7 @@
       "decidedBy": "RELATIONSHIP_MANAGER",
       "approvedPrice": 1500
      },
-     "quotedPrice": 25966,
+     "quotedPrice": 25460,
      "hubStatus": "handed_over",
      "payout": {
       "status": "paid",
@@ -4287,7 +4287,7 @@
     "riderId": "<rider:+917000000001>",
     "partnerId": "<user:p1@example.test>",
     "device": "Galaxy S21 (8GB + 256GB)",
-    "price": 6650,
+    "price": 9390,
     "status": "failed",
     "pincode": "111111",
     "address": "Far away",
@@ -4309,7 +4309,7 @@
       }
      ],
      "priceReview": {
-      "quotedPrice": 6650,
+      "quotedPrice": 9390,
       "requestedPrice": 999,
       "requestedAt": "<date>",
       "decision": "rejected",
@@ -4733,7 +4733,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#1>",
     "isRead": false
@@ -4743,7 +4743,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#1>",
     "isRead": false
@@ -4753,7 +4753,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#1>",
     "isRead": true
@@ -4763,7 +4763,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#1>",
     "isRead": false
@@ -4773,7 +4773,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #1: the executive offers ₹1234 instead of ₹25966. Approve or reject it.",
+    "message": "Order #1: the executive offers ₹1234 instead of ₹25460. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#1>",
     "isRead": false
@@ -4783,7 +4783,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#3>",
     "isRead": false
@@ -4793,7 +4793,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#3>",
     "isRead": false
@@ -4803,7 +4803,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#3>",
     "isRead": true
@@ -4813,7 +4813,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#3>",
     "isRead": false
@@ -4823,7 +4823,7 @@
     "role": null,
     "riderId": null,
     "title": "Price approval needed",
-    "message": "Order #3: the executive offers ₹999 instead of ₹6650. Approve or reject it.",
+    "message": "Order #3: the executive offers ₹999 instead of ₹9390. Approve or reject it.",
     "type": "order_price_review",
     "orderId": "<order:#3>",
     "isRead": false

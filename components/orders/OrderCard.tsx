@@ -11,7 +11,7 @@ interface OrderCardProps {
 }
 
 import OrderStepper from './OrderStepper';
-import { ORDER_STATUS, TONE_BADGE, displayPhone, parseAnswers, payoutOf, priceReviewOf, quotedPriceOf, statusLabel, statusTone } from '@/lib/order-status';
+import { ORDER_STATUS, TONE_BADGE, deviceAgeLabel, displayPhone, parseAnswers, payoutOf, priceReviewOf, quotedPriceOf, statusLabel, statusTone } from '@/lib/order-status';
 export default function OrderCard({ order }: OrderCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -247,12 +247,12 @@ export default function OrderCard({ order }: OrderCardProps) {
                                         </div>
                                     )}
 
-                                    {/* Warranty Period */}
+                                    {/* Device age (answer key "warranty") */}
                                     {answers.warranty && (
                                         <div className="flex justify-between items-start gap-4 pb-3 border-b border-border">
-                                            <span className="text-muted-foreground">Warranty Period</span>
-                                            <span className="font-medium text-right text-foreground max-w-[50%] capitalize">
-                                                {String(answers.warranty).replace(/_/g, ' ').replace('months', 'Months')}
+                                            <span className="text-muted-foreground">Device age</span>
+                                            <span className="font-medium text-right text-foreground max-w-[50%]">
+                                                {deviceAgeLabel(answers.warranty)}
                                             </span>
                                         </div>
                                     )}

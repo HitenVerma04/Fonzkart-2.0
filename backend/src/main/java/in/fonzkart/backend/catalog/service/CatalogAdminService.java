@@ -2,6 +2,7 @@ package in.fonzkart.backend.catalog.service;
 
 import in.fonzkart.backend.auth.rules.StaffAccess;
 import in.fonzkart.backend.auth.session.SessionPayload;
+import in.fonzkart.backend.pricing.data.PricingData;
 import in.fonzkart.backend.shared.text.JsText;
 import in.fonzkart.backend.shared.web.ActionException;
 import java.sql.Array;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +34,12 @@ public class CatalogAdminService {
 
     private final StaffAccess staffAccess;
     private final JdbcTemplate jdbc;
+    private final PricingData pricingData;
 
-    public CatalogAdminService(StaffAccess staffAccess, JdbcTemplate jdbc) {
+    public CatalogAdminService(StaffAccess staffAccess, JdbcTemplate jdbc, PricingData pricingData) {
         this.staffAccess = staffAccess;
         this.jdbc = jdbc;
+        this.pricingData = pricingData;
     }
 
     private void requireAdmin(Optional<SessionPayload> session) {
@@ -172,7 +176,17 @@ public class CatalogAdminService {
     public Map<String, Object> updateVariant(Optional<SessionPayload> session, String id, String modelId, String name,
                                              Integer basePrice) {
         requireAdmin(session);
+        List<Integer> before = jdbc.query("SELECT \"basePrice\" FROM \"Variant\" WHERE id = ?", (rs, i) -> (Integer) rs.getObject(1), id);
         update("UPDATE \"Variant\" SET \"modelId\" = ?, name = ?, \"basePrice\" = ? WHERE id = ?", modelId, name, basePrice, id);
+        Integer old = before.isEmpty() ? null : before.get(0);
+        if (!java.util.Objects.equals(old, basePrice)) {
+            // An admin's own price: the monthly revaluation leaves it alone (see PricingData#pinManual).
+            try {
+                pricingData.pinManual(id, old, basePrice, session.map(sp -> sp.user() == null ? null : sp.user().name()).orElse("admin"));
+            } catch (RuntimeException e) {
+                LoggerFactory.getLogger(CatalogAdminService.class).warn("[pricing] price edit not recorded: {}", e.getMessage());
+            }
+        }
         return result(null, null);
     }
 

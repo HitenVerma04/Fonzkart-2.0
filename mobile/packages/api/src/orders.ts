@@ -2,6 +2,7 @@
 // (Customer app), the field executive's (Partner app, rider mode) and the staff's (Partner and Admin apps). The
 // same endpoints serve the website, so an order changed in any app or on the website looks the same everywhere.
 import { request } from './client';
+import type { PriceBreakdownItem } from './pricingEngine';
 
 /** An order as the backend returns it (the website's lib/store.ts → Order). */
 export interface AppOrder {
@@ -37,6 +38,12 @@ export interface Quote {
   price: number;
   basePrice: number;
   category: string;
+  /** How sure the offer is (0–1); older servers leave it out. */
+  confidence?: number;
+  floorApplied?: boolean;
+  /** Max value → offer, step by step. */
+  breakdown?: PriceBreakdownItem[];
+  engineVersion?: string;
 }
 
 export interface PlaceOrderInput {

@@ -3,6 +3,7 @@ import { db } from '@/lib/store';
 import ClientCategoryManager from '@/components/admin/ClientCategoryManager';
 import { redirect } from 'next/navigation';
 import { ADMINS, hasStaffRole } from '@/lib/staff-access';
+import { getPricingSettings } from '@/actions/admin';
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     // Catalog and pricing rules are for administrators (sidebar "Inventory": SUPER_ADMIN and ADMIN only).
@@ -26,9 +27,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     const categoryModelIds = new Set(models.map(m => m.id));
     const categoryVariants = variants.filter(v => categoryModelIds.has(v.modelId));
 
-    // Fetch Evaluation/Pricing Rules
+    // Fetch Evaluation/Pricing Rules, and how offers are worked out (built-in shares, lowest offer) from the backend
     const rulesRaw = await db.getEvaluationRules(slug);
     const rules = JSON.parse(JSON.stringify(rulesRaw));
+    const pricing = await getPricingSettings(slug).catch(() => null);
 
     return (
         <ClientCategoryManager
@@ -37,6 +39,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             models={models}
             variants={categoryVariants}
             rules={rules}
+            pricing={pricing}
         />
     );
 }

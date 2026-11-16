@@ -7,6 +7,8 @@ export interface QuestionOption {
   label: string;
   description?: string;
   icon?: string;
+  /** The heading this option is shown under in a tick-all-that-apply list ("Camera", "Buttons & controls"). */
+  group?: string;
 }
 
 export interface YesNoQuestion {
@@ -58,8 +60,8 @@ export function stepsForDevice(questionnaire: Questionnaire, category: string | 
     const options = step.options.flatMap(option =>
       option.id === 'battery'
         ? [
-            { id: 'battery_health_low', label: 'Battery Health < 85%', icon: 'Battery' },
-            { id: 'battery_health_high', label: 'Battery Health > 85%', icon: 'Battery' },
+            { id: 'battery_health_low', label: 'Battery Health < 85%', icon: 'Battery', group: option.group },
+            { id: 'battery_health_high', label: 'Battery Health > 85%', icon: 'Battery', group: option.group },
           ]
         : [option],
     );
@@ -86,6 +88,48 @@ export function toggleOption(current: Answers[string] | undefined, optionId: str
 /** True when the step (or section) records several choices. */
 export function isMultiSelect(type: string | undefined): boolean {
   return type === 'multi-select' || type === 'multi-select-grid';
+}
+
+/**
+ * The headings of the functional problems, in display order, and which problems go under each. The questionnaire
+ * carries the same groups on each option (`group`); this list is used when it does not (a server from before the
+ * groups), so every app version shows the problems grouped.
+ */
+export const ISSUE_GROUPS: { title: string; ids: string[] }[] = [
+  { title: 'Network & connectivity', ids: ['wifi', 'sim1', 'sim2', 'bluetooth'] },
+  { title: 'Camera', ids: ['front_camera', 'back_camera', 'camera_glass', 'front_camera_blur', 'back_camera_blur'] },
+  { title: 'Sensors', ids: ['finger_sensor', 'face_sensor', 'proximity', 'heart_sensor', 'remote_sensor'] },
+  { title: 'Buttons & controls', ids: ['power_button', 'volume_button', 'silent_button', 'buttons', 'crown', 'mode_dial'] },
+  { title: 'Sound & vibration', ids: ['speaker', 'earpiece', 'microphone', 'audio_ic', 'vibrator', 'sound'] },
+  { title: 'Battery & charging', ids: ['battery', 'battery_health_low', 'battery_health_high', 'battery_low', 'charging_port'] },
+  { title: 'Display & power', ids: ['display_flicker', 'power_fault'] },
+  { title: 'Ports & slots', ids: ['ports', 'hdmi_usb', 'card_slot', 'mic_jack'] },
+];
+
+/** The heading of problems that fit no other group (always shown last). */
+export const MISC_GROUP = 'Miscellaneous';
+
+/**
+ * A list of options split under headings: each option's own `group`, or for the functional problems step the
+ * group {@link ISSUE_GROUPS} gives it. Known headings come in ISSUE_GROUPS order, others in the order they appear,
+ * and options with no heading last under "Miscellaneous". A list without any heading comes back as one group with no
+ * title.
+ */
+export function groupOptions(options: QuestionOption[], stepId?: string): { title?: string; options: QuestionOption[] }[] {
+  const headingOf = (o: QuestionOption) =>
+    o.group ?? (stepId === 'functional_issues' ? ISSUE_GROUPS.find(g => g.ids.includes(o.id))?.title : undefined);
+  if (!options.some(o => headingOf(o))) return [{ options }];
+  const order = ISSUE_GROUPS.map(g => g.title);
+  const groups = new Map<string, QuestionOption[]>();
+  for (const o of options) {
+    const title = headingOf(o) ?? MISC_GROUP;
+    groups.set(title, [...(groups.get(title) ?? []), o]);
+  }
+  const rank = (title: string) => (title === MISC_GROUP ? 1e6 : order.includes(title) ? order.indexOf(title) : 1e3);
+  return [...groups.entries()]
+    .map(([title, list], index) => ({ title, options: list, index }))
+    .sort((a, b) => rank(a.title) - rank(b.title) || a.index - b.index)
+    .map(({ title, options: list }) => ({ title, options: list }));
 }
 
 /** Readable summary of the answers, in step order, for the offer screen. */

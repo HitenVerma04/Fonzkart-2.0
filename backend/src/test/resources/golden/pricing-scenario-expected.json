@@ -472,25 +472,25 @@
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 18985
+    "returned": 17980
    }
   },
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 24700
+    "returned": 26630
    }
   },
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 8000
+    "returned": 3520
    }
   },
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 3700
+    "returned": 3520
    }
   },
   {
@@ -835,19 +835,19 @@
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 16085
+    "returned": 15340
    }
   },
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 39750
+    "returned": 26630
    }
   },
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 36016
+    "returned": 16340
    }
   }
  ],

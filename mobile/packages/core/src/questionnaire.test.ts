@@ -95,3 +95,23 @@ test('stored model categories map to the website sell categories', async () => {
   assert.equal(sellCategoryOf(''), 'smartphone');
   assert.equal(sellCategoryOf(undefined), 'smartphone');
 });
+
+test('functional problems are shown under headings, from the options or the built-in list', async () => {
+  const { groupOptions } = await import('./questionnaire');
+  const options = [
+    { id: 'wifi', label: 'WiFi' }, { id: 'front_camera', label: 'Front Camera' }, { id: 'speaker', label: 'Speaker' },
+    { id: 'bluetooth', label: 'Bluetooth' }, { id: 'battery_health_low', label: 'Battery Health < 85%' }, { id: 'mystery', label: 'Mystery' },
+  ];
+  // A server without groups: the built-in list places them, in its order; unknown problems go last under "Miscellaneous".
+  assert.deepEqual(groupOptions(options, 'functional_issues').map(g => `${g.title}: ${g.options.map(o => o.id).join(',')}`), [
+    'Network & connectivity: wifi,bluetooth',
+    'Camera: front_camera',
+    'Sound & vibration: speaker',
+    'Battery & charging: battery_health_low',
+    'Miscellaneous: mystery',
+  ]);
+  // The options' own groups win, and other lists keep no headings unless their options carry one.
+  assert.deepEqual(groupOptions([{ id: 'wifi', label: 'WiFi', group: 'Smart features' }], 'functional_issues')[0]?.title, 'Smart features');
+  assert.deepEqual(groupOptions([{ id: 'charger', label: 'Charger' }, { id: 'box', label: 'Box' }], 'accessories'),
+    [{ options: [{ id: 'charger', label: 'Charger' }, { id: 'box', label: 'Box' }] }]);
+});

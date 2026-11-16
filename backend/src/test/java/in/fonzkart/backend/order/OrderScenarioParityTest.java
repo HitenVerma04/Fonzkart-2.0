@@ -89,6 +89,7 @@ class OrderScenarioParityTest {
         JsonNode expected = read("/golden/order-scenario-expected.json");
 
         List<String> mismatches = new ArrayList<>();
+        List<JsonNode> actualSteps = new ArrayList<>();
         int i = 0;
         for (JsonNode step : scenario.get("steps")) {
             String actor = step.get("actor").asText();
@@ -101,6 +102,7 @@ class OrderScenarioParityTest {
                         sortNotifications(outcome.get("returned").get("notifications")));
             }
             JsonNode exp = expected.get("steps").get(i);
+            actualSteps.add(outcome);
             assertThat(exp.get("step").asText()).isEqualTo(actor + ":" + action);
             if (!exp.get("outcome").equals(outcome)) {
                 mismatches.add("#" + (i + 1) + " " + actor + ":" + action + "\n  expected " + exp.get("outcome")
@@ -108,6 +110,7 @@ class OrderScenarioParityTest {
             }
             i++;
         }
+        dumpActual(actualSteps, canon(normalize(snapshot())));
         assertThat(i).isEqualTo(expected.get("steps").size()).isEqualTo(96);
         assertThat(mismatches).as("steps differing from the website implementation").isEmpty();
 
@@ -443,5 +446,19 @@ class OrderScenarioParityTest {
 
     private JsonNode read(String path) throws Exception {
         return mapper.readTree(getClass().getResourceAsStream(path));
+    }
+
+    /**
+     * With -Dgolden.dump=true the outcomes are written to target/ (steps and snapshot), to review against the expected
+     * file after a deliberate change (a new offer formula changes every price).
+     */
+    private void dumpActual(List<JsonNode> steps, JsonNode snapshot) throws java.io.IOException {
+        if (!Boolean.getBoolean("golden.dump")) {
+            return;
+        }
+        com.fasterxml.jackson.databind.node.ObjectNode out = new ObjectMapper().createObjectNode();
+        out.set("steps", new ObjectMapper().valueToTree(steps));
+        out.set("snapshot", snapshot);
+        new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(new java.io.File("target/" + getClass().getSimpleName() + "-actual.json"), out);
     }
 }

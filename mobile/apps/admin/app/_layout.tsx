@@ -25,6 +25,7 @@ export default function RootLayout() {
           <Stack.Screen name="users" options={{ title: 'Users & roles' }} />
           <Stack.Screen name="rm" options={{ title: 'RM dashboard' }} />
           <Stack.Screen name="pricing" options={{ title: 'Pricing rules' }} />
+          <Stack.Screen name="pricing-engine" options={{ title: 'Pricing engine' }} />
           <Stack.Screen name="inbox" options={{ title: 'Notifications' }} />
           <Stack.Screen name="catalog/index" options={{ title: 'Catalog' }} />
           <Stack.Screen name="catalog/brand/[id]" options={{ title: 'Models' }} />

@@ -17,6 +17,8 @@ import in.fonzkart.backend.order.repository.OrderPeopleRepository;
 import in.fonzkart.backend.order.rules.OrderJson;
 import in.fonzkart.backend.order.rules.OrderStatus;
 import in.fonzkart.backend.pricing.rules.JsValues;
+import in.fonzkart.backend.pricing.engine.PriceSheet;
+import in.fonzkart.backend.pricing.engine.SheetPricer;
 import in.fonzkart.backend.pricing.service.PricingService;
 import in.fonzkart.backend.rider.entity.Rider;
 import in.fonzkart.backend.rider.repository.RiderRepository;
@@ -99,7 +101,8 @@ public class CustomerOrderService {
             throw OrderAccess.invalid("Invalid: Order details");
         }
         String deviceName = r.device() + " (" + r.variant() + ")";
-        int price = (int) quote(r.device(), r.variant(), r.answers()).get("price");
+        Priced priced = priced(r.device(), r.variant(), r.answers());
+        int price = (int) priced.quote().price();
 
         Double lat = null;
         Double lng = null;
@@ -116,6 +119,7 @@ public class CustomerOrderService {
                 deviceName, price, OrderStatus.PENDING, r.address(), r.pincode(), lat, lng, answersText,
                 routed.map(User::getId).orElse(null), JsDates.nowUtc()));
         CustomerOrder order = orders.findById(saved.getId()).orElse(saved);
+        pricing.logQuote("order", order.getId(), priced.variant(), priced.quote(), priced.answers());
 
         Optional<User> customer = users.findById(me.id());
         broadcastNewOrder(order, routed.orElse(null), customer.map(User::getName).orElse(null));
@@ -139,6 +143,35 @@ public class CustomerOrderService {
      * price, so the apps show it as the final quote ({@code POST /api/orders/quote}).
      */
     public Map<String, Object> quote(String device, String variantName, JsonNode answers) {
+        Priced priced = priced(device, variantName, answers);
+        pricing.logQuote("quote", null, priced.variant(), priced.quote(), priced.answers());
+        SheetPricer.Result result = priced.quote().result();
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("price", (int) priced.quote().price());
+        m.put("basePrice", priced.variant().basePrice());
+        m.put("category", priced.category());
+        m.put("confidence", result.confidence());
+        m.put("floorApplied", result.floorApplied());
+        m.put("breakdown", result.breakdown());
+        m.put("engineVersion", priced.quote().sheet().engineVersion());
+        return m;
+    }
+
+    /** The price sheet the apps price a device with as the customer answers (GET /api/pricing/sheet). */
+    public PriceSheet sheet(String device, String variantName) {
+        if (!JsText.truthy(device) || !JsText.truthy(variantName)) {
+            throw OrderAccess.invalid("Invalid: Order details");
+        }
+        VariantWithModelDto variant = findDevice(device, variantName)
+                .orElseThrow(() -> OrderAccess.invalid("Invalid: Device not found"));
+        return pricing.sheetFor(variant);
+    }
+
+    /** A device priced for these answers. */
+    record Priced(VariantWithModelDto variant, PricingService.Quote quote, JsonNode answers, String category) {
+    }
+
+    private Priced priced(String device, String variantName, JsonNode answers) {
         if (!JsText.truthy(device) || !JsText.truthy(variantName)) {
             throw OrderAccess.invalid("Invalid: Order details");
         }
@@ -146,12 +179,7 @@ public class CustomerOrderService {
                 .orElseThrow(() -> OrderAccess.invalid("Invalid: Device not found"));
         String category = sellCategory(variant.model() == null ? null : variant.model().category());
         JsonNode pricingAnswers = answers != null && answers.isObject() ? answers : F.objectNode();
-        int price = (int) pricing.calculatePrice(variant.basePrice(), pricingAnswers, F.textNode(category));
-        Map<String, Object> m = new LinkedHashMap<>();
-        m.put("price", price);
-        m.put("basePrice", variant.basePrice());
-        m.put("category", category);
-        return m;
+        return new Priced(variant, pricing.quote(variant, pricingAnswers), pricingAnswers, category);
     }
 
     /**
@@ -159,7 +187,7 @@ public class CustomerOrderService {
      * with the brand in front ("Apple iPhone 13"). A leading brand is accepted only when it is the found model's brand
      * (its id is the brand name in lower case with dashes, as addBrand makes it).
      */
-    Optional<VariantWithModelDto> findDevice(String device, String variantName) {
+    public Optional<VariantWithModelDto> findDevice(String device, String variantName) {
         String name = JsText.trim(device);
         Optional<VariantWithModelDto> exact = priced(variants.findVariantByName(name + " (" + variantName + ")"));
         if (exact.isPresent()) {

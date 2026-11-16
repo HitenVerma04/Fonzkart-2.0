@@ -7,6 +7,7 @@ import { quoteApi } from './quote';
 import { customerOrdersApi, executiveApi, notificationsApi, staffOrdersApi, type PlaceOrderInput } from './orders';
 import { ridersApi } from './riders';
 import { adminApi } from './admin';
+import { pricingEngineApi } from './pricingEngine';
 import { carouselApi, catalogAdminApi, emailApi } from './content';
 import { shopAdminApi, shopApi, type PlaceShopOrderInput } from './shop';
 import { buyAdminApi, buyApi, repairAdminApi, repairApi, type BookRepairInput, type PlaceRefurbishedOrderInput } from './buyRepair';
@@ -143,6 +144,20 @@ export function useQuote(device: string | undefined, variant: string | undefined
     queryFn: ({ signal }) => customerOrdersApi.quote(device!, variant!, answers!, signal),
     enabled: !!device && !!variant && answers !== undefined,
     staleTime: 0,
+  });
+}
+
+/**
+ * A device's price sheet: the live offer is worked out from it on the phone (priceFromSheet in @fonzkart/core) as
+ * the customer answers. Kept a minute: an admin's change shows on the next device chosen.
+ */
+export function usePriceSheet(device: string | undefined, variant: string | undefined) {
+  return useQuery({
+    queryKey: ['quote', 'sheet', device ?? null, variant ?? null],
+    queryFn: ({ signal }) => pricingEngineApi.sheet(device!, variant!, signal),
+    enabled: !!device && !!variant,
+    staleTime: 60_000,
+    retry: 1,
   });
 }
 
@@ -284,6 +299,7 @@ export const adminKeys = {
   cities: ['staff', 'cities'] as const,
   rmDashboard: ['staff', 'rm-dashboard'] as const,
   rules: (category: string) => ['staff', 'rules', category] as const,
+  pricingSettings: (category: string) => ['staff', 'pricing-settings', category] as const,
 };
 
 export const useStaffDirectory = () => useQuery({ queryKey: adminKeys.directory, queryFn: ({ signal }) => adminApi.directory(signal), staleTime: 0 });
@@ -295,6 +311,28 @@ export const useRmDashboard = () => useQuery({
 });
 export const usePricingRules = (category: string) =>
   useQuery({ queryKey: adminKeys.rules(category), queryFn: ({ signal }) => adminApi.pricingRules(category, signal), staleTime: 0 });
+export const usePricingSettings = (category: string) =>
+  useQuery({ queryKey: adminKeys.pricingSettings(category), queryFn: ({ signal }) => adminApi.pricingSettings(category, signal), staleTime: 0 });
+
+export const engineKeys = {
+  all: ['staff', 'pricing-engine'] as const,
+  overview: ['staff', 'pricing-engine', 'overview'] as const,
+  suggestions: (status: string) => ['staff', 'pricing-engine', 'suggestions', status] as const,
+  sales: ['staff', 'pricing-engine', 'sales'] as const,
+  repairCosts: (category: string) => ['staff', 'pricing-engine', 'repair-costs', category] as const,
+  variant: (id: string) => ['staff', 'pricing-engine', 'variant', id] as const,
+};
+
+export const useEngineOverview = () =>
+  useQuery({ queryKey: engineKeys.overview, queryFn: ({ signal }) => pricingEngineApi.overview(signal), staleTime: 0 });
+export const useEngineSuggestions = (status: string) =>
+  useQuery({ queryKey: engineKeys.suggestions(status), queryFn: ({ signal }) => pricingEngineApi.suggestions(status, signal), staleTime: 0 });
+export const useDeviceSales = () =>
+  useQuery({ queryKey: engineKeys.sales, queryFn: ({ signal }) => pricingEngineApi.sales(signal), staleTime: 0 });
+export const useRepairCosts = (category: string) =>
+  useQuery({ queryKey: engineKeys.repairCosts(category), queryFn: ({ signal }) => pricingEngineApi.repairCosts(category || undefined, signal), staleTime: 0 });
+export const useVariantPricing = (id: string | undefined) =>
+  useQuery({ queryKey: engineKeys.variant(id ?? ''), queryFn: ({ signal }) => pricingEngineApi.variant(id!, signal), enabled: !!id, staleTime: 0 });
 
 // ------------------------------------------------------------------------------------------------ content and email
 

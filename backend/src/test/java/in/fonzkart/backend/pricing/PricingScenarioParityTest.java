@@ -37,6 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * access control and Prisma's validation/coercion, and calculatePrice before and after rule changes).
  * golden/pricing-scenario.json was executed against the website code (scripts/security-tests/run.sh golden) on
  * db/01 + db/03 + db/04 seeds — since the staff-permission hardening only SUPER_ADMIN and ADMIN may change rules;
+ * the calculatePrice steps have since been updated to the pricing engine (PriceSheetService / SheetPricer, 2026-11; -Dgolden.dump=true writes the new outcomes to target/ for review);
  * the outcome of every step and the final "EvaluationRule" table are in golden/pricing-scenario-expected.json.
  */
 @Testcontainers(disabledWithoutDocker = true)
@@ -71,12 +72,14 @@ class PricingScenarioParityTest {
         JsonNode expected = read("/golden/pricing-scenario-expected.json");
 
         List<String> mismatches = new ArrayList<>();
+        List<JsonNode> actualSteps = new ArrayList<>();
         int i = 0;
         for (JsonNode step : scenario.get("steps")) {
             String actor = step.get("actor").asText();
             String action = step.get("action").asText();
             JsonNode outcome = normalize(invoke(actor, action, step.get("input")));
             JsonNode exp = expected.get("steps").get(i);
+            actualSteps.add(outcome);
             assertThat(exp.get("step").asText()).isEqualTo(actor + ":" + action);
             if (!normalize(exp.get("outcome")).equals(outcome)) {
                 mismatches.add("#" + (i + 1) + " " + actor + ":" + action + "\n  expected " + exp.get("outcome")
@@ -84,6 +87,7 @@ class PricingScenarioParityTest {
             }
             i++;
         }
+        dumpActual(actualSteps, normalize(rulesSnapshot()));
         assertThat(i).isEqualTo(35);
         assertThat(mismatches).as("steps differing from the website implementation").isEmpty();
         assertThat(normalize(rulesSnapshot())).isEqualTo(normalize(expected.get("rules")));
@@ -175,5 +179,19 @@ class PricingScenarioParityTest {
         try (InputStream in = getClass().getResourceAsStream(resource)) {
             return mapper.readTree(in);
         }
+    }
+
+    /**
+     * With -Dgolden.dump=true the outcomes are written to target/ (steps and snapshot), to review against the expected
+     * file after a deliberate change (a new offer formula changes every price).
+     */
+    private void dumpActual(List<JsonNode> steps, JsonNode snapshot) throws java.io.IOException {
+        if (!Boolean.getBoolean("golden.dump")) {
+            return;
+        }
+        com.fasterxml.jackson.databind.node.ObjectNode out = new ObjectMapper().createObjectNode();
+        out.set("steps", new ObjectMapper().valueToTree(steps));
+        out.set("snapshot", snapshot);
+        new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(new java.io.File("target/" + getClass().getSimpleName() + "-actual.json"), out);
     }
 }

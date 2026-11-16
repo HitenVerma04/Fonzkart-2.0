@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { customerOrdersApi, usePincodeAvailability, useQuestionnaire, useQuote, useSession } from '@fonzkart/api';
-import { cleanPincode, describeAnswers, formatInr, isCompletePincode, stepsForDevice } from '@fonzkart/core';
+import { cleanPincode, describeAnswers, describeBreakdown, formatInr, isCompletePincode, stepsForDevice } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
 import {
@@ -32,6 +32,12 @@ export default function Offer() {
     if (!draft?.answers || !questionnaire.data) return [];
     return describeAnswers(stepsForDevice(questionnaire.data, draft.category, draft.modelName), draft.answers);
   }, [draft, questionnaire.data]);
+
+  // The server's steps from the max value to the offer, in words (older servers send none: the card is left out).
+  const breakdown = useMemo(() => {
+    if (!draft || !questionnaire.data || !quote.data?.breakdown?.length) return [];
+    return describeBreakdown(stepsForDevice(questionnaire.data, draft.category, draft.modelName), quote.data.breakdown);
+  }, [draft, questionnaire.data, quote.data]);
 
   // Saved for "Pick up where you left off" on Home: the price is ready, only the pickup is left to book.
   useEffect(() => {
@@ -92,6 +98,34 @@ export default function Offer() {
           </View>
         </View>
       </Appear>
+
+      {breakdown.length ? (
+        <Appear index={1}>
+          <Card title="How we worked out your price" icon="sparkle">
+            <Text style={styles.answersHint}>
+              Repairs are priced for your model; scratches, age and accessories take a share of the max value.
+            </Text>
+            <View style={styles.answers}>
+              <View style={styles.answer}>
+                <Text style={styles.answerTitle}>Max value</Text>
+                <Text style={styles.answerValue}>{formatInr(draft.basePrice)}</Text>
+              </View>
+              {breakdown.map((line, i) => (
+                <View key={`${line.label}-${i}`} style={[styles.answer, styles.answerDivider]}>
+                  <Text style={styles.answerTitle}>{line.label}</Text>
+                  <Text style={[styles.answerValue, line.amount < 0 && { color: colors.green }]}>
+                    {line.amount < 0 ? '+' : '−'}{formatInr(Math.abs(line.amount))}
+                  </Text>
+                </View>
+              ))}
+              <View style={[styles.answer, styles.answerDivider]}>
+                <Text style={[styles.answerTitle, { color: colors.text, fontWeight: '700' }]}>Your offer</Text>
+                <Text style={styles.answerValue}>{formatInr(quote.data!.price)}</Text>
+              </View>
+            </View>
+          </Card>
+        </Appear>
+      ) : null}
 
       <Appear index={1}>
         <Card title="Free doorstep pickup" icon="truck">

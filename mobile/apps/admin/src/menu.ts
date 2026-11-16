@@ -1,7 +1,7 @@
 // The Admin app's sections by role: the same as the website's admin sidebar (components/admin/AdminSidebar.tsx),
 // plus "Edit carousel view", the festive theme and the screen guard store, which only the Customer app has.
 export type Section = {
-  href: '/orders' | '/partners' | '/pincode-requests' | '/riders' | '/cities' | '/zonal-heads' | '/users' | '/rm' | '/pricing' | '/catalog' | '/homepage'
+  href: '/orders' | '/partners' | '/pincode-requests' | '/riders' | '/cities' | '/zonal-heads' | '/users' | '/rm' | '/pricing' | '/pricing-engine' | '/catalog' | '/homepage'
     | '/carousel' | '/festive-theme' | '/screen-guards' | '/shop-orders' | '/refurbished' | '/buy-orders' | '/repair-prices' | '/repair-bookings' | '/email';
   title: string;
   detail: string;
@@ -26,6 +26,7 @@ export const SECTIONS: Section[] = [
   { href: '/cities', title: 'Cities', detail: 'Hubs, pincodes, live and featured cities', roles: [...ADMINS, ZH], group: 'People & places' },
   { href: '/zonal-heads', title: 'Zonal heads', detail: 'Create and assign cities', roles: ADMINS, group: 'People & places' },
   { href: '/users', title: 'Users & roles', detail: 'Admins, relationship managers, directory', roles: ADMINS, group: 'People & places' },
+  { href: '/pricing-engine', title: 'Pricing engine', detail: 'Suggestions, resales, repair costs, automation', roles: ADMINS, group: 'Sell: prices & catalog' },
   { href: '/pricing', title: 'Pricing rules', detail: 'Deductions per answer and category', roles: ADMINS, group: 'Sell: prices & catalog' },
   { href: '/catalog', title: 'Catalog', detail: 'Brands, models, variants and pictures', roles: ADMINS, group: 'Sell: prices & catalog' },
   { href: '/homepage', title: 'Landing page', detail: 'Banner prices and featured cities', roles: ADMINS, group: 'Customer app' },

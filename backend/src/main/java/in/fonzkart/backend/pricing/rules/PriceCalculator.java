@@ -1,248 +1,134 @@
 package in.fonzkart.backend.pricing.rules;
 
-import static in.fonzkart.backend.pricing.rules.JsValues.arrayIncludes;
-import static in.fonzkart.backend.pricing.rules.JsValues.equalsString;
-import static in.fonzkart.backend.pricing.rules.JsValues.get;
-import static in.fonzkart.backend.pricing.rules.JsValues.includes;
-import static in.fonzkart.backend.pricing.rules.JsValues.isFalse;
-import static in.fonzkart.backend.pricing.rules.JsValues.isTrue;
-import static in.fonzkart.backend.pricing.rules.JsValues.optionalIncludes;
-import static in.fonzkart.backend.pricing.rules.JsValues.orEmptyArray;
-import static in.fonzkart.backend.pricing.rules.JsValues.toNumber;
-import static in.fonzkart.backend.pricing.rules.JsValues.truthy;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import in.fonzkart.backend.pricing.entity.EvaluationRule;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Line-by-line port of actions/priceCalculation.ts → calculatePrice(). Operations are performed in the same order
- * with IEEE doubles, so results are bit-identical to the JavaScript (verified against the original on ~1,800 cases).
- * <ul>
- *   <li>If the category has rules in "EvaluationRule", each rule is applied in database order.</li>
- *   <li>Otherwise the hard-coded per-category logic applies (smartphone, laptop, tablet, watch, camera, tv/smarttv);
- *       any other category gets no deductions.</li>
- *   <li>Then the floor: 400, or for base prices ≥ 50,000 → 1800 (flawless/good), 1200 (average), 500 otherwise;
- *       result = Math.floor(Math.max(price, floor)).</li>
- * </ul>
- * {@code answers} is the client's JSON ({@link JsValues#undefined()} when absent); JavaScript type semantics apply
- * (e.g. a string accessories value is substring-matched, a number throws).
+ * The offer for a device, worked out like Cashify's: the variant's base price is the max value (flawless, everything
+ * working, newest, bought in India, with box and bill) and an answer can only take something off it.
+ * <ol>
+ *   <li>Each answer takes a share of the max value: the admin's pricing rule for that answer when there is one (its
+ *       percent, plus its ₹ amount as a share of the max value), otherwise the built-in share
+ *       ({@link PricingDefaults}). A share is between 0 and 90%, so no rule can raise the price.</li>
+ *   <li>Answers to the same question that apply together (several functional problems, several missing accessories)
+ *       overlap instead of adding up: two 10% problems take 19%, not 20%. A question takes at most its cap (functional
+ *       problems on a phone: 50%).</li>
+ *   <li>Questions multiply: each takes its share of what the others left, so the price can never reach zero. A 30%
+ *       screen and an 18% body leave 70% × 82% = 57.4% of the max value, not 100% − 48% = 52%.</li>
+ *   <li>The offer never drops below the lowest offer (a percent of the max value that admins set, 15% until they do)
+ *       and never goes above the max value. It is rounded down to ₹10.</li>
+ * </ol>
+ * Before this, deductions were subtracted one by one from the full price with a fixed ₹400–1,800 floor, a warranty
+ * answer added up to 10% on top (offers above the max value), and once any rule was saved for a category, every
+ * answer without a rule stopped counting.
  */
 public final class PriceCalculator {
+
+    /** The lowest offer, in percent of the max value, until the admins set one. */
+    public static final double DEFAULT_MIN_OFFER_PERCENT = 15;
+    /** The most a single answer can take. */
+    static final double MAX_ANSWER_SHARE = 0.9;
+    /** The most a several-choice question without a built-in cap can take (a question only an admin priced). */
+    static final double OPEN_MULTI_CAP = 0.6;
 
     private PriceCalculator() {
     }
 
-    public static double calculate(double basePrice, JsonNode answers, String category, List<EvaluationRule> rules) {
-        double finalPrice = basePrice;
+    /**
+     * The offer in rupees (a whole number of tens; the max value itself when nothing is taken off).
+     *
+     * @param basePrice       the variant's max value; 0 when it is not a positive number
+     * @param answers         the questionnaire answers (option id, list of option ids, or true / false per question)
+     * @param category        the sell category, for the built-in shares
+     * @param rules           the admins' pricing rules of that category
+     * @param minOfferPercent the lowest offer, in percent of the max value
+     */
+    public static double calculate(double basePrice, JsonNode answers, String category, List<EvaluationRule> rules,
+                                   double minOfferPercent) {
+        if (!(basePrice > 0) || Double.isInfinite(basePrice)) {
+            return 0;
+        }
+        double max = Math.floor(basePrice);
+        double kept = keptShare(basePrice, answers, category, rules);
+        if (kept >= 1) {
+            return max;
+        }
+        double lowest = basePrice * clamp(minOfferPercent, 0, 100) / 100;
+        double offer = Math.max(basePrice * kept, lowest);
+        return Math.min(max, Math.floor(offer / 10) * 10);
+    }
 
-        if (rules.isEmpty()) {
-            // Fallback to legacy hardcoded logic if no rules are set in DB
-            if ("smartphone".equals(category)) {
-                if (isFalse(get(answers, "calls"))) finalPrice *= 0.8;
-                if (isFalse(get(answers, "touch"))) finalPrice *= 0.7;
-                if (isFalse(get(answers, "screen_original"))) finalPrice *= 0.9;
+    /** The share of the max value that the answers leave (1 = nothing taken off). */
+    static double keptShare(double basePrice, JsonNode answers, String category, List<EvaluationRule> rules) {
+        Map<String, PricingDefaults.Question> builtIn = PricingDefaults.forCategory(category);
 
-                // Screen Condition Deductions
-                JsonNode screen = get(answers, "physical_condition");
-                if (equalsString(screen, "good")) finalPrice -= basePrice * 0.10;
-                else if (equalsString(screen, "average")) finalPrice -= basePrice * 0.20;
-                else if (equalsString(screen, "below_average")) finalPrice -= basePrice * 0.35;
-
-                // Body Condition Deductions
-                JsonNode body = get(answers, "body_condition");
-                if (equalsString(body, "good")) finalPrice -= basePrice * 0.05;
-                else if (equalsString(body, "average")) finalPrice -= basePrice * 0.10;
-                else if (equalsString(body, "below_average")) finalPrice -= basePrice * 0.20;
-
-                // Functional Problems (4% per issue)
-                finalPrice = perIssue(finalPrice, basePrice, 0.04, get(answers, "functional_issues"));
-
-                // Warranty (Bonus)
-                finalPrice = warranty(finalPrice, basePrice, get(answers, "warranty"));
-
-                // Accessories (Deductions if missing)
-                JsonNode accessories = get(answers, "accessories");
-                if (missing(accessories, "charger")) finalPrice -= 500;
-                if (missing(accessories, "box")) finalPrice -= 300;
-                if (missing(accessories, "bill")) finalPrice -= basePrice * 0.15;
-            } else if ("laptop".equals(category)) {
-                if (isFalse(get(answers, "power"))) finalPrice -= basePrice * 0.50;
-                if (isFalse(get(answers, "ports"))) finalPrice -= basePrice * 0.10;
-                if (isFalse(get(answers, "screen_working"))) finalPrice -= basePrice * 0.40;
-                if (isFalse(get(answers, "keyboard"))) finalPrice -= basePrice * 0.15;
-
-                JsonNode phys = orEmptyArray(get(answers, "physical_condition"));
-                if (includes(phys, "screen_damage")) finalPrice -= basePrice * 0.30;
-                if (includes(phys, "body_damage")) finalPrice -= basePrice * 0.20;
-                if (includes(phys, "battery_dead")) finalPrice -= basePrice * 0.15;
-                if (includes(phys, "keys_missing")) finalPrice -= basePrice * 0.10;
-
-                JsonNode specs = orEmptyArray(get(answers, "specs"));
-                if (includes(specs, "charger_missing")) finalPrice -= 1500;
-                if (includes(specs, "box_missing")) finalPrice -= 500;
-            } else if ("tablet".equals(category)) {
-                if (isFalse(get(answers, "power"))) finalPrice *= 0.50;
-                if (isFalse(get(answers, "touch"))) finalPrice *= 0.70;
-                if (isFalse(get(answers, "wifi"))) finalPrice *= 0.85;
-
-                JsonNode screen = get(answers, "physical_condition");
-                if (equalsString(screen, "good")) finalPrice -= basePrice * 0.10;
-                else if (equalsString(screen, "average")) finalPrice -= basePrice * 0.20;
-                else if (equalsString(screen, "below_average")) finalPrice -= basePrice * 0.35;
-
-                JsonNode body = get(answers, "body_condition");
-                if (equalsString(body, "good")) finalPrice -= basePrice * 0.05;
-                else if (equalsString(body, "average")) finalPrice -= basePrice * 0.10;
-                else if (equalsString(body, "below_average")) finalPrice -= basePrice * 0.20;
-
-                finalPrice = perIssue(finalPrice, basePrice, 0.04, get(answers, "functional_issues"));
-                finalPrice = warranty(finalPrice, basePrice, get(answers, "warranty"));
-
-                JsonNode accessories = get(answers, "accessories");
-                if (missing(accessories, "charger")) finalPrice -= 500;
-                if (missing(accessories, "box")) finalPrice -= 300;
-                if (missing(accessories, "bill")) finalPrice -= basePrice * 0.15;
-            } else if ("watch".equals(category)) {
-                if (isFalse(get(answers, "power"))) finalPrice -= basePrice * 0.50;
-                if (isFalse(get(answers, "touch"))) finalPrice -= basePrice * 0.30;
-                if (isFalse(get(answers, "charging"))) finalPrice -= basePrice * 0.15;
-
-                JsonNode screen = get(answers, "physical_condition");
-                if (equalsString(screen, "good")) finalPrice -= basePrice * 0.08;
-                else if (equalsString(screen, "average")) finalPrice -= basePrice * 0.18;
-                else if (equalsString(screen, "damaged")) finalPrice -= basePrice * 0.35;
-
-                JsonNode body = get(answers, "body_condition");
-                if (equalsString(body, "good")) finalPrice -= basePrice * 0.05;
-                else if (equalsString(body, "average")) finalPrice -= basePrice * 0.12;
-                else if (equalsString(body, "below_average")) finalPrice -= basePrice * 0.25;
-
-                finalPrice = perIssue(finalPrice, basePrice, 0.05, get(answers, "functional_issues"));
-                finalPrice = warranty(finalPrice, basePrice, get(answers, "warranty"));
-
-                JsonNode accessories = get(answers, "accessories");
-                if (missing(accessories, "charger")) finalPrice -= 400;
-                if (missing(accessories, "strap")) finalPrice -= 300;
-                if (missing(accessories, "box")) finalPrice -= 200;
-                if (missing(accessories, "bill")) finalPrice -= basePrice * 0.10;
-            } else if ("camera".equals(category)) {
-                if (isFalse(get(answers, "power"))) finalPrice -= basePrice * 0.50;
-                if (isFalse(get(answers, "lens_focus"))) finalPrice -= basePrice * 0.30;
-                if (isTrue(get(answers, "sensor_spots"))) finalPrice -= basePrice * 0.25;
-                if (isFalse(get(answers, "flash"))) finalPrice -= basePrice * 0.10;
-
-                // Physical Condition (Body)
-                JsonNode body = get(answers, "physical_condition");
-                if (equalsString(body, "good")) finalPrice -= basePrice * 0.10;
-                else if (equalsString(body, "average")) finalPrice -= basePrice * 0.20;
-                else if (equalsString(body, "below_average")) finalPrice -= basePrice * 0.35;
-
-                // Screen/Viewfinder Condition
-                JsonNode screen = get(answers, "screen_condition");
-                if (equalsString(screen, "cracked")) finalPrice -= basePrice * 0.30;
-                else if (equalsString(screen, "dead_pixels")) finalPrice -= basePrice * 0.20;
-
-                finalPrice = perIssue(finalPrice, basePrice, 0.05, get(answers, "functional_issues"));
-                finalPrice = warranty(finalPrice, basePrice, get(answers, "warranty"));
-
-                JsonNode accessories = get(answers, "accessories");
-                if (missing(accessories, "battery")) finalPrice -= 1000;
-                if (missing(accessories, "charger")) finalPrice -= 1000;
-                if (missing(accessories, "lens_cap")) finalPrice -= 200;
-                if (missing(accessories, "strap")) finalPrice -= 200;
-                if (missing(accessories, "box")) finalPrice -= 300;
-                if (missing(accessories, "bill")) finalPrice -= basePrice * 0.15;
-            } else if ("tv".equals(category) || "smarttv".equals(category)) {
-                JsonNode screen = get(answers, "physical_condition");
-                if (equalsString(screen, "good")) finalPrice -= basePrice * 0.10;
-                else if (equalsString(screen, "average")) finalPrice -= basePrice * 0.20;
-                else if (equalsString(screen, "damaged")) finalPrice -= basePrice * 0.50;
-
-                JsonNode body = get(answers, "body_condition");
-                if (equalsString(body, "good")) finalPrice -= basePrice * 0.05;
-                else if (equalsString(body, "average")) finalPrice -= basePrice * 0.12;
-                else if (equalsString(body, "below_average")) finalPrice -= basePrice * 0.25;
-
-                finalPrice = perIssue(finalPrice, basePrice, 0.05, get(answers, "functional_issues"));
-                finalPrice = warranty(finalPrice, basePrice, get(answers, "warranty"));
-
-                JsonNode accessories = get(answers, "accessories");
-                if (missing(accessories, "remote")) finalPrice -= 800;
-                if (missing(accessories, "stand")) finalPrice -= 500;
-                if (missing(accessories, "bill")) finalPrice -= basePrice * 0.15;
-                if (missing(accessories, "box")) finalPrice -= 400;
+        // question → answer → share taken: the built-in shares, with the admins' rules in place of them
+        Map<String, Map<String, Double>> shares = new LinkedHashMap<>();
+        builtIn.forEach((question, q) -> {
+            Map<String, Double> byAnswer = new LinkedHashMap<>();
+            q.answers().forEach((answer, percent) -> byAnswer.put(answer, percent / 100));
+            shares.put(question, byAnswer);
+        });
+        for (EvaluationRule rule : rules) {
+            if (rule.getQuestionKey() == null || rule.getAnswerKey() == null) {
+                continue;
             }
-        } else {
-            // Apply DB Rules
-            for (EvaluationRule rule : rules) {
-                JsonNode answer = get(answers, rule.getQuestionKey());
+            double share = rule.getDeductionPercent() / 100 + rule.getDeductionAmount() / basePrice;
+            shares.computeIfAbsent(rule.getQuestionKey(), k -> new LinkedHashMap<>()).put(rule.getAnswerKey(), share);
+        }
 
-                if (answer.isBoolean()) {
-                    boolean ruleVal = "true".equals(rule.getAnswerKey());
-                    if (answer.booleanValue() == ruleVal) {
-                        finalPrice = apply(finalPrice, basePrice, rule);
-                    }
-                } else if (answer.isArray()) {
-                    // Array check (multi-select); '!x' means "x was NOT selected"
-                    if (rule.getAnswerKey().startsWith("!")) {
-                        if (!arrayIncludes(answer, rule.getAnswerKey().substring(1))) {
-                            finalPrice = apply(finalPrice, basePrice, rule);
-                        }
-                    } else if (arrayIncludes(answer, rule.getAnswerKey())) {
-                        finalPrice = apply(finalPrice, basePrice, rule);
-                    }
-                } else if (answer.isTextual()) {
-                    if (answer.textValue().equals(rule.getAnswerKey())) {
-                        finalPrice = apply(finalPrice, basePrice, rule);
-                    }
+        double kept = 1;
+        for (Map.Entry<String, Map<String, Double>> question : shares.entrySet()) {
+            JsonNode answer = answers == null ? MissingNode.getInstance() : answers.path(question.getKey());
+            double left = 1;
+            for (Map.Entry<String, Double> option : question.getValue().entrySet()) {
+                if (applies(answer, option.getKey())) {
+                    left *= 1 - clamp(option.getValue(), 0, MAX_ANSWER_SHARE);
                 }
             }
+            PricingDefaults.Question known = builtIn.get(question.getKey());
+            double cap = known != null ? known.capPercent() / 100
+                    : answer.isArray() || answer.isMissingNode() ? OPEN_MULTI_CAP : MAX_ANSWER_SHARE;
+            kept *= 1 - Math.min(1 - left, cap);
         }
-
-        // Minimum floor based on device value and condition
-        double minPrice = 400;
-        if (basePrice >= 50000) {
-            JsonNode pc = get(answers, "physical_condition");
-            String cond = pc.isTextual() ? pc.textValue() : "below_average";
-            if (cond.equals("flawless") || cond.equals("good")) minPrice = 1800;
-            else if (cond.equals("average")) minPrice = 1200;
-            else minPrice = 500;
-        }
-
-        return Math.floor(Math.max(finalPrice, minPrice));
+        return kept;
     }
 
-    /** applyRule(rule) */
-    private static double apply(double finalPrice, double basePrice, EvaluationRule rule) {
-        if (rule.getDeductionAmount() != 0) {
-            finalPrice -= rule.getDeductionAmount();
+    /**
+     * Whether a rule's answer key matches the customer's answer: the chosen option, a ticked option ("x") or one not
+     * ticked ("!x") of a list, or "true" / "false". A list never answered counts as nothing ticked (no box, no bill).
+     */
+    public static boolean applies(JsonNode answer, String key) {
+        boolean notTicked = key.startsWith("!");
+        if (answer == null || answer.isMissingNode() || answer.isNull()) {
+            return notTicked;
         }
-        if (rule.getDeductionPercent() != 0) {
-            finalPrice -= (basePrice * (rule.getDeductionPercent() / 100));
+        if (answer.isBoolean()) {
+            return key.equals(Boolean.toString(answer.booleanValue()));
         }
-        return finalPrice;
+        if (answer.isArray()) {
+            String item = notTicked ? key.substring(1) : key;
+            boolean ticked = false;
+            for (JsonNode value : answer) {
+                if (value.isTextual() && value.textValue().equals(item)) {
+                    ticked = true;
+                    break;
+                }
+            }
+            return notTicked != ticked;
+        }
+        return answer.isTextual() && answer.textValue().equals(key);
     }
 
-    /** {@code if (problems && problems.length > 0) finalPrice -= (basePrice * rate * problems.length)} */
-    private static double perIssue(double finalPrice, double basePrice, double rate, JsonNode problems) {
-        if (truthy(problems) && toNumber(get(problems, "length")) > 0) {
-            finalPrice -= (basePrice * rate * toNumber(get(problems, "length")));
+    /** {@code value} within [low, high]; low for NaN. */
+    static double clamp(double value, double low, double high) {
+        if (Double.isNaN(value)) {
+            return low;
         }
-        return finalPrice;
-    }
-
-    /** Warranty bonus: 0–3 months +5%, 3–6 months +7%, 6–11 months +10%. */
-    private static double warranty(double finalPrice, double basePrice, JsonNode warranty) {
-        if (equalsString(warranty, "0_3_months")) finalPrice += basePrice * 0.05;
-        else if (equalsString(warranty, "3_6_months")) finalPrice += basePrice * 0.07;
-        else if (equalsString(warranty, "6_11_months")) finalPrice += basePrice * 0.10;
-        return finalPrice;
-    }
-
-    /** {@code !accessories?.includes(item)} */
-    private static boolean missing(JsonNode accessories, String item) {
-        Boolean included = optionalIncludes(accessories, item);
-        return included == null || !included;
+        return Math.max(low, Math.min(high, value));
     }
 }

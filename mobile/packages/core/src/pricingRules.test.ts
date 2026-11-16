@@ -21,3 +21,23 @@ test('pricing rule rows are keyed like the website editor and the price calculat
     'kit=!box:Missing Box',
   ]);
 });
+
+test('built-in shares pick the bad yes/no answer and add answers only some devices see', () => {
+  const steps = [
+    { id: 'core', title: 'Checks', type: 'yes-no', questions: [{ id: 'sensor_spots', text: 'Spots on the sensor?' }, { id: 'power', text: 'Turns on?' }] },
+    { id: 'functional_issues', title: 'Problems', type: 'multi-select-grid', options: [{ id: 'battery', label: 'Battery' }, { id: 'wifi', label: 'WiFi' }] },
+  ] as unknown as QuestionStep[];
+  const builtIn = [
+    { questionKey: 'sensor_spots', answerKey: 'true', percent: 20 },
+    { questionKey: 'power', answerKey: 'false', percent: 60 },
+    { questionKey: 'functional_issues', answerKey: 'battery_health_low', percent: 8 },
+    { questionKey: 'not_asked', answerKey: 'x', percent: 5 },
+  ];
+  assert.deepEqual(pricingRuleRows(steps, builtIn).map(r => `${r.questionKey}=${r.answerKey}:${r.answerLabel}`), [
+    'sensor_spots=true:Yes',
+    'power=false:Defective / No',
+    'functional_issues=battery:Battery',
+    'functional_issues=wifi:WiFi',
+    'functional_issues=battery_health_low:Battery Health < 85% (iPhone)',
+  ]);
+});

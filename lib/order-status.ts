@@ -83,6 +83,19 @@ export const TONE_BADGE: Record<Tone, string> = {
     gray: 'bg-muted text-muted-foreground',
 };
 
+// ------------------------------------------------------------------------------------------------ answers
+
+/** The "Device age" answer (stored under the key "warranty") as the questionnaire shows it. */
+const DEVICE_AGE_LABELS: Record<string, string> = {
+    '0_3_months': '0 - 3 Months',
+    '3_6_months': '3 - 6 Months',
+    '6_11_months': '6 - 11 Months',
+    no: 'Above 11 Months',
+};
+
+export const deviceAgeLabel = (value: unknown): string | undefined =>
+    value ? DEVICE_AGE_LABELS[String(value)] ?? String(value).replace(/_/g, ' ') : undefined;
+
 // ------------------------------------------------------------------------------------------------ payouts
 
 export const PAYOUT_METHOD_LABELS: Record<string, string> = {

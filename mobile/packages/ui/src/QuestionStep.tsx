@@ -1,7 +1,7 @@
 // One step of the website's device questionnaire, used by the customer's quote (Customer app) and the executive's
 // re-check at pickup (Partner app), so both ask exactly the same questions in the same way.
 import { Text, View } from 'react-native';
-import { isMultiSelect, toggleOption, type Answers, type QuestionOption, type QuestionStep } from '@fonzkart/core';
+import { groupOptions, isMultiSelect, toggleOption, type Answers, type QuestionOption, type QuestionStep } from '@fonzkart/core';
 import { ChoiceCard, YesNo } from './ChoiceCard';
 import { makeStyles } from './ThemeContext';
 import { font, spacing } from './theme';
@@ -14,7 +14,7 @@ export function QuestionStepView({ step, answers, onChange }: {
   const styles = useStyles();
   const choices = (key: string, type: string | undefined, options: QuestionOption[] | undefined) => {
     const multi = isMultiSelect(type);
-    return (options ?? []).map(option => {
+    const card = (option: QuestionOption) => {
       const current = answers[key];
       const selected = multi ? Array.isArray(current) && current.includes(option.id) : current === option.id;
       return (
@@ -27,7 +27,16 @@ export function QuestionStepView({ step, answers, onChange }: {
           onPress={() => onChange(key, multi ? toggleOption(current, option.id) : option.id)}
         />
       );
-    });
+    };
+    // Long problem lists come under headings (Camera, Buttons & controls, ...), as in the Customer app.
+    const groups = multi ? groupOptions(options ?? [], key) : [];
+    if (!groups.some(g => g.title)) return (options ?? []).map(card);
+    return groups.map(g => (
+      <View key={g.title} style={styles.section}>
+        <Text style={styles.sectionTitle}>{g.title}</Text>
+        {g.options.map(card)}
+      </View>
+    ));
   };
 
   return (

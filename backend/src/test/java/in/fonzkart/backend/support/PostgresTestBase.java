@@ -46,6 +46,7 @@ public final class PostgresTestBase {
         registry.add("fonzkart.mail.port", () -> "1025");
         registry.add("fonzkart.mail.user", () -> "noreply@fonzkart.in");
         registry.add("fonzkart.mail.pass", () -> "x");
+        registry.add("fonzkart.catalog.launch-prices", () -> "false"); // tests apply launch prices themselves
     }
 
     @TestConfiguration

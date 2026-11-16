@@ -346,3 +346,114 @@ model Notification {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+// ---------------------------------------------------------------- pricing engine (backend/src/main/resources/pricing/schema.sql;
+// the backend creates these tables on startup)
+
+// How a variant's max value is kept: "auto" (from its launch price and age, revalued monthly) or "manual" (an admin's price).
+model VariantPricing {
+  variantId    String    @id
+  launchPrice  Int?
+  launchMonth  String?   // YYYY-MM
+  mode         String    @default("auto")
+  marketFactor Float     @default(1)
+  lastAutoAt   DateTime?
+  updatedAt    DateTime  @default(now()) @updatedAt
+}
+
+// A repair's cost for a model, a brand or a whole category. source: admin | official | fonzkart_repair.
+model RepairCost {
+  id         String   @id
+  category   String
+  brandId    String   @default("")
+  modelId    String   @default("")
+  part       String
+  cost       Int
+  source     String
+  sourceUrl  String?
+  note       String?
+  observedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@unique([category, brandId, modelId, part, source])
+}
+
+// A bought device resold: what it sold for and what its repairs cost. repairs is JSON: [{part, cost}].
+model DeviceSale {
+  id            String   @id
+  orderId       String?  @unique
+  variantId     String?
+  modelId       String?
+  device        String
+  category      String?
+  purchasePrice Int
+  basePrice     Int?     // the max value when it was sold
+  salePrice     Int
+  repairCost    Int      @default(0)
+  repairs       String?
+  channel       String?
+  grade         String?
+  note          String?
+  soldAt        DateTime @default(now())
+  createdBy     String?
+  createdAt     DateTime @default(now())
+
+  @@index([modelId])
+}
+
+// Every price the server gave. stage: quote | order | inspection.
+model PriceQuote {
+  id            String   @id
+  stage         String
+  orderId       String?
+  variantId     String?
+  device        String?
+  category      String?
+  basePrice     Int?
+  price         Int
+  confidence    Float?
+  engineVersion String?
+  answers       String?
+  breakdown     String?
+  createdAt     DateTime @default(now())
+
+  @@index([variantId])
+  @@index([orderId])
+  @@index([createdAt])
+}
+
+// A change the pricing engine suggests (or made by itself). status: open | applied | dismissed | resolved.
+model PricingRecommendation {
+  id             String    @id
+  kind           String
+  targetKey      String
+  title          String
+  detail         String?
+  currentValue   Float?
+  suggestedValue Float?
+  confidence     Float?
+  evidence       String?
+  status         String    @default("open")
+  autoApplied    Boolean   @default(false)
+  decidedAt      DateTime?
+  decidedBy      String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+
+  @@index([status])
+  @@index([kind, targetKey])
+}
+
+// Every change of a variant's max value, by whom (an admin, the monthly revaluation, an applied recommendation).
+model PriceHistory {
+  id        String   @id
+  variantId String
+  oldPrice  Int?
+  newPrice  Int
+  reason    String
+  actor     String?
+  createdAt DateTime @default(now())
+
+  @@index([variantId])
+}

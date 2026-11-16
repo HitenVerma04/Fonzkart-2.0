@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn } from 'react-native-reanimated';
-import { isMultiSelect, toggleOption, type Answers, type QuestionOption, type QuestionStep } from '@fonzkart/core';
+import { groupOptions, isMultiSelect, toggleOption, type Answers, type QuestionOption, type QuestionStep } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { Icon, type IconName } from './Icon';
 import { Tap } from './Tap';
@@ -81,9 +81,10 @@ export function QuestionStepView({ step, answers, onChange }: {
   const styles = useStyles();
   const choices = (key: string, kind: string | undefined, options: QuestionOption[] | undefined) => {
     const multi = isMultiSelect(kind);
+    const list = options ?? [];
     // Tick-all-that-apply lists of short labels (functional problems, accessories) read faster as a two-column grid.
-    const compact = multi && (options ?? []).every(o => !o.description && o.label.length <= 28);
-    const cards = (options ?? []).map(option => {
+    const compact = multi && list.every(o => !o.description && o.label.length <= 28);
+    const card = (option: QuestionOption) => {
       const current = answers[key];
       const selected = multi ? Array.isArray(current) && current.includes(option.id) : current === option.id;
       return (
@@ -97,8 +98,17 @@ export function QuestionStepView({ step, answers, onChange }: {
           onPress={() => onChange(key, multi ? toggleOption(current, option.id) : option.id)}
         />
       );
-    });
-    return compact ? <View style={styles.grid}>{cards}</View> : cards;
+    };
+    const cards = (items: QuestionOption[]) => (compact ? <View style={styles.grid}>{items.map(card)}</View> : items.map(card));
+    // Long problem lists come under headings (Camera, Buttons & controls, ...), like the sections of Device Details.
+    const groups = multi ? groupOptions(list, key) : [];
+    if (!groups.some(g => g.title)) return cards(list);
+    return groups.map(g => (
+      <View key={g.title} style={styles.group}>
+        <Text style={styles.groupTitle}>{g.title}</Text>
+        {cards(g.options)}
+      </View>
+    ));
   };
 
   return (
