@@ -123,7 +123,7 @@ public class AuthService {
         }
         User user = found.get();
         if (!Objects.equals(user.getResetToken(), otp)) {
-            return wrongCode(email);
+            return wrongCode(user);
         }
         if (isExpired(user.getResetTokenExpiry())) {
             return error("Your OTP has expired. Please sign up again or request a new one.");
@@ -235,7 +235,7 @@ public class AuthService {
             return error("Invalid user.");
         }
         if (!Objects.equals(found.get().getResetToken(), otp)) {
-            return wrongCode(email);
+            return wrongCode(found.get());
         }
         if (isExpired(found.get().getResetTokenExpiry())) {
             return error("Your OTP has expired. Please request a new one.");
@@ -324,11 +324,17 @@ public class AuthService {
         limiter.reset(Kind.CODE, email); // a new code gets its own attempts
     }
 
-    /** A wrong one-time code. The {@value AttemptLimiter#MAX_CODE_FAILURES}th cancels the code: a new one must be requested. */
-    private ActionResponse wrongCode(String email) {
-        if (limiter.failed(Kind.CODE, email)) {
-            users.clearResetTokenByEmail(email, JsDates.nowUtc());
-            limiter.reset(Kind.CODE, email);
+    /**
+     * A wrong one-time code. The {@value AttemptLimiter#MAX_CODE_FAILURES}th cancels the code: a new one must be
+     * requested. Counted and cancelled on the account itself (its stored email), never on the text typed: otherwise
+     * other spellings of the same address ("Ann@X.in", a pattern matching it) would each get fresh guesses and the
+     * cancellation would miss the account.
+     */
+    private ActionResponse wrongCode(User user) {
+        String account = user.getEmail();
+        if (limiter.failed(Kind.CODE, account)) {
+            users.clearResetTokenByEmail(account, JsDates.nowUtc());
+            limiter.reset(Kind.CODE, account);
             return error(AttemptLimiter.TOO_MANY_CODES);
         }
         return error("Invalid OTP provided.");

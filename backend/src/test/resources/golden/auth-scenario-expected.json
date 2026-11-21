@@ -135,33 +135,18 @@
   {
    "step": "mallory:signin",
    "outcome": {
-    "redirect": "/"
+    "returned": {
+     "error": "Invalid email/phone or password"
+    }
    },
-   "cookieUser": {
-    "id": "<id:alice@example.test>",
-    "email": "alice@example.test",
-    "name": "Alice",
-    "role": "USER"
-   }
+   "cookieUser": null
   },
   {
    "step": "mallory:session",
    "outcome": {
-    "returned": {
-     "user": {
-      "id": "<id:alice@example.test>",
-      "email": "alice@example.test",
-      "name": "Alice",
-      "role": "USER"
-     }
-    }
+    "returned": null
    },
-   "cookieUser": {
-    "id": "<id:alice@example.test>",
-    "email": "alice@example.test",
-    "name": "Alice",
-    "role": "USER"
-   }
+   "cookieUser": null
   },
   {
    "step": "anon:signin",

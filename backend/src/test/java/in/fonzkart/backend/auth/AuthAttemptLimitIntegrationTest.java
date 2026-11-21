@@ -78,6 +78,39 @@ class AuthAttemptLimitIntegrationTest {
     }
 
     @Test
+    void otherSpellingsOfTheAddressShareTheCountAndPatternsFindNoAccount() throws Exception {
+        jdbc.update("UPDATE \"User\" SET \"resetToken\" = '654321', \"resetTokenExpiry\" = now() + interval '15 minutes' "
+                + "WHERE email = 'user@example.test'");
+        // A wildcard pattern no longer stands in for the address.
+        for (String pattern : new String[] {"user@example.tes_", "user@%", "%"}) {
+            assertThat(post("/api/auth/password-reset/confirm", Map.of("email", pattern, "otp", "000000", "password", "x"))
+                    .get("error").asText()).as(pattern).isEqualTo("Invalid user.");
+        }
+        // Capitalised spellings are the same account: they share the guesses, and the fifth cancels the code.
+        String[] spellings = {"User@example.test", "USER@EXAMPLE.TEST", "user@Example.test", "uSer@example.test"};
+        for (String spelling : spellings) {
+            assertThat(post("/api/auth/password-reset/confirm", Map.of("email", spelling, "otp", "111111", "password", "x"))
+                    .get("error").asText()).as(spelling).isEqualTo("Invalid OTP provided.");
+        }
+        assertThat(post("/api/auth/password-reset/confirm", Map.of("email", "USER@example.TEST", "otp", "222222", "password", "x"))
+                .get("error").asText()).isEqualTo(AttemptLimiter.TOO_MANY_CODES);
+        assertThat(jdbc.queryForObject("SELECT \"resetToken\" FROM \"User\" WHERE email = 'user@example.test'", String.class)).isNull();
+        // (Not trying the old code again here: that would count against the account for the other tests.)
+    }
+
+    @Test
+    void anAddressWithAnUnderscoreStillSignsIn() throws Exception {
+        jdbc.update("UPDATE \"User\" SET email = 'u_ser@example.test' WHERE email = 'user@example.test'");
+        try {
+            assertThat(post("/api/auth/signin", Map.of("email", "U_ser@Example.test", "password", "pw")).has("redirectTo")).isTrue();
+            assertThat(post("/api/auth/signin", Map.of("email", "uxser@example.test", "password", "pw")).get("error").asText())
+                    .isEqualTo("Invalid email/phone or password");
+        } finally {
+            jdbc.update("UPDATE \"User\" SET email = 'user@example.test' WHERE email = 'u_ser@example.test'");
+        }
+    }
+
+    @Test
     void executivePasswordsAreLimitedToo() throws Exception {
         for (int i = 0; i < AttemptLimiter.MAX_SIGNIN_FAILURES; i++) {
             assertThat(post("/api/executive/login", Map.of("phone", "+917000000001", "password", "guess" + i)).get("error").asText())

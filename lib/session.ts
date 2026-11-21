@@ -50,7 +50,8 @@ export async function login(userData: { id: string; email: string; name: string;
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 1 week
     const session = await encrypt({ user: userData, expires });
 
-    (await cookies()).set('session', session, { expires, httpOnly: true, sameSite: 'lax' });
+    // Secure in production: the login cookie is never sent over plain HTTP (browsers allow it on http://localhost).
+    (await cookies()).set('session', session, { expires, httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' });
 }
 
 export async function logout() {

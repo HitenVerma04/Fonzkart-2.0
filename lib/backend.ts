@@ -91,7 +91,8 @@ export async function relayCookies(setCookies: string[]) {
         if (index <= 0) continue;
         const name = pair.slice(0, index);
         const value = pair.slice(index + 1);
-        const options: Record<string, unknown> = { path: '/' };
+        // Secure in production (the site is HTTPS only), whatever the backend sent.
+        const options: Record<string, unknown> = { path: '/', ...(process.env.NODE_ENV === 'production' ? { secure: true } : {}) };
         for (const attribute of attributes) {
             const [key, raw] = attribute.split('=');
             const k = key.toLowerCase();

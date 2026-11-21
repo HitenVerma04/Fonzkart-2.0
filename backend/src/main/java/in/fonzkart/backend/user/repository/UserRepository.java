@@ -21,16 +21,21 @@ public interface UserRepository extends JpaRepository<User, String> {
     /**
      * lib/store.ts → db.findUserByEmail(): prisma.user.findFirst({ where: { email: { equals, mode: 'insensitive' } } }).
      * <p>
-     * PRESERVED BEHAVIOUR (security finding): Prisma 5.21 generates {@code "email" ILIKE $1} WITHOUT escaping, so
-     * '%' and '_' in the input act as wildcards and the first matching row is returned. Kept identical on purpose;
-     * fixing it requires an explicit decision (see backend/README.md).
+     * Case-insensitive. Callers pass the address through {@link #likeLiteral}, so '%' and '_' (and '\') match only
+     * themselves: an address typed with wildcards no longer finds someone else's account (Prisma 5.21 did not escape
+     * them, which let a pattern stand in for an address and get fresh tries at its one-time code).
      */
     @Query(value = "SELECT * FROM \"User\" WHERE \"email\" ILIKE :email LIMIT 1", nativeQuery = true)
     Optional<User> findFirstByEmailInsensitive(@Param("email") String email);
 
-    /** db.findUserByEmail(email): the input is trimmed and lower-cased first. */
+    /** db.findUserByEmail(email): the input is trimmed and lower-cased first, and matched literally. */
     default Optional<User> findUserByEmail(String email) {
-        return findFirstByEmailInsensitive(JsText.lower(JsText.trim(email)));
+        return findFirstByEmailInsensitive(likeLiteral(JsText.lower(JsText.trim(email))));
+    }
+
+    /** Escapes LIKE's wildcards ('%', '_') and its escape character ('\', PostgreSQL's default) in a value. */
+    static String likeLiteral(String value) {
+        return value == null ? null : value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
     /** prisma.user.findFirst({ where: { phone } }) */

@@ -39,5 +39,5 @@ export async function verifyExecutiveToken(token: string | null | undefined): Pr
     }
 }
 
-/** Browser-session cookie, as before, now also SameSite=Lax. */
-export const executiveCookieOptions = { httpOnly: true, sameSite: 'lax' as const, path: '/' };
+/** Browser-session cookie, as before, now also SameSite=Lax, and Secure in production (HTTPS only). */
+export const executiveCookieOptions = { httpOnly: true, sameSite: 'lax' as const, path: '/', secure: process.env.NODE_ENV === 'production' };

@@ -136,7 +136,7 @@ export async function verifyEmailSignup(prevState: { error?: string, success?: s
     }
 
     if (user.resetToken !== otp) {
-        return wrongCode(email);
+        return wrongCode(user.email);
     }
     
     if (!user.resetTokenExpiry || new Date() > user.resetTokenExpiry) {
@@ -273,7 +273,11 @@ export async function signin(prevState: { error?: string } | null, formData: For
     redirect('/');
 }
 
-/** A wrong one-time code. The 5th cancels the code: a new one must be requested (lib/attempt-limits.ts). */
+/**
+ * A wrong one-time code. The 5th cancels the code: a new one must be requested (lib/attempt-limits.ts). Pass the
+ * account's stored email, not the text typed: other spellings of the same address must share the count, and the
+ * cancellation must reach the account.
+ */
 async function wrongCode(email: string) {
     if (attempts.failed('CODE', email)) {
         await db.clearResetToken(email);
@@ -369,7 +373,7 @@ export async function verifyAndResetPassword(prevState: { error?: string, succes
     }
 
     if (user.resetToken !== otp) {
-        return wrongCode(email);
+        return wrongCode(user.email);
     }
     
     if (!user.resetTokenExpiry || new Date() > user.resetTokenExpiry) {

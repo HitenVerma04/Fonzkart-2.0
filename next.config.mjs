@@ -37,6 +37,21 @@ const nextConfig = {
     },
   },
   output: 'standalone',
+  // Basic protection on every page: no MIME sniffing, no framing by other sites (clickjacking), no full URLs leaked to
+  // other sites, and browsers keep to HTTPS for a year. (No Content-Security-Policy yet: Google Ads, maps and
+  // Supabase scripts would need listing first.)
+  async headers() {
+    return [{
+      source: '/:path*',
+      headers: [
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
+        { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self)' },
+      ],
+    }];
+  },
 };
 
 export default nextConfig;
