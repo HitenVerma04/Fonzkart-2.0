@@ -24,7 +24,7 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
 
     const handleCategorySelect = (category: string) => {
         if (category === 'bulk-orders') {
-            router.push('/contact?topic=bulk');
+            router.push('/bulk');
             return;
         }
         if (category === 'repair') {

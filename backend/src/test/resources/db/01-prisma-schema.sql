@@ -241,6 +241,18 @@ CREATE INDEX "PushToken_userId_idx" ON "PushToken"("userId");
 CREATE INDEX "PushToken_riderId_idx" ON "PushToken"("riderId");
 
 -- CreateTable
+CREATE TABLE "PartnerCity" (
+    "partnerId" TEXT NOT NULL,
+    "cityId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PartnerCity_pkey" PRIMARY KEY ("partnerId","cityId")
+);
+
+-- CreateIndex
+CREATE INDEX "PartnerCity_cityId_idx" ON "PartnerCity"("cityId");
+
+-- CreateTable
 CREATE TABLE "PincodeRequest" (
     "id" TEXT NOT NULL,
     "partnerId" TEXT NOT NULL,

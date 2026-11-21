@@ -25,8 +25,9 @@ public interface OrderPeopleRepository extends Repository<User, String> {
     @Query("SELECT u FROM User u WHERE u.role IN :roles")
     List<User> findByRoleIn(@Param("roles") Collection<String> roles);
 
-    /** findMany({ where: { role: 'PARTNER', cityId: { in: cityIds } } }) */
-    @Query("SELECT u FROM User u WHERE u.role = 'PARTNER' AND u.cityId IN :cityIds")
+    /** Partners in these cities: as their main city or one of their extra cities ("PartnerCity"). */
+    @Query(value = "SELECT * FROM \"User\" u WHERE u.role = 'PARTNER' AND (u.\"cityId\" IN (:cityIds) "
+            + "OR u.id IN (SELECT pc.\"partnerId\" FROM \"PartnerCity\" pc WHERE pc.\"cityId\" IN (:cityIds)))", nativeQuery = true)
     List<User> findPartnersInCities(@Param("cityIds") Collection<String> cityIds);
 
     /** findMany({ where: { role: 'PARTNER', relationshipManagerId } }) */

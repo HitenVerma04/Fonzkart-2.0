@@ -4,10 +4,16 @@ import { useActionState, useEffect, useState } from 'react';
 import { updateProfile } from '@/actions/profile';
 import { CheckCircle2, User as UserIcon, Phone, Mail, Loader2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cleanPhone, nameProblem, phoneProblem } from '@/lib/validate';
+import { invalidBox, useFormChecks } from '@/lib/useFormChecks';
+import { FieldError } from '@/components/ui/FieldError';
 
 export default function ProfileForm({ user }: { user: any }) {
     const [state, formAction, pending] = useActionState(updateProfile, null);
     const [successMessage, setSuccessMessage] = useState(false);
+    const [name, setName] = useState<string>(user.name ?? '');
+    const [phone, setPhone] = useState<string>(cleanPhone(user.phone ?? ''));
+    const checks = useFormChecks({ name: nameProblem(name), phone: phoneProblem(phone) });
 
     useEffect(() => {
         if (state?.success) {
@@ -18,7 +24,7 @@ export default function ProfileForm({ user }: { user: any }) {
     }, [state]);
 
     return (
-        <form action={formAction} className="space-y-6">
+        <form action={formAction} noValidate className="space-y-6" onSubmit={e => { if (!checks.ok()) e.preventDefault(); }}>
             <AnimatePresence>
                 {state?.error && (
                     <motion.div
@@ -52,12 +58,15 @@ export default function ProfileForm({ user }: { user: any }) {
                         <input
                             type="text"
                             name="name"
-                            defaultValue={user.name}
-                            required
-                            className="w-full pl-11 pr-4 py-3 bg-background border rounded-xl focus:ring-2 focus:ring-primary/50 outline-none"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            onBlur={checks.leave('name')}
+                            aria-invalid={!!checks.show('name')}
+                            className={`w-full pl-11 pr-4 py-3 bg-background border rounded-xl focus:ring-2 focus:ring-primary/50 outline-none ${checks.show('name') ? invalidBox : ''}`}
                             placeholder="Your Name"
                         />
                     </div>
+                    <FieldError message={checks.show('name')} />
                 </div>
 
                 <div className="space-y-2">
@@ -84,15 +93,17 @@ export default function ProfileForm({ user }: { user: any }) {
                             <input
                                 type="tel"
                                 name="phone"
-                                defaultValue={user.phone?.replace(/^\+91/, '')}
-                                pattern="[0-9]{10}"
-                                maxLength={10}
-                                required
-                                className="w-full pl-11 pr-4 py-3 bg-background border rounded-xl focus:ring-2 focus:ring-primary/50 outline-none tracking-wide"
+                                inputMode="numeric"
+                                value={phone}
+                                onChange={e => setPhone(cleanPhone(e.target.value))}
+                                onBlur={checks.leave('phone')}
+                                aria-invalid={!!checks.show('phone')}
+                                className={`w-full pl-11 pr-4 py-3 bg-background border rounded-xl focus:ring-2 focus:ring-primary/50 outline-none tracking-wide ${checks.show('phone') ? invalidBox : ''}`}
                                 placeholder="9876543210"
                             />
                         </div>
                     </div>
+                    <FieldError message={checks.show('phone')} />
                 </div>
             </div>
 

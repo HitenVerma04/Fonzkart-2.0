@@ -2,15 +2,21 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from "framer-motion";
-import { ArrowLeft, Search, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, Search, X } from "lucide-react";
 import Image from "next/image";
 import { Model } from '@/lib/store';
 import { fetchModels } from '@/actions/catalog';
 import { deduplicateModels, resolveModelImage } from '@/lib/catalog2026';
+import { groupSeries } from '@/lib/series';
+
+/** localStorage: whether the phone series panel is open (folded away by the customer: 'closed'). */
+const SERIES_PANEL_KEY = 'fz-series-panel';
 import SVGLoader from "@/components/ui/SVGLoader";
 
 interface ModelSelectorProps {
     brandId: string;
+    /** The brand's display name ("Realme"), for the series names. */
+    brandName?: string;
     category?: string;
     originalCategory?: string;
     onSelect: (model: Model) => void;
@@ -54,7 +60,7 @@ const ModelImage = ({ src, alt, brandId = '', priority = false, scale = 1 }: { s
     );
 };
 
-export default function ModelSelector({ brandId, category, originalCategory, onSelect, onBack }: ModelSelectorProps) {
+export default function ModelSelector({ brandId, brandName, category, originalCategory, onSelect, onBack }: ModelSelectorProps) {
     const [models, setModels] = useState<Model[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -353,13 +359,33 @@ export default function ModelSelector({ brandId, category, originalCategory, onS
         return list.length > 1 ? list : [];
     }, [models, brandId, category]);
 
+    // Phones: the series worked out from the model names, as in the Customer app (lib/series.ts): Realme 2 Series,
+    // Realme C Series, Galaxy S Series, iPhone 15 Series, … Other categories keep the hand-made list above.
+    const phoneSeries = useMemo(
+        () => (category ?? 'smartphone') === 'smartphone' && models.length >= 6 ? groupSeries(brandName ?? brandId, models) : [],
+        [models, brandName, brandId, category],
+    );
+    const [seriesOpen, setSeriesOpen] = useState(true);
+    useEffect(() => {
+        try { setSeriesOpen(localStorage.getItem(SERIES_PANEL_KEY) !== 'closed'); } catch { /* private mode: stays open */ }
+    }, []);
+    const toggleSeries = () => setSeriesOpen(open => {
+        try { localStorage.setItem(SERIES_PANEL_KEY, open ? 'closed' : 'open'); } catch { /* not remembered */ }
+        return !open;
+    });
+
     // Filter Models
     const filteredModels = useMemo(() => {
+        const inPhoneSeries = phoneSeries.length && activeSeries
+            ? new Set(phoneSeries.find(s => s.key === activeSeries)?.modelIds ?? [])
+            : null;
         const filtered = models.filter(m => {
             if (!m.name) return false;
             const matchesSearch = m.name.toLowerCase().includes(searchTerm.toLowerCase());
 
             if (!matchesSearch) return false;
+
+            if (inPhoneSeries) return inPhoneSeries.has(m.id);
 
             if (activeSeries) {
                 const name = m.name.toLowerCase();
@@ -691,7 +717,7 @@ export default function ModelSelector({ brandId, category, originalCategory, onS
             if (scoreA !== scoreB) return scoreB - scoreA;
             return a.name.localeCompare(b.name);
         });
-    }, [models, searchTerm, activeSeries]);
+    }, [models, searchTerm, activeSeries, phoneSeries]);
 
     return (
         <div className="space-y-6">
@@ -723,8 +749,49 @@ export default function ModelSelector({ brandId, category, originalCategory, onS
                     )}
                 </div>
 
-                {/* Series Filters */}
-                {seriesList.length > 0 && (
+                {/* Phone series: tiles that fold away (remembered), like the Customer app. */}
+                {phoneSeries.length > 0 && (
+                    <div className="space-y-3">
+                        <button onClick={toggleSeries} aria-expanded={seriesOpen}
+                            className="flex w-full items-center gap-3 rounded-xl py-1 text-left">
+                            <span className="flex-1">
+                                <span className="block text-lg font-bold">Select series</span>
+                                <span className="block text-sm text-muted-foreground">
+                                    {activeSeries
+                                        ? `Showing ${phoneSeries.find(s => s.key === activeSeries)?.label ?? ''}`
+                                        : seriesOpen ? `${phoneSeries.length} series · pick one to narrow the list` : 'Pick a series instead of scrolling'}
+                                </span>
+                            </span>
+                            <span className="text-sm font-bold text-primary">{seriesOpen ? 'Hide' : 'Show'}</span>
+                            <ChevronDown className={`h-5 w-5 text-primary transition-transform ${seriesOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {!seriesOpen && activeSeries && (
+                            <button onClick={() => setActiveSeries(null)}
+                                className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
+                                {phoneSeries.find(s => s.key === activeSeries)?.label} <X className="h-4 w-4" />
+                            </button>
+                        )}
+                        {seriesOpen && (
+                            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+                                className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+                                <button onClick={() => setActiveSeries(null)}
+                                    className={`flex min-h-[58px] flex-col items-center justify-center rounded-xl px-2 py-2 text-center text-sm font-semibold transition-all ${!activeSeries ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-accent'}`}>
+                                    All models
+                                </button>
+                                {phoneSeries.map(s => (
+                                    <button key={s.key} onClick={() => setActiveSeries(s.key === activeSeries ? null : s.key)}
+                                        className={`flex min-h-[58px] flex-col items-center justify-center rounded-xl px-2 py-2 text-center text-sm font-semibold transition-all ${activeSeries === s.key ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-accent'}`}>
+                                        <span className="leading-tight">{s.label}</span>
+                                        <span className={`text-[11px] ${activeSeries === s.key ? 'opacity-80' : 'text-muted-foreground'}`}>{s.modelIds.length}</span>
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </div>
+                )}
+
+                {/* Series Filters (other categories) */}
+                {phoneSeries.length === 0 && seriesList.length > 0 && (
                     <div className="space-y-3">
                         <h3 className="font-semibold text-lg">Choose by series</h3>
                         <div className="flex flex-wrap gap-2">

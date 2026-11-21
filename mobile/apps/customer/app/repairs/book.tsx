@@ -115,7 +115,8 @@ export default function BookRepair() {
         {problem && !error ? <Notice text={problem} /> : null}
         {error ? <Notice tone="error" text={error} /> : null}
         {signedIn ? (
-          <Button title="Book the visit" icon="check" loading={book.isPending} disabled={!!problem} onPress={() => void confirm()} />
+          <Button title="Book the visit" icon="check" loading={book.isPending} disabled={!!problem && problem !== form.problem}
+            onPress={() => { if (!signedIn || form.check()) void confirm(); }} />
         ) : (
           <Button title="Sign in to book" icon="user" onPress={() => router.push({ pathname: '/account/sign-in', params: { returnTo: `/repairs/book?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}` } })} />
         )}

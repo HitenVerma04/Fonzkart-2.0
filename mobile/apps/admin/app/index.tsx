@@ -4,7 +4,7 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'r
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { authApi, usePincodeRequests, useSession, useStaffInbox, useStaffOrders, useUnassignedCount } from '@fonzkart/api';
-import { ORDER_STATUS, isFailed, normalizeStatus } from '@fonzkart/core';
+import { ORDER_STATUS, emailOrPhoneProblem, isFailed, normalizeStatus } from '@fonzkart/core';
 import { Button, Loading, Logo, Notice, SearchField, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
 import { ADMIN_APP_ROLES, GROUPS, sectionsFor } from '../src/menu';
 
@@ -26,6 +26,8 @@ function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [tried, setTried] = useState(false);
+  const ready = () => { setTried(true); return !emailOrPhoneProblem(id) && !!password; };
   const submit = async () => {
     setBusy(true);
     setError(null);
@@ -47,11 +49,11 @@ function SignIn() {
           <Text style={styles.app}>Admin</Text>
         </View>
         <TextField label="Email or phone number" value={id} onChangeText={setId} autoCapitalize="none" autoCorrect={false}
-          textContentType="username" />
+          textContentType="username" placeholder="Email or 10-digit number" error={emailOrPhoneProblem(id)} showError={tried} />
         <TextField label="Password" value={password} onChangeText={setPassword} secureTextEntry textContentType="password"
-          onSubmitEditing={() => void submit()} />
+          error={password ? null : 'Enter your password.'} showError={tried} onSubmitEditing={() => { if (ready()) void submit(); }} />
         {error ? <Notice tone="error" text={error} /> : null}
-        <Button title="Sign in" loading={busy} disabled={!id.trim() || !password} onPress={() => void submit()} />
+        <Button title="Sign in" loading={busy} onPress={() => { if (ready()) void submit(); }} />
       </ScrollView>
     </SafeAreaView>
   );

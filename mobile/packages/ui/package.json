@@ -13,6 +13,9 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "expo-constants": "*",
+    "expo-notifications": "*",
+    "react-native-safe-area-context": "*"
   }
 }

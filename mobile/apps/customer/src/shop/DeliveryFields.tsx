@@ -1,7 +1,9 @@
 // Name, mobile, address and pincode, for buying a device or booking a repair. Starts from the account's name and phone.
+// Each field says what is wrong under it (the @fonzkart/core checks); `tried` shows every message at once after the
+// customer pressed the button with something still wrong.
 import { useEffect, useState } from 'react';
 import { useProfile, useSession } from '@fonzkart/api';
-import { cleanPincode, isCompletePincode } from '@fonzkart/core';
+import { addressProblem, cleanPhone, cleanPincode, nameProblem, phoneProblem, pincodeProblem } from '@fonzkart/core';
 import { TextField } from '../design';
 
 export function useDeliveryForm() {
@@ -11,6 +13,7 @@ export function useDeliveryForm() {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [pincode, setPincode] = useState('');
+  const [tried, setTried] = useState(false);
 
   // The account's name and phone (stored as +91XXXXXXXXXX) as defaults.
   useEffect(() => {
@@ -20,14 +23,21 @@ export function useDeliveryForm() {
     if (stored) setPhone(current => current || stored);
   }, [profile.data]);
 
-  const problem = !name.trim() ? 'Enter your name.'
-    : phone.length !== 10 ? 'Enter your 10-digit mobile number.'
-    : address.trim().length < 10 ? 'Enter your full address.'
-    : !isCompletePincode(pincode) ? 'Enter your 6-digit pincode.'
-    : '';
+  const errors = {
+    name: nameProblem(name),
+    phone: phoneProblem(phone),
+    address: addressProblem(address, { what: 'your address' }),
+    pincode: pincodeProblem(pincode),
+  };
+  const problem = errors.name ?? errors.phone ?? errors.address ?? errors.pincode ?? '';
 
   return {
-    name, setName, phone, setPhone, address, setAddress, pincode, setPincode, problem,
+    name, setName, phone, setPhone, address, setAddress, pincode, setPincode, problem, errors, tried,
+    /** Call when the button is pressed: true when the form is ready, else every field shows its message. */
+    check: () => {
+      setTried(true);
+      return !problem;
+    },
     values: { name: name.trim(), phone, address: address.trim(), pincode },
   };
 }
@@ -35,13 +45,15 @@ export function useDeliveryForm() {
 export function DeliveryFields({ form, phoneHint }: { form: ReturnType<typeof useDeliveryForm>; phoneHint: string }) {
   return (
     <>
-      <TextField label="Full name" value={form.name} onChangeText={form.setName} autoComplete="name" textContentType="name" />
-      <TextField label="Mobile number" value={form.phone} onChangeText={text => form.setPhone(text.replace(/\D/g, '').slice(0, 10))}
-        keyboardType="phone-pad" prefix="+91" hint={phoneHint} />
+      <TextField label="Full name" value={form.name} onChangeText={form.setName} autoComplete="name" textContentType="name"
+        error={form.errors.name} showError={form.tried} />
+      <TextField label="Mobile number" value={form.phone} onChangeText={text => form.setPhone(cleanPhone(text))}
+        keyboardType="phone-pad" prefix="+91" hint={phoneHint} placeholder="10-digit mobile number"
+        error={form.errors.phone} showError={form.tried} />
       <TextField label="House / flat, street, area" value={form.address} onChangeText={form.setAddress} multiline
-        placeholder="e.g. 12, 2nd Cross, Indiranagar, Bengaluru" />
+        placeholder="e.g. 12, 2nd Cross, Indiranagar, Bengaluru" error={form.errors.address} showError={form.tried} />
       <TextField label="Pincode" value={form.pincode} onChangeText={text => form.setPincode(cleanPincode(text))}
-        keyboardType="number-pad" maxLength={6} />
+        keyboardType="number-pad" maxLength={6} placeholder="6-digit pincode" error={form.errors.pincode} showError={form.tried} />
     </>
   );
 }

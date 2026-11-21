@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { authApi } from '@fonzkart/api';
+import { emailOrPhoneProblem } from '@fonzkart/core';
 import { Logo, makeStyles } from '@fonzkart/ui';
 import { networkMessage, useAuthOutcome } from '../../src/authFlow';
 import { Appear, Button, Notice, Page, TextField, type, useDesign } from '../../src/design';
@@ -16,6 +17,9 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [tried, setTried] = useState(false);
+  const idProblem = emailOrPhoneProblem(id);
+  const passwordMissing = password ? null : 'Enter your password.';
 
   const submit = async () => {
     setBusy(true);
@@ -42,6 +46,8 @@ export default function SignIn() {
           label="Email or phone number"
           value={id}
           onChangeText={setId}
+          error={idProblem}
+          showError={tried}
           placeholder="Email or 10-digit number"
           autoCapitalize="none"
           autoCorrect={false}
@@ -55,10 +61,12 @@ export default function SignIn() {
           secureTextEntry
           autoComplete="current-password"
           textContentType="password"
-          onSubmitEditing={submit}
+          onSubmitEditing={() => { setTried(true); if (!idProblem && !passwordMissing) void submit(); }}
+          error={passwordMissing}
+          showError={tried}
         />
         {error ? <Notice tone="error" text={error} /> : null}
-        <Button title="Sign in" onPress={submit} loading={busy} disabled={!id.trim() || !password} />
+        <Button title="Sign in" loading={busy} onPress={() => { setTried(true); if (!idProblem && !passwordMissing) void submit(); }} />
       </Appear>
       <Appear index={2} style={styles.links}>
         <Button title="Forgot password?" variant="link" onPress={() => router.push({ pathname: '/account/forgot', params: { returnTo: returnTo ?? '' } })} />

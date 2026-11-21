@@ -1,14 +1,25 @@
-
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { signup } from '@/actions/auth';
 import Link from 'next/link';
 import { Smartphone, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { cleanPhone, emailProblem, nameProblem, passwordProblem, phoneProblem } from '@/lib/validate';
+import { invalidBox, useFormChecks } from '@/lib/useFormChecks';
+import { FieldError } from '@/components/ui/FieldError';
+
+const box = 'w-full h-12 px-4 rounded-lg border bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all';
 
 export default function SignupPage() {
     const [state, action, isPending] = useActionState(signup, null);
+    const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
+    const checks = useFormChecks({
+        name: nameProblem(form.name),
+        email: emailProblem(form.email),
+        phone: phoneProblem(form.phone),
+        password: passwordProblem(form.password),
+    });
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-accent/20 p-4">
@@ -25,54 +36,72 @@ export default function SignupPage() {
                     <p className="text-muted-foreground">Start selling your gadgets today</p>
                 </div>
 
-                <form action={action} className="space-y-4">
+                {/* Checked here first (lib/validate.ts); the server checks again. */}
+                <form action={action} noValidate className="space-y-4" onSubmit={e => { if (!checks.ok()) e.preventDefault(); }}>
                     <div>
                         <label className="block text-sm font-medium mb-1">Full Name</label>
                         <input
                             name="name"
                             type="text"
-                            required
-                            className="w-full h-12 px-4 rounded-lg border bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                            autoComplete="name"
+                            value={form.name}
+                            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                            onBlur={checks.leave('name')}
+                            aria-invalid={!!checks.show('name')}
+                            className={`${box} ${checks.show('name') ? invalidBox : ''}`}
                             placeholder="John Doe"
                         />
+                        <FieldError message={checks.show('name')} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Email</label>
                         <input
                             name="email"
                             type="email"
-                            required
-                            className="w-full h-12 px-4 rounded-lg border bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                            autoComplete="email"
+                            value={form.email}
+                            onChange={e => setForm(f => ({ ...f, email: e.target.value.trim() }))}
+                            onBlur={checks.leave('email')}
+                            aria-invalid={!!checks.show('email')}
+                            className={`${box} ${checks.show('email') ? invalidBox : ''}`}
                             placeholder="john@example.com"
                         />
+                        <FieldError message={checks.show('email')} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Phone Number</label>
-                        <div className="flex w-full border rounded-lg bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
+                        <div className={`flex w-full border rounded-lg bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all ${checks.show('phone') ? invalidBox : ''}`}>
                             <span className="flex items-center pl-4 pr-3 border-r border-border bg-muted/20 text-muted-foreground font-medium text-sm">+91</span>
                             <input
                                 name="phone"
                                 type="tel"
-                                required
-                                pattern="[0-9]{10}"
-                                maxLength={10}
-                                onChange={(e) => {
-                                    e.target.value = e.target.value.replace(/\D/g, '');
-                                }}
+                                inputMode="numeric"
+                                autoComplete="tel-national"
+                                value={form.phone}
+                                onChange={e => setForm(f => ({ ...f, phone: cleanPhone(e.target.value) }))}
+                                onBlur={checks.leave('phone')}
+                                aria-invalid={!!checks.show('phone')}
                                 className="w-full h-12 px-4 outline-none bg-transparent"
                                 placeholder="9876543210"
                             />
                         </div>
+                        <FieldError message={checks.show('phone')} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Password</label>
                         <input
                             name="password"
                             type="password"
-                            required
-                            className="w-full h-12 px-4 rounded-lg border bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                            autoComplete="new-password"
+                            value={form.password}
+                            onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                            onBlur={checks.leave('password')}
+                            aria-invalid={!!checks.show('password')}
+                            className={`${box} ${checks.show('password') ? invalidBox : ''}`}
                             placeholder="••••••••"
                         />
+                        <FieldError message={checks.show('password')} />
+                        {!checks.show('password') && <p className="mt-1.5 text-xs text-muted-foreground">At least 6 characters.</p>}
                     </div>
 
                     {state?.error && (

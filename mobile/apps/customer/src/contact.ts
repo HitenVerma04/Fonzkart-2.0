@@ -7,6 +7,6 @@ export const CONTACT = {
   hours: 'Mon–Sat, 10am – 7pm',
 };
 
-/** The website's ready-made bulk enquiry (contact page with ?topic=bulk). */
+/** The ready-made bulk enquiry (also the website's /bulk page): a business liquidating IT assets or e-waste. */
 export const BULK_MESSAGE =
-  'Hi, I have a bulk quantity of devices/corporate assets for selling or e-waste recycling. Please contact me with details.';
+  'Hi Fonzkart, we have surplus IT assets / e-waste to liquidate. Device types and rough quantity: ____. Location: ____. Please share a quote.';

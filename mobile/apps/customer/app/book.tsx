@@ -6,7 +6,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import { usePincodeAvailability, usePlaceOrder, useProfile, useQuote, useSession } from '@fonzkart/api';
 import {
-  PAYMENT_METHODS, availableSlots, bookingAnswers, bookingProblems, cleanPincode, expressAvailable, formatInr,
+  PAYMENT_METHODS, addressProblem, availableSlots, bankAccountProblem, bookingAnswers, bookingProblems, cleanPhone, cleanPincode,
+  expressAvailable, formatInr, ifscProblem, nameProblem, phoneProblem, pincodeProblem, upiProblem,
   isCompletePincode, pickupDays, type PaymentMethod,
 } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
@@ -33,6 +34,8 @@ export default function Book() {
   const [now] = useState(() => new Date());
   const days = useMemo(() => pickupDays(now), [now]);
   const [phone, setPhone] = useState('');
+  // The customer pressed Confirm with something missing: every field says what is wrong.
+  const [tried, setTried] = useState(false);
   const [address, setAddress] = useState('');
   const [pincode, setPincode] = useState(cleanPincode(params.pincode ?? ''));
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -148,15 +151,17 @@ export default function Book() {
             onPress={() => void locateMe()} />
           {location ? <Notice tone="success" text="Location pinned. The executive will navigate to it." /> : null}
           {locationError ? <Notice tone="error" text={locationError} /> : null}
-          <TextField label="House / flat, street, area" value={address} onChangeText={setAddress} multiline
+          <TextField label="House / flat, street, area" value={address} onChangeText={setAddress} multiline showError={tried}
+            error={location && !address.trim() ? null : addressProblem(address)}
             placeholder="e.g. 12, 2nd Cross, Indiranagar" />
-          <TextField label="Pincode" value={pincode} onChangeText={text => setPincode(cleanPincode(text))}
+          <TextField label="Pincode" value={pincode} onChangeText={text => setPincode(cleanPincode(text))} showError={tried}
+            error={pincodeProblem(pincode)} placeholder="6-digit pincode"
             keyboardType="number-pad" maxLength={6} />
           {isCompletePincode(pincode) && pickup.data === false ? (
             <Notice tone="error" text={`We don't pick up from ${pincode} yet.`} />
           ) : null}
-          <TextField label="Mobile number" value={phone} onChangeText={text => setPhone(text.replace(/\D/g, '').slice(0, 10))}
-            keyboardType="phone-pad" prefix="+91" hint="The executive calls this number before coming." />
+          <TextField label="Mobile number" value={phone} onChangeText={text => setPhone(cleanPhone(text))} showError={tried}
+            error={phoneProblem(phone)} placeholder="10-digit mobile number" keyboardType="phone-pad" prefix="+91" hint="The executive calls this number before coming." />
         </Card>
       </Appear>
 
@@ -198,25 +203,28 @@ export default function Book() {
               onPress={() => setPaymentMethod(m.id)} />
           ))}
           {paymentMethod === 'upi' ? (
-            <TextField label="UPI ID" value={upiId} onChangeText={setUpiId} autoCapitalize="none" placeholder="name@bank" />
+            <TextField label="UPI ID" value={upiId} onChangeText={t => setUpiId(t.trim())} autoCapitalize="none" autoCorrect={false}
+              placeholder="name@bank" error={upiProblem(upiId)} showError={tried} />
           ) : null}
           {paymentMethod === 'bank_transfer' ? (
             <>
-              <TextField label="Account holder name" value={bankAccountName} onChangeText={setBankAccountName} />
-              <TextField label="Account number" value={bankAccount} onChangeText={text => setBankAccount(text.replace(/\D/g, ''))}
-                keyboardType="number-pad" />
-              <TextField label="IFSC" value={bankIfsc} onChangeText={text => setBankIfsc(text.toUpperCase())} autoCapitalize="characters" />
+              <TextField label="Account holder name" value={bankAccountName} onChangeText={setBankAccountName} showError={tried}
+                error={nameProblem(bankAccountName, { what: "the account holder's name" })} />
+              <TextField label="Account number" value={bankAccount} onChangeText={text => setBankAccount(text.replace(/\D/g, '').slice(0, 18))}
+                keyboardType="number-pad" maxLength={18} error={bankAccountProblem(bankAccount)} showError={tried} />
+              <TextField label="IFSC" value={bankIfsc} onChangeText={text => setBankIfsc(text.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11))}
+                autoCapitalize="characters" autoCorrect={false} maxLength={11} placeholder="e.g. SBIN0001234" error={ifscProblem(bankIfsc)} showError={tried} />
             </>
           ) : null}
         </Card>
       </Appear>
 
       <Appear index={4} style={styles.footer}>
-        {problems.length && !error ? <Notice text={problems[0]!} /> : null}
+        {problems.length && !error ? <Notice tone={tried ? 'error' : undefined} text={problems.length > 1 ? `${problems[0]!} (${problems.length - 1} more to fix above)` : problems[0]!} /> : null}
         {error ? <Notice tone="error" text={error} /> : null}
         <Button title="Confirm pickup" icon="check" loading={placeOrder.isPending}
-          disabled={problems.length > 0 || !serviceable || typeof quote.data?.price !== 'number'}
-          onPress={() => void confirm()} />
+          disabled={!serviceable || typeof quote.data?.price !== 'number'}
+          onPress={() => { if (problems.length) { setTried(true); return; } void confirm(); }} />
         <Text style={styles.small}>The executive checks the device at pickup. If its condition differs from your answers, they may offer a revised price for your approval.</Text>
       </Appear>
     </Page>

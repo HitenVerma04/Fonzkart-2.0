@@ -50,13 +50,17 @@ public class StaffController {
 
     /** Partners page "Register Partner" form; relationshipManagerId is ignored for RMs (their partners are their own). */
     public record PartnerCreateRequest(String name, String email, String phone, String password, String cityId,
-                                       String managerId, String relationshipManagerId) {
+                                       String managerId, String relationshipManagerId, java.util.List<String> cityIds) {
     }
 
     public record CityRequest(String cityId) {
     }
 
     public record AssignmentRequest(String cityId, String managerId, String relationshipManagerId) {
+    }
+
+    /** Every city a partner is responsible for; mainCityId (optional) is the one that becomes their main city. */
+    public record PartnerCitiesRequest(java.util.List<String> cityIds, String mainCityId) {
     }
 
     private final StaffRoleService roles;
@@ -153,7 +157,7 @@ public class StaffController {
     @PostMapping("/partners")
     public Map<String, Object> createPartner(HttpServletRequest request, @RequestBody PartnerCreateRequest r) {
         return partners.createPartner(sessions.getSession(request), r.name(), r.email(), r.phone(), r.password(),
-                r.cityId(), r.managerId(), r.relationshipManagerId());
+                r.cityId(), r.managerId(), r.relationshipManagerId(), r.cityIds());
     }
 
     @PutMapping("/partners/{partnerId}/assignment")
@@ -161,6 +165,12 @@ public class StaffController {
                                                 @RequestBody AssignmentRequest r) {
         return partners.updateAssignment(sessions.getSession(request), partnerId, r.cityId(), r.managerId(),
                 r.relationshipManagerId());
+    }
+
+    @PutMapping("/partners/{partnerId}/cities")
+    public Map<String, Object> updatePartnerCities(HttpServletRequest request, @PathVariable String partnerId,
+                                                   @RequestBody PartnerCitiesRequest r) {
+        return partners.updateCities(sessions.getSession(request), partnerId, r.cityIds(), r.mainCityId());
     }
 
     // ---- app/admin/rm-dashboard/page.tsx

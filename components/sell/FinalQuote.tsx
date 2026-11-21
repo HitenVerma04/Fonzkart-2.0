@@ -7,6 +7,9 @@ import { quickRegister, quickLogin } from '@/actions/inlineAuth';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { bankAccountProblem, cleanPhone, ifscProblem, nameProblem, phoneProblem, pincodeProblem, upiProblem } from '@/lib/validate';
+import { invalidBox, useFormChecks } from '@/lib/useFormChecks';
+import { FieldError } from '@/components/ui/FieldError';
 
 // Dynamic Import for Map (Client Only)
 const MapPicker = dynamic(() => import('./MapPicker'), { ssr: false });
@@ -51,6 +54,16 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
     const [bankAccount, setBankAccount] = useState('');
     const [bankIfsc, setBankIfsc] = useState('');
     const [bankAccountName, setBankAccountName] = useState('');
+
+    // What is wrong with each field (lib/validate.ts, as in the apps), shown under it once left or after pressing on.
+    const phoneChecks = useFormChecks({ phone: phoneProblem(cleanPhone(phone)) });
+    const pinChecks = useFormChecks({ pincode: pincodeProblem(pincode) });
+    const payChecks = useFormChecks({
+        upi: paymentMethod === 'upi' ? upiProblem(upiId) : null,
+        bankName: paymentMethod === 'bank_transfer' ? nameProblem(bankAccountName, { what: "the account holder's name" }) : null,
+        bankAccount: paymentMethod === 'bank_transfer' ? bankAccountProblem(bankAccount) : null,
+        ifsc: paymentMethod === 'bank_transfer' ? ifscProblem(bankIfsc) : null,
+    });
 
     // UI States
     const [isGettingLocation, setIsGettingLocation] = useState(false);
@@ -397,17 +410,20 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
                                 type="tel"
                                 maxLength={10}
                                 value={phone}
-                                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                                className="flex-1 p-4 border rounded-xl bg-background focus:ring-2 focus:ring-primary/50 outline-none text-lg tracking-widest"
+                                inputMode="numeric"
+                                onChange={(e) => setPhone(cleanPhone(e.target.value))}
+                                onBlur={phoneChecks.leave('phone')}
+                                aria-invalid={!!phoneChecks.show('phone')}
+                                className={`flex-1 p-4 border rounded-xl bg-background focus:ring-2 focus:ring-primary/50 outline-none text-lg tracking-widest ${phoneChecks.show('phone') ? invalidBox : ''}`}
                                 placeholder="98765 43210"
                                 autoFocus
                             />
                         </div>
+                        <FieldError message={phoneChecks.show('phone')} />
                     </div>
 
                     <button
-                        onClick={() => setBookingStep('quote')}
-                        disabled={phone.length < 10}
+                        onClick={() => { if (phoneChecks.ok()) setBookingStep('quote'); }}
                         className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         See Best Price <ArrowRight className="w-5 h-5" />
@@ -567,17 +583,21 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
                         <input
                             type="text"
                             maxLength={6}
-                            className="w-full p-4 border rounded-xl bg-background focus:ring-2 focus:ring-primary/50 outline-none"
+                            inputMode="numeric"
+                            className={`w-full p-4 border rounded-xl bg-background focus:ring-2 focus:ring-primary/50 outline-none ${pinChecks.show('pincode') ? invalidBox : ''}`}
                             placeholder="e.g. 560032"
                             value={pincode}
+                            onBlur={pinChecks.leave('pincode')}
+                            aria-invalid={!!pinChecks.show('pincode')}
                             onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
                         />
+                        <FieldError message={pinChecks.show('pincode')} />
                     </div>
                 </div>
 
                 <button
-                    onClick={handleCheckServiceability}
-                    disabled={(!address && !location) || pincode.length !== 6 || isCheckingPincode}
+                    onClick={() => { if (pinChecks.ok()) void handleCheckServiceability(); }}
+                    disabled={(!address && !location) || isCheckingPincode}
                     className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                     {isCheckingPincode ? <Loader2 className="animate-spin w-5 h-5" /> : <>Continue to Schedule <ArrowRight className="w-5 h-5" /></>}
@@ -891,10 +911,13 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
                             <input
                                 type="text"
                                 value={upiId}
-                                onChange={(e) => setUpiId(e.target.value)}
+                                onChange={(e) => setUpiId(e.target.value.trim())}
+                                onBlur={payChecks.leave('upi')}
+                                aria-invalid={!!payChecks.show('upi')}
                                 placeholder="username@bank"
-                                className="w-full h-12 px-4 rounded-xl border bg-background font-mono text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+                                className={`w-full h-12 px-4 rounded-xl border bg-background font-mono text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all ${payChecks.show('upi') ? invalidBox : ''}`}
                             />
+                            <FieldError message={payChecks.show('upi')} />
                         </motion.div>
                     )}
                 </div>
@@ -928,9 +951,12 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
                                     type="text"
                                     value={bankAccountName}
                                     onChange={(e) => setBankAccountName(e.target.value)}
+                                    onBlur={payChecks.leave('bankName')}
+                                    aria-invalid={!!payChecks.show('bankName')}
                                     placeholder="Enter full name"
-                                    className="w-full h-12 px-4 rounded-xl border bg-background text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+                                    className={`w-full h-12 px-4 rounded-xl border bg-background text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all ${payChecks.show('bankName') ? invalidBox : ''}`}
                                 />
+                                <FieldError message={payChecks.show('bankName')} />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
@@ -938,20 +964,27 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
                                     <input
                                         type="text"
                                         value={bankAccount}
-                                        onChange={(e) => setBankAccount(e.target.value.replace(/\D/g, ''))}
+                                        inputMode="numeric"
+                                        onChange={(e) => setBankAccount(e.target.value.replace(/\D/g, '').slice(0, 18))}
+                                        onBlur={payChecks.leave('bankAccount')}
+                                        aria-invalid={!!payChecks.show('bankAccount')}
                                         placeholder="Enter account number"
-                                        className="w-full h-12 px-4 rounded-xl border bg-background font-mono text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+                                        className={`w-full h-12 px-4 rounded-xl border bg-background font-mono text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all ${payChecks.show('bankAccount') ? invalidBox : ''}`}
                                     />
+                                    <FieldError message={payChecks.show('bankAccount')} />
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">IFSC Code</label>
                                     <input
                                         type="text"
                                         value={bankIfsc}
-                                        onChange={(e) => setBankIfsc(e.target.value.toUpperCase())}
+                                        onChange={(e) => setBankIfsc(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11))}
+                                        onBlur={payChecks.leave('ifsc')}
+                                        aria-invalid={!!payChecks.show('ifsc')}
                                         placeholder="SBIN0012345"
-                                        className="w-full h-12 px-4 rounded-xl border bg-background font-mono text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+                                        className={`w-full h-12 px-4 rounded-xl border bg-background font-mono text-sm outline-none focus:ring-4 focus:ring-primary/10 transition-all ${payChecks.show('ifsc') ? invalidBox : ''}`}
                                     />
+                                    <FieldError message={payChecks.show('ifsc')} />
                                 </div>
                             </div>
                         </motion.div>
@@ -994,8 +1027,8 @@ export default function FinalQuote({ basePrice, answers, deviceInfo, isRepair, u
             </div>
 
             <button
-                onClick={handleConfirmOrder}
-                disabled={isSubmitting || (paymentMethod === 'upi' && !upiId) || (paymentMethod === 'bank_transfer' && (!bankAccount || !bankIfsc || !bankAccountName))}
+                onClick={() => { if (payChecks.ok()) void handleConfirmOrder(); }}
+                disabled={isSubmitting}
                 className="w-full h-14 text-lg font-bold text-white bg-green-600 rounded-xl shadow-lg hover:bg-green-700 hover:scale-[1.01] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-8 shadow-green-600/10 hover:shadow-green-600/20"
             >
                 {isSubmitting ? <Loader2 className="animate-spin w-5 h-5" /> : (isRepair ? 'Confirm Booking' : 'Confirm & Complete Order')}

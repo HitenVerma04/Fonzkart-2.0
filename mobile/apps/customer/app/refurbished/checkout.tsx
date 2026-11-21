@@ -76,10 +76,10 @@ export default function RefurbishedCheckout() {
         </Card>
       </Appear>
       <Appear index={3} style={styles.footer}>
-        {form.problem && !error ? <Notice text={form.problem} /> : null}
+        {form.problem && form.tried && !error ? <Notice tone="error" text={form.problem} /> : null}
         {error ? <Notice tone="error" text={error} /> : null}
         <Button title={`Place order · ${formatInr(device.price)}`} icon="check" loading={placeOrder.isPending}
-          disabled={!!form.problem} onPress={() => void place()} />
+          onPress={() => { if (form.check()) void place(); }} />
         <Text style={styles.small}>We'll confirm your order by phone. Check the device before you pay.</Text>
       </Appear>
     </Page>

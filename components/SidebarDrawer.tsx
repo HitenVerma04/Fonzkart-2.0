@@ -315,12 +315,12 @@ export function SidebarDrawer({ isOpen, onClose, session, isAdminUser }: Sidebar
                             </Link>
                         </div>
                         <Link
-                            href="/contact?topic=bulk"
+                            href="/bulk"
                             onClick={onClose}
                             className="flex items-center gap-2 px-3 py-2 mt-1 rounded-lg text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors"
                         >
                             <Recycle className="h-3.5 w-3.5 shrink-0" />
-                            Bulk Corporate Orders &amp; Recycling
+                            Fonzkart for Business: sell IT assets in bulk
                         </Link>
                     </div>
 

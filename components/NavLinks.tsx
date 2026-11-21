@@ -252,11 +252,11 @@ export function NavLinks({ session, isAdminUser }: { session: { user?: NavLinksS
                                     </li>
                                     <li className="pt-1">
                                         <Link
-                                            href="/contact?topic=bulk"
+                                            href="/bulk"
                                             className="flex items-center gap-2 p-2 rounded-xl bg-accent/60 hover:bg-accent text-xs font-medium text-foreground transition-colors"
                                         >
                                             <Recycle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                                            <span>Bulk Orders &amp; Recycling</span>
+                                            <span>Fonzkart for Business</span>
                                         </Link>
                                     </li>
                                 </ul>

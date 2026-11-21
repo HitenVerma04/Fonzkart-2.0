@@ -1,6 +1,7 @@
 // The pickup booking rules of the website's booking steps (components/sell/FinalQuote.tsx), so the apps offer the
 // same days, slots, express window and payment options, and send the same order answers.
 import { PAYOUT_METHOD_LABELS } from './orderStatus';
+import { bankAccountProblem, ifscProblem, nameProblem, phoneProblem, pincodeProblem, upiProblem } from './validate';
 
 export const PICKUP_SLOTS = ['10:00 AM - 02:00 PM', '03:00 PM - 07:00 PM'] as const;
 
@@ -74,13 +75,18 @@ export interface BookingDetails {
 /** What is still missing before the booking can be sent, in the website's order (empty: ready). */
 export function bookingProblems(b: BookingDetails): string[] {
   const problems: string[] = [];
-  if (b.phone.replace(/\D/g, '').length !== 10) problems.push('Enter your 10-digit mobile number.');
+  const add = (problem: string | null) => {
+    if (problem) problems.push(problem);
+  };
+  add(phoneProblem(b.phone.replace(/\D/g, '')));
   if (!b.address.trim() && !b.location) problems.push('Enter your pickup address or use your location.');
-  if (!/^\d{6}$/.test(b.pincode)) problems.push('Enter the 6-digit pincode.');
+  add(pincodeProblem(b.pincode));
   if (!b.isExpress && !b.slot) problems.push('Choose a pickup time.');
-  if (b.paymentMethod === 'upi' && !b.upiId.trim()) problems.push('Enter your UPI ID.');
-  if (b.paymentMethod === 'bank_transfer' && (!b.bankAccount.trim() || !b.bankIfsc.trim() || !b.bankAccountName.trim())) {
-    problems.push('Enter the account holder, account number and IFSC.');
+  if (b.paymentMethod === 'upi') add(upiProblem(b.upiId));
+  if (b.paymentMethod === 'bank_transfer') {
+    add(nameProblem(b.bankAccountName, { what: "the account holder's name" }));
+    add(bankAccountProblem(b.bankAccount));
+    add(ifscProblem(b.bankIfsc));
   }
   return problems;
 }

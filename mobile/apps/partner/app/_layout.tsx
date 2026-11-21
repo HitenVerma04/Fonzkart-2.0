@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { createQueryClient } from '@fonzkart/api';
 import { stackScreenOptions, useRefreshOnAppFocus } from '@fonzkart/ui';
+import { PartnerNotifications } from '../src/notifications';
 import { PartnerSessionProvider } from '../src/session';
 
 const queryClient = createQueryClient();
@@ -25,6 +26,7 @@ export default function RootLayout() {
           <Stack.Screen name="partner/areas" options={{ title: 'Service areas' }} />
           <Stack.Screen name="partner/inbox" options={{ title: 'Notifications' }} />
         </Stack>
+        <PartnerNotifications />
       </PartnerSessionProvider>
     </QueryClientProvider>
   );

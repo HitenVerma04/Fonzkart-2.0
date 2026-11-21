@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Alert, FlatList, Platform, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { ridersApi, useRidersOverview, type TeamRider } from '@fonzkart/api';
-import { displayPhone, isCompleted, isFailed } from '@fonzkart/core';
+import { cleanPhone, displayPhone, emailProblem, isCompleted, isFailed, nameProblem, phoneProblem } from '@fonzkart/core';
 import { Button, Card, EmptyState, ErrorState, ListPicker, Loading, Notice, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
 
 export function TeamManager() {
@@ -16,6 +16,7 @@ export function TeamManager() {
   const [partnerId, setPartnerId] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [tried, setTried] = useState(false);
   const [message, setMessage] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
 
   if (overview.isPending) return <Loading />;
@@ -46,7 +47,7 @@ export function TeamManager() {
 
   const add = () => run(async () => {
     const result = await ridersApi.add({ name: name.trim(), phone: `+91${phone}`, email: email.trim() || undefined, partnerId: chosenPartner ?? undefined });
-    if (!result.error) { setName(''); setPhone(''); setEmail(''); }
+    if (!result.error) { setName(''); setPhone(''); setEmail(''); setTried(false); }
     return result;
   }, `${name.trim()} added. They sign in to the Partner app with +91 ${phone}.`);
 
@@ -69,15 +70,19 @@ export function TeamManager() {
       ListHeaderComponent={
         <View style={styles.head}>
           <Card title="Add a field executive">
-            <TextField label="Name" value={name} onChangeText={setName} />
-            <TextField label="Mobile number" value={phone} onChangeText={t => setPhone(t.replace(/\D/g, '').slice(0, 10))}
-              keyboardType="phone-pad" prefix="+91" />
-            <TextField label="Email (optional)" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+            <TextField label="Name" value={name} onChangeText={setName} error={nameProblem(name, { what: "the executive's name" })} showError={tried} />
+            <TextField label="Mobile number" value={phone} onChangeText={t => setPhone(cleanPhone(t))} error={phoneProblem(phone)} showError={tried}
+              keyboardType="phone-pad" prefix="+91" placeholder="10-digit mobile number" />
+            <TextField label="Email (optional)" value={email} onChangeText={t => setEmail(t.trim())} autoCapitalize="none" keyboardType="email-address"
+              error={emailProblem(email, { required: false })} showError={tried} />
             {!isPartner ? (
               <Button title={chosenPartner ? `Partner: ${partnerName(chosenPartner)}` : 'Choose partner'} variant="secondary" onPress={() => setPicking(true)} />
             ) : null}
-            <Button title="Add executive" loading={busy} disabled={!name.trim() || phone.length !== 10 || (!isPartner && currentUserRole !== 'ZONAL_HEAD' && !chosenPartner)}
-              onPress={() => void add()} />
+            <Button title="Add executive" loading={busy} disabled={!isPartner && currentUserRole !== 'ZONAL_HEAD' && !chosenPartner}
+              onPress={() => {
+                setTried(true);
+                if (!nameProblem(name) && !phoneProblem(phone) && !emailProblem(email, { required: false })) void add();
+              }} />
           </Card>
           {message ? <Notice tone={message.tone} text={message.text} /> : null}
           <Text style={styles.count}>{riders.length} field executive{riders.length === 1 ? '' : 's'}</Text>

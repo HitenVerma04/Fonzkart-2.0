@@ -34,8 +34,8 @@ const LOOK: Record<HomeTileId, { background: string; text: string; caption: stri
   desktop: { background: '#f0fdf4', text: '#064e3b', caption: 'Turn your old PC into cash' },
   earbuds: { background: '#fdf4ff', text: '#701a75', caption: 'Instant quote and fast money' },
   repair: { background: '#fef2f2', text: '#7f1d1d', caption: 'Quick, reliable, affordable' },
-  screenguard: { background: '#f0fdfa', text: '#083344', caption: 'Unbreakable • 3-hr doorstep' },
-  bulk: { background: '#fff8eb', text: '#78350f', caption: 'Any quantity · we collect' },
+  screenguard: { background: '#f0fdfa', text: '#083344', caption: 'Doorstep fitting · coming soon' },
+  bulk: { background: '#fff8eb', text: '#78350f', caption: 'For businesses · cash for IT assets' },
 };
 
 /** Dark mode: the same hue, deep instead of pastel, with light text. */
@@ -75,12 +75,14 @@ const CardArt = memo(function CardArt({ id, width, height }: { id: HomeTileId; w
   return <Art width={width} height={height} />;
 });
 
-export function CategoryCard({ id, name, width, index, onPress }: {
+export function CategoryCard({ id, name, width, index, onPress, badge }: {
   id: HomeTileId;
   name: string;
   width: number;
   index: number;
   onPress: () => void;
+  /** A small pill in the corner ("SOON"). */
+  badge?: string;
 }) {
   const dark = useTheme().scheme === 'dark';
   const look = dark ? { ...LOOK[id], ...DARK[id] } : LOOK[id];
@@ -102,6 +104,7 @@ export function CategoryCard({ id, name, width, index, onPress }: {
         style={[styles.card, dark && styles.cardDark, { width, height, backgroundColor: look.background }]}
       >
         <View pointerEvents="none" style={[styles.gloss, dark && styles.glossDark]} />
+        {badge ? <Text style={[styles.badge, { fontSize: 8.5 * k, paddingHorizontal: 6 * k, top: 6 * k, right: 6 * k }]} maxFontSizeMultiplier={1}>{badge}</Text> : null}
         <Text style={[styles.name, { color: look.text, height: nameArea, paddingTop: 8 * k, paddingHorizontal: 8 * k, fontSize: (name.length > 10 ? 13.5 : 15) * k, lineHeight: 20 * k }]}
           numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} maxFontSizeMultiplier={1}>{name}</Text>
         <View style={styles.art} pointerEvents="none">
@@ -123,6 +126,10 @@ const styles = StyleSheet.create({
   name: { fontWeight: '900', letterSpacing: -0.4 },
   art: { flex: 1, alignItems: 'center', overflow: 'hidden' },
   cardDark: { borderColor: 'rgba(255,255,255,0.1)' },
+  badge: {
+    position: 'absolute', zIndex: 2, overflow: 'hidden', borderRadius: 999, paddingVertical: 2, backgroundColor: '#16a34a', color: '#ffffff',
+    fontWeight: '900', letterSpacing: 0.6,
+  },
   gloss: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 40%)' },
   glossDark: { backgroundImage: 'linear-gradient(150deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 40%)' },
   caption: {

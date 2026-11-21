@@ -55,12 +55,17 @@ public interface UserRepository extends JpaRepository<User, String> {
     /** A relationship manager's partners, by name. */
     List<User> findByRoleAndRelationshipManagerIdOrderByNameAsc(String role, String relationshipManagerId);
 
-    @Query("SELECT u FROM User u WHERE u.role = :role AND (u.cityId IN :cityIds OR u.managerId = :managerId) ORDER BY u.name ASC")
+    /** In one of the cities (as main city or one of the extra cities, "PartnerCity"), or managed by this zonal head. */
+    @Query(value = "SELECT * FROM \"User\" u WHERE u.role = :role AND (u.\"cityId\" IN (:cityIds) OR u.\"managerId\" = :managerId "
+            + "OR u.id IN (SELECT pc.\"partnerId\" FROM \"PartnerCity\" pc WHERE pc.\"cityId\" IN (:cityIds))) ORDER BY u.name ASC",
+            nativeQuery = true)
     List<User> findPartnersForZonalHead(@Param("role") String role, @Param("cityIds") Collection<String> cityIds,
                                         @Param("managerId") String managerId);
 
     /** Same filter without ordering (app/admin/riders/page.tsx has no orderBy). */
-    @Query("SELECT u FROM User u WHERE u.role = :role AND (u.cityId IN :cityIds OR u.managerId = :managerId)")
+    @Query(value = "SELECT * FROM \"User\" u WHERE u.role = :role AND (u.\"cityId\" IN (:cityIds) OR u.\"managerId\" = :managerId "
+            + "OR u.id IN (SELECT pc.\"partnerId\" FROM \"PartnerCity\" pc WHERE pc.\"cityId\" IN (:cityIds)))",
+            nativeQuery = true)
     List<User> findPartnersForZonalHeadUnordered(@Param("role") String role, @Param("cityIds") Collection<String> cityIds,
                                                  @Param("managerId") String managerId);
 

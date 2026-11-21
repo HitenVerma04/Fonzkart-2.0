@@ -39,7 +39,7 @@ export function useFestiveTheme() {
     queryKey: festiveKeys.theme,
     queryFn: ({ signal }) => festiveApi.get(signal),
     staleTime: 60_000,
-    refetchInterval: 60_000,
+    refetchInterval: INBOX_REFRESH_MS,
   });
 }
 
@@ -137,6 +137,9 @@ export const orderKeys = {
 /** How often an open order screen asks for news (besides refreshing when the app comes back to the screen). */
 export const LIVE_ORDER_REFRESH_MS = 20_000;
 
+/** How often an inbox asks for news while the app is open (the in-app banner announces what is new). */
+export const INBOX_REFRESH_MS = 30_000;
+
 /** The final offer for a device: the server's price, exactly what the order will be booked at. Always fresh. */
 export function useQuote(device: string | undefined, variant: string | undefined, answers: Record<string, unknown> | undefined) {
   return useQuery({
@@ -187,7 +190,7 @@ export function useNotifications(enabled: boolean) {
     queryFn: ({ signal }) => notificationsApi.list(signal),
     enabled,
     staleTime: 0,
-    refetchInterval: 60_000,
+    refetchInterval: INBOX_REFRESH_MS,
   });
 }
 
@@ -237,7 +240,7 @@ export function useExecutiveInbox(enabled: boolean) {
     queryFn: ({ signal }) => executiveApi.notifications(signal),
     enabled,
     staleTime: 0,
-    refetchInterval: 60_000,
+    refetchInterval: INBOX_REFRESH_MS,
   });
 }
 
@@ -286,7 +289,7 @@ export function useStaffInbox(enabled: boolean) {
     queryFn: ({ signal }) => notificationsApi.list(signal),
     enabled,
     staleTime: 0,
-    refetchInterval: 60_000,
+    refetchInterval: INBOX_REFRESH_MS,
   });
 }
 

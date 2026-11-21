@@ -1,40 +1,30 @@
 // Screen guard checkout: delivery details and cash on delivery. The server prices the order from its own data; the
 // summary here shows the same latest store prices.
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { shopKeys, usePlaceShopOrder, useProfile, useScreenGuardStore, useSession, type ShopOrder } from '@fonzkart/api';
-import { cleanPincode, formatInr, isCompletePincode } from '@fonzkart/core';
+import { shopKeys, usePlaceShopOrder, useScreenGuardStore, useSession, type ShopOrder } from '@fonzkart/api';
+import { formatInr } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
-import { Appear, Button, Card, ChoiceCard, EmptyState, ErrorState, Notice, Page, SkeletonCard, TextField, type } from '../../src/design';
+import { Appear, Button, Card, ChoiceCard, EmptyState, ErrorState, Notice, Page, SkeletonCard, type } from '../../src/design';
 import { clearCart, priceCart, useCart } from '../../src/shop/cart';
+import { DeliveryFields, useDeliveryForm } from '../../src/shop/DeliveryFields';
 
 export default function Checkout() {
   const styles = useStyles();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { session } = useSession();
-  const profile = useProfile(session.status === 'signedIn');
   const store = useScreenGuardStore();
   const cart = useCart();
   const placeOrder = usePlaceShopOrder();
   const totals = priceCart(cart, store.data?.items);
 
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [pincode, setPincode] = useState('');
+  // Name, mobile, address and pincode with their checks (starts from the account's name and phone).
+  const form = useDeliveryForm();
   const [error, setError] = useState('');
-
-  // The account's name and phone (stored as +91XXXXXXXXXX) as defaults.
-  useEffect(() => {
-    if (!profile.data) return;
-    setName(current => current || profile.data.name);
-    const stored = profile.data.phone?.replace(/\D/g, '').slice(-10);
-    if (stored) setPhone(current => current || stored);
-  }, [profile.data]);
 
   if (session.status !== 'signedIn') return <EmptyState icon="lock" message="Sign in to place your order." />;
   if (store.isPending) return <Page><SkeletonCard lines={4} /><SkeletonCard lines={3} /></Page>;
@@ -46,11 +36,8 @@ export default function Checkout() {
     );
   }
 
-  const problem = !name.trim() ? 'Enter your name.'
-    : phone.length !== 10 ? 'Enter your 10-digit mobile number.'
-    : address.trim().length < 10 ? 'Enter your full delivery address.'
-    : !isCompletePincode(pincode) ? 'Enter your 6-digit pincode.'
-    : '';
+  const problem = form.problem;
+  const { name, phone, address, pincode } = form.values;
 
   const place = async () => {
     setError('');
@@ -75,13 +62,7 @@ export default function Checkout() {
     <Page>
       <Appear>
         <Card title="Delivery address" icon="location">
-          <TextField label="Full name" value={name} onChangeText={setName} autoComplete="name" textContentType="name" />
-          <TextField label="Mobile number" value={phone} onChangeText={text => setPhone(text.replace(/\D/g, '').slice(0, 10))}
-            keyboardType="phone-pad" prefix="+91" hint="The delivery partner calls this number." />
-          <TextField label="House / flat, street, area" value={address} onChangeText={setAddress} multiline
-            placeholder="e.g. 12, 2nd Cross, Indiranagar, Bengaluru" />
-          <TextField label="Pincode" value={pincode} onChangeText={text => setPincode(cleanPincode(text))}
-            keyboardType="number-pad" maxLength={6} />
+          <DeliveryFields form={form} phoneHint="The delivery partner calls this number." />
         </Card>
       </Appear>
 
@@ -118,10 +99,10 @@ export default function Checkout() {
       </Appear>
 
       <Appear index={3} style={styles.footer}>
-        {problem && !error ? <Notice text={problem} /> : null}
+        {problem && form.tried && !error ? <Notice tone="error" text={problem} /> : null}
         {error ? <Notice tone="error" text={error} /> : null}
         <Button title={`Place order · ${formatInr(totals.payTotal)}`} icon="check" loading={placeOrder.isPending}
-          disabled={!!problem} onPress={() => void place()} />
+          onPress={() => { if (form.check()) void place(); }} />
         <Text style={styles.small}>We'll confirm your order by phone. Check the guard fits before you pay.</Text>
       </Appear>
     </Page>

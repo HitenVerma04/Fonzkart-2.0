@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Clock, ShieldCheck, Wrench } from 'lucide-react';
 import { bookRepair } from '@/actions/buyRepair';
 import { REPAIR_ISSUES, REPAIR_SLOTS, inr, issueLabel, type RepairBooking, type RepairPrice, type RepairSlot } from '@/lib/buyRepair';
+import { DeliveryFields, useDeliveryForm } from '@/components/ui/DeliveryFields';
 
 const field = 'w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none focus:border-primary';
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -42,16 +43,15 @@ export function RepairBooker({ items, signedIn, defaultName }: { items: RepairPr
     const days = useMemo(visitDays, []);
     const [date, setDate] = useState('');
     const [slot, setSlot] = useState<RepairSlot | ''>('');
-    const [form, setForm] = useState({ name: defaultName, phone: '', address: '', pincode: '' });
+    const delivery = useDeliveryForm(defaultName);
+    const form = delivery.values;
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [booked, setBooked] = useState<RepairBooking | null>(null);
-    const problem = !chosen ? 'Choose your phone and the repair.' : !date || !slot ? 'Choose a day and a time.'
-        : form.name.trim().length < 2 ? 'Enter your name.' : !/^\d{10}$/.test(form.phone) ? 'Enter your 10-digit mobile number.'
-        : form.address.trim().length < 6 ? 'Enter your full address.' : !/^\d{6}$/.test(form.pincode) ? 'Enter your 6-digit pincode.' : '';
+    const choiceProblem = !chosen ? 'Choose your phone and the repair.' : !date || !slot ? 'Choose a day and a time.' : '';
 
     const submit = async () => {
-        if (!chosen || !slot) return;
+        if (!chosen || !slot || !delivery.check()) return;
         setBusy(true);
         setError('');
         const result = await bookRepair({ repairPriceId: chosen.id, visitDate: date, slot, name: form.name.trim(), phone: form.phone, address: form.address.trim(), pincode: form.pincode });
@@ -145,20 +145,17 @@ export function RepairBooker({ items, signedIn, defaultName }: { items: RepairPr
                     ) : <p className="text-sm text-muted-foreground">Choose your phone and the repair to see the price.</p>}
                     {signedIn ? (
                         <>
-                            <input className={field} placeholder="Full name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-                            <input className={field} placeholder="10-digit mobile number" inputMode="numeric" maxLength={10} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })} />
-                            <textarea className={field} placeholder="Full address" rows={3} value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} />
-                            <input className={field} placeholder="6-digit pincode" inputMode="numeric" maxLength={6} value={form.pincode} onChange={e => setForm({ ...form, pincode: e.target.value.replace(/\D/g, '') })} />
+                            <DeliveryFields form={delivery} field={field} />
                         </>
                     ) : <p className="text-sm text-muted-foreground">Sign in to book a visit.</p>}
                     {chosen ? <div className="flex justify-between border-t pt-3 font-black"><span>Pay after the repair</span><span>{inr(chosen.price)}</span></div> : null}
                     {error ? <p className="text-sm text-red-500">{error}</p> : null}
                     {signedIn ? (
                         <>
-                            <button type="button" disabled={!!problem || busy} onClick={submit} className="w-full rounded-full bg-primary py-3 font-bold text-primary-foreground disabled:opacity-50">
+                            <button type="button" disabled={!!choiceProblem || busy} onClick={submit} className="w-full rounded-full bg-primary py-3 font-bold text-primary-foreground disabled:opacity-50">
                                 {busy ? 'Booking…' : 'Book the visit'}
                             </button>
-                            {problem ? <p className="text-center text-xs text-muted-foreground">{problem}</p> : null}
+                            {choiceProblem ? <p className="text-center text-xs text-muted-foreground">{choiceProblem}</p> : null}
                         </>
                     ) : (
                         <Link href="/login" className="block w-full rounded-full bg-primary py-3 text-center font-bold text-primary-foreground">Sign in to continue</Link>

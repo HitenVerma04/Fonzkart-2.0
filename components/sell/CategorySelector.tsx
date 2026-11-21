@@ -962,7 +962,7 @@ const categories = [
     {
         id: 'unbreakable-screenguard',
         name: 'Screen Guard',
-        subtext: 'UNBREAKABLE • 3-HR DOORSTEP',
+        subtext: 'DOORSTEP FITTING • COMING SOON',
         component: <ScreenGuardGraphic />,
         bgColors: 'bg-[#f0fdfa] dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10 dark:border dark:hover:bg-white/[0.06] dark:hover:shadow-[0_0_30px_rgba(19,226,91,0.2)]',
         textColor: 'text-[#083344] dark:text-cyan-300'
@@ -970,7 +970,7 @@ const categories = [
     {
         id: 'bulk-orders',
         name: 'Bulk Orders',
-        subtext: 'CORPORATE & RECYCLING',
+        subtext: 'FOR BUSINESSES • CASH FOR IT ASSETS',
         component: <BulkOrdersGraphic />,
         bgColors: 'bg-[#ecfdf5] dark:bg-white/[0.03] dark:backdrop-blur-xl dark:border-white/10 dark:border dark:hover:bg-white/[0.06] dark:hover:shadow-[0_0_30px_rgba(16,185,129,0.2)]',
         textColor: 'text-[#064e3b] dark:text-emerald-300'
@@ -983,7 +983,7 @@ export default function CategorySelector({ onSelect }: CategorySelectorProps) {
 
     const handleClick = (id: string) => {
         if (id === 'bulk-orders') {
-            router.push('/contact?topic=bulk');
+            router.push('/bulk');
             return;
         }
         onSelect(id);
@@ -1012,6 +1012,11 @@ export default function CategorySelector({ onSelect }: CategorySelectorProps) {
                             border-transparent hover:border-black/5 dark:hover:border-white/10
                         `}
                     >
+                        {cat.id === 'unbreakable-screenguard' && (
+                            <span className="absolute right-5 top-5 z-30 rounded-full bg-emerald-600 px-3 py-1 text-[10px] font-black tracking-[0.15em] text-white shadow-lg animate-pulse">
+                                SOON
+                            </span>
+                        )}
                         {/* Text Content */}
                         <div className="absolute top-6 left-6 md:top-8 md:left-8 z-20 w-3/4">
                             <p className={`text-[10px] md:text-xs font-bold uppercase tracking-wider opacity-70 mb-2 ${cat.textColor}`}>

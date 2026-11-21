@@ -3,13 +3,13 @@
     "name": "Fonzkart Admin",
     "slug": "fonzkart-admin",
     "scheme": "fonzkart-admin",
-    "version": "0.3.7",
+    "version": "0.3.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "android": {
       "package": "in.fonzkart.admin",
-      "versionCode": 11,
+      "versionCode": 12,
       "blockedPermissions": [
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -51,7 +51,13 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-notifications",
+        {
+          "color": "#16a34a"
+        }
+      ]
     ]
   }
 }

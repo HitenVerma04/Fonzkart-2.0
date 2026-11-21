@@ -314,6 +314,17 @@ model PushToken {
   @@index([riderId])
 }
 
+// The cities a partner is responsible for besides their main city (User.cityId). The backend creates this table on
+// startup (PartnerCities.ensureTable), so a deploy needs no hand-run SQL.
+model PartnerCity {
+  partnerId String
+  cityId    String
+  createdAt DateTime @default(now())
+
+  @@id([partnerId, cityId])
+  @@index([cityId])
+}
+
 /// A partner asking to serve more pincodes (Partner app); an admin or the city's zonal head approves all or some of
 /// them (Admin app), which adds them to the partner's pincodes.
 model PincodeRequest {

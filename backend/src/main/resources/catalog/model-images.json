@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-16.2",
+  "version": "2026-11-18.1",
   "about": "Picture fixes applied once per version on startup: a model (brand, category, name) gets \"img\" only while its picture is still one of \"replaces\" (a phone photo standing in for a watch, a missing file) or none the catalog would show (empty, a logo), so a photo an admin sets later is never overwritten. A model without an official photo gets a neutral watch drawing (generic-device) instead of another device. Brand logos the same way. Photos are the brands' own product images (apple.com support, samsung.com/in, oneplus.in, mi.com, nothing.tech, boat-lifestyle.com, dell.com), resized to 500x500.",
   "models": [
     {"brandId":"samsung","category":"watch","name":"Galaxy Watch 4","img":"/models/samsung-smartwatch/Galaxy_Watch_4.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png"]},
@@ -26,7 +26,7 @@
     {"brandId":"boat","category":"watch","name":"Boat Storm Call","img":"/models/boat-smartwatch/Storm_Call.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png"]},
     {"brandId":"boat","category":"watch","name":"Boat Wave Sigma","img":"/models/boat-smartwatch/Wave_Sigma.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png"]},
     {"brandId":"boat","category":"watch","name":"Boat Xtend","img":"/models/boat-smartwatch/Xtend.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png"]},
-    {"brandId":"boat","category":"watch","name":"Boat Flash","img":"/models/generic-device/smartwatch.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png"]},
+    {"brandId":"boat","category":"watch","name":"Boat Flash","img":"/models/boat-smartwatch/Flash.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png","/models/generic-device/smartwatch.png"]},
     {"brandId":"lenovo","category":"tablet","name":"Tab M10","img":"/models/lenovo-tablet/Lenovo_Tab_M10_3rd_Gen_10.1_inch_WiFi_4G.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png"]},
     {"brandId":"microsoft","category":"tablet","name":"Surface Go 3","img":"/models/microsoft-laptop/Surface_Go_3_Series.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png"]},
     {"brandId":"microsoft","category":"tablet","name":"Surface Pro 8","img":"/models/microsoft-laptop/Surface_Pro_8.png","replaces":["/models/samsung/Samsung_Galaxy_S25_Ultra.png"]},
@@ -46,6 +46,7 @@
     {"brandId":"oneplus","category":"earbuds","name":"OnePlus Buds Pro 2","img":"/models/generic-device/earbuds.png","replaces":["/models/oneplus-earbuds/buds_pro_2.png"]}
   ],
   "brands": [
-    {"id":"boat","logo":"/models/boat/logo.png","replaces":["https://www.boat-lifestyle.com/cdn/shop/files/boAt_logo_small_50b4ec1c-3b08-410a-9d29-a1b63e527f32.png"]}
+    {"id":"boat","logo":"/models/boat/logo.png","replaces":["https://www.boat-lifestyle.com/cdn/shop/files/boAt_logo_small_50b4ec1c-3b08-410a-9d29-a1b63e527f32.png"]},
+    {"id":"poco","logo":"/brands/poco-logo.png","replaces":["/brands/poco.svg","/brands/poco.png",""]}
   ]
 }

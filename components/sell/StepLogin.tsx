@@ -4,6 +4,9 @@
 import { useState } from 'react';
 import { quickLogin, quickRegister } from '@/actions/inlineAuth';
 import { Loader2, ArrowRight } from 'lucide-react';
+import { cleanPhone, emailProblem, nameProblem, passwordProblem, phoneProblem } from '@/lib/validate';
+import { invalidBox, useFormChecks } from '@/lib/useFormChecks';
+import { FieldError } from '@/components/ui/FieldError';
 
 interface StepLoginProps {
     onSuccess: (user: any) => void;
@@ -13,6 +16,21 @@ export default function StepLogin({ onSuccess }: StepLoginProps) {
     const [mode, setMode] = useState<'register' | 'login'>('register');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [form, setForm] = useState({ name: '', phone: '', email: '', password: '' });
+    const registering = mode === 'register';
+    const checks = useFormChecks({
+        name: registering ? nameProblem(form.name) : null,
+        phone: registering ? phoneProblem(form.phone) : null,
+        email: emailProblem(form.email),
+        password: registering ? passwordProblem(form.password) : form.password ? null : 'Enter your password.',
+    });
+    const set = (key: keyof typeof form, clean: (v: string) => string = v => v) =>
+        (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [key]: clean(e.target.value) }));
+    const fieldProps = (key: 'name' | 'phone' | 'email' | 'password') => ({
+        value: form[key],
+        onBlur: checks.leave(key),
+        'aria-invalid': !!checks.show(key),
+    });
 
     async function handleSubmit(formData: FormData) {
         setIsLoading(true);
@@ -45,34 +63,37 @@ export default function StepLogin({ onSuccess }: StepLoginProps) {
                     : 'Sign in to view your offer.'}
             </p>
 
-            <form action={handleSubmit} className="space-y-4">
+            <form action={handleSubmit} noValidate className="space-y-4" onSubmit={e => { if (!checks.ok()) e.preventDefault(); }}>
                 {mode === 'register' && (
                     <>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Full Name</label>
                             <input
                                 name="name"
-                                required
-                                className="w-full p-2 border rounded-lg bg-background"
+                                autoComplete="name"
+                                {...fieldProps('name')}
+                                onChange={set('name')}
+                                className={`w-full p-2 border rounded-lg bg-background ${checks.show('name') ? invalidBox : ''}`}
                                 placeholder="John Doe"
                             />
+                            <FieldError message={checks.show('name')} />
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Phone Number</label>
-                            <div className="flex items-center w-full border rounded-lg bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all">
+                            <div className={`flex items-center w-full border rounded-lg bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all ${checks.show('phone') ? invalidBox : ''}`}>
                                 <span className="pl-3 pr-2 py-2 border-r border-border/50 text-muted-foreground font-medium text-sm bg-muted/20">+91</span>
                                 <input
                                     name="phone"
-                                    required
                                     type="tel"
-                                    maxLength={10}
-                                    onChange={(e) => {
-                                        e.target.value = e.target.value.replace(/\D/g, '');
-                                    }}
+                                    inputMode="numeric"
+                                    autoComplete="tel-national"
+                                    {...fieldProps('phone')}
+                                    onChange={set('phone', cleanPhone)}
                                     className="w-full p-2 text-sm outline-none bg-transparent"
                                     placeholder="9876543210"
                                 />
                             </div>
+                            <FieldError message={checks.show('phone')} />
                         </div>
                     </>
                 )}
@@ -82,10 +103,13 @@ export default function StepLogin({ onSuccess }: StepLoginProps) {
                     <input
                         name="email"
                         type="email"
-                        required
-                        className="w-full p-2 border rounded-lg bg-background"
+                        autoComplete="email"
+                        {...fieldProps('email')}
+                        onChange={set('email', v => v.trim())}
+                        className={`w-full p-2 border rounded-lg bg-background ${checks.show('email') ? invalidBox : ''}`}
                         placeholder="john@example.com"
                     />
+                    <FieldError message={checks.show('email')} />
                 </div>
 
                 <div className="space-y-2">
@@ -93,10 +117,13 @@ export default function StepLogin({ onSuccess }: StepLoginProps) {
                     <input
                         name="password"
                         type="password"
-                        required
-                        className="w-full p-2 border rounded-lg bg-background"
+                        autoComplete={registering ? 'new-password' : 'current-password'}
+                        {...fieldProps('password')}
+                        onChange={set('password')}
+                        className={`w-full p-2 border rounded-lg bg-background ${checks.show('password') ? invalidBox : ''}`}
                         placeholder="••••••••"
                     />
+                    <FieldError message={checks.show('password')} />
                 </div>
 
                 {error && <p className="text-sm text-red-500">{error}</p>}
@@ -117,14 +144,14 @@ export default function StepLogin({ onSuccess }: StepLoginProps) {
                 {mode === 'register' ? (
                     <p className="text-muted-foreground">
                         Already have an account?{' '}
-                        <button onClick={() => setMode('login')} className="text-primary font-bold hover:underline">
+                        <button type="button" onClick={() => { setMode('login'); checks.reset(); }} className="text-primary font-bold hover:underline">
                             Sign in
                         </button>
                     </p>
                 ) : (
                     <p className="text-muted-foreground">
                         New user?{' '}
-                        <button onClick={() => setMode('register')} className="text-primary font-bold hover:underline">
+                        <button type="button" onClick={() => { setMode('register'); checks.reset(); }} className="text-primary font-bold hover:underline">
                             Create account
                         </button>
                     </p>

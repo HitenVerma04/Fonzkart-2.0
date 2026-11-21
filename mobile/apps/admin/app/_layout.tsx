@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SessionProvider, createQueryClient } from '@fonzkart/api';
 import { stackScreenOptions, useRefreshOnAppFocus } from '@fonzkart/ui';
+import { AdminNotifications } from '../src/notifications';
 import { tokenStorage } from '../src/tokenStorage';
 
 const queryClient = createQueryClient();
@@ -43,6 +44,7 @@ export default function RootLayout() {
           <Stack.Screen name="email/[id]" options={{ title: 'Message' }} />
           <Stack.Screen name="email/compose" options={{ title: 'New email' }} />
         </Stack>
+        <AdminNotifications />
       </SessionProvider>
     </QueryClientProvider>
   );

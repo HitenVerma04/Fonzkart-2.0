@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { authApi } from '@fonzkart/api';
+import { emailProblem, passwordProblem } from '@fonzkart/core';
 import { Logo, makeStyles } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
 import { Appear, Button, Notice, Page, TextField, type, useDesign } from '../../src/design';
@@ -17,6 +18,10 @@ export default function Forgot() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [tried, setTried] = useState(false);
+  const emailError = emailProblem(email);
+  const codeError = otp.length === 6 ? null : otp ? `The code has 6 digits; this has ${otp.length}.` : 'Enter the 6-digit code from the email.';
+  const passwordError = passwordProblem(password);
 
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
@@ -56,7 +61,9 @@ export default function Forgot() {
           <TextField
             label="Email"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={text => setEmail(text.trim())}
+            error={emailError}
+            showError={tried}
             placeholder="john@example.com"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -64,7 +71,7 @@ export default function Forgot() {
             autoComplete="email"
           />
           {error ? <Notice tone="error" text={error} /> : null}
-          <Button title="Send code" onPress={sendCode} loading={busy} disabled={!email.trim()} />
+          <Button title="Send code" loading={busy} onPress={() => { setTried(true); if (!emailError) { setTried(false); void sendCode(); } }} />
         </Appear>
       ) : (
         <Appear key="code" index={1} style={styles.form}>
@@ -79,6 +86,8 @@ export default function Forgot() {
             autoComplete="one-time-code"
             textContentType="oneTimeCode"
             style={styles.code}
+            error={codeError}
+            showError={tried}
           />
           <TextField
             label="New password"
@@ -87,9 +96,12 @@ export default function Forgot() {
             secureTextEntry
             autoComplete="new-password"
             textContentType="newPassword"
+            error={passwordError}
+            showError={tried}
+            hint="At least 6 characters."
           />
           {error ? <Notice tone="error" text={error} /> : null}
-          <Button title="Set new password" onPress={reset} loading={busy} disabled={otp.length !== 6 || !password} />
+          <Button title="Set new password" loading={busy} onPress={() => { setTried(true); if (!codeError && !passwordError) void reset(); }} />
           <Button title="Use a different email" variant="link" onPress={() => { setStep('email'); setOtp(''); setError(null); }} />
         </Appear>
       )}

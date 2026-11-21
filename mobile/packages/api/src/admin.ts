@@ -36,6 +36,8 @@ export interface PartnerOverviewItem extends StaffUser {
   city: City | null;
   manager: StaffUser | null;
   relationshipManager: StaffUser | null;
+  /** Every city the partner is responsible for, main city first (older servers: absent, use city). */
+  cities?: City[];
 }
 
 export interface PartnersOverview {
@@ -128,11 +130,14 @@ export const adminApi = {
   // Partners (app/admin/partners)
   partners: (signal?: AbortSignal) => get<PartnersOverview>('/api/staff/partners/overview', signal),
   grantPartner: (email: string, cityId?: string, managerId?: string) => post('/api/staff/partners/grant', { email, cityId, managerId }),
-  createPartner: (input: { name: string; email: string; phone: string; password: string; cityId?: string; managerId?: string; relationshipManagerId?: string }) =>
+  createPartner: (input: { name: string; email: string; phone: string; password: string; cityId?: string; cityIds?: string[]; managerId?: string; relationshipManagerId?: string }) =>
     create('/api/staff/partners', input, 'partner'),
   updatePartnerAssignment: (partnerId: string, input: { cityId?: string | null; managerId?: string | null; relationshipManagerId?: string | null }) =>
     put(`/api/staff/partners/${enc(partnerId)}/assignment`, input),
   updatePartnerPincodes: (partnerId: string, pincodes: string[]) => put(`/api/cities/partners/${enc(partnerId)}/pincodes`, { pincodes }),
+  /** Every city the partner is responsible for; mainCityId becomes their main city. Pincodes of removed cities leave their service areas. */
+  updatePartnerCities: (partnerId: string, cityIds: string[], mainCityId?: string) =>
+    put(`/api/staff/partners/${enc(partnerId)}/cities`, { cityIds, mainCityId }) as Promise<ActionResult & { removedPincodes?: number }>,
   removePartnerFromCity: (partnerId: string) => post(`/api/cities/partners/${enc(partnerId)}/remove`),
 
   // Zonal heads (app/admin/zonal-heads)

@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { getCurrentStaff, type StaffUser } from "@/lib/staff-access";
 import { backendRequest, usesApi } from "@/lib/backend";
+import { getSession } from "@/lib/session";
 
 // In-app notifications for the admin panel bell. Who the caller is comes from the signed-in session and the
 // database (getCurrentStaff), never from arguments sent by the browser: the old (role, userId) parameters are still
@@ -44,9 +45,11 @@ export async function getNotifications(_userRole?: string, _userId?: string) {
     }
     try {
         const staff = await currentPanelUser();
-        if (!staff) return { success: true, notifications: [] };
+        // A customer sees only their own (order updates), as in the Customer app's inbox.
+        const customerId = staff ? null : (await getSession())?.user?.id ?? null;
+        if (!staff && !customerId) return { success: true, notifications: [] };
         const notifications = await prisma.notification.findMany({
-            where: addressedTo(staff),
+            where: staff ? addressedTo(staff) : { userId: customerId },
             orderBy: { createdAt: 'desc' },
             take: 20
         });
@@ -64,9 +67,10 @@ export async function markAsRead(id: string) {
     }
     try {
         const staff = await currentPanelUser();
-        if (!staff || typeof id !== 'string' || !id) return { success: false };
+        const customerId = staff ? null : (await getSession())?.user?.id ?? null;
+        if ((!staff && !customerId) || typeof id !== 'string' || !id) return { success: false };
         const { count } = await prisma.notification.updateMany({
-            where: { id, ...addressedTo(staff) },
+            where: staff ? { id, ...addressedTo(staff) } : { id, userId: customerId },
             data: { isRead: true }
         });
         return { success: count > 0 };

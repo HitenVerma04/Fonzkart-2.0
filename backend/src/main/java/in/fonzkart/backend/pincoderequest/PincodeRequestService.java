@@ -13,6 +13,7 @@ import in.fonzkart.backend.shared.time.JsDates;
 import in.fonzkart.backend.shared.web.ActionException;
 import in.fonzkart.backend.user.entity.User;
 import in.fonzkart.backend.user.repository.UserRepository;
+import in.fonzkart.backend.user.service.PartnerCities;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,9 +45,12 @@ public class PincodeRequestService {
     private final StaffAccess staffAccess;
     private final CityAccess cityAccess;
     private final OrderNotifications notifications;
+    private final PartnerCities partnerCities;
 
     public PincodeRequestService(PincodeRequestRepository requests, UserRepository users, CityRepository cities,
-                                 StaffAccess staffAccess, CityAccess cityAccess, OrderNotifications notifications) {
+                                 StaffAccess staffAccess, CityAccess cityAccess, OrderNotifications notifications,
+                                 PartnerCities partnerCities) {
+        this.partnerCities = partnerCities;
         this.requests = requests;
         this.users = users;
         this.cities = cities;
@@ -63,6 +67,8 @@ public class PincodeRequestService {
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("pincodes", Arrays.asList(nonNull(partner.getPincodes())));
         out.put("city", cityView(partner.getCityId()));
+        // Every city the partner serves (main first), with its pincodes.
+        out.put("cities", partnerCities.cityIds(partner).stream().map(this::cityView).filter(c -> c != null).toList());
         out.put("requests", requests.findByPartnerIdOrderByCreatedAtDesc(partner.getId()).stream().map(this::view).toList());
         return out;
     }

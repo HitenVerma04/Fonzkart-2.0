@@ -39,7 +39,7 @@ const BUILT_IN: Banner[] = [
     art: { icon: 'watch', kicker: 'More than phones', gradient: 'linear-gradient(125deg, #065f46 0%, #059669 55%, #6ee7b7 100%)', cta: 'Explore' },
   },
   {
-    id: 'bulk', title: 'Selling in bulk?', subtitle: 'Corporate IT assets and e-waste recycling', category: null,
+    id: 'bulk', title: 'Liquidating IT assets?', subtitle: 'We buy in bulk from businesses, working or scrap', category: null,
     art: { icon: 'building', kicker: 'For businesses', gradient: 'linear-gradient(125deg, #0b2316 0%, #14532d 60%, #16a34a 100%)', cta: 'Talk to us' },
   },
 ];

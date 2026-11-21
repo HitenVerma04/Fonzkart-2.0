@@ -3,13 +3,13 @@
     "name": "Fonzkart Partner",
     "slug": "fonzkart-partner",
     "scheme": "fonzkart-partner",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "android": {
       "package": "in.fonzkart.partner",
-      "versionCode": 7,
+      "versionCode": 8,
       "blockedPermissions": [
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -57,7 +57,13 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-notifications",
+        {
+          "color": "#16a34a"
+        }
+      ]
     ]
   }
 }

@@ -8,6 +8,7 @@ import in.fonzkart.backend.auth.rules.StaffAccess.Staff;
 import in.fonzkart.backend.auth.session.SessionPayload;
 import in.fonzkart.backend.shared.web.ActionException;
 import in.fonzkart.backend.user.repository.UserRepository;
+import in.fonzkart.backend.user.service.PartnerCities;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +32,10 @@ public class CityAccess {
 
     private final StaffAccess staffAccess;
     private final UserRepository users;
+    private final PartnerCities partnerCities;
 
-    public CityAccess(StaffAccess staffAccess, UserRepository users) {
+    public CityAccess(StaffAccess staffAccess, UserRepository users, PartnerCities partnerCities) {
+        this.partnerCities = partnerCities;
         this.staffAccess = staffAccess;
         this.users = users;
     }
@@ -56,7 +59,7 @@ public class CityAccess {
         Set<String> cityIds = zonalHeadCityIds(staff);
         boolean inScope = users.findById(partnerId)
                 .filter(p -> Roles.PARTNER.equals(p.getRole()))
-                .filter(p -> (p.getCityId() != null && cityIds.contains(p.getCityId()))
+                .filter(p -> partnerCities.cityIds(p).stream().anyMatch(cityIds::contains)
                         || staff.id().equals(p.getManagerId()))
                 .isPresent();
         if (!inScope) {

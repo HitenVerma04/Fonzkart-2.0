@@ -127,7 +127,7 @@ export default function SellWizard({ initialBrands, initialCategory, initialBran
 
     const handleCategorySelect = async (cat: string) => {
         if (cat === 'bulk-orders') {
-            router.push('/contact?topic=bulk');
+            router.push('/bulk');
             return;
         }
         let targetCategory = cat;
@@ -135,16 +135,8 @@ export default function SellWizard({ initialBrands, initialCategory, initialBran
             setIsRepair(true);
             targetCategory = 'smartphone'; // Default to smartphone repair for now
         } else if (cat === 'unbreakable-screenguard') {
-            setIsRepair(true); // Re-use repair boolean to skip quote UI logic and go straight to booking
-            setCategory('unbreakable-screenguard');
-            
-            // Only fetch specific brands to mimic actual screen guard support
-            const allBrands = await fetchBrands('smartphone');
-            const requiredBrands = ['Apple', 'Samsung', 'OnePlus', 'Google'];
-            const newBrands = allBrands.filter(b => requiredBrands.includes(b.name));
-            
-            setBrands(newBrands);
-            window.location.hash = 'brand';
+            // Screen guards are a doorstep service, coming soon: its own page explains it.
+            router.push('/screen-guard');
             return;
         } else {
             setIsRepair(false);
@@ -233,6 +225,7 @@ export default function SellWizard({ initialBrands, initialCategory, initialBran
                     <motion.div key="model" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                         <ModelSelector
                             brandId={selectedBrand.id}
+                            brandName={selectedBrand.name}
                             category={category === 'unbreakable-screenguard' ? 'smartphone' : category}
                             originalCategory={category}
                             onSelect={handleModelSelect}

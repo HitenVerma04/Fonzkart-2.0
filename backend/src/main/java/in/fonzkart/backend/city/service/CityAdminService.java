@@ -17,6 +17,7 @@ import in.fonzkart.backend.shared.web.ActionException;
 import in.fonzkart.backend.user.dto.UserDto;
 import in.fonzkart.backend.user.entity.User;
 import in.fonzkart.backend.user.repository.UserRepository;
+import in.fonzkart.backend.user.service.PartnerCities;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -53,11 +54,13 @@ public class CityAdminService {
     private final CityRepository cities;
     private final UserRepository users;
     private final CityAccess cityAccess;
+    private final PartnerCities partnerCities;
 
-    public CityAdminService(CityRepository cities, UserRepository users, CityAccess cityAccess) {
+    public CityAdminService(CityRepository cities, UserRepository users, CityAccess cityAccess, PartnerCities partnerCities) {
         this.cities = cities;
         this.users = users;
         this.cityAccess = cityAccess;
+        this.partnerCities = partnerCities;
     }
 
     // ------------------------------------------------------------------------------- cities page
@@ -83,6 +86,16 @@ public class CityAdminService {
             for (User u : users.findByCityIdIn(list.stream().map(City::getId).toList())) {
                 usersByCity.computeIfAbsent(u.getCityId(), k -> new ArrayList<>()).add(u);
             }
+            // Partners serving a city as one of their extra cities are listed under it too.
+            Map<String, List<String>> extra = partnerCities.partnerIdsByExtraCity(list.stream().map(City::getId).toList());
+            Map<String, User> partnersById = new LinkedHashMap<>();
+            List<String> ids = extra.values().stream().flatMap(List::stream).distinct().toList();
+            if (!ids.isEmpty()) {
+                users.findAllById(ids).forEach(u -> partnersById.put(u.getId(), u));
+            }
+            extra.forEach((cityId, partnerIds) -> partnerIds.stream().map(partnersById::get)
+                    .filter(u -> u != null && Roles.PARTNER.equals(u.getRole()))
+                    .forEach(u -> usersByCity.computeIfAbsent(cityId, k -> new ArrayList<>()).add(u)));
         }
         List<CityWithUsers> result = list.stream().map(c -> {
             List<User> cityUsers = usersByCity.getOrDefault(c.getId(), List.of());
@@ -141,6 +154,7 @@ public class CityAdminService {
     public void removePartnerFromCity(Optional<SessionPayload> session, String partnerId) {
         cityAccess.requirePartner(session, partnerId);
         requireUpdated(users.clearCityAndPincodesById(partnerId, new String[0], JsDates.nowUtc()));
+        partnerCities.setExtras(partnerId, null, List.of());
     }
 
     // -------------------------------------------------------------------- actions/admin.ts (homepage)

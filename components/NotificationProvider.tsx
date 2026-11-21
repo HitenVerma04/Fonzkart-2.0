@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabaseClient } from '@/lib/supabaseClient';
 import { getNotifications, markAsRead } from '@/actions/notifications';
+import { useRouter } from 'next/navigation';
+import { NotificationToast } from './NotificationToast';
 
 interface Notification {
     id: string;
@@ -37,6 +39,9 @@ export function NotificationProvider({
     riderId?: string;
 }) {
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    // True after the first load: what was there then is not announced by the banner.
+    const [loaded, setLoaded] = useState(false);
+    const router = useRouter();
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     const fetchNotifications = async () => {
@@ -47,6 +52,7 @@ export function NotificationProvider({
                 ...n,
                 createdAt: new Date(n.createdAt)
             })));
+            setLoaded(true);
         }
     };
 
@@ -204,6 +210,14 @@ export function NotificationProvider({
         }}>
             {children}
 
+            {/* A new notification while the panel is open slides in from the top (as in the apps). */}
+            <NotificationToast
+                items={loaded ? notifications.map(n => ({ ...n, orderId: n.orderId ?? null })) : undefined}
+                onOpen={n => {
+                    if (!n.isRead) void markRead(n.id);
+                    router.push(n.orderId ? '/admin/orders' : '/admin');
+                }}
+            />
             {/* Global Buzzer Indicator */}
             {buzzerActive && hasUnassigned && (
                 <div className="fixed bottom-6 right-6 z-[100] animate-bounce">

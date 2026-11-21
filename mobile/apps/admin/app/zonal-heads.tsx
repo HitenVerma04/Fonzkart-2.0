@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { adminApi, useCitiesOverview, useZonalHeads, type ActionResult, type ZonalHead } from '@fonzkart/api';
-import { displayPhone } from '@fonzkart/core';
+import { cleanPhone, displayPhone, emailProblem, nameProblem, passwordProblem, phoneProblem } from '@fonzkart/core';
 import { Button, Card, EmptyState, ErrorState, ListPicker, Loading, Notice, TextField, colors, font, spacing } from '@fonzkart/ui';
 
 export default function ZonalHeads() {
@@ -12,6 +12,13 @@ export default function ZonalHeads() {
   const cities = useCitiesOverview();
   const [assignTo, setAssignTo] = useState<ZonalHead | null>(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
+  const [tried, setTried] = useState(false);
+  const errors = {
+    name: nameProblem(form.name),
+    email: emailProblem(form.email),
+    phone: phoneProblem(form.phone, { required: false }),
+    password: passwordProblem(form.password),
+  };
   const [message, setMessage] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
 
   if (heads.isPending || cities.isPending) return <Loading />;
@@ -50,13 +57,18 @@ export default function ZonalHeads() {
         ListHeaderComponent={
           <View style={styles.head}>
             <Card title="Create a zonal head">
-              <TextField label="Name" value={form.name} onChangeText={name => setForm(f => ({ ...f, name }))} />
-              <TextField label="Email" value={form.email} onChangeText={email => setForm(f => ({ ...f, email }))} autoCapitalize="none"
-                keyboardType="email-address" />
-              <TextField label="Phone" value={form.phone} onChangeText={phone => setForm(f => ({ ...f, phone: phone.replace(/\D/g, '').slice(0, 10) }))}
-                keyboardType="phone-pad" prefix="+91" />
-              <TextField label="First password" value={form.password} onChangeText={password => setForm(f => ({ ...f, password }))} secureTextEntry />
-              <Button title="Create" disabled={!form.name.trim() || !form.email.trim() || !form.password} onPress={() => void create()} />
+              <TextField label="Name" value={form.name} onChangeText={name => setForm(f => ({ ...f, name }))}
+                error={errors.name} showError={tried} />
+              <TextField label="Email" value={form.email} onChangeText={email => setForm(f => ({ ...f, email: email.trim() }))} autoCapitalize="none"
+                keyboardType="email-address" error={errors.email} showError={tried} />
+              <TextField label="Phone (optional)" value={form.phone} onChangeText={phone => setForm(f => ({ ...f, phone: cleanPhone(phone) }))}
+                keyboardType="phone-pad" prefix="+91" error={errors.phone} showError={tried} />
+              <TextField label="First password" value={form.password} onChangeText={password => setForm(f => ({ ...f, password }))} secureTextEntry
+                error={errors.password} showError={tried} hint="At least 6 characters." />
+              <Button title="Create" onPress={() => {
+                setTried(true);
+                if (!Object.values(errors).some(Boolean)) void create().then(() => setTried(false));
+              }} />
             </Card>
             {message ? <Notice tone={message.tone} text={message.text} /> : null}
           </View>

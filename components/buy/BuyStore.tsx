@@ -8,6 +8,7 @@ import { ShieldCheck, Smartphone, Truck, X } from 'lucide-react';
 import { placeRefurbishedOrder } from '@/actions/buyRepair';
 import { DEVICE_GRADES, gradeLabel, inr, type DeviceGrade, type RefurbishedDevice, type RefurbishedOrder } from '@/lib/buyRepair';
 import { discountPercent } from '@/lib/shop';
+import { DeliveryFields, useDeliveryForm } from '@/components/ui/DeliveryFields';
 
 const field = 'w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none focus:border-primary';
 
@@ -83,14 +84,14 @@ export function BuyStore({ items, signedIn, defaultName }: { items: RefurbishedD
 }
 
 function Checkout({ device, signedIn, defaultName, onClose }: { device: RefurbishedDevice; signedIn: boolean; defaultName: string; onClose: () => void }) {
-    const [form, setForm] = useState({ name: defaultName, phone: '', address: '', pincode: '' });
+    const delivery = useDeliveryForm(defaultName);
+    const form = delivery.values;
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [placed, setPlaced] = useState<RefurbishedOrder | null>(null);
-    const problem = form.name.trim().length < 2 ? 'Enter your name.' : !/^\d{10}$/.test(form.phone) ? 'Enter your 10-digit mobile number.'
-        : form.address.trim().length < 6 ? 'Enter your full address.' : !/^\d{6}$/.test(form.pincode) ? 'Enter your 6-digit pincode.' : '';
 
     const submit = async () => {
+        if (!delivery.check()) return;
         setBusy(true);
         setError('');
         const result = await placeRefurbishedOrder({ deviceId: device.id, name: form.name.trim(), phone: form.phone, address: form.address.trim(), pincode: form.pincode });
@@ -121,16 +122,12 @@ function Checkout({ device, signedIn, defaultName, onClose }: { device: Refurbis
                 ) : signedIn ? (
                     <div className="space-y-3">
                         <h2 className="font-bold">Delivery details</h2>
-                        <input className={field} placeholder="Full name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-                        <input className={field} placeholder="10-digit mobile number" inputMode="numeric" maxLength={10} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })} />
-                        <textarea className={field} placeholder="Full address" rows={3} value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} />
-                        <input className={field} placeholder="6-digit pincode" inputMode="numeric" maxLength={6} value={form.pincode} onChange={e => setForm({ ...form, pincode: e.target.value.replace(/\D/g, '') })} />
+                        <DeliveryFields form={delivery} field={field} />
                         <div className="flex justify-between border-t pt-3 font-black"><span>To pay on delivery</span><span>{inr(device.price)}</span></div>
                         {error ? <p className="text-sm text-red-500">{error}</p> : null}
-                        <button type="button" disabled={!!problem || busy} onClick={submit} className="w-full rounded-full bg-primary py-3 font-bold text-primary-foreground disabled:opacity-50">
+                        <button type="button" disabled={busy} onClick={submit} className="w-full rounded-full bg-primary py-3 font-bold text-primary-foreground disabled:opacity-50">
                             {busy ? 'Placing order…' : 'Place order · cash on delivery'}
                         </button>
-                        {problem && (form.phone || form.address || form.pincode) ? <p className="text-center text-xs text-muted-foreground">{problem}</p> : null}
                     </div>
                 ) : (
                     <div className="py-4 text-center">

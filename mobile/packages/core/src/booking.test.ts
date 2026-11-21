@@ -40,7 +40,10 @@ test('a booking needs a phone, an address or location, a pincode, a time and pay
   assert.equal(bookingProblems({ ...base, slot: '', isExpress: true }).length, 0);
   assert.equal(bookingProblems({ ...base, slot: '' }).length, 1);
   assert.equal(bookingProblems({ ...base, paymentMethod: 'upi' }).length, 1);
-  assert.equal(bookingProblems({ ...base, paymentMethod: 'bank_transfer', bankAccount: '1', bankIfsc: 'x' }).length, 1);
+  assert.equal(bookingProblems({ ...base, paymentMethod: 'bank_transfer', bankAccount: '1', bankIfsc: 'x' }).length, 3);
+  assert.equal(bookingProblems({ ...base, paymentMethod: 'bank_transfer', bankAccount: '123456789', bankIfsc: 'SBIN0001234', bankAccountName: 'A B' }).length, 0);
+  assert.equal(bookingProblems({ ...base, paymentMethod: 'upi', upiId: 'me@okaxis' }).length, 0);
+  assert.equal(bookingProblems({ ...base, phone: '1234567890' })[0], 'Indian mobile numbers start with 6, 7, 8 or 9.');
 });
 
 test('the order answers carry the booking exactly as the website sends them', () => {

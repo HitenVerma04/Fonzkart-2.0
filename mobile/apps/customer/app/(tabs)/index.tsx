@@ -208,7 +208,7 @@ export default function Home() {
           <View style={styles.grid}>
             <CategoryCard id="repair" name="Repair" width={categoryWidth} index={0} onPress={() => router.navigate('/repair')} />
             <View ref={launchTarget('screenguard')} collapsable={false}>
-              <CategoryCard id="screenguard" name="Screen Guard" width={categoryWidth} index={1} onPress={() => router.push('/screen-guard')} />
+              <CategoryCard id="screenguard" name="Screen Guard" badge="SOON" width={categoryWidth} index={1} onPress={() => router.push('/screen-guard')} />
             </View>
             <CategoryCard id="bulk" name="Bulk Orders" width={categoryWidth} index={2} onPress={() => router.push('/bulk')} />
           </View>

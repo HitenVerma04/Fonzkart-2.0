@@ -57,6 +57,7 @@ class StaffAdminIntegrationTest {
 
     @BeforeEach
     void cleanDatabase() {
+        jdbc.update("DELETE FROM \"PartnerCity\"");
         jdbc.update("DELETE FROM \"Rider\"");
         jdbc.update("DELETE FROM \"City\"");
         jdbc.update("DELETE FROM \"User\"");
@@ -244,6 +245,59 @@ class StaffAdminIntegrationTest {
                 .containsEntry("cityId", null).containsEntry("managerId", null);
     }
 
+
+    @Test
+    void aPartnerCanServeSeveralCitiesAndZonalHeadsChangeOnlyTheirOwn() throws Exception {
+        String admin = superAdmin();
+        quickRegister("Zed", "zed@example.test", null);
+        post("/api/staff/zonal-heads/grant", admin, Map.of("email", "zed@example.test"));
+        String zh = quickLogin("zed@example.test");
+        String zhId = id("zed@example.test");
+        insertCity("c-a", "Alpha", true, null);
+        insertCity("c-b", "Beta", true, zhId);
+        insertCity("c-c", "Gamma", true, null);
+        jdbc.update("UPDATE \"City\" SET pincodes = '{100001,100002}' WHERE id = 'c-a'");
+        jdbc.update("UPDATE \"City\" SET pincodes = '{200001}' WHERE id = 'c-b'");
+        jdbc.update("UPDATE \"City\" SET pincodes = '{300001}' WHERE id = 'c-c'");
+
+        // Created with several cities: the first is the main one.
+        Map<String, Object> body = new java.util.HashMap<>(partner("multi@example.test", "", "none"));
+        body.put("cityIds", List.of("c-a", "c-c"));
+        assertThat(json(post("/api/staff/partners", admin, body)).get("created").asBoolean()).isTrue();
+        String p = id("multi@example.test");
+        assertThat(jdbc.queryForObject("SELECT \"cityId\" FROM \"User\" WHERE id = ?", String.class, p)).isEqualTo("c-a");
+
+        // Admin: all three cities, Gamma as main.
+        put("/api/staff/partners/" + p + "/cities", admin, Map.of("cityIds", List.of("c-a", "c-b", "c-c"), "mainCityId", "c-c"));
+        jdbc.update("UPDATE \"User\" SET pincodes = '{100001,200001,300001}' WHERE id = ?", p);
+        JsonNode mine = partnerOf(json(get("/api/staff/partners/overview", admin)), "multi@example.test");
+        assertThat(mine.get("city").get("id").asText()).isEqualTo("c-c");
+        assertThat(ids(mine.get("cities"))).containsExactly("c-c", "c-a", "c-b");
+
+        // The zonal head of Beta sees the partner through the extra city, and may only change Beta.
+        JsonNode zhView = json(get("/api/staff/partners/overview", zh));
+        assertThat(emails(zhView.get("partners"))).contains("multi@example.test");
+        put("/api/staff/partners/" + p + "/cities", zh, Map.of("cityIds", List.of()));
+        mine = partnerOf(json(get("/api/staff/partners/overview", admin)), "multi@example.test");
+        assertThat(ids(mine.get("cities"))).containsExactly("c-c", "c-a");
+        // Beta's pincode left the partner's service areas with the city; the others stay.
+        assertThat(jdbc.queryForObject("SELECT array_to_string(pincodes, ',') FROM \"User\" WHERE id = ?", String.class, p))
+                .isEqualTo("100001,300001");
+
+        // The website's single City field replaces only the main city; the other cities stay.
+        put("/api/staff/partners/" + p + "/assignment", admin, Map.of("cityId", "c-b", "managerId", "none"));
+        mine = partnerOf(json(get("/api/staff/partners/overview", admin)), "multi@example.test");
+        assertThat(ids(mine.get("cities"))).containsExactly("c-b", "c-a");
+    }
+
+    private static JsonNode partnerOf(JsonNode overview, String email) {
+        for (JsonNode p : overview.get("partners")) {
+            if (p.get("email").asText().equals(email)) {
+                return p;
+            }
+        }
+        throw new AssertionError(email + " not listed");
+    }
     @Test
     void relationshipManagersOwnTheirPartnersAndSeeOnlyThemOnTheDashboard() throws Exception {
         String admin = superAdmin();

@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { pincodeRequestKeys, pincodeRequestsApi, pincodeRequestsError, staffKeys, useMyPincodeRequests, type PincodeRequestItem } from '@fonzkart/api';
+import { pincodeRequestKeys, pincodeRequestsApi, pincodeRequestsError, staffKeys, useMyPincodeRequests, type MyPincodes, type PincodeRequestItem } from '@fonzkart/api';
 import { Button, Card, ErrorState, Loading, Notice, colors, font, formatDateTime, radius, spacing } from '@fonzkart/ui';
 import { usePartnerSession } from '../../src/session';
 
@@ -16,6 +16,9 @@ const STATUS: Record<PincodeRequestItem['status'], { label: string; color: strin
   CANCELLED: { label: 'Cancelled', color: '#4b5563', background: '#f3f4f6' },
 };
 const SHOW_FIRST = 30;
+
+/** Every city the partner serves, main city first (older servers send only the main city). */
+const myCities = (data: MyPincodes | undefined) => (data?.cities?.length ? data.cities : data?.city ? [data.city] : []);
 
 export default function ServiceAreas() {
   const client = useQueryClient();
@@ -38,14 +41,15 @@ export default function ServiceAreas() {
     return {
       mine: own,
       waiting: pending,
-      suggestions: (data.data?.city?.pincodes ?? []).filter(p => !own.has(p) && !pending.has(p)),
+      suggestions: [...new Set(myCities(data.data).flatMap(c => c.pincodes))].filter(p => !own.has(p) && !pending.has(p)),
     };
   }, [data.data]);
 
   if (!signedIn) return <Redirect href="/" />;
   if (data.isPending) return <Loading label="Loading your service areas…" />;
   if (data.isError) return <ErrorState message={pincodeRequestsError(data.error)} onRetry={() => data.refetch()} />;
-  const { pincodes, city, requests } = data.data;
+  const { pincodes, requests } = data.data;
+  const cityNames = myCities(data.data).map(c => c.name).join(', ');
 
   const toggle = (code: string) => setChosen(now => now.includes(code) ? now.filter(c => c !== code) : [...now, code]);
 
@@ -109,7 +113,7 @@ export default function ServiceAreas() {
       {message ? <Notice tone={message.tone} text={message.text} /> : null}
 
       <Card title={`You serve ${pincodes.length} pincode${pincodes.length === 1 ? '' : 's'}`}>
-        <Text style={styles.muted}>{city ? `City: ${city.name}. ` : 'No city assigned yet. '}New orders in these pincodes come to you.</Text>
+        <Text style={styles.muted}>{cityNames ? `${myCities(data.data).length > 1 ? 'Cities' : 'City'}: ${cityNames}. ` : 'No city assigned yet. '}New orders in these pincodes come to you.</Text>
         {pincodes.length ? (
           <View style={styles.chips}>
             {mineShown.map(code => <Text key={code} style={[styles.chip, styles.chipMine]}>{code}</Text>)}
@@ -144,7 +148,7 @@ export default function ServiceAreas() {
         {suggestions.length ? (
           <>
             <View style={styles.rowBetween}>
-              <Text style={styles.subhead}>{city?.name} pincodes you don't serve ({suggestions.length})</Text>
+              <Text style={styles.subhead}>{cityNames} pincodes you don't serve ({suggestions.length})</Text>
               <Pressable hitSlop={8} accessibilityRole="button"
                 onPress={() => setChosen(now => suggestions.every(s => now.includes(s)) ? now.filter(c => !suggestions.includes(c)) : [...new Set([...now, ...suggestions])])}>
                 <Text style={styles.link}>{suggestions.every(s => chosen.includes(s)) ? 'Clear' : 'Select all'}</Text>

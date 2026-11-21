@@ -14,9 +14,9 @@ public final class UserViews {
     public record UserWithCity(@JsonUnwrapped UserDto user, CityDto city) {
     }
 
-    /** app/admin/partners/page.tsx: partners with { city: true, manager: true } */
+    /** app/admin/partners/page.tsx: partners with { city: true, manager: true }, plus every city they serve (main first). */
     public record PartnerWithCityAndManager(@JsonUnwrapped UserDto user, CityDto city, UserDto manager,
-                                            UserDto relationshipManager) {
+                                            UserDto relationshipManager, List<CityDto> cities) {
     }
 
     /** app/admin/zonal-heads/page.tsx: zonal heads with managedCities and managed partners (with city) */

@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { authApi, executiveApi, setAuthToken } from '@fonzkart/api';
+import { cleanPhone, emailOrPhoneProblem, passwordProblem, phoneProblem } from '@fonzkart/core';
 import { Button, Loading, Logo, Notice, Segmented, TextField, colors, font, spacing } from '@fonzkart/ui';
 import { STAFF_ELSEWHERE, usePartnerSession } from '../src/session';
 
@@ -18,6 +19,8 @@ export default function Start() {
   const [onboardingId, setOnboardingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Pressed the button with a mistake: the fields say what is wrong.
+  const [tried, setTried] = useState(false);
 
   if (session.status === 'loading') return <Loading />;
   if (session.status === 'executive') return <Redirect href="/rider" />;
@@ -84,31 +87,33 @@ export default function Start() {
         <Segmented<Mode>
           options={[{ id: 'account', label: 'Partner / staff account' }, { id: 'rider', label: 'Field executive (phone)' }]}
           value={mode}
-          onChange={m => { setMode(m); setError(null); setOnboardingId(null); }}
+          onChange={m => { setMode(m); setError(null); setOnboardingId(null); setTried(false); }}
         />
 
         {mode === 'account' ? (
           <>
             <TextField label="Email or phone number" value={id} onChangeText={setId} autoCapitalize="none" autoCorrect={false}
-              placeholder="Email or 10-digit number" textContentType="username" />
+              placeholder="Email or 10-digit number" textContentType="username" error={emailOrPhoneProblem(id)} showError={tried} />
             <TextField label="Password" value={password} onChangeText={setPassword} secureTextEntry textContentType="password"
-              onSubmitEditing={() => void accountSignIn()} />
-            <Button title="Sign in" loading={busy} disabled={!id.trim() || !password} onPress={() => void accountSignIn()} />
+              error={password ? null : 'Enter your password.'} showError={tried}
+              onSubmitEditing={() => { setTried(true); if (!emailOrPhoneProblem(id) && password) void accountSignIn(); }} />
+            <Button title="Sign in" loading={busy} onPress={() => { setTried(true); if (!emailOrPhoneProblem(id) && password) void accountSignIn(); }} />
           </>
         ) : onboardingId ? (
           <>
             <Notice text="Welcome! This is your first sign-in. Choose a password for your account." />
             <TextField label="New password" value={newPassword} onChangeText={setNewPassword} secureTextEntry
-              textContentType="newPassword" hint="At least 6 characters." />
-            <Button title="Set password and continue" loading={busy} disabled={!newPassword} onPress={() => void setFirstPassword()} />
+              textContentType="newPassword" hint="At least 6 characters." error={passwordProblem(newPassword)} showError={tried} />
+            <Button title="Set password and continue" loading={busy}
+              onPress={() => { setTried(true); if (!passwordProblem(newPassword)) void setFirstPassword(); }} />
           </>
         ) : (
           <>
-            <TextField label="Mobile number" value={phone} onChangeText={t => setPhone(t.replace(/\D/g, '').slice(0, 10))}
+            <TextField label="Mobile number" value={phone} onChangeText={t => setPhone(cleanPhone(t))} error={phoneProblem(phone)} showError={tried}
               keyboardType="phone-pad" prefix="+91" placeholder="Registered number" />
             <TextField label="Password" value={password} onChangeText={setPassword} secureTextEntry textContentType="password"
-              hint="First time? Leave it empty to set your password." onSubmitEditing={() => void riderSignIn()} />
-            <Button title="Continue" loading={busy} disabled={phone.length !== 10} onPress={() => void riderSignIn()} />
+              hint="First time? Leave it empty to set your password." onSubmitEditing={() => { setTried(true); if (!phoneProblem(phone)) void riderSignIn(); }} />
+            <Button title="Continue" loading={busy} onPress={() => { setTried(true); if (!phoneProblem(phone)) void riderSignIn(); }} />
           </>
         )}
         {error ? <Notice tone="error" text={error} /> : null}

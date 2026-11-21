@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { authApi } from '@fonzkart/api';
+import { cleanPhone, emailProblem, nameProblem, passwordProblem, phoneProblem } from '@fonzkart/core';
 import { Logo, makeStyles } from '@fonzkart/ui';
 import { networkMessage, useAuthOutcome } from '../../src/authFlow';
 import { Appear, Button, Notice, Page, TextField, type, useDesign } from '../../src/design';
@@ -19,7 +20,10 @@ export default function SignUp() {
   const [busy, setBusy] = useState(false);
 
   // Same fields and checks as the website's sign-up form (10-digit phone; the server adds +91).
-  const complete = name.trim() && email.trim() && /^\d{10}$/.test(phone) && password;
+  const errors = { name: nameProblem(name), email: emailProblem(email), phone: phoneProblem(phone), password: passwordProblem(password) };
+  const firstProblem = errors.name ?? errors.email ?? errors.phone ?? errors.password;
+  // Pressed "Create account" with something wrong: every field says what.
+  const [tried, setTried] = useState(false);
 
   const submit = async () => {
     setBusy(true);
@@ -41,11 +45,14 @@ export default function SignUp() {
         <Text style={styles.subtitle}>Sell your devices in minutes and get paid at your door.</Text>
       </Appear>
       <Appear index={1} style={styles.form}>
-        <TextField label="Full name" value={name} onChangeText={setName} placeholder="John Doe" autoComplete="name" textContentType="name" />
+        <TextField label="Full name" value={name} onChangeText={setName} placeholder="John Doe" autoComplete="name" textContentType="name"
+          error={errors.name} showError={tried} />
         <TextField
           label="Email"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={text => setEmail(text.trim())}
+          error={errors.email}
+          showError={tried}
           placeholder="john@example.com"
           keyboardType="email-address"
           autoCapitalize="none"
@@ -57,10 +64,12 @@ export default function SignUp() {
           label="Phone number"
           prefix="+91"
           value={phone}
-          onChangeText={text => setPhone(text.replace(/\D/g, '').slice(0, 10))}
+          onChangeText={text => setPhone(cleanPhone(text))}
+          error={errors.phone}
+          showError={tried}
           placeholder="9876543210"
           keyboardType="phone-pad"
-          maxLength={10}
+          maxLength={14}
           autoComplete="tel"
           textContentType="telephoneNumber"
         />
@@ -70,11 +79,14 @@ export default function SignUp() {
           onChangeText={setPassword}
           secureTextEntry
           autoComplete="new-password"
+          error={errors.password}
+          showError={tried}
+          hint="At least 6 characters."
           textContentType="newPassword"
         />
         <Text style={styles.hint}>We'll email you a 6-digit code to confirm your address.</Text>
         {error ? <Notice tone="error" text={error} /> : null}
-        <Button title="Create account" onPress={submit} loading={busy} disabled={!complete} />
+        <Button title="Create account" loading={busy} onPress={() => { setTried(true); if (!firstProblem) void submit(); }} />
       </Appear>
     </Page>
   );

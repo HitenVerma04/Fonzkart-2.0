@@ -19,6 +19,7 @@ import {
 import { NavLinks } from './NavLinks';
 import { SidebarDrawer } from './SidebarDrawer';
 import { logout } from '@/actions/session';
+import { SiteNotifications } from './SiteNotifications';
 
 interface HeaderSessionUser {
     id?: string | null;
@@ -64,6 +65,8 @@ export function HeaderClientControls({ session, isAdminUser }: HeaderClientContr
 
     return (
         <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {/* Signed in: the notifications bell and the banner for new updates (one instance for every screen size). */}
+            {session?.user ? <SiteNotifications isStaff={isAdminUser} /> : null}
             {/* ----------------- MOBILE VIEW ICONS (lg:hidden) ----------------- */}
             <div className="flex lg:hidden items-center gap-1 sm:gap-1.5">
                 {/* 1. Direct Sell / Check Price Quick Action */}

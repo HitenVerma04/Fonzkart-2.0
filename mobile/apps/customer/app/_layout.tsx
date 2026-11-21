@@ -6,11 +6,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { SessionProvider, createQueryClient } from '@fonzkart/api';
-import { useRefreshOnAppFocus, useTheme } from '@fonzkart/ui';
+import { InAppNotifier, useRefreshOnAppFocus, useTheme } from '@fonzkart/ui';
 import { AppHeader } from '../src/design';
 import { FestiveProvider } from '../src/festive/FestiveProvider';
 import { LaunchIntro } from '../src/LaunchIntro';
-import { usePushNotifications } from '../src/push';
+import { useCustomerInbox, usePushNotifications } from '../src/push';
 import { themeStorage } from '../src/themeStorage';
 import { tokenStorage } from '../src/tokenStorage';
 
@@ -53,6 +53,7 @@ export default function RootLayout() {
 function Screens() {
   const { scheme, colors } = useTheme();
   usePushNotifications();
+  const inbox = useCustomerInbox();
   // The native window behind every screen: without this it stays white and flashes through while a screen slides
   // in or out in dark mode.
   useEffect(() => {
@@ -92,7 +93,7 @@ function Screens() {
         <Stack.Screen name="book" options={{ title: 'Book pickup' }} />
         <Stack.Screen name="orders/[id]" options={{ title: 'Order' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
-        <Stack.Screen name="bulk" options={{ title: 'Bulk orders' }} />
+        <Stack.Screen name="bulk" options={{ title: 'For business' }} />
         <Stack.Screen name="screen-guard" options={{ title: 'Screen guards' }} />
         <Stack.Screen name="shop/cart" options={{ title: 'Cart' }} />
         <Stack.Screen name="shop/checkout" options={{ title: 'Checkout' }} />
@@ -103,6 +104,8 @@ function Screens() {
         <Stack.Screen name="repairs/book" options={{ title: 'Book a repair' }} />
         <Stack.Screen name="repairs/booking/[id]" options={{ title: 'Repair booking' }} />
       </Stack>
+      {/* A new update while the app is open slides in from the top. */}
+      <InAppNotifier items={inbox.items} onOpen={inbox.open} />
     </NavigationThemeProvider>
   );
 }

@@ -34,6 +34,8 @@ export interface PincodeRequestForReview extends PincodeRequestItem {
 export interface MyPincodes {
   pincodes: string[];
   city: PincodeRequestCity | null;
+  /** Every city the partner serves, main city first (older servers: absent, use city). */
+  cities?: PincodeRequestCity[];
   requests: PincodeRequestItem[];
 }
 

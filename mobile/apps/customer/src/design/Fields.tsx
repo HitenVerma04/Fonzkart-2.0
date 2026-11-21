@@ -8,27 +8,52 @@ import { Icon } from './Icon';
 import { Tap } from './Tap';
 import { radii, type } from './tokens';
 
-export function TextField({ label, prefix, hint, onFocus, onBlur, ...input }: TextInputProps & { label: string; prefix?: string; hint?: string }) {
+/**
+ * A labelled text box. `error` (a @fonzkart/core check: phoneProblem, pincodeProblem, …) shows in red under the box
+ * once the customer leaves the field, or at once with `showError` (after they pressed the button), so nobody is told
+ * off while still typing. A field that was wrong and is now right gets a green tick.
+ */
+export function TextField({ label, prefix, hint, error, showError, onFocus, onBlur, ...input }: TextInputProps & {
+  label: string;
+  prefix?: string;
+  hint?: string;
+  /** What is wrong with the value, or null/undefined when it is fine. */
+  error?: string | null;
+  /** Show the error before the field was left (after a submit). */
+  showError?: boolean;
+}) {
   const colors = useColors();
   const styles = useStyles();
   const [focused, setFocused] = useState(false);
+  const [left, setLeft] = useState(false);
+  const [wasWrong, setWasWrong] = useState(false);
+  const visibleError = error && (left || showError) ? error : null;
+  if (visibleError && !wasWrong) setWasWrong(true);
+  const fixed = wasWrong && !error && !!input.value;
   return (
     <View style={styles.field}>
-      <Text style={[styles.label, focused && { color: colors.green }]}>{label}</Text>
-      <View style={[styles.box, focused && styles.boxFocused, input.multiline && styles.boxMultiline]}>
+      <Text style={[styles.label, focused && { color: colors.green }, visibleError ? { color: colors.danger } : null]}>{label}</Text>
+      <View style={[styles.box, focused && styles.boxFocused, input.multiline && styles.boxMultiline, visibleError ? styles.boxError : null]}>
         {prefix ? <Text style={styles.prefix}>{prefix}</Text> : null}
         <TextInput
           placeholderTextColor={colors.muted}
           selectionColor={colors.green}
           cursorColor={colors.green}
           accessibilityLabel={label}
+          accessibilityHint={visibleError ?? undefined}
+          aria-invalid={!!visibleError}
           onFocus={e => { setFocused(true); onFocus?.(e); }}
-          onBlur={e => { setFocused(false); onBlur?.(e); }}
+          onBlur={e => { setFocused(false); setLeft(true); onBlur?.(e); }}
           {...input}
           style={[styles.input, input.style]}
         />
+        {fixed ? <Icon name="check" color={colors.green} size={18} strokeWidth={2.6} /> : null}
       </View>
-      {hint ? <Text style={styles.hint}>{hint}</Text> : null}
+      {visibleError ? (
+        <Animated.View entering={FadeInDown.duration(180)} style={styles.errorRow}>
+          <Text style={styles.error} accessibilityRole="alert" accessibilityLiveRegion="polite">{visibleError}</Text>
+        </Animated.View>
+      ) : hint ? <Text style={styles.hint}>{hint}</Text> : null}
     </View>
   );
 }
@@ -118,6 +143,9 @@ const useStyles = makeStyles(colors => ({
   prefix: { ...type.body, fontWeight: '600', color: colors.muted, marginRight: 8 },
   input: { flex: 1, ...type.body, color: colors.text, paddingVertical: 10 },
   hint: { ...type.small, fontSize: 12, color: colors.muted },
+  boxError: { borderColor: colors.danger, boxShadow: `0px 0px 0px 3px ${colors.danger}22` },
+  errorRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  error: { ...type.small, fontSize: 13, fontWeight: '600', color: colors.danger },
   // the iOS search field: a 44-pt capsule, system gray fill, no border
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, paddingHorizontal: 14 },
   searchPlain: { backgroundColor: 'rgba(118,118,128,0.12)', borderRadius: radii.pill },
