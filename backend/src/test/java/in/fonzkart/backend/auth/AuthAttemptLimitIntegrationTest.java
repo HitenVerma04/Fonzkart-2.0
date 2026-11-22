@@ -120,6 +120,28 @@ class AuthAttemptLimitIntegrationTest {
                 .isEqualTo(AttemptLimiter.TOO_MANY_SIGNINS);
     }
 
+    @Test
+    void anExecutiveIsFoundHoweverTheNumberWasSavedOrTyped() throws Exception {
+        // Saved as "+917000000003": typed with or without +91, with spaces.
+        for (String typed : new String[] {"+917000000003", "7000000003", "+91 70000 00003", "917000000003"}) {
+            JsonNode body = post("/api/executive/login", Map.of("phone", typed));
+            assertThat(body.path("needsOnboarding").asBoolean()).as(typed).isTrue();
+            assertThat(body.get("id").asText()).as(typed).isEqualTo("r3");
+        }
+        // Saved as 10 digits (the website's form), typed as the Partner app sends it.
+        jdbc.update("UPDATE \"Rider\" SET phone = '7000000003' WHERE id = 'r3'");
+        try {
+            assertThat(post("/api/executive/login", Map.of("phone", "+917000000003")).get("id").asText()).isEqualTo("r3");
+        } finally {
+            jdbc.update("UPDATE \"Rider\" SET phone = '+917000000003' WHERE id = 'r3'");
+        }
+        // A number nobody added, or too short, is still refused.
+        for (String typed : new String[] {"+919999999999", "70000"}) {
+            assertThat(post("/api/executive/login", Map.of("phone", typed)).get("error").asText()).as(typed)
+                    .isEqualTo(in.fonzkart.backend.rider.service.ExecutiveAuthService.NOT_AN_EXECUTIVE);
+        }
+    }
+
     private JsonNode reset(String otp) throws Exception {
         return post("/api/auth/password-reset/confirm", Map.of("email", "user3@example.test", "otp", otp, "password", "new-pw"));
     }

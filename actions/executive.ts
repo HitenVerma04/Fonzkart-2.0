@@ -22,11 +22,19 @@ async function startExecutiveSession(riderId: string) {
 export async function loginExecutive(phone: string, password?: string) {
     // With USE_API_AUTH=1 the backend checks the password and sets the executive cookie (as the Partner app's rider mode).
     if (usesApi('AUTH')) return backendAction('/api/executive/login', { phone, password });
-    const riders = await db.getRiders();
-    const executive = riders.find(r => r.phone === phone);
+    // Matched on the number's last 10 digits, however it was typed or saved (+91 or not, spaces), as the backend:
+    // the exact spelling first, then one that already has a password, then the oldest.
+    const lastTen = (p?: string | null) => { const d = (p ?? '').replace(/\D/g, ''); return d.length < 10 ? null : d.slice(-10); };
+    const digits = lastTen(phone);
+    const riders = digits ? await db.getRiders() : [];
+    const executive = riders
+        .filter(r => lastTen(r.phone) === digits)
+        .sort((a, b) => Number(b.phone === phone) - Number(a.phone === phone)
+            || Number(!!b.password) - Number(!!a.password)
+            || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
 
     if (!executive) {
-        return { success: false, error: 'Phone number not found. Access denied.' };
+        return { success: false, error: 'This number is not registered as a field executive yet. Ask your partner or Fonzkart admin to add it.' };
     }
 
     // Check if onboarding is needed

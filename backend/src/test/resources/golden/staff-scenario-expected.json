@@ -3404,7 +3404,7 @@
    "outcome": {
     "returned": {
      "success": false,
-     "error": "Phone number not found. Access denied."
+     "error": "This number is not registered as a field executive yet. Ask your partner or Fonzkart admin to add it."
     }
    },
    "jar": {

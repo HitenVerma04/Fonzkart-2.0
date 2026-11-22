@@ -33,6 +33,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutiveAuthService {
 
+    /** No field executive has this number: someone must add it first (Partner app → Team, or the website). */
+    public static final String NOT_AN_EXECUTIVE =
+            "This number is not registered as a field executive yet. Ask your partner or Fonzkart admin to add it.";
+
     private final RiderRepository riders;
     private final UserRepository users;
     private final SessionService sessions;
@@ -52,9 +56,11 @@ public class ExecutiveAuthService {
 
     /** loginExecutive(phone, password?) */
     public ActionResponse login(String phone, String password) {
-        Optional<Rider> found = phone == null ? Optional.empty() : riders.findFirstByPhone(phone);
+        // Matched on the number itself, not on how it was typed or saved (+91 or not, spaces).
+        String digits = RiderRepository.lastTenDigits(phone);
+        Optional<Rider> found = digits == null ? Optional.empty() : riders.findFirstBySameNumber(digits, phone);
         if (found.isEmpty()) {
-            return ActionResponse.returned(failure("Phone number not found. Access denied."));
+            return ActionResponse.returned(failure(NOT_AN_EXECUTIVE));
         }
         Rider executive = found.get();
         // Check if onboarding is needed

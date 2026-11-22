@@ -18,6 +18,22 @@ public interface RiderRepository extends JpaRepository<Rider, String> {
     @Query(value = "SELECT * FROM \"Rider\" WHERE \"phone\" = :phone LIMIT 1", nativeQuery = true)
     Optional<Rider> findFirstByPhone(@Param("phone") String phone);
 
+    /**
+     * Executive phone login: the rider with the same number however it was saved ("+919876543210", "9876543210",
+     * "98765 43210"; the website's form saves 10 digits, the apps "+91…"), compared on the last 10 digits.
+     * If several match: the exact spelling first, then one that already has a password, then the oldest.
+     */
+    @Query(value = "SELECT * FROM \"Rider\" WHERE right(regexp_replace(coalesce(\"phone\", ''), '[^0-9]', '', 'g'), 10) = :digits "
+            + "ORDER BY (\"phone\" = :phone) DESC, (coalesce(\"password\", '') <> '') DESC, \"createdAt\" ASC LIMIT 1",
+            nativeQuery = true)
+    Optional<Rider> findFirstBySameNumber(@Param("digits") String lastTenDigits, @Param("phone") String phone);
+
+    /** The number's last 10 digits (an Indian mobile number without +91 / 0), or null when it has fewer. */
+    static String lastTenDigits(String phone) {
+        String digits = phone == null ? "" : phone.replaceAll("[^0-9]", "");
+        return digits.length() < 10 ? null : digits.substring(digits.length() - 10);
+    }
+
     List<Rider> findAllByOrderByCreatedAtDesc();
 
     List<Rider> findByPartnerIdInOrderByCreatedAtDesc(Collection<String> partnerIds);
