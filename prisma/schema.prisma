@@ -186,7 +186,7 @@ model CarouselSlide {
 model ScreenGuard {
   id           String   @id @default(cuid())
   name         String
-  guardType    String   // tempered | privacy | matte | clear | full | lens
+  guardType    String   // tempered | unbreakable (Gorilla Glass 5) | privacy | matte | clear | full | lens
   brand        String   // phone brand it fits, e.g. "Apple"
   model        String   // phone model it fits, e.g. "iPhone 15"
   imageUrl     String?  // a website path (/uploads/...) or https URL
@@ -263,13 +263,14 @@ model RefurbishedOrder {
   updatedAt      DateTime @updatedAt
 }
 
-// The fixed price of one repair for one phone. issue: screen | battery | charging | camera | speaker | back.
+// The price (or price range) of one repair for one phone. issue: screen | battery | charging | camera | speaker | back.
 model RepairPrice {
   id           String   @id @default(cuid())
   brand        String
   model        String
   issue        String
   price        Int
+  priceMax     Int? // the top of a price range (the backend adds this column); null for a fixed price
   isActive     Boolean  @default(true)
   displayOrder Int      @default(0)
   createdAt    DateTime @default(now())
@@ -288,6 +289,7 @@ model RepairBooking {
   model         String
   issue         String
   price         Int
+  priceMax      Int?
   visitDate     String
   slot          String
   name          String

@@ -119,7 +119,10 @@ export interface RepairPrice {
   brand: string;
   model: string;
   issue: RepairIssue;
+  /** The fixed price, or the lowest of a range. */
   price: number;
+  /** The highest of a price range; null (or missing, from an older server) for a fixed price. */
+  priceMax?: number | null;
   isActive: boolean;
   displayOrder: number;
 }
@@ -138,8 +141,10 @@ export interface RepairBooking {
   brand: string;
   model: string;
   issue: RepairIssue;
-  /** The price at the time of the booking, whole rupees. */
+  /** The price at the time of the booking, whole rupees (the lowest, when it was a range). */
   price: number;
+  /** The highest of the range at the time of the booking; null for a fixed price. */
+  priceMax?: number | null;
   /** YYYY-MM-DD */
   visitDate: string;
   slot: RepairSlot;

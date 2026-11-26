@@ -5,7 +5,7 @@ import {
   REPAIR_ISSUES, useMyOrders, useMyRefurbishedOrders, useMyRepairBookings, useMyShopOrders, useSession, type RefurbishedOrder, type RepairBooking,
   type ShopOrder,
 } from '@fonzkart/api';
-import { formatInr } from '@fonzkart/core';
+import { formatInr, formatInrRange } from '@fonzkart/core';
 import { formatDateTime, makeStyles, useColors } from '@fonzkart/ui';
 import {
   EmptyState, ErrorState, Icon, MAX_CONTENT, OrderCard, PAGE_PADDING, radii, Segmented, SkeletonRows, SkeletonScreen, TabTitle, Tap,
@@ -183,7 +183,7 @@ function RepairCard({ booking, onPress }: { booking: RepairBooking; onPress: () 
         </View>
         <Text style={styles.cardSummary} numberOfLines={1}>{issue} · {booking.model}</Text>
         <Text style={styles.cardMeta}>Visit on {visitDay(booking.visitDate)}</Text>
-        <Text style={styles.cardTotal}>{formatInr(booking.price)}</Text>
+        <Text style={styles.cardTotal}>{formatInrRange(booking.price, booking.priceMax)}</Text>
       </View>
       <Icon name="chevronRight" color={colors.muted} size={18} />
     </Tap>

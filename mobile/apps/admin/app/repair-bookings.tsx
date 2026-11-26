@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   REPAIR_ISSUES, REPAIR_SLOTS, REPAIR_STATUSES, repairAdminApi, repairKeys, useRepairAdminBookings, type RepairBooking, type RepairStatus,
 } from '@fonzkart/api';
-import { formatInr } from '@fonzkart/core';
+import { formatInrRange } from '@fonzkart/core';
 import { EmptyState, ErrorState, Loading, Notice, Segmented, colors, font, formatDateTime, radius, spacing } from '@fonzkart/ui';
 
 const statusLabel = (id: string) => REPAIR_STATUSES.find(s => s.id === id)?.label ?? id;
@@ -79,7 +79,7 @@ export default function RepairBookings() {
           <Text style={styles.muted} selectable>{b.phone}{b.customerEmail ? ` · ${b.customerEmail}` : ''}</Text>
           <View style={styles.itemRow}>
             <Text style={styles.itemName} numberOfLines={2}>{issueLabel(b.issue)} · {b.model}</Text>
-            <Text style={styles.total}>{formatInr(b.price)}</Text>
+            <Text style={styles.total}>{formatInrRange(b.price, b.priceMax)}</Text>
           </View>
           <Text style={styles.label}>Visit: {b.visitDate}, {slotLabel(b.slot)}</Text>
           <Text style={styles.muted} selectable>{b.address}, {b.pincode}</Text>

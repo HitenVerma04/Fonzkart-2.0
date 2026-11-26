@@ -147,6 +147,39 @@ class ShopIntegrationTest {
         assertThat(put("/api/shop/admin/screen-guards/missing", admin, guard("X", 10, 5)).statusCode()).isEqualTo(404);
     }
 
+    @Autowired
+    private ScreenGuardKinds kinds;
+
+    @Test
+    void everyPhoneGetsTheOtherGuardKindsOnceAndAdminGuardsAreKept() {
+        jdbc.update("INSERT INTO \"ScreenGuard\" (id, name, \"guardType\", brand, model, \"imageUrl\", mrp, price, \"isActive\", "
+                + "\"displayOrder\", \"createdAt\", \"updatedAt\") VALUES "
+                + "('g-a', 'Phone A Screen Guard', 'tempered', 'Apple', 'Phone A', '/models/a.webp', 999, 799, true, 1, now(), now()), "
+                + "('g-b', 'Phone B Screen Guard', 'tempered', 'Samsung', 'Phone B', null, 1199, 899, false, 2, now(), now()), "
+                + "('own', 'Phone B own matte', 'matte', 'samsung', 'phone b', null, 700, 650, true, 3, now(), now())");
+
+        ScreenGuardKinds.Result first = kinds.apply();
+        assertThat(first.applied()).isTrue();
+        assertThat(first.added()).isEqualTo(5); // A: unbreakable, matte, privacy. B: unbreakable, privacy (its matte is kept).
+
+        Map<String, Object> unbreakable = jdbc.queryForMap("SELECT name, mrp, price, \"imageUrl\", \"isActive\", \"displayOrder\" "
+                + "FROM \"ScreenGuard\" WHERE id = 'g-a-unbreakable'");
+        assertThat(unbreakable.get("name")).isEqualTo("Phone A Gorilla Glass 5 Unbreakable Guard");
+        assertThat(unbreakable.get("mrp")).isEqualTo(1499);
+        assertThat(unbreakable.get("price")).isEqualTo(1299);
+        assertThat(unbreakable.get("imageUrl")).isEqualTo("/models/a.webp");
+        assertThat(unbreakable.get("isActive")).isEqualTo(true);
+        assertThat(unbreakable.get("displayOrder")).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT \"isActive\" FROM \"ScreenGuard\" WHERE id = 'g-b-privacy'", Boolean.class)).isFalse();
+        assertThat(jdbc.queryForObject("SELECT price FROM \"ScreenGuard\" WHERE id = 'own'", Integer.class)).isEqualTo(650);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM \"ScreenGuard\" WHERE id = 'g-b-matte'", Integer.class)).isZero();
+
+        jdbc.update("DELETE FROM \"ScreenGuard\" WHERE id = 'g-a-matte'"); // an admin removed one
+        ScreenGuardKinds.Result again = kinds.apply();
+        assertThat(again.applied()).isFalse();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM \"ScreenGuard\"", Integer.class)).isEqualTo(7);
+    }
+
     @Test
     void customersSeeActiveGuardsPricedByTheDiscountSwitch() throws Exception {
         String admin = admin();

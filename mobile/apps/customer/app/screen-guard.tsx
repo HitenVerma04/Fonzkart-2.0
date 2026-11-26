@@ -1,13 +1,17 @@
 // Screen guards: a doorstep service, coming soon. A technician brings the right guard for the customer's exact model
-// and fits it at their door. Until it launches this screen shows the service (how it works, the guard types) and
-// sends the customer to what they can do today. The store and cart code (src/shop) stays for the launch.
+// and fits it at their door. Until it launches this screen shows the service (how it works, the guard kinds) and
+// sends the customer to what they can do today. The store and cart code (src/shop) stays for the launch. Every phone
+// gets four kinds of guard (tempered glass, Gorilla Glass 5 unbreakable, matte, privacy); "Check your phone" lists them
+// for the customer's model. The website's page (components/shop/ScreenGuardSoon.tsx) matches it.
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { guardKind, guardsByModel, useScreenGuardStore } from '@fonzkart/api';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { CATEGORY_ART } from '../src/categoryArt/art';
 import { ArtBackground, useLoop } from '../src/categoryArt/motion';
-import { Appear, Button, Icon, Page, radii, type, useDesign, type IconName } from '../src/design';
+import { Appear, Button, Icon, Page, radii, SearchBar, type, useDesign, type IconName } from '../src/design';
 import { useTileWidth } from '../src/grid';
 
 const STEPS: { icon: IconName; title: string }[] = [
@@ -16,18 +20,22 @@ const STEPS: { icon: IconName; title: string }[] = [
   { icon: 'shield', title: 'Fitted on the spot' },
 ];
 
-const GUARDS: { icon: IconName; title: string; note: string }[] = [
-  { icon: 'shield', title: 'Tempered glass', note: 'Everyday armour' },
-  { icon: 'lock', title: 'Privacy', note: 'Side views blocked' },
-  { icon: 'sun', title: 'Matte', note: 'No glare, no prints' },
-  { icon: 'camera', title: 'Camera lens', note: 'Lens protected' },
-];
+const KIND_ICON: Record<string, IconName> = {
+  tempered: 'shield', unbreakable: 'bolt', matte: 'sun', privacy: 'lock', clear: 'sparkle', full: 'phone', lens: 'camera',
+};
+
+/** The kinds every phone gets. */
+const MAIN_KINDS = ['unbreakable', 'tempered', 'matte', 'privacy'];
 
 const PROMISES: { icon: IconName; text: string }[] = [
+  { icon: 'truck', text: 'Fitted at your doorstep' },
+  { icon: 'shield', text: 'Unbreakable Gorilla Glass 5 guards' },
   { icon: 'check', text: 'Exact fit for your model' },
   { icon: 'sparkle', text: 'Bubble-free fitting' },
   { icon: 'cash', text: 'Pay after fitting' },
 ];
+
+const normal = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
 /** The drawing's backdrop: the Screen Guard card's light teal. */
 const ART_BACKGROUND = '#f0fdfa';
@@ -89,24 +97,75 @@ export default function ScreenGuardSoon() {
       </Appear>
 
       <Appear index={2}>
-        <Text style={styles.section}>Guards we'll carry</Text>
+        <Text style={styles.section}>Four kinds for every phone</Text>
         <View style={styles.grid}>
-          {GUARDS.map(g => (
-            <View key={g.title} style={[styles.guard, { boxShadow: d.shadow.sm }]}>
-              <View style={styles.guardIcon}><Icon name={g.icon} color={colors.greenDark} size={22} filled /></View>
-              <Text style={styles.guardTitle}>{g.title}</Text>
-              <Text style={styles.guardNote}>{g.note}</Text>
-            </View>
-          ))}
+          {MAIN_KINDS.map(guardKind).map(k => {
+            const star = k.id === 'unbreakable';
+            return (
+              <View key={k.id} style={[styles.guard, star && styles.guardStar, { boxShadow: d.shadow.sm }]}>
+                {star ? <View style={styles.toughest}><Text style={styles.toughestText}>TOUGHEST</Text></View> : null}
+                <View style={[styles.guardIcon, star && styles.guardIconStar]}>
+                  <Icon name={KIND_ICON[k.id] ?? 'shield'} color={star ? '#052e16' : colors.greenDark} size={22} filled />
+                </View>
+                <Text style={[styles.guardTitle, star && styles.white]}>{k.title}</Text>
+                <Text style={[styles.guardNote, star && styles.starNote]}>{k.note}</Text>
+              </View>
+            );
+          })}
         </View>
       </Appear>
 
-      <Appear index={3} style={styles.footer}>
+      <Appear index={3}>
+        <GuardFinder />
+      </Appear>
+
+      <Appear index={4} style={styles.footer}>
         <Text style={styles.meanwhile}>Launching soon. Meanwhile:</Text>
         <Button title="Sell a device" icon="sell" onPress={() => router.navigate('/')} />
         <Button title="Book a repair" variant="secondary" icon="repair" onPress={() => router.navigate('/repair')} />
       </Appear>
     </Page>
+  );
+}
+
+/** "Check your phone": search a model and see every kind of guard made for it. Hidden until the list loads. */
+function GuardFinder() {
+  const styles = useStyles();
+  const colors = useColors();
+  const store = useScreenGuardStore();
+  const models = useMemo(() => guardsByModel(store.data?.items ?? []), [store.data]);
+  const [query, setQuery] = useState('');
+  if (!models.length) return null;
+  const words = normal(query);
+  const matches = words ? models.filter(m => normal(`${m.brand} ${m.model}`).includes(words)) : models;
+  const shown = matches.slice(0, 5);
+  return (
+    <View style={styles.finder}>
+      <Text style={styles.section}>Check your phone</Text>
+      <Text style={styles.finderNote}>{models.length} phones covered. Prices when we launch.</Text>
+      <SearchBar value={query} onChangeText={setQuery} placeholder="Type your phone, e.g. iPhone 16 Pro" />
+      {shown.length ? shown.map(m => (
+        <View key={`${m.brand}|${m.model}`} style={styles.model}>
+          <Text style={styles.modelBrand}>{m.brand.toUpperCase()}</Text>
+          <Text style={styles.modelName}>{m.model}</Text>
+          <View style={styles.kinds}>
+            {m.guards.map(g => {
+              const kind = guardKind(g.guardType);
+              const star = kind.id === 'unbreakable';
+              return (
+                <View key={g.id} style={[styles.kind, star && styles.kindStar]}>
+                  <Icon name={KIND_ICON[kind.id] ?? 'shield'} color={star ? '#bef264' : colors.greenDark} size={12} filled />
+                  <Text style={[styles.kindText, star && styles.kindTextStar]}>{star ? 'Unbreakable · Gorilla Glass 5' : kind.title}</Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      )) : (
+        <Text style={styles.none}>{"Not on the list yet. Tell us when we launch and we'll bring the right guard."}</Text>
+      )}
+      {matches.length > shown.length ? <Text style={styles.finderNote}>{matches.length - shown.length} more phones. Type your model to find it.</Text> : null}
+    </View>
   );
 }
 
@@ -136,9 +195,26 @@ const useStyles = makeStyles(colors => ({
     flexBasis: '47%', flexGrow: 1, backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border,
     padding: 14, gap: 4,
   },
+  guardStar: { backgroundColor: '#052e16', borderColor: '#166534' },
   guardIcon: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.greenTint, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+  guardIconStar: { backgroundColor: '#bef264' },
+  toughest: { position: 'absolute', top: 12, right: 12, backgroundColor: '#bef264', borderRadius: radii.pill, paddingHorizontal: 7, paddingVertical: 2 },
+  toughestText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.6, color: '#052e16' },
   guardTitle: { ...type.label, color: colors.navy },
+  white: { color: '#ffffff' },
   guardNote: { ...type.small, color: colors.muted },
+  starNote: { color: '#d1fae5' },
+  finder: { gap: 10 },
+  finderNote: { ...type.small, color: colors.muted, marginTop: -6 },
+  model: { backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, padding: 14, gap: 2 },
+  modelBrand: { ...type.tiny, fontWeight: '800', letterSpacing: 0.8, color: colors.muted },
+  modelName: { ...type.label, color: colors.navy },
+  kinds: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
+  kind: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: radii.pill, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.greenTint },
+  kindStar: { backgroundColor: '#052e16' },
+  kindText: { fontSize: 12, fontWeight: '700', color: colors.greenDark },
+  kindTextStar: { color: '#bef264' },
+  none: { ...type.small, fontWeight: '600', color: colors.navy, backgroundColor: colors.surface, borderRadius: radii.lg, padding: 14 },
   footer: { gap: 10 },
   meanwhile: { ...type.small, fontWeight: '700', color: colors.muted, textAlign: 'center' },
 }));

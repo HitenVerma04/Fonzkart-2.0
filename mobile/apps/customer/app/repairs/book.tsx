@@ -1,5 +1,6 @@
-// Booking a repair for one phone: what is wrong, when to visit, and where. The price shown is fixed; the server takes it
-// from its own list, and the customer pays after the repair.
+// Booking a repair for one phone: what is wrong, when to visit, and where. The price shown is fixed or a range (the
+// technician confirms the exact price before starting); the server takes it from its own list, and the customer pays
+// after the repair.
 import { useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -7,7 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   REPAIR_ISSUES, REPAIR_SLOTS, repairKeys, useBookRepair, useRepairPrices, useSession, type RepairBooking, type RepairSlot,
 } from '@fonzkart/api';
-import { formatInr } from '@fonzkart/core';
+import { formatInrRange } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import { networkMessage } from '../../src/authFlow';
 import { Appear, Button, Card, ChoiceCard, Chip, EmptyState, ErrorState, Notice, Page, SkeletonCard, type } from '../../src/design';
@@ -50,7 +51,7 @@ export default function BookRepair() {
   if (prices.isError) return <ErrorState error={prices.error} onRetry={() => prices.refetch()} />;
   const options = REPAIR_ISSUES.flatMap(issue => {
     const price = prices.data.items.find(p => p.brand === brand && p.model === model && p.issue === issue.id);
-    return price ? [{ ...issue, priceId: price.id, price: price.price }] : [];
+    return price ? [{ ...issue, priceId: price.id, price: price.price, priceMax: price.priceMax }] : [];
   });
   if (!options.length) {
     return (
@@ -84,7 +85,7 @@ export default function BookRepair() {
       <Appear index={1}>
         <Card title="What needs repairing?" icon="repair">
           {options.map(o => (
-            <ChoiceCard key={o.id} label={`${o.label} · ${formatInr(o.price)}`} description={o.detail} selected={priceId === o.priceId} onPress={() => setPriceId(o.priceId)} />
+            <ChoiceCard key={o.id} label={`${o.label} · ${formatInrRange(o.price, o.priceMax)}`} description={o.detail} selected={priceId === o.priceId} onPress={() => setPriceId(o.priceId)} />
           ))}
         </Card>
       </Appear>
@@ -107,9 +108,14 @@ export default function BookRepair() {
       ) : null}
       <Appear index={4} style={styles.footer}>
         {chosen ? (
-          <View style={styles.row}>
-            <Text style={styles.total}>Pay after the repair</Text>
-            <Text style={styles.total}>{formatInr(chosen.price)}</Text>
+          <View style={styles.gapSmall}>
+            <View style={styles.row}>
+              <Text style={styles.total}>Pay after the repair</Text>
+              <Text style={styles.total}>{formatInrRange(chosen.price, chosen.priceMax)}</Text>
+            </View>
+            {chosen.priceMax != null && chosen.priceMax > chosen.price ? (
+              <Text style={styles.small}>The technician checks your phone and tells you the exact price within this range before starting.</Text>
+            ) : null}
           </View>
         ) : null}
         {problem && !error ? <Notice text={problem} /> : null}
@@ -133,4 +139,5 @@ const useStyles = makeStyles(colors => ({
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
   total: { fontSize: 17, lineHeight: 22, fontWeight: '700', color: colors.navy },
   footer: { gap: 12 },
+  gapSmall: { gap: 4 },
 }));

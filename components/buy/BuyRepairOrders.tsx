@@ -1,5 +1,5 @@
 // The customer's refurbished device orders and repair bookings, on My Orders (as in the Customer app's Orders tab).
-import { REPAIR_SLOTS, REPAIR_STATUSES, gradeLabel, inr, issueLabel, type RefurbishedOrder, type RepairBooking } from '@/lib/buyRepair';
+import { REPAIR_SLOTS, REPAIR_STATUSES, gradeLabel, inr, inrRange, issueLabel, type RefurbishedOrder, type RepairBooking } from '@/lib/buyRepair';
 import { SHOP_ORDER_STATUSES } from '@/lib/shop';
 
 const badge = 'rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary';
@@ -45,7 +45,7 @@ export function BuyRepairOrders({ orders, bookings }: { orders: RefurbishedOrder
                                 <p className="text-sm text-muted-foreground">
                                     Visit {new Date(`${b.visitDate}T00:00:00`).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}, {REPAIR_SLOTS.find(s => s.id === b.slot)?.time ?? b.slot}
                                 </p>
-                                <p className="mt-1 text-sm font-bold">{inr(b.price)} · pay after the repair</p>
+                                <p className="mt-1 text-sm font-bold">{inrRange(b.price, b.priceMax)} · pay after the repair</p>
                             </article>
                         ))}
                     </div>

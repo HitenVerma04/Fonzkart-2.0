@@ -3,15 +3,12 @@ import { FlatList, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useBrand, useModels } from '@fonzkart/api';
 import { makeStyles } from '@fonzkart/ui';
-import { groupSeries, modelImage } from '@fonzkart/core';
+import { modelImage } from '@fonzkart/core';
 import { deviceKindOf, EmptyState, ErrorState, MAX_CONTENT, PAGE_PADDING, ProductImage, SearchBar, SkeletonTiles, Tile } from '../../src/design';
 import { GRID_GAP, useTileWidth } from '../../src/grid';
 import { recordSellStep } from '../../src/sellProgress';
-import { SeriesPicker, useSeriesPanel } from '../../src/SeriesPicker';
 
 const COLUMNS = 2;
-/** Below this many models a series picker only gets in the way. */
-const SERIES_FROM = 6;
 
 export default function BrandModels() {
   const styles = useStyles();
@@ -19,8 +16,6 @@ export default function BrandModels() {
   const router = useRouter();
   const width = useTileWidth(COLUMNS);
   const [filter, setFilter] = useState('');
-  const [seriesKey, setSeriesKey] = useState<string | null>(null);
-  const [seriesOpen, setSeriesOpen] = useSeriesPanel();
   const brand = useBrand(name ? undefined : id); // the name normally comes with the link
   const models = useModels(id, category);
   const brandName = name ?? brand.data?.name ?? 'Models';
@@ -31,19 +26,11 @@ export default function BrandModels() {
     recordSellStep({ stage: 'models', category: category ?? 'smartphone', brandId: id, brandName: knownName });
   }, [id, category, knownName]);
 
-  // The brand's series (Realme 2 Series, Realme C Series, …), from the model names.
-  const series = useMemo(() => {
-    const list = models.data ?? [];
-    // Phones only: watch and tablet names ("Watch Series 9", "Tab S9") do not group well this way.
-    return (category ?? 'smartphone') === 'smartphone' && list.length >= SERIES_FROM ? groupSeries(knownName ?? '', list) : [];
-  }, [models.data, knownName, category]);
-
   const shown = useMemo(() => {
     const words = filter.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    const inSeries = seriesKey ? new Set(series.find(s => s.key === seriesKey)?.modelIds ?? []) : null;
-    const list = (models.data ?? []).filter(m => !inSeries || inSeries.has(m.id));
+    const list = models.data ?? [];
     return words.length ? list.filter(m => words.every(w => m.name.toLowerCase().includes(w))) : list;
-  }, [models.data, filter, series, seriesKey]);
+  }, [models.data, filter]);
 
   return (
     <>
@@ -67,10 +54,6 @@ export default function BrandModels() {
           ListHeaderComponent={
             <View style={styles.filter}>
               <SearchBar value={filter} onChangeText={setFilter} placeholder={`Search ${brandName} models`} />
-              {series.length ? (
-                <SeriesPicker series={series} selected={seriesKey} onSelect={setSeriesKey}
-                  open={seriesOpen} onToggle={() => setSeriesOpen(!seriesOpen)} />
-              ) : null}
             </View>
           }
           ListEmptyComponent={

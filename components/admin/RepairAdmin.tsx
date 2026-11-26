@@ -1,14 +1,15 @@
 'use client';
 
 // Repairs for administrators (the Admin app's "Repair prices" and "Repair bookings"): the switch that shows Repair to
-// customers, the fixed price of each repair per phone, and the booked visits.
+// customers, the price of each repair per phone (fixed, or a range from lowest to highest), and the booked visits.
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteRepairPrice, saveRepairPrice, setRepairBookingStatus, setRepairEnabled } from '@/actions/buyRepair';
-import { REPAIR_ISSUES, REPAIR_SLOTS, REPAIR_STATUSES, inr, issueLabel, type RepairBooking, type RepairPrice, type RepairPriceInput, type RepairStatus } from '@/lib/buyRepair';
+import { REPAIR_ISSUES, REPAIR_SLOTS, REPAIR_STATUSES, inrRange, issueLabel, type RepairBooking, type RepairPrice, type RepairPriceInput, type RepairStatus } from '@/lib/buyRepair';
 
 const field = 'w-full rounded-lg border bg-background px-3 py-2 text-sm';
-const EMPTY: RepairPriceInput = { brand: '', model: '', issue: 'screen', price: 0, isActive: true };
+const EMPTY: RepairPriceInput = { brand: '', model: '', issue: 'screen', price: 0, priceMax: null, isActive: true };
+const rupees = (text: string) => Number(text.replace(/\D/g, '').slice(0, 6)) || 0;
 
 export function RepairAdmin({ enabled: initialEnabled, items, bookings }: { enabled: boolean; items: RepairPrice[]; bookings: RepairBooking[] }) {
     const router = useRouter();
@@ -35,7 +36,7 @@ export function RepairAdmin({ enabled: initialEnabled, items, bookings }: { enab
     const open = (p: RepairPrice | 'new', preset?: Partial<RepairPriceInput>) => {
         setEditing(p);
         setMessage(null);
-        setForm(p === 'new' ? { ...EMPTY, ...preset } : { brand: p.brand, model: p.model, issue: p.issue, price: p.price, isActive: p.isActive, displayOrder: p.displayOrder });
+        setForm(p === 'new' ? { ...EMPTY, ...preset } : { brand: p.brand, model: p.model, issue: p.issue, price: p.price, priceMax: p.priceMax ?? null, isActive: p.isActive, displayOrder: p.displayOrder });
     };
 
     const run = async (task: () => Promise<{ ok: boolean; error?: string }>, done: string, after?: () => void) => {
@@ -51,9 +52,10 @@ export function RepairAdmin({ enabled: initialEnabled, items, bookings }: { enab
         }
     };
 
-    const canSave = !!form.brand.trim() && !!form.model.trim() && form.price > 0;
+    const rangeProblem = form.priceMax && form.priceMax < form.price ? 'The highest price must be at least the lowest.' : '';
+    const canSave = !!form.brand.trim() && !!form.model.trim() && form.price > 0 && !rangeProblem;
     const save = () => {
-        const input = { ...form, brand: form.brand.trim(), model: form.model.trim() };
+        const input = { ...form, brand: form.brand.trim(), model: form.model.trim(), priceMax: form.priceMax || null };
         void run(() => saveRepairPrice(editing === 'new' || !editing ? null : editing.id, input),
             `${issueLabel(input.issue)} for ${input.brand} ${input.model} ${editing === 'new' ? 'added' : 'saved'}.`, () => setEditing(null));
     };
@@ -83,11 +85,13 @@ export function RepairAdmin({ enabled: initialEnabled, items, bookings }: { enab
                     {editing ? (
                         <section className="space-y-4 rounded-2xl border bg-card p-5">
                             <h2 className="text-lg font-bold">{editing === 'new' ? 'New repair price' : 'Edit repair price'}</h2>
-                            <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="grid gap-3 sm:grid-cols-4">
                                 <label className="text-sm">Phone brand<input className={field} maxLength={40} placeholder="e.g. Apple" value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })} /></label>
                                 <label className="text-sm">Phone model<input className={field} maxLength={60} placeholder="e.g. iPhone 13" value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} /></label>
-                                <label className="text-sm">Price (₹)<input className={field} inputMode="numeric" value={form.price ? String(form.price) : ''} onChange={e => setForm({ ...form, price: Number(e.target.value.replace(/\D/g, '').slice(0, 6)) || 0 })} /></label>
+                                <label className="text-sm">{form.priceMax ? 'Lowest price (₹)' : 'Price (₹)'}<input className={field} inputMode="numeric" value={form.price ? String(form.price) : ''} onChange={e => setForm({ ...form, price: rupees(e.target.value) })} /></label>
+                                <label className="text-sm">Up to (₹), optional<input className={field} inputMode="numeric" placeholder="For a range" value={form.priceMax ? String(form.priceMax) : ''} onChange={e => setForm({ ...form, priceMax: rupees(e.target.value) || null })} /></label>
                             </div>
+                            {rangeProblem ? <p className="text-sm text-red-500">{rangeProblem}</p> : null}
                             <div>
                                 <span className="text-sm font-semibold">Repair</span>
                                 <div className="mt-1 flex flex-wrap gap-2">
@@ -123,7 +127,7 @@ export function RepairAdmin({ enabled: initialEnabled, items, bookings }: { enab
                                             <li key={p.id} className={`flex items-center justify-between gap-3 py-2 text-sm ${p.isActive ? '' : 'opacity-60'}`}>
                                                 <span>{issueLabel(p.issue)}{p.isActive ? '' : ' · Hidden'}</span>
                                                 <span className="flex items-center gap-4">
-                                                    <b>{inr(p.price)}</b>
+                                                    <b>{inrRange(p.price, p.priceMax)}</b>
                                                     <button type="button" onClick={() => open(p)} className="font-bold text-primary hover:underline">Edit</button>
                                                     <button type="button" disabled={busy} className="font-bold text-red-500 hover:underline"
                                                         onClick={() => deleting === p.id ? void run(() => deleteRepairPrice(p.id), `${issueLabel(p.issue)} for ${phone} deleted.`, () => setDeleting(null)) : setDeleting(p.id)}>
@@ -162,7 +166,7 @@ function Booking({ booking }: { booking: RepairBooking }) {
     return (
         <article className="rounded-2xl border bg-card p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="font-bold">Booking #{booking.bookingNumber} · {inr(booking.price)}</p>
+                <p className="font-bold">Booking #{booking.bookingNumber} · {inrRange(booking.price, booking.priceMax)}</p>
                 <select aria-label={`Status of booking ${booking.bookingNumber}`} value={status} onChange={e => change(e.target.value as RepairStatus)} className="rounded-lg border bg-background px-2 py-1 text-sm">
                     {REPAIR_STATUSES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
                 </select>

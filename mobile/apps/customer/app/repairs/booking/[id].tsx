@@ -2,7 +2,7 @@
 import { RefreshControl, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { REPAIR_ISSUES, REPAIR_SLOTS, useMyRepairBookings } from '@fonzkart/api';
-import { formatInr } from '@fonzkart/core';
+import { formatInrRange } from '@fonzkart/core';
 import { formatDateTime, makeStyles, useColors } from '@fonzkart/ui';
 import { Appear, Card, EmptyState, ErrorState, InfoRow, Notice, Page, radii, SkeletonCard, type, useDesign } from '../../../src/design';
 import { RepairStatusBadge } from '../../../src/shop/ShopBits';
@@ -35,7 +35,10 @@ export default function RepairBookingDetail() {
           <Text style={styles.name}>{issue}</Text>
           <Text style={styles.date}>{b.model}</Text>
           <Text style={styles.label}>Pay after the repair</Text>
-          <Text style={styles.price}>{formatInr(b.price)}</Text>
+          <Text style={styles.price}>{formatInrRange(b.price, b.priceMax)}</Text>
+          {b.priceMax != null && b.priceMax > b.price ? (
+            <Text style={styles.date}>The technician tells you the exact price within this range before starting.</Text>
+          ) : null}
         </View>
       </Appear>
       <Appear index={2}>

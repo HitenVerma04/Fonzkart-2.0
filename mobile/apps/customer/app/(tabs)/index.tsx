@@ -1,7 +1,8 @@
 // Home, laid out like Blinkit's: a header (white, or near-black in dark mode) with the animated Fonzkart "F", the name,
 // "Buy • Sell • Repair • Refurbish", the bell, profile and the search bar; then "Pick up where you left off" (when a valuation was left part-way), the
 // carousel, "Sell this phone" (Cashify's), the animated sell categories, Repair & Protect, a row of top phone brands,
-// and the Fonzkart promise in a dark card (CRED's style).
+// the Fonzkart promise in a dark card (CRED's style), and at the very bottom the brand sign-off (Bengaluru live, the
+// other cities coming soon).
 import { useCallback } from 'react';
 import { Platform, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import Animated, {
@@ -23,6 +24,7 @@ import {
 import { HomeCarousel } from '../../src/HomeCarousel';
 import { FactoryBackground } from '../../src/home/FactoryBackground';
 import { HeroLogo } from '../../src/home/HeroLogo';
+import { BrandSignOff } from '../../src/home/BrandSignOff';
 import { ResumeCard } from '../../src/home/ResumeCard';
 import { PromiseCard } from '../../src/home/sections';
 import { SellThisDevice } from '../../src/home/SellThisDevice';
@@ -239,6 +241,10 @@ export default function Home() {
 
         <Appear index={4}>
           <PromiseCard />
+        </Appear>
+
+        <Appear index={5}>
+          <BrandSignOff />
         </Appear>
       </View>
     </Animated.ScrollView>

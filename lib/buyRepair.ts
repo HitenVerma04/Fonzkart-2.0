@@ -89,7 +89,10 @@ export type RepairPrice = {
     brand: string;
     model: string;
     issue: RepairIssue;
+    /** The fixed price, or the lowest of a range. */
     price: number;
+    /** The highest of a price range; null for a fixed price. */
+    priceMax?: number | null;
     isActive: boolean;
     displayOrder: number;
 };
@@ -106,6 +109,8 @@ export type RepairBooking = {
     model: string;
     issue: RepairIssue;
     price: number;
+    /** The highest of the range at the time of the booking; null for a fixed price. */
+    priceMax?: number | null;
     /** YYYY-MM-DD */
     visitDate: string;
     slot: RepairSlot;
@@ -154,6 +159,12 @@ export type PincodeRequestForReview = PincodeRequestItem & {
 export type MyPincodes = { pincodes: string[]; city: PincodeCity | null; requests: PincodeRequestItem[] };
 
 export const inr = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+
+/** A price or a price range: "₹7,000" or "₹7,000 – ₹10,000" (as formatInrRange in the apps). */
+export const inrRange = (min: number, max?: number | null) => (max != null && max > min ? `${inr(min)} – ${inr(max)}` : inr(min));
+
+/** Shown with a price range. */
+export const RANGE_NOTE = 'The technician checks your phone and tells you the exact price within this range before starting.';
 
 /** A picture path from the backend (/uploads/…) or a full URL, as an <img> src. */
 export const pictureSrc = (path: string | null | undefined) => (path ? path : null);

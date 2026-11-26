@@ -1,6 +1,7 @@
 export { config } from './config';
 export { imageUrl, modelImage } from './images';
-export { formatInr } from './format';
+export { formatInr, formatInrRange } from './format';
+export { FALLBACK_CITIES, LIVE_CITIES, cityName, isLiveCity, servedCities, type ServedCity } from './cities';
 export { SELL_CATEGORIES, categoryName, sellCategoryOf, type SellCategoryId } from './categories';
 export { cleanPincode, isCompletePincode } from './pincode';
 export {
@@ -86,4 +87,3 @@ export {
   quantityProblem,
   upiProblem,
 } from './validate';
-export { groupSeries, type Series } from './series';

@@ -13,4 +13,7 @@ export const quoteApi = {
   /** True when Fonzkart picks up from this pincode. */
   pincodeAvailable: (pincode: string, signal?: AbortSignal) =>
     getJson<boolean>('/api/cities/pincode-availability', { pincode }, signal),
+
+  /** The names of the cities switched on in the Admin app (public). */
+  activeCities: (signal?: AbortSignal) => getJson<string[]>('/api/cities/active-names', undefined, signal),
 };

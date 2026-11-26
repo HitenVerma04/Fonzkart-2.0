@@ -18,6 +18,11 @@ import { Brand } from '@/lib/store';
 import { FestiveBanner } from '@/components/festive/FestiveBanner';
 import { FactoryBackground } from '@/components/home/FactoryBackground';
 import { SellThisDevice } from '@/components/home/SellThisDevice';
+import { IndiaJourney } from '@/components/home/IndiaJourney';
+import { servedCities } from '@/lib/cities';
+
+/** City chips in the hero (phones); the full list is in the journey section at the bottom. */
+const HERO_CITIES = 8;
 
 export function HomeClient({ initialBrands, activeCities = [], displayPrices = [] }: { initialBrands: Brand[], activeCities?: string[], displayPrices?: any[] }) {
     const router = useRouter();
@@ -75,18 +80,19 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
 
                             {/* Mobile View Specifics (Logo + Chips) */}
                             <div className="block xl:hidden w-full space-y-4 pt-0 mb-12">
-                                <div className="flex flex-wrap justify-center gap-2 px-2 pt-6 pb-2">
-                                    {activeCities.length > 0 ? activeCities.map(city => (
-                                        <div key={city} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 text-black dark:text-white text-[10px] font-bold border border-green-200/50 shadow-sm transition-all cursor-default whitespace-nowrap">
-                                            <MapPin className="w-3 h-3 text-green-500" />
-                                            {city}
+                                {/* The cities: Bengaluru is live, every other one has a "Coming soon" tag above it. */}
+                                <div className="flex flex-wrap justify-center gap-x-2 gap-y-3 px-2 pt-6 pb-2">
+                                    {servedCities(activeCities).slice(0, HERO_CITIES).map(city => (
+                                        <div key={city.name} className="relative pt-2">
+                                            <span className={`absolute left-1/2 top-0 z-10 -translate-x-1/2 whitespace-nowrap rounded px-1.5 text-[7.5px] font-black uppercase leading-[13px] tracking-wider ${city.live ? 'bg-green-500 text-white' : 'border border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-400/50 dark:bg-amber-950 dark:text-amber-300'}`}>
+                                                {city.live ? 'Live' : 'Coming soon'}
+                                            </span>
+                                            <div className={`inline-flex items-center gap-1.5 px-3 pt-2 pb-1.5 rounded-full text-[10px] font-bold border shadow-sm cursor-default whitespace-nowrap ${city.live ? 'bg-green-50 dark:bg-green-950/40 text-black dark:text-white border-green-400' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}>
+                                                <MapPin className={`w-3 h-3 ${city.live ? 'text-green-500' : 'text-amber-500'}`} />
+                                                {city.name}
+                                            </div>
                                         </div>
-                                    )) : (
-                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 text-black dark:text-white text-[10px] font-bold border border-green-200/50 shadow-sm transition-all cursor-default whitespace-nowrap">
-                                            <MapPin className="w-3 h-3 text-green-500" />
-                                            Bengaluru
-                                        </div>
-                                    )}
+                                    ))}
                                 </div>
                                 <div className="flex justify-center items-center py-2 w-full">
                                     <div className="scale-[1.5] origin-center transform flex justify-center items-center py-4">
@@ -194,8 +200,8 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
                             <p className="text-sm text-slate-400 font-medium">Cash Paid</p>
                         </div>
                         <div className="p-4">
-                            <h3 className="text-3xl md:text-4xl font-bold text-teal-400 mb-2">4+</h3>
-                            <p className="text-sm text-slate-400 font-medium">Cities Covered</p>
+                            <h3 className="text-3xl md:text-4xl font-bold text-teal-400 mb-2">{Math.max(servedCities(activeCities).length - 1, 1)}+</h3>
+                            <p className="text-sm text-slate-400 font-medium">Cities Coming Soon</p>
                         </div>
                         <div className="p-4">
                             <h3 className="text-3xl md:text-4xl font-bold text-lime-400 mb-2">4.8★</h3>
@@ -334,6 +340,9 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
                     </div>
                 </div>
             </section>
+
+            {/* Our journey across India (as at the bottom of the Customer app's home) */}
+            <IndiaJourney cityNames={activeCities} />
         </div>
     );
 }

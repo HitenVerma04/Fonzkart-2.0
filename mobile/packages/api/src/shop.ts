@@ -7,17 +7,57 @@ type Result = { success?: boolean; id?: string; error?: string };
 const send = async (method: 'POST' | 'PUT' | 'DELETE', path: string, body?: unknown) =>
   (await request<Result>(method, path, { body })).data ?? {};
 
-export type GuardType = 'tempered' | 'privacy' | 'matte' | 'clear' | 'full' | 'lens';
+export type GuardType = 'tempered' | 'unbreakable' | 'privacy' | 'matte' | 'clear' | 'full' | 'lens';
 
 /** The guard types, in the order the store lists them. */
 export const GUARD_TYPES: { id: GuardType; label: string }[] = [
   { id: 'tempered', label: 'Tempered glass' },
+  { id: 'unbreakable', label: 'Gorilla Glass 5' },
   { id: 'privacy', label: 'Privacy' },
   { id: 'matte', label: 'Matte' },
   { id: 'clear', label: 'HD clear' },
   { id: 'full', label: 'Full coverage' },
   { id: 'lens', label: 'Camera lens' },
 ];
+
+/** How each kind is shown to customers, in the order they are listed for a phone. */
+export const GUARD_KINDS: { id: GuardType; title: string; note: string }[] = [
+  { id: 'tempered', title: 'Tempered glass', note: 'Everyday armour, crystal clear' },
+  { id: 'unbreakable', title: 'Unbreakable', note: 'Gorilla Glass 5 strength' },
+  { id: 'matte', title: 'Matte', note: 'No glare, no fingerprints' },
+  { id: 'privacy', title: 'Privacy', note: 'Side views blocked' },
+  { id: 'clear', title: 'HD clear', note: 'Ultra-clear view' },
+  { id: 'full', title: 'Full coverage', note: 'Edge to edge' },
+  { id: 'lens', title: 'Camera lens', note: 'Lens protected' },
+];
+
+export const guardKind = (id: string) => GUARD_KINDS.find(k => k.id === id) ?? { id: id as GuardType, title: id, note: '' };
+
+/** One phone and every kind of guard made for it, kinds in GUARD_KINDS order. */
+export interface GuardModel {
+  brand: string;
+  model: string;
+  imageUrl: string | null;
+  guards: ScreenGuard[];
+}
+
+/** The store's guards grouped by phone (brand and model, ignoring case), phones in store order. */
+export function guardsByModel(items: ScreenGuard[]): GuardModel[] {
+  const rank = (t: string) => { const i = GUARD_KINDS.findIndex(k => k.id === t); return i < 0 ? GUARD_KINDS.length : i; };
+  const byKey = new Map<string, GuardModel>();
+  for (const g of items) {
+    const key = `${g.brand}|${g.model}`.toLowerCase();
+    const found = byKey.get(key);
+    if (found) found.guards.push(g);
+    else byKey.set(key, { brand: g.brand, model: g.model, imageUrl: g.imageUrl, guards: [g] });
+  }
+  const models = [...byKey.values()];
+  for (const m of models) {
+    m.guards.sort((a, b) => rank(a.guardType) - rank(b.guardType));
+    m.imageUrl = m.guards.find(g => g.imageUrl)?.imageUrl ?? null;
+  }
+  return models;
+}
 
 export interface ScreenGuard {
   id: string;

@@ -7,3 +7,8 @@ export function formatInr(amount: number): string {
   const rest = digits.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ',');
   return `${sign}₹${rest ? rest + ',' + lastThree : lastThree}`;
 }
+
+/** A price or a price range: "₹7,000" or "₹7,000 – ₹10,000" (when max is above min). */
+export function formatInrRange(min: number, max?: number | null): string {
+  return max != null && max > min ? `${formatInr(min)} – ${formatInr(max)}` : formatInr(min);
+}

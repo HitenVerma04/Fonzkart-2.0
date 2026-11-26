@@ -82,7 +82,7 @@ public class ShopService {
 
     static final String FESTIVE_THEME = "app.festiveTheme";
     static final List<String> FESTIVE_THEMES = List.of("none", "republic", "independence", "diwali", "eid", "christmas");
-    static final List<String> GUARD_TYPES = List.of("tempered", "privacy", "matte", "clear", "full", "lens");
+    static final List<String> GUARD_TYPES = List.of("tempered", "unbreakable", "privacy", "matte", "clear", "full", "lens");
     static final List<String> STATUSES = List.of("placed", "confirmed", "shipped", "delivered", "cancelled");
     static final String STORE_ENABLED = "shop.storeEnabled";
     static final String DISCOUNTS_ENABLED = "shop.discountsEnabled";

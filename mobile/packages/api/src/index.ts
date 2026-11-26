@@ -91,6 +91,7 @@ export {
   useNotifications,
   useOfferPrice,
   usePincodeAvailability,
+  useActiveCities,
   usePlaceOrder,
   useProfile,
   useQuestionnaire,
@@ -162,7 +163,10 @@ export {
   type RepairStatus,
 } from './buyRepair';
 export {
+  GUARD_KINDS,
   GUARD_TYPES,
+  guardKind,
+  guardsByModel,
   SHOP_ORDER_STATUSES,
   discountPercent,
   shopAdminApi,
@@ -172,6 +176,7 @@ export {
   type ScreenGuard,
   type ScreenGuardInput,
   type ScreenGuardStore,
+  type GuardModel,
   type ShopOrder,
   type ShopOrderItem,
   type ShopOrderStatus,

@@ -225,7 +225,6 @@ export default function SellWizard({ initialBrands, initialCategory, initialBran
                     <motion.div key="model" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                         <ModelSelector
                             brandId={selectedBrand.id}
-                            brandName={selectedBrand.name}
                             category={category === 'unbreakable-screenguard' ? 'smartphone' : category}
                             originalCategory={category}
                             onSelect={handleModelSelect}

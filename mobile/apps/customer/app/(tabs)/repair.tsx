@@ -1,5 +1,5 @@
 // Repair: find your phone (the one in your hand comes first when we repair it), then choose the repair and a visit.
-// Prices are fixed per phone and repair, so the list shows what the cheapest repair starts from.
+// Each phone and repair has a price or a price range, so the list shows what the cheapest repair starts from.
 import { memo, useCallback, useMemo, useState } from 'react';
 import { FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -13,7 +13,7 @@ import {
 import { readDeviceSpecs } from '../../src/home/thisDevice';
 import { ServiceHero } from '../../src/shop/ServiceHero';
 
-const PROMISES = ['Fixed price, shown before you book', 'Repaired at your doorstep', 'Pay after the repair'];
+const PROMISES = ['Price shown before you book', 'Repaired at your doorstep', 'Pay after the repair'];
 const normal = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
 type Phone = { brand: string; model: string; from: number; repairs: number };

@@ -118,6 +118,15 @@ export function usePincodeAvailability(pincode: string) {
   });
 }
 
+/** The active cities' names (the home page's "across India" section). */
+export function useActiveCities() {
+  return useQuery({
+    queryKey: ['cities', 'active-names'],
+    queryFn: ({ signal }) => quoteApi.activeCities(signal),
+    staleTime: 30 * 60_000,
+  });
+}
+
 export function useProfile(enabled: boolean) {
   return useQuery({
     queryKey: [...ACCOUNT_KEY, 'profile'],

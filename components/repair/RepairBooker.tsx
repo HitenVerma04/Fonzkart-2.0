@@ -1,12 +1,12 @@
 'use client';
 
-// Doorstep repair: choose the phone (brand, model) and what is wrong, see the fixed price, pick a day and time, and
+// Doorstep repair: choose the phone (brand, model) and what is wrong, see the price or price range, pick a day and time, and
 // book, as in the Customer app's Repair tab. The server takes the price from its own list.
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Clock, ShieldCheck, Wrench } from 'lucide-react';
 import { bookRepair } from '@/actions/buyRepair';
-import { REPAIR_ISSUES, REPAIR_SLOTS, inr, issueLabel, type RepairBooking, type RepairPrice, type RepairSlot } from '@/lib/buyRepair';
+import { RANGE_NOTE, REPAIR_ISSUES, REPAIR_SLOTS, inrRange, issueLabel, type RepairBooking, type RepairPrice, type RepairSlot } from '@/lib/buyRepair';
 import { DeliveryFields, useDeliveryForm } from '@/components/ui/DeliveryFields';
 
 const field = 'w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none focus:border-primary';
@@ -65,7 +65,7 @@ export function RepairBooker({ items, signedIn, defaultName }: { items: RepairPr
             <div className="mx-auto max-w-xl px-4 py-16 text-center">
                 <h1 className="text-3xl font-black">Repair booked</h1>
                 <p className="mt-2 text-muted-foreground">
-                    Booking #{booked.bookingNumber} · {issueLabel(booked.issue)} for {booked.brand} {booked.model} · {inr(booked.price)}, pay after the repair.
+                    Booking #{booked.bookingNumber} · {issueLabel(booked.issue)} for {booked.brand} {booked.model} · {inrRange(booked.price, booked.priceMax)}, pay after the repair.
                 </p>
                 <Link href="/orders" className="mt-6 inline-block rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground">See my bookings</Link>
             </div>
@@ -76,7 +76,7 @@ export function RepairBooker({ items, signedIn, defaultName }: { items: RepairPr
         <div className="mx-auto max-w-5xl px-4 py-10">
             <header className="mb-8">
                 <h1 className="text-3xl font-black md:text-4xl">Doorstep repair</h1>
-                <p className="mt-2 text-muted-foreground">Fixed prices, repaired at your home or office. Pay after the repair.</p>
+                <p className="mt-2 text-muted-foreground">Prices shown before you book, repaired at your home or office. Pay after the repair.</p>
                 <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1.5"><Wrench className="h-4 w-4 text-primary" /> Trained technicians</span>
                     <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Quality parts</span>
@@ -108,7 +108,7 @@ export function RepairBooker({ items, signedIn, defaultName }: { items: RepairPr
                                     const issue = REPAIR_ISSUES.find(i => i.id === p.issue);
                                     return (
                                         <button key={p.id} type="button" onClick={() => setPriceId(p.id)} className={chip(priceId === p.id)}>
-                                            <span className="flex justify-between gap-2"><span>{issue?.label ?? p.issue}</span><span className="font-black">{inr(p.price)}</span></span>
+                                            <span className="flex justify-between gap-2"><span>{issue?.label ?? p.issue}</span><span className="whitespace-nowrap font-black">{inrRange(p.price, p.priceMax)}</span></span>
                                             <span className="block text-xs font-normal text-muted-foreground">{issue?.detail}</span>
                                         </button>
                                     );
@@ -148,7 +148,8 @@ export function RepairBooker({ items, signedIn, defaultName }: { items: RepairPr
                             <DeliveryFields form={delivery} field={field} />
                         </>
                     ) : <p className="text-sm text-muted-foreground">Sign in to book a visit.</p>}
-                    {chosen ? <div className="flex justify-between border-t pt-3 font-black"><span>Pay after the repair</span><span>{inr(chosen.price)}</span></div> : null}
+                    {chosen ? <div className="flex justify-between gap-2 border-t pt-3 font-black"><span>Pay after the repair</span><span className="text-right">{inrRange(chosen.price, chosen.priceMax)}</span></div> : null}
+                    {chosen && chosen.priceMax != null && chosen.priceMax > chosen.price ? <p className="text-xs text-muted-foreground">{RANGE_NOTE}</p> : null}
                     {error ? <p className="text-sm text-red-500">{error}</p> : null}
                     {signedIn ? (
                         <>

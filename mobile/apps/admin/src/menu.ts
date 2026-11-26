@@ -36,7 +36,7 @@ export const SECTIONS: Section[] = [
   { href: '/shop-orders', title: 'Shop orders', detail: 'Screen guard orders, cash on delivery', roles: ADMINS, group: 'Store, Buy & Repair' },
   { href: '/refurbished', title: 'Refurbished devices', detail: 'Devices for sale, grades, prices and stock', roles: ADMINS, group: 'Store, Buy & Repair' },
   { href: '/buy-orders', title: 'Device orders', detail: 'Refurbished devices ordered, cash on delivery', roles: ADMINS, group: 'Store, Buy & Repair' },
-  { href: '/repair-prices', title: 'Repair prices', detail: 'Fixed prices per phone and repair', roles: ADMINS, group: 'Store, Buy & Repair' },
+  { href: '/repair-prices', title: 'Repair prices', detail: 'Price or price range per phone and repair', roles: ADMINS, group: 'Store, Buy & Repair' },
   { href: '/repair-bookings', title: 'Repair bookings', detail: 'Doorstep repair visits', roles: ADMINS, group: 'Store, Buy & Repair' },
   { href: '/email', title: 'Email', detail: 'The Fonzkart mailboxes', roles: [...ADMINS, ZH, RM], group: 'Mail' },
 ];

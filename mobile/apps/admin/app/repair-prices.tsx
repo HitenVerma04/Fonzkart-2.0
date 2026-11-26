@@ -1,13 +1,14 @@
-// Repair prices: the switch that shows Repair to customers, and the fixed price of each repair for each phone. Search a
-// phone to edit its prices; a repair without a price is not offered for that phone.
+// Repair prices: the switch that shows Repair to customers, and the price of each repair for each phone: a fixed price,
+// or a range (lowest to highest) when the exact cost depends on the phone. Search a phone to edit its prices; a repair
+// without a price is not offered for that phone.
 import { useMemo, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Switch, Text, View } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { REPAIR_ISSUES, repairAdminApi, repairKeys, useRepairAdmin, type RepairPrice, type RepairPriceInput } from '@fonzkart/api';
-import { formatInr } from '@fonzkart/core';
+import { formatInrRange } from '@fonzkart/core';
 import { Button, Card, EmptyState, ErrorState, Loading, Notice, Segmented, TextField, colors, font, radius, spacing } from '@fonzkart/ui';
 
-const EMPTY: RepairPriceInput = { brand: '', model: '', issue: 'screen', price: 0, isActive: true };
+const EMPTY: RepairPriceInput = { brand: '', model: '', issue: 'screen', price: 0, priceMax: null, isActive: true };
 const SHOWN = 60;
 const issueLabel = (id: string) => REPAIR_ISSUES.find(i => i.id === id)?.label ?? id;
 const toRupees = (text: string) => Number(text.replace(/\D/g, '').slice(0, 6)) || 0;
@@ -60,7 +61,7 @@ export default function RepairPriceEditor() {
     }
   };
   const save = () => {
-    const input = { ...form, brand: form.brand.trim(), model: form.model.trim() };
+    const input = { ...form, brand: form.brand.trim(), model: form.model.trim(), priceMax: form.priceMax ? form.priceMax : null };
     if (editing === 'new') void run(() => repairAdminApi.add(input), `Price added for ${input.model}.`);
     else if (editing) void run(() => repairAdminApi.update(editing.id, input), `Price saved for ${input.model}.`);
   };
@@ -68,7 +69,8 @@ export default function RepairPriceEditor() {
     if (deleting !== p.id) setDeleting(p.id);
     else void run(() => repairAdminApi.remove(p.id), 'Price deleted.');
   };
-  const canSave = !!form.brand.trim() && !!form.model.trim() && form.price > 0;
+  const rangeProblem = form.priceMax != null && form.priceMax > 0 && form.priceMax < form.price ? 'The highest price must be at least the lowest.' : null;
+  const canSave = !!form.brand.trim() && !!form.model.trim() && form.price > 0 && !rangeProblem;
 
   return (
     <FlatList
@@ -98,7 +100,17 @@ export default function RepairPriceEditor() {
               </View>
               <Text style={styles.label}>Repair</Text>
               <Segmented options={REPAIR_ISSUES} value={form.issue} onChange={issue => setForm(f => ({ ...f, issue }))} />
-              <TextField label="Price (₹)" value={form.price ? String(form.price) : ''} keyboardType="number-pad" onChangeText={t => setForm(f => ({ ...f, price: toRupees(t) }))} />
+              <View style={styles.row}>
+                <View style={styles.flex}>
+                  <TextField label={form.priceMax ? 'Lowest price (₹)' : 'Price (₹)'} value={form.price ? String(form.price) : ''} keyboardType="number-pad"
+                    onChangeText={t => setForm(f => ({ ...f, price: toRupees(t) }))} />
+                </View>
+                <View style={styles.flex}>
+                  <TextField label="Up to (₹), optional" value={form.priceMax ? String(form.priceMax) : ''} keyboardType="number-pad"
+                    placeholder="For a range" error={rangeProblem} showError
+                    onChangeText={t => setForm(f => ({ ...f, priceMax: toRupees(t) || null }))} />
+                </View>
+              </View>
               <View style={styles.switchRow}>
                 <Text style={[styles.label, styles.flex]}>Offer this repair</Text>
                 <Switch value={form.isActive} trackColor={{ true: colors.green }} accessibilityLabel="Offer this repair" onValueChange={isActive => setForm(f => ({ ...f, isActive }))} />
@@ -119,7 +131,7 @@ export default function RepairPriceEditor() {
           <View style={styles.flex}>
             <Text style={styles.name} numberOfLines={1}>{item.model}</Text>
             <Text style={styles.muted}>{issueLabel(item.issue)}{item.isActive ? '' : ' · Hidden'}</Text>
-            <Text style={styles.price}>{formatInr(item.price)}</Text>
+            <Text style={styles.price}>{formatInrRange(item.price, item.priceMax)}</Text>
           </View>
           <View style={styles.actions}>
             <Button title="Edit" variant="link" onPress={() => open(item)} />

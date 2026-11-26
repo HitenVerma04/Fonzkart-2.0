@@ -44,6 +44,8 @@ class BuyRepairIntegrationTest {
     private int port;
     @Autowired
     private JdbcTemplate jdbc;
+    @Autowired
+    private RepairPriceSheet sheet;
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient http = HttpClient.newHttpClient();
@@ -181,6 +183,80 @@ class BuyRepairIntegrationTest {
         json(put("/api/repair/admin/settings", admin, Map.of("enabled", false)));
         assertThat(json(get("/api/repair/prices", null)).get("enabled").asBoolean()).isFalse();
         assertThat(error(post("/api/repair/bookings", cara, booking(priceId, 1, "morning")))).contains("closed");
+    }
+
+    @Test
+    void aRepairCanHaveAPriceRangeAndTheBookingKeepsIt() throws Exception {
+        String admin = admin();
+        Map<String, Object> range = price("battery", 7000);
+        range.put("priceMax", 10000);
+        String priceId = id(post("/api/repair/admin/prices", admin, range));
+        JsonNode listed = json(get("/api/repair/prices", null)).get("items").get(0);
+        assertThat(listed.get("price").asInt()).isEqualTo(7000);
+        assertThat(listed.get("priceMax").asInt()).isEqualTo(10000);
+
+        // The top of the range cannot be below the bottom; the same number is a fixed price.
+        Map<String, Object> upsideDown = price("charging", 5000);
+        upsideDown.put("priceMax", 4000);
+        assertThat(error(post("/api/repair/admin/prices", admin, upsideDown))).contains("at least the lowest");
+        Map<String, Object> same = price("camera", 5000);
+        same.put("priceMax", 5000);
+        String fixedId = id(post("/api/repair/admin/prices", admin, same));
+        JsonNode fixed = null;
+        for (JsonNode item : json(get("/api/repair/admin/prices", admin)).get("items")) {
+            if (item.get("id").asText().equals(fixedId)) {
+                fixed = item;
+            }
+        }
+        assertThat(fixed).isNotNull();
+        assertThat(fixed.get("priceMax").isNull()).isTrue();
+
+        String cara = quickRegister("Cara", "cara@example.test");
+        JsonNode booked = json(post("/api/repair/bookings", cara, booking(priceId, 2, "morning")));
+        assertThat(booked.get("price").asInt()).isEqualTo(7000);
+        assertThat(booked.get("priceMax").asInt()).isEqualTo(10000);
+        assertThat(json(get("/api/repair/bookings", cara)).get(0).get("priceMax").asInt()).isEqualTo(10000);
+    }
+
+    @Test
+    void thePriceSheetSetsRangesOnceAndOnlyForPhonesOnTheList() throws Exception {
+        String admin = admin();
+        id(post("/api/repair/admin/prices", admin, price("battery", 1999)));
+        Map<String, Object> other = price("battery", 1999);
+        other.put("model", "Nokia 3310");
+        id(post("/api/repair/admin/prices", admin, other));
+        jdbc.update("DELETE FROM \"AppSetting\" WHERE key = ?", RepairPriceSheet.VERSION_KEY);
+
+        JsonNode file = new ObjectMapper().readTree("""
+                {"version": "test-1", "issues": ["screen", "battery"],
+                 "phones": [{"brand": "apple", "model": "IPHONE 15", "prices": [[14000, 22000], [4500, 7000]]},
+                            {"brand": "Apple", "model": "Not On The List", "prices": [[1, 2], [3, 4]]}]}""");
+        assertThat(sheet.apply(file).updated()).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM \"RepairPrice\"", Integer.class)).isEqualTo(2);
+        assertThat(jdbc.queryForMap("SELECT price, \"priceMax\" FROM \"RepairPrice\" WHERE model = 'iPhone 15'"))
+                .containsEntry("price", 4500).containsEntry("priceMax", 7000);
+        assertThat(jdbc.queryForObject("SELECT price FROM \"RepairPrice\" WHERE model = 'Nokia 3310'", Integer.class)).isEqualTo(1999);
+
+        // The same version again changes nothing, so an admin's later edit stays.
+        jdbc.update("UPDATE \"RepairPrice\" SET price = 5000, \"priceMax\" = NULL WHERE model = 'iPhone 15'");
+        assertThat(sheet.apply(file).applied()).isFalse();
+        assertThat(jdbc.queryForObject("SELECT price FROM \"RepairPrice\" WHERE model = 'iPhone 15'", Integer.class)).isEqualTo(5000);
+    }
+
+    @Test
+    void theShippedPriceSheetIsWellFormed() throws Exception {
+        JsonNode file = new ObjectMapper().readTree(new org.springframework.core.io.ClassPathResource("repair/repair-prices.json").getInputStream());
+        assertThat(file.path("version").asText()).isNotBlank();
+        assertThat(file.path("issues")).hasSize(6);
+        assertThat(file.path("phones").size()).isGreaterThan(50);
+        for (JsonNode phone : file.path("phones")) {
+            String name = phone.path("brand").asText() + " " + phone.path("model").asText();
+            assertThat(phone.path("prices")).as(name).hasSize(6);
+            for (JsonNode range : phone.path("prices")) {
+                assertThat(range.get(0).asInt()).as(name).isPositive();
+                assertThat(range.get(1).asInt()).as(name).isGreaterThan(range.get(0).asInt()).isLessThanOrEqualTo(ServiceSupport.MAX_PRICE);
+            }
+        }
     }
 
     private static Map<String, Object> device(int stock) {

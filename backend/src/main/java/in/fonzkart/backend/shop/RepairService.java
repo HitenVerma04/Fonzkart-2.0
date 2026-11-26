@@ -27,17 +27,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Repairs: "RepairPrice" holds the fixed price of each repair for each phone; a customer books a doorstep visit for a
+ * Repairs: "RepairPrice" holds the price (or price range) of each repair for each phone; a customer books a doorstep visit for a
  * date and time slot in "RepairBooking" and pays after the repair. Everyone reads the prices; administrators edit them
  * and move bookings along.
  */
 @Service
 public class RepairService {
 
-    public record Price(String id, String brand, String model, String issue, int price, boolean isActive, int displayOrder) {
+    /** price: the fixed price, or the lowest of a range; priceMax: the highest of the range (null for a fixed price). */
+    public record Price(String id, String brand, String model, String issue, int price, Integer priceMax, boolean isActive,
+                        int displayOrder) {
     }
 
-    public record PriceInput(String brand, String model, String issue, Double price, Boolean isActive, Double displayOrder) {
+    public record PriceInput(String brand, String model, String issue, Double price, Double priceMax, Boolean isActive,
+                             Double displayOrder) {
     }
 
     public record Store(boolean enabled, List<Price> items) {
@@ -47,7 +50,7 @@ public class RepairService {
     }
 
     public record Booking(String id, int bookingNumber, String status, String brand, String model, String issue, int price,
-                          String visitDate, String slot, String name, String phone, String address, String pincode,
+                          Integer priceMax, String visitDate, String slot, String name, String phone, String address, String pincode,
                           String createdAt, @JsonInclude(JsonInclude.Include.NON_NULL) String customerEmail) {
     }
 
@@ -69,11 +72,11 @@ public class RepairService {
     private static final ZoneId INDIA = ZoneId.of("Asia/Kolkata");
     private static final int MAX_SHORT = 40;
 
-    private static final String COLUMNS = "id, brand, model, issue, price, \"isActive\", \"displayOrder\"";
+    private static final String COLUMNS = "id, brand, model, issue, price, \"priceMax\", \"isActive\", \"displayOrder\"";
     private static final String SORTED = " ORDER BY \"displayOrder\" ASC, brand ASC, model ASC, issue ASC";
     private static final RowMapper<Price> PRICE = (rs, i) -> new Price(rs.getString(1), rs.getString(2), rs.getString(3),
-            rs.getString(4), rs.getInt(5), rs.getBoolean(6), rs.getInt(7));
-    private static final String BOOKING_COLUMNS = "b.id, b.\"bookingNumber\", b.status, b.brand, b.model, b.issue, b.price, "
+            rs.getString(4), rs.getInt(5), rs.getObject(6, Integer.class), rs.getBoolean(7), rs.getInt(8));
+    private static final String BOOKING_COLUMNS = "b.id, b.\"bookingNumber\", b.status, b.brand, b.model, b.issue, b.price, b.\"priceMax\", "
             + "b.\"visitDate\", b.slot, b.name, b.phone, b.address, b.pincode, b.\"createdAt\"";
 
     private final ServiceSupport support;
@@ -117,10 +120,10 @@ public class RepairService {
         Price p = found.get(0);
         String id = Cuid.next();
         LocalDateTime now = JsDates.nowUtc();
-        jdbc.update("INSERT INTO \"RepairBooking\" (id, \"userId\", \"repairPriceId\", brand, model, issue, price, \"visitDate\", slot, "
-                        + "name, phone, address, pincode, status, \"createdAt\", \"updatedAt\") "
-                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'booked', ?, ?)",
-                id, me.id(), p.id(), p.brand(), p.model(), p.issue(), p.price(), date.toString(), slot, customer.name(), customer.phone(),
+        jdbc.update("INSERT INTO \"RepairBooking\" (id, \"userId\", \"repairPriceId\", brand, model, issue, price, \"priceMax\", "
+                        + "\"visitDate\", slot, name, phone, address, pincode, status, \"createdAt\", \"updatedAt\") "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'booked', ?, ?)",
+                id, me.id(), p.id(), p.brand(), p.model(), p.issue(), p.price(), p.priceMax(), date.toString(), slot, customer.name(), customer.phone(),
                 customer.address(), customer.pincode(), now, now);
         return jdbc.queryForObject("SELECT " + BOOKING_COLUMNS + ", NULL::text FROM \"RepairBooking\" b WHERE b.id = ?", this::booking, id);
     }
@@ -145,8 +148,9 @@ public class RepairService {
         String id = Cuid.next();
         LocalDateTime now = JsDates.nowUtc();
         try {
-            jdbc.update("INSERT INTO \"RepairPrice\" (id, brand, model, issue, price, \"isActive\", \"displayOrder\", \"createdAt\", \"updatedAt\") "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", id, p.brand(), p.model(), p.issue(), p.price(), p.isActive(), p.displayOrder(), now, now);
+            jdbc.update("INSERT INTO \"RepairPrice\" (id, brand, model, issue, price, \"priceMax\", \"isActive\", \"displayOrder\", "
+                    + "\"createdAt\", \"updatedAt\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    id, p.brand(), p.model(), p.issue(), p.price(), p.priceMax(), p.isActive(), p.displayOrder(), now, now);
         } catch (DuplicateKeyException e) {
             throw duplicate();
         }
@@ -160,9 +164,9 @@ public class RepairService {
         Integer position = input.displayOrder() != null ? p.displayOrder() : null;
         int changed;
         try {
-            changed = jdbc.update("UPDATE \"RepairPrice\" SET brand = ?, model = ?, issue = ?, price = ?, \"isActive\" = ?, "
-                    + "\"displayOrder\" = COALESCE(?, \"displayOrder\"), \"updatedAt\" = ? WHERE id = ?",
-                    p.brand(), p.model(), p.issue(), p.price(), p.isActive(), position, JsDates.nowUtc(), id);
+            changed = jdbc.update("UPDATE \"RepairPrice\" SET brand = ?, model = ?, issue = ?, price = ?, \"priceMax\" = ?, "
+                    + "\"isActive\" = ?, \"displayOrder\" = COALESCE(?, \"displayOrder\"), \"updatedAt\" = ? WHERE id = ?",
+                    p.brand(), p.model(), p.issue(), p.price(), p.priceMax(), p.isActive(), position, JsDates.nowUtc(), id);
         } catch (DuplicateKeyException e) {
             throw duplicate();
         }
@@ -256,12 +260,23 @@ public class RepairService {
         if (position == null) {
             throw badRequest("The position must be a whole number.");
         }
-        return new Price(null, brand, model, issue, price, input.isActive() == null || input.isActive(), position);
+        // A range: the highest price, at least the lowest. Empty, or the same as the lowest, is a fixed price.
+        Integer priceMax = null;
+        if (input.priceMax() != null) {
+            priceMax = whole(input.priceMax());
+            if (priceMax == null || priceMax < price || priceMax > ServiceSupport.MAX_PRICE) {
+                throw badRequest("The highest price must be a whole number of rupees, at least the lowest price.");
+            }
+            if (priceMax.equals(price)) {
+                priceMax = null;
+            }
+        }
+        return new Price(null, brand, model, issue, price, priceMax, input.isActive() == null || input.isActive(), position);
     }
 
     private Booking booking(ResultSet rs, int row) throws SQLException {
         return new Booking(rs.getString(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6),
-                rs.getInt(7), rs.getString(8), rs.getString(9), rs.getString(10), rs.getString(11), rs.getString(12), rs.getString(13),
-                JsDates.toIsoString(rs.getObject(14, LocalDateTime.class)), rs.getString(15));
+                rs.getInt(7), rs.getObject(8, Integer.class), rs.getString(9), rs.getString(10), rs.getString(11), rs.getString(12),
+                rs.getString(13), rs.getString(14), JsDates.toIsoString(rs.getObject(15, LocalDateTime.class)), rs.getString(16));
     }
 }
