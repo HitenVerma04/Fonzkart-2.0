@@ -48,7 +48,7 @@ public final class PricingDefaults {
                         "charging_port", 6, "proximity", 4, "vibrator", 2, "battery", 8,
                         // iPhones ask for the battery health instead of "Battery"; above 85% is healthy.
                         "battery_health_low", 8, "battery_health_high", 0,
-                        "front_camera_blur", 5, "back_camera_blur", 8)
+                        "front_camera_blur", 5, "back_camera_blur", 8, "screen_replaced", 30)
                 .question("purchase_location", SINGLE, "global", 10)
                 .question("accessories", 10, "!charger", 1, "!box", 2, "!bill", 4)
                 .warranty()

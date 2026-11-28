@@ -90,7 +90,7 @@ const DEVICE_AGE_LABELS: Record<string, string> = {
     '0_3_months': '0 - 3 Months',
     '3_6_months': '3 - 6 Months',
     '6_11_months': '6 - 11 Months',
-    no: 'Above 11 Months',
+    no: 'Over 11 months / out of warranty',
 };
 
 export const deviceAgeLabel = (value: unknown): string | undefined =>

@@ -6,6 +6,7 @@ import in.fonzkart.backend.pricing.engine.PriceSheet;
 import in.fonzkart.backend.pricing.engine.RepairCostEstimator;
 import in.fonzkart.backend.pricing.entity.EvaluationRule;
 import in.fonzkart.backend.pricing.repository.EvaluationRuleRepository;
+import in.fonzkart.backend.pricing.rules.MarketCuts;
 import in.fonzkart.backend.pricing.rules.MaxValueRule;
 import in.fonzkart.backend.pricing.rules.PricingDefaults;
 import in.fonzkart.backend.shared.time.JsDates;
@@ -33,13 +34,20 @@ import org.springframework.stereotype.Service;
  *       rule for that answer, or the built-in share.</li>
  *   <li>An admin's rule for a <i>repair</i> answer is the least it takes: the repair estimate takes more when the part
  *       costs more (an old 20% screen rule would otherwise make a ₹40,000 foldable display cost ₹9,000).</li>
+ *   <li><b>Smartphones follow the used-phone market</b> ({@link MarketCuts}, Cashify and Cashkr averaged): a cosmetic
+ *       answer takes the market's share instead of the built-in one, and a repair costs the market's cut for that
+ *       problem unless the part's repair estimate is more.</li>
  *   <li>When resales show what this model sells for, the sheet carries a profit guard (see {@link SheetPricer}).</li>
  * </ul>
  */
 @Service
 public class PriceSheetService {
 
-    public static final String ENGINE_VERSION = "2026.11-v2";
+    public static final String ENGINE_VERSION = "2026.11-v3";
+    /** A line taken from the used-phone market's cuts ({@link MarketCuts}). */
+    public static final String SOURCE_MARKET = "market";
+    /** Measured on two platforms across eleven phones: firmer than a prior, less than an admin's own figure. */
+    static final double MARKET_CONFIDENCE = 0.75;
     /** A repair estimate with no confidence at all is padded by this much (none at full confidence). */
     static final double UNCERTAINTY_BUFFER = 0.2;
     /** Fonzkart's repair list issues → parts. */
@@ -99,6 +107,7 @@ public class PriceSheetService {
         List<PriceSheet.Line> lines = new ArrayList<>();
         Map<String, Double> caps = new LinkedHashMap<>();
         builtIn.forEach((q, question) -> caps.put(q, question.capPercent() / 100));
+        long labourFirst = PartCatalog.labour(category).first();
         for (String qa : answers) {
             int at = qa.indexOf('=');
             String q = qa.substring(0, at);
@@ -106,15 +115,30 @@ public class PriceSheetService {
             EvaluationRule rule = ruleByAnswer.get(qa);
             double ruleShare = rule == null || max <= 0 ? 0
                     : rule.getDeductionPercent() / 100 + rule.getDeductionAmount() / (double) max;
+            Double market = MarketCuts.percent(category, d.brandId(), q, a);
             PartCatalog.PartUse use = PartCatalog.use(category, q, a);
             RepairCostEstimator.Estimate estimate = use == null || max <= 0 ? null
                     : estimates.computeIfAbsent(use.part(), part -> Optional.ofNullable(RepairCostEstimator.estimate(part, device,
                     listed.getOrDefault(part, List.of()), knowledge.paid(category, part, d.modelId(), tier), now))).orElse(null);
-            if (estimate != null) {
-                double padded = estimate.cost() * use.severity() * (1 + UNCERTAINTY_BUFFER * (1 - estimate.confidence()));
-                long cost = Math.min(max, Math.round(padded / 10) * 10);
-                String source = estimate.source();
-                double confidence = estimate.confidence();
+            if (use != null && max > 0 && (estimate != null || market != null)) {
+                long cost = 0;
+                String source = RepairCostEstimator.SOURCE_ADMIN;
+                double confidence = 0;
+                if (estimate != null) {
+                    double padded = estimate.cost() * use.severity() * (1 + UNCERTAINTY_BUFFER * (1 - estimate.confidence()));
+                    cost = Math.min(max, Math.round(padded / 10) * 10);
+                    source = estimate.source();
+                    confidence = estimate.confidence();
+                }
+                if (market != null) {
+                    // The market's cut for this problem alone, labour included, so a single problem lands on it.
+                    long marketCost = Math.min(max, Math.max(0, Math.round((market / 100 * max - labourFirst) / 10) * 10));
+                    if (marketCost > cost) {
+                        cost = marketCost;
+                        source = SOURCE_MARKET;
+                        confidence = Math.max(confidence, MARKET_CONFIDENCE);
+                    }
+                }
                 if (rule != null && ruleShare * max > cost) {
                     cost = Math.min(max, Math.round(clamp(ruleShare, 0, 0.9) * max / 10) * 10);
                     source = RepairCostEstimator.SOURCE_ADMIN;
@@ -131,6 +155,12 @@ public class PriceSheetService {
                 }
                 if (!caps.containsKey(q)) {
                     caps.put(q, a.equals("true") || a.equals("false") ? 0.9 : 0.6);
+                }
+                continue;
+            }
+            if (market != null) {
+                if (market > 0) {
+                    lines.add(new PriceSheet.Line(q, a, PriceSheet.VALUE, round4(market / 100), null, 0, MARKET_CONFIDENCE, SOURCE_MARKET));
                 }
                 continue;
             }

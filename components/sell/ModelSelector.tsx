@@ -17,12 +17,22 @@ interface ModelSelectorProps {
     onBack: () => void;
 }
 
+/** iPhones whose photo already fills the frame: shown at full size, since zooming them in would cut the phone off. */
 const EXCLUDED_MODELS = new Set([
     "iPhone 17", "iPhone 17 Air",
     "iPhone 16 Plus", "iPhone 16", "iPhone 16e", "iPhone 16 E",
     "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
     "iPhone XS Max", "iPhone XS"
 ]);
+
+/** The same, by photo: a model sharing one of these photos (iPhone Duo uses the Air's, iPhone 17e the 16e's) is not zoomed either. */
+const TIGHT_PHOTOS = new Set([
+    'Apple_iPhone_17.png', 'Apple_iPhone_Air.png', 'Apple_iPhone_16_Plus.png', 'Apple_iPhone_16.png', 'Apple_iPhone_16e.png',
+    'Apple_iPhone_15_Pro_Max.png', 'Apple_iPhone_15_Pro.png', 'Apple_iPhone_15_Plus.png', 'Apple_iPhone_15.png',
+    'Apple_iPhone_XS_Max.png', 'Apple_iPhone_XS.png',
+]);
+const fillsFrame = (name: string, img?: string | null) =>
+    EXCLUDED_MODELS.has(name) || TIGHT_PHOTOS.has((img ?? '').split(/[?#]/)[0].split('/').pop() ?? '');
 
 // Helper Component for Image Fallback
 const ModelImage = ({ src, alt, brandId = '', priority = false, scale = 1 }: { src: string, alt: string, brandId?: string, priority?: boolean, scale?: number }) => {
@@ -364,7 +374,7 @@ export default function ModelSelector({ brandId, category, originalCategory, onS
                                     priority={index < 8}
                                     scale={
                                         model.name.includes('iPhone')
-                                            ? (EXCLUDED_MODELS.has(model.name) ? 1 : 1.35)
+                                            ? (fillsFrame(model.name, model.img) ? 1 : 1.35)
                                             : (model.name.toLowerCase().includes('watch') ? 1.5 : 1.05)
                                     }
                                 />

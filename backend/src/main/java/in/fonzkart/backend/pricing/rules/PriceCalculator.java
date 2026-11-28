@@ -2,6 +2,7 @@ package in.fonzkart.backend.pricing.rules;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import in.fonzkart.backend.pricing.entity.EvaluationRule;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,6 +35,9 @@ public final class PriceCalculator {
     static final double MAX_ANSWER_SHARE = 0.9;
     /** The most a several-choice question without a built-in cap can take (a question only an admin priced). */
     static final double OPEN_MULTI_CAP = 0.6;
+    /** The device age question; left unanswered it counts as over 11 months or out of warranty (answer "no"). */
+    static final String DEVICE_AGE = "warranty";
+    static final String OUT_OF_WARRANTY = "no";
 
     private PriceCalculator() {
     }
@@ -83,7 +87,7 @@ public final class PriceCalculator {
 
         double kept = 1;
         for (Map.Entry<String, Map<String, Double>> question : shares.entrySet()) {
-            JsonNode answer = answers == null ? MissingNode.getInstance() : answers.path(question.getKey());
+            JsonNode answer = answerTo(answers, question.getKey());
             double left = 1;
             for (Map.Entry<String, Double> option : question.getValue().entrySet()) {
                 if (applies(answer, option.getKey())) {
@@ -96,6 +100,15 @@ public final class PriceCalculator {
             kept *= 1 - Math.min(1 - left, cap);
         }
         return kept;
+    }
+
+    /** The customer's answer to a question; a device age left unanswered is "no" (over 11 months or out of warranty). */
+    public static JsonNode answerTo(JsonNode answers, String question) {
+        JsonNode answer = answers == null ? MissingNode.getInstance() : answers.path(question);
+        if (DEVICE_AGE.equals(question) && (answer.isMissingNode() || answer.isNull() || answer.asText("").isBlank())) {
+            return TextNode.valueOf(OUT_OF_WARRANTY);
+        }
+        return answer;
     }
 
     /**

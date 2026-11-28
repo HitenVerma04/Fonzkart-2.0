@@ -231,11 +231,12 @@ export const questionnaireSteps = {
                 { id: 'sim1', label: 'Sim 1', icon: 'Smartphone', group: 'Network & connectivity' },
                 { id: 'sim2', label: 'Sim 2', icon: 'Smartphone', group: 'Network & connectivity' },
                 { id: 'bluetooth', label: 'Bluetooth', icon: 'Bluetooth', group: 'Network & connectivity' },
-                { id: 'front_camera', label: 'Front Camera', icon: 'Camera', group: 'Camera' },
+                { id: 'screen_replaced', label: 'Screen Not Original', icon: 'Smartphone', group: 'Display' },
+                { id: 'camera_glass', label: 'Camera Glass / Lens Broken', icon: 'CameraOff', group: 'Camera' },
                 { id: 'back_camera', label: 'Back Camera', icon: 'Camera', group: 'Camera' },
-                { id: 'camera_glass', label: 'Camera Glass Broken', icon: 'CameraOff', group: 'Camera' },
-                { id: 'front_camera_blur', label: 'Front Camera Image Blur', icon: 'Image', group: 'Camera' },
-                { id: 'back_camera_blur', label: 'Back Camera Image Blur', icon: 'Image', group: 'Camera' },
+                { id: 'back_camera_blur', label: 'Back Camera Image Blur / Spot', icon: 'Image', group: 'Camera' },
+                { id: 'front_camera', label: 'Front Camera', icon: 'Camera', group: 'Camera' },
+                { id: 'front_camera_blur', label: 'Front Camera Image Blur / Spot', icon: 'Image', group: 'Camera' },
                 { id: 'finger_sensor', label: 'Finger Touch Sensor', icon: 'Fingerprint', group: 'Sensors' },
                 { id: 'face_sensor', label: 'Face Sensor', icon: 'User', group: 'Sensors' },
                 { id: 'proximity', label: 'Proximity Sensor', icon: 'Move', group: 'Sensors' },
@@ -284,7 +285,6 @@ export const questionnaireSteps = {
                         { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
                         { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
                         { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
-                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]
@@ -376,7 +376,6 @@ export const questionnaireSteps = {
                         { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
                         { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
                         { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
-                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]
@@ -466,7 +465,6 @@ export const questionnaireSteps = {
                         { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
                         { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
                         { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
-                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]
@@ -569,7 +567,6 @@ export const questionnaireSteps = {
                         { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
                         { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
                         { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
-                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]
@@ -695,7 +692,6 @@ export const questionnaireSteps = {
                         { id: '0_3_months', label: '0 - 3 Months', description: 'Bought less than 3 months ago', icon: 'Clock' },
                         { id: '3_6_months', label: '3 - 6 Months', description: 'Bought 3 to 6 months ago', icon: 'Clock' },
                         { id: '6_11_months', label: '6 - 11 Months', description: 'Bought 6 to 11 months ago', icon: 'Clock' },
-                        { id: 'no', label: 'Above 11 Months', description: 'Bought over 11 months ago, or out of warranty', icon: 'XCircle' },
                     ]
                 }
             ]

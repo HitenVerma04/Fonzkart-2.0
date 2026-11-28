@@ -95,9 +95,15 @@
           "group": "Network & connectivity"
         },
         {
-          "id": "front_camera",
-          "label": "Front Camera",
-          "icon": "Camera",
+          "id": "screen_replaced",
+          "label": "Screen Not Original",
+          "icon": "Smartphone",
+          "group": "Display"
+        },
+        {
+          "id": "camera_glass",
+          "label": "Camera Glass / Lens Broken",
+          "icon": "CameraOff",
           "group": "Camera"
         },
         {
@@ -107,20 +113,20 @@
           "group": "Camera"
         },
         {
-          "id": "camera_glass",
-          "label": "Camera Glass Broken",
-          "icon": "CameraOff",
-          "group": "Camera"
-        },
-        {
-          "id": "front_camera_blur",
-          "label": "Front Camera Image Blur",
+          "id": "back_camera_blur",
+          "label": "Back Camera Image Blur / Spot",
           "icon": "Image",
           "group": "Camera"
         },
         {
-          "id": "back_camera_blur",
-          "label": "Back Camera Image Blur",
+          "id": "front_camera",
+          "label": "Front Camera",
+          "icon": "Camera",
+          "group": "Camera"
+        },
+        {
+          "id": "front_camera_blur",
+          "label": "Front Camera Image Blur / Spot",
           "icon": "Image",
           "group": "Camera"
         },
@@ -271,12 +277,6 @@
               "label": "6 - 11 Months",
               "description": "Bought 6 to 11 months ago",
               "icon": "Clock"
-            },
-            {
-              "id": "no",
-              "label": "Above 11 Months",
-              "description": "Bought over 11 months ago, or out of warranty",
-              "icon": "XCircle"
             }
           ]
         }
@@ -508,12 +508,6 @@
               "label": "6 - 11 Months",
               "description": "Bought 6 to 11 months ago",
               "icon": "Clock"
-            },
-            {
-              "id": "no",
-              "label": "Above 11 Months",
-              "description": "Bought over 11 months ago, or out of warranty",
-              "icon": "XCircle"
             }
           ]
         }
@@ -732,12 +726,6 @@
               "label": "6 - 11 Months",
               "description": "Bought 6 to 11 months ago",
               "icon": "Clock"
-            },
-            {
-              "id": "no",
-              "label": "Above 11 Months",
-              "description": "Bought over 11 months ago, or out of warranty",
-              "icon": "XCircle"
             }
           ]
         }
@@ -981,12 +969,6 @@
               "label": "6 - 11 Months",
               "description": "Bought 6 to 11 months ago",
               "icon": "Clock"
-            },
-            {
-              "id": "no",
-              "label": "Above 11 Months",
-              "description": "Bought over 11 months ago, or out of warranty",
-              "icon": "XCircle"
             }
           ]
         }
@@ -1287,12 +1269,6 @@
               "label": "6 - 11 Months",
               "description": "Bought 6 to 11 months ago",
               "icon": "Clock"
-            },
-            {
-              "id": "no",
-              "label": "Above 11 Months",
-              "description": "Bought over 11 months ago, or out of warranty",
-              "icon": "XCircle"
             }
           ]
         }

@@ -69,19 +69,63 @@ export function stepsForDevice(questionnaire: Questionnaire, category: string | 
   });
 }
 
-/** Whether "Continue" is allowed: single choices must be made and every yes/no answered; multi-selects are optional. */
-export function isStepComplete(step: QuestionStep, answers: Answers): boolean {
-  if (step.type === 'single-select') return !!answers[step.id];
-  if (step.questions) return step.questions.every(q => typeof answers[q.id] === 'boolean');
-  if (step.type === 'combined-step') {
-    return (step.sections ?? []).every(section => section.type !== 'single-select' || !!answers[section.id]);
-  }
-  return true;
+/**
+ * Options of which exactly one must be ticked whenever a list shows them: an iPhone's battery health is either below or
+ * above 85%. Ticking one unticks the other, and the list cannot be left until one is ticked.
+ */
+export const ONE_OF: string[][] = [['battery_health_low', 'battery_health_high']];
+
+/** Single choices the customer may skip, and the answer a skipped one stands for (device age: out of warranty). */
+export const SKIPPABLE: Record<string, string> = { warranty: 'no' };
+
+/** The ONE_OF groups a list of options must answer. */
+export function requiredGroups(options: QuestionOption[] | undefined): string[][] {
+  const ids = new Set((options ?? []).map(o => o.id));
+  return ONE_OF.filter(group => group.every(id => ids.has(id)));
 }
 
-/** Adds or removes an option in a multi-select answer, keeping the order of selection. */
+/** Whether a question (step, section or yes/no) must be answered: marked with an asterisk. */
+export function isRequired(key: string, type: string | undefined, options?: QuestionOption[]): boolean {
+  if (type === 'single-select') return !(key in SKIPPABLE);
+  if (isMultiSelect(type)) return requiredGroups(options).length > 0;
+  return type === undefined || type === 'yes-no' || type === 'boolean';
+}
+
+const listAnswered = (options: QuestionOption[] | undefined, value: Answers[string] | undefined) => {
+  const list = Array.isArray(value) ? value : [];
+  return requiredGroups(options).every(group => group.some(id => list.includes(id)));
+};
+
+/** Whether "Continue" is allowed: required choices made (one battery health), every yes/no answered. */
+export function isStepComplete(step: QuestionStep, answers: Answers): boolean {
+  if (step.type === 'single-select') return !!answers[step.id] || step.id in SKIPPABLE;
+  if (step.questions) return step.questions.every(q => typeof answers[q.id] === 'boolean');
+  if (step.type === 'combined-step') {
+    return (step.sections ?? []).every(section =>
+      section.type === 'single-select' ? !!answers[section.id] || section.id in SKIPPABLE : listAnswered(section.options, answers[section.id]));
+  }
+  return listAnswered(step.options, answers[step.id]);
+}
+
+/** The answers with skipped questions filled in as they count (a skipped device age is "no": out of warranty). */
+export function withSkippedAnswers(steps: QuestionStep[], answers: Answers): Answers {
+  const keys = steps.flatMap(step => [step.id, ...(step.sections ?? []).map(section => section.id)]);
+  const filled = { ...answers };
+  for (const key of keys) {
+    const skipped = SKIPPABLE[key];
+    if (skipped !== undefined && !filled[key]) filled[key] = skipped;
+  }
+  return filled;
+}
+
+/**
+ * Adds or removes an option in a multi-select answer, keeping the order of selection. An option of a ONE_OF group
+ * works like a radio button: it replaces the other options of its group and stays ticked when tapped again.
+ */
 export function toggleOption(current: Answers[string] | undefined, optionId: string): string[] {
   const list = Array.isArray(current) ? current : [];
+  const group = ONE_OF.find(g => g.includes(optionId));
+  if (group) return list.includes(optionId) ? list : [...list.filter(id => !group.includes(id)), optionId];
   return list.includes(optionId) ? list.filter(id => id !== optionId) : [...list, optionId];
 }
 
@@ -97,7 +141,8 @@ export function isMultiSelect(type: string | undefined): boolean {
  */
 export const ISSUE_GROUPS: { title: string; ids: string[] }[] = [
   { title: 'Network & connectivity', ids: ['wifi', 'sim1', 'sim2', 'bluetooth'] },
-  { title: 'Camera', ids: ['front_camera', 'back_camera', 'camera_glass', 'front_camera_blur', 'back_camera_blur'] },
+  { title: 'Display', ids: ['screen_replaced'] },
+  { title: 'Camera', ids: ['camera_glass', 'back_camera', 'back_camera_blur', 'front_camera', 'front_camera_blur'] },
   { title: 'Sensors', ids: ['finger_sensor', 'face_sensor', 'proximity', 'heart_sensor', 'remote_sensor'] },
   { title: 'Buttons & controls', ids: ['power_button', 'volume_button', 'silent_button', 'buttons', 'crown', 'mode_dial'] },
   { title: 'Sound & vibration', ids: ['speaker', 'earpiece', 'microphone', 'audio_ic', 'vibrator', 'sound'] },

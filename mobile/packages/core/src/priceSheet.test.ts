@@ -20,13 +20,24 @@ test('every golden case prices as the server does', () => {
 
 test('ticking a problem lowers the price at once; unticking restores it', () => {
   const sheet = golden.sheets.phone!;
-  const owned = { accessories: ['charger', 'box', 'bill'] };
+  const owned = { accessories: ['charger', 'box', 'bill'], warranty: '0_3_months' };
   const clean = priceFromSheet(sheet, owned).price;
   const broken = priceFromSheet(sheet, { ...owned, functional_issues: ['back_camera'] });
   assert.equal(clean, sheet.maxValue);
   assert.ok(broken.price < clean);
   assert.equal(broken.repairsOff, 6300 + 300);
   assert.equal(priceFromSheet(sheet, { ...owned, functional_issues: [] }).price, clean);
+});
+
+test('a device age left unanswered counts as out of warranty, as on the server', () => {
+  const sheet = golden.sheets.phone!;
+  const owned = { accessories: ['charger', 'box', 'bill'] };
+  const skipped = priceFromSheet(sheet, owned).price;
+  assert.equal(skipped, priceFromSheet(sheet, { ...owned, warranty: 'no' }).price);
+  assert.equal(skipped, priceFromSheet(sheet, { ...owned, warranty: '' }).price);
+  assert.ok(skipped < priceFromSheet(sheet, { ...owned, warranty: '0_3_months' }).price);
+  // Not reached yet (live price): the age takes nothing.
+  assert.equal(priceFromSheet(sheet, owned, new Set(['accessories'])).price, sheet.maxValue);
 });
 
 test('answer keys', () => {

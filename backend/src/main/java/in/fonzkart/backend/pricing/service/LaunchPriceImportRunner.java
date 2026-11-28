@@ -11,7 +11,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Applies a new version of catalog/launch-prices.json when the backend starts (see {@link LaunchPriceImport}). A failure
+ * Applies a new version of catalog/launch-prices.json, then of catalog/market-prices.json ({@link MarketPriceImport}),
+ * when the backend starts (see {@link LaunchPriceImport}). A failure
  * is logged and never stops the backend. Off with {@code fonzkart.catalog.launch-prices=false} (the tests).
  */
 @Component
@@ -23,11 +24,13 @@ class LaunchPriceImportRunner implements ApplicationRunner {
     private final LaunchPriceImport importer;
     private final MaxValueService maxValues;
     private final CatalogImageFix images;
+    private final MarketPriceImport market;
 
-    LaunchPriceImportRunner(LaunchPriceImport importer, MaxValueService maxValues, CatalogImageFix images) {
+    LaunchPriceImportRunner(LaunchPriceImport importer, MaxValueService maxValues, CatalogImageFix images, MarketPriceImport market) {
         this.importer = importer;
         this.maxValues = maxValues;
         this.images = images;
+        this.market = market;
     }
 
     @Override
@@ -49,6 +52,12 @@ class LaunchPriceImportRunner implements ApplicationRunner {
             }
         } catch (RuntimeException e) {
             LOG.error("[pricing] launch data was not recorded", e);
+        }
+        try {
+            // Last, so the market prices are what stays when a new launch-price version arrives in the same deploy.
+            market.apply(YearMonth.now(ZoneId.of("Asia/Kolkata")));
+        } catch (RuntimeException e) {
+            LOG.error("[pricing] market prices were not applied", e);
         }
     }
 }

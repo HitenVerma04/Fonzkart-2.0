@@ -2,10 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   describeAnswers,
+  isRequired,
   isStepComplete,
   questionnaireCategory,
   stepsForDevice,
   toggleOption,
+  withSkippedAnswers,
   type Questionnaire,
   type QuestionStep,
 } from './questionnaire';
@@ -56,6 +58,34 @@ test('step completion follows the website rules', () => {
   assert.equal(isStepComplete(yesNo, { power: true, touch: false }), true);
   assert.equal(isStepComplete(combined, { accessories: ['box'] }), false);
   assert.equal(isStepComplete(combined, { purchase_location: 'india' }), true);
+});
+
+test('an iPhone must give exactly one battery health', () => {
+  const iphoneIssues = stepsForDevice(questionnaire, 'smartphone', 'iPhone 15')[1]!;
+  assert.equal(isStepComplete(iphoneIssues, {}), false, 'battery health is required');
+  assert.equal(isStepComplete(iphoneIssues, { functional_issues: ['wifi'] }), false);
+  assert.equal(isStepComplete(iphoneIssues, { functional_issues: ['battery_health_high'] }), true);
+  assert.equal(isRequired('functional_issues', iphoneIssues.type, iphoneIssues.options), true);
+  assert.equal(isRequired('functional_issues', issues.type, issues.options), false, 'other phones: optional');
+  // Ticking one health replaces the other; tapping the ticked one keeps it.
+  assert.deepEqual(toggleOption(['wifi', 'battery_health_low'], 'battery_health_high'), ['wifi', 'battery_health_high']);
+  assert.deepEqual(toggleOption(['battery_health_high'], 'battery_health_high'), ['battery_health_high']);
+});
+
+test('device age may be skipped and then counts as out of warranty', () => {
+  const details: QuestionStep = {
+    id: 'device_details', title: 'Details', type: 'combined-step',
+    sections: [
+      { id: 'purchase_location', title: 'Bought where?', type: 'single-select', options: [{ id: 'india', label: 'India' }] },
+      { id: 'warranty', title: 'Device age', type: 'single-select', options: [{ id: '0_3_months', label: '0 - 3 Months' }] },
+    ],
+  };
+  assert.equal(isStepComplete(details, { purchase_location: 'india' }), true);
+  assert.equal(isRequired('warranty', 'single-select'), false);
+  assert.equal(isRequired('purchase_location', 'single-select'), true);
+  assert.deepEqual(withSkippedAnswers([details], { purchase_location: 'india' }), { purchase_location: 'india', warranty: 'no' });
+  assert.deepEqual(withSkippedAnswers([details], { warranty: '0_3_months' }), { warranty: '0_3_months' });
+  assert.deepEqual(withSkippedAnswers([single], {}), {}, 'only where the question is asked');
 });
 
 test('multi-select toggling keeps selection order', () => {

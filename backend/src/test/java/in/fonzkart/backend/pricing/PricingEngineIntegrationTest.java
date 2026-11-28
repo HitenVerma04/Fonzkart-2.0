@@ -12,6 +12,7 @@ import in.fonzkart.backend.order.service.CustomerOrderService;
 import in.fonzkart.backend.pricing.data.PricingData;
 import in.fonzkart.backend.pricing.engine.PriceSheet;
 import in.fonzkart.backend.pricing.engine.SheetPricer;
+import in.fonzkart.backend.pricing.service.MarketPriceImport;
 import in.fonzkart.backend.pricing.service.MaxValueService;
 import in.fonzkart.backend.pricing.service.PricingIntelligenceService;
 import in.fonzkart.backend.pricing.service.PricingKnowledge;
@@ -62,6 +63,7 @@ class PricingEngineIntegrationTest {
     @Autowired PricingKnowledge knowledge;
     @Autowired CatalogAdminService catalogAdmin;
     @Autowired PricingData data;
+    @Autowired MarketPriceImport market;
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
@@ -101,13 +103,26 @@ class PricingEngineIntegrationTest {
         PriceSheet iphone = orders.sheet("iPhone 15", "128GB");
         PriceSheet fold = orders.sheet("Galaxy Z Fold 7", "12GB/256GB");
         PriceSheet lava = orders.sheet("Lava Blaze 3", "4GB/64GB");
-        long iphoneScreen = line(iphone, "physical_condition", "below_average").cost();
-        long foldScreen = line(fold, "physical_condition", "below_average").cost();
-        long lavaScreen = line(lava, "physical_condition", "below_average").cost();
-        // iPhone 15 from model-reference.json (₹79,900 launch): ~26% padded for uncertainty
-        assertThat(iphoneScreen).isBetween(10000L, 15000L); // 26% of ₹79,900 at 75%, 3 years of part-price fall, padded
-        assertThat(foldScreen).isGreaterThan(40000L); // a folding display
-        assertThat(lavaScreen).isLessThan(4000L);     // budget phone, launch price worked back from ₹6,000
+        PriceSheet.Line iphoneScreen = line(iphone, "physical_condition", "below_average");
+        PriceSheet.Line foldScreen = line(fold, "physical_condition", "below_average");
+        PriceSheet.Line lavaScreen = line(lava, "physical_condition", "below_average");
+        // Fonzkart's cut for a broken screen (50%) less the first repair's labour, so one problem lands on it:
+        // 50% of ₹45,000 − ₹300. Its repair estimate (26% of the ₹79,900 launch at 75%, aged, padded) is less.
+        assertThat(iphoneScreen.cost()).isEqualTo(22200L);
+        assertThat(iphoneScreen.source()).isEqualTo("market");
+        assertThat(iphoneScreen.part()).isEqualTo("display");
+        // A folding display: at least the cut, more when its repair estimate is more.
+        assertThat(foldScreen.cost()).isGreaterThanOrEqualTo(Math.round(0.5 * fold.maxValue()) - 300);
+        assertThat(lavaScreen.cost()).isEqualTo(2700L); // 50% of ₹6,000 − ₹300
+        // A screen that is not original is a display repair at the same 50%, so with a cracked screen it is taken once.
+        PriceSheet.Line notOriginal = line(iphone, "functional_issues", "screen_replaced");
+        assertThat(notOriginal.part()).isEqualTo("display");
+        assertThat(notOriginal.cost()).isEqualTo(22200L);
+        // A faulty fingerprint sensor: 50% on an Android phone, the market's 23.5% on an iPhone.
+        assertThat(line(lava, "functional_issues", "finger_sensor").cost()).isEqualTo(2700L);
+        assertThat(line(iphone, "functional_issues", "finger_sensor").cost()).isEqualTo(10280L);
+        assertThat(line(iphone, "physical_condition", "good").share()).isEqualTo(0.15);
+        assertThat(line(iphone, "physical_condition", "average").share()).isEqualTo(0.30);
         assertThat(line(iphone, "physical_condition", "good").kind()).isEqualTo(PriceSheet.VALUE);
         assertThat(line(iphone, "functional_issues", "wifi").part()).isEqualTo("board");
     }
@@ -123,10 +138,11 @@ class PricingEngineIntegrationTest {
         assertThat(official.cost()).isNotEqualTo(prior).isBetween(6000L, 7200L); // mostly 75% of the list price, little padding
 
         jdbc.update("INSERT INTO \"RepairPrice\" (id, brand, model, issue, price, \"isActive\", \"displayOrder\", \"createdAt\", \"updatedAt\") "
-                + "VALUES ('rp1', 'Apple', 'iPhone 15', 'screen', 18000, true, 0, now(), now())");
+                + "VALUES ('rp1', 'Apple', 'iPhone 15', 'screen', 40000, true, 0, now(), now())");
+        // Fonzkart's own repair price makes the screen cost more than the cut (₹22,200 here), so it is used.
         PriceSheet.Line screen = line(orders.sheet("iPhone 15", "128GB"), "physical_condition", "below_average");
         assertThat(screen.source()).isEqualTo("fonzkart_repair");
-        assertThat(screen.cost()).isLessThan(20000L);
+        assertThat(screen.cost()).isBetween(22200L, 40000L);
         assertThatThrownBy(() -> intelligence.saveRepairCosts(NOBODY, json("{\"part\":\"battery\",\"cost\":1}")))
                 .isInstanceOf(ActionException.class);
         assertThatThrownBy(() -> intelligence.saveRepairCosts(ADMIN, json("{\"category\":\"smartphone\",\"part\":\"unicorn\",\"cost\":10}")))
@@ -146,7 +162,7 @@ class PricingEngineIntegrationTest {
 
     @Test
     void quotesComeFromTheSheetAndAreLogged() throws Exception {
-        JsonNode answers = json("{\"physical_condition\":\"below_average\",\"body_condition\":\"good\",\"functional_issues\":[\"wifi\",\"sim1\"],"
+        JsonNode answers = json("{\"physical_condition\":\"below_average\",\"body_condition\":\"good\",\"functional_issues\":[\"wifi\"],"
                 + "\"purchase_location\":\"india\",\"accessories\":[\"charger\",\"box\",\"bill\"],\"warranty\":\"0_3_months\"}");
         Map<String, Object> quote = orders.quote("iPhone 15", "128GB", answers);
         long fromSheet = SheetPricer.price(orders.sheet("iPhone 15", "128GB"), answers).price();
@@ -233,5 +249,37 @@ class PricingEngineIntegrationTest {
         assertThat(pricing.settings("smartphone")).doesNotContainKey("targetMarginPercent"); // public: no margin
         assertThatThrownBy(() -> pricing.saveSettings(ADMIN, json("{\"targetMarginPercent\":95}"))).isInstanceOf(ActionException.class);
         assertThat(intelligence.overview(ADMIN)).containsKeys("catalog", "learning", "openSuggestions");
+    }
+
+    @Test
+    void marketPricesSetMaxValuesOnceAndKeepTheRevaluationOnTheMarket() throws Exception {
+        jdbc.update("DELETE FROM \"AppSetting\" WHERE key LIKE 'catalog.marketPrices.%'");
+        data.upsertLaunch("v-128", 79900, "2023-09");
+        YearMonth now = YearMonth.of(2026, 11);
+        JsonNode file = json("{\"version\":\"t1\",\"collected\":\"2026-11-26\",\"variants\":["
+                + "{\"id\":\"v-128\",\"price\":40000},{\"id\":\"not-here\",\"price\":5000}]}");
+
+        MarketPriceImport.Result result = market.apply(file, now);
+        assertThat(result.applied()).isTrue();
+        assertThat(result.repriced()).isEqualTo(1);
+        assertThat(result.siblingsRepriced()).isEqualTo(1);
+        assertThat(result.notInCatalog()).isEqualTo(1);
+        assertThat(basePrice("v-128")).isEqualTo(40000);
+        // Its 256GB sibling, which the file does not list, moves by the same ratio: ₹43,000 × 40/45.
+        assertThat(basePrice("v-256")).isEqualTo(38220);
+        assertThat(data.history("v-128", 5).get(0).reason()).contains("Market average");
+
+        // The monthly revaluation now aims at the market price (or the variant was made manual when it is too far
+        // from the launch-price rule), so it does not pull the price back.
+        PricingData.VariantPricing vp = data.variantPricing("v-128").orElseThrow();
+        if (vp.auto()) {
+            PricingData.CatalogVariant v = data.catalogVariant("v-128").orElseThrow();
+            assertThat(MaxValueService.target(v, vp, now)).isBetween(39800L, 40000L);
+        }
+        assertThat(market.apply(file, now).applied()).isFalse(); // once per version
+    }
+
+    private int basePrice(String variantId) {
+        return jdbc.queryForObject("SELECT \"basePrice\" FROM \"Variant\" WHERE id = ?", Integer.class, variantId);
     }
 }

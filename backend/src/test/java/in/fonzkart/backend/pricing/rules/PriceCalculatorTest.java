@@ -117,7 +117,7 @@ class PriceCalculatorTest {
     @Test
     void anAmountIsAShareOfTheMaxValue() throws Exception {
         // ₹924 of 92,400 = 1%, like the built-in missing charger.
-        String noBox = "{\"accessories\":[\"charger\",\"bill\"]}";
+        String noBox = "{\"accessories\":[\"charger\",\"bill\"],\"warranty\":\"0_3_months\"}";
         assertThat(calc(IPHONE_17_PRO, noBox, "smartphone", List.of(rule("accessories", "!box", 924, 0)), 15)).isEqualTo(91_470);
     }
 
@@ -131,20 +131,31 @@ class PriceCalculatorTest {
     @Test
     void manyProblemsStopAtTheQuestionsCap() throws Exception {
         // All 22 problems would take 78%; phone problems take at most 50%.
-        assertThat(phone(10_000, "{\"functional_issues\":" + ALL_PHONE_ISSUES + "}")).isEqualTo(4_650); // 50%, and no box/bill/charger: × 0.9314
+        assertThat(phone(10_000, "{\"functional_issues\":" + ALL_PHONE_ISSUES + ",\"warranty\":\"0_3_months\"}")).isEqualTo(4_650); // 50%, and no box/bill/charger: × 0.9314
     }
 
     @Test
     void anAccessoryListNeverAnsweredMeansNothingTicked() throws Exception {
-        assertThat(phone(10_000, "{}")).isEqualTo(9_310); // no charger, box or bill: 1 - 0.99 × 0.98 × 0.96 = 6.86%
+        assertThat(phone(10_000, "{\"warranty\":\"0_3_months\"}")).isEqualTo(9_310); // no charger, box or bill: 1 - 0.99 × 0.98 × 0.96 = 6.86%
     }
 
     @Test
     void yesNoQuestionsCountTheirBadAnswer() throws Exception {
-        assertThat(calc(10_000, "{\"sensor_spots\":true,\"accessories\":[\"battery\",\"charger\",\"lens_cap\",\"strap\",\"box\",\"bill\"]}",
+        assertThat(calc(10_000, "{\"sensor_spots\":true,\"accessories\":[\"battery\",\"charger\",\"lens_cap\",\"strap\",\"box\",\"bill\"],\"warranty\":\"0_3_months\"}",
                 "camera", List.of(), 15)).isEqualTo(8_000);
-        assertThat(calc(10_000, "{\"sensor_spots\":false,\"lens_focus\":true,\"accessories\":[\"battery\",\"charger\",\"lens_cap\",\"strap\",\"box\",\"bill\"]}",
+        assertThat(calc(10_000, "{\"sensor_spots\":false,\"lens_focus\":true,\"accessories\":[\"battery\",\"charger\",\"lens_cap\",\"strap\",\"box\",\"bill\"],\"warranty\":\"0_3_months\"}",
                 "camera", List.of(), 15)).isEqualTo(10_000);
+    }
+
+    @Test
+    void aDeviceAgeLeftUnansweredCountsAsOutOfWarranty() throws Exception {
+        String base = "{\"physical_condition\":\"flawless\",\"accessories\":[\"charger\",\"box\",\"bill\"]";
+        double outOfWarranty = phone(10_000, base + ",\"warranty\":\"no\"}");
+        assertThat(outOfWarranty).isLessThan(10_000);
+        assertThat(phone(10_000, base + "}")).isEqualTo(outOfWarranty);
+        assertThat(phone(10_000, base + ",\"warranty\":\"\"}")).isEqualTo(outOfWarranty);
+        assertThat(phone(10_000, base + ",\"warranty\":null}")).isEqualTo(outOfWarranty);
+        assertThat(phone(10_000, base + ",\"warranty\":\"0_3_months\"}")).isEqualTo(10_000);
     }
 
     @Test

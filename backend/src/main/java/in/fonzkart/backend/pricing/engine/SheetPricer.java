@@ -57,7 +57,7 @@ public final class SheetPricer {
         Map<String, List<String>> partAnswers = new LinkedHashMap<>();
         for (PriceSheet.Line line : sheet.lines()) {
             if (PriceSheet.REPAIR.equals(line.kind())) {
-                if (PriceCalculator.applies(given.path(line.question()), line.answer())) {
+                if (PriceCalculator.applies(PriceCalculator.answerTo(given, line.question()), line.answer())) {
                     PriceSheet.Line held = parts.get(line.part());
                     if (held == null || line.cost() > held.cost()) {
                         parts.put(line.part(), line);
@@ -71,7 +71,7 @@ public final class SheetPricer {
         double kept = 1;
         double running = max;
         for (Map.Entry<String, List<PriceSheet.Line>> q : shareQuestions.entrySet()) {
-            JsonNode answer = given.path(q.getKey());
+            JsonNode answer = PriceCalculator.answerTo(given, q.getKey());
             double left = 1;
             List<String> matched = new ArrayList<>();
             for (PriceSheet.Line line : q.getValue()) {

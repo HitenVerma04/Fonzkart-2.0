@@ -2,7 +2,7 @@
 
 One pricing system on the Spring Boot backend and PostgreSQL, used by the website, the Customer app (live price while
 answering), the Partner app (pickup check) and the Admin app (overview, suggestions, resales, repair costs).
-Engine version `2026.11-v2`.
+Engine version `2026.11-v3` (v3: smartphones follow the used-phone market, see below).
 
 ## Why it changed
 
@@ -32,6 +32,27 @@ max value (flawless, with box and bill)
   "cracked screen" are one display. "Camera" + "blurry camera" are one camera (`PartCatalog`).
 * **The breakdown is returned with every quote.** The Customer app shows it as "How we worked out your price", so the
   customer sees where every rupee went.
+
+## Smartphones follow the used-phone market (v3, 2026-11-27)
+
+The owners asked for Fonzkart's offers to land near what Cashify and Cashkr pay. Both parts of the offer were measured
+on those platforms in November 2026 (spreadsheet Fonzkart-Phone-Resale-Prices.xlsx) and the engine now follows them:
+
+* **Max values:** `catalog/market-prices.json` holds the average of the two platforms' "up to" price for 1,789 phone
+  variants. `MarketPriceImport` applies it once per version on startup (after the launch prices). A variant neither
+  platform lists moves by the same ratio as the other storage sizes of its model. An auto variant gets the market
+  factor that makes the monthly revaluation aim at the market price; if that factor would be outside 0.7–1.3 the
+  variant becomes manual. Every change is in `PriceHistory`. A later launch-prices.json version re-prices auto
+  variants from the rule again, so a new market file should follow it.
+* **Cuts:** `MarketCuts` holds the market's cut for each smartphone answer (the two platforms averaged). A cosmetic
+  answer takes that share; a repair answer costs that share of the max value less the first job's labour (so one
+  problem lands exactly on the market), unless the part's repair estimate is more (foldable displays). An admin's
+  rule still wins as before. Answers without market data (camera glass, bought abroad) keep the built-in figures.
+* **Fonzkart's own cuts (2026-11-28):** the owners set a few figures above the market's. Screen good 15%, average 30%,
+  below average 50%; "Screen Not Original" (a new Functional Problems tile, a display repair, so taken once with a
+  cracked screen) 50%; a faulty fingerprint sensor on an Android phone 50% (iPhones keep the market's 23.5%).
+
+Other categories are unchanged.
 
 ## Repair costs: from the best evidence available
 

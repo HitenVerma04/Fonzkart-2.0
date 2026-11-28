@@ -3,7 +3,7 @@ import { BackHandler, Platform, ScrollView, Text, View, type ScrollViewInstance 
 import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { usePriceSheet, useQuestionnaire } from '@fonzkart/api';
-import { formatInr, isStepComplete, priceFromSheet, stepQuestionIds, stepsForDevice, type Answers } from '@fonzkart/core';
+import { formatInr, isStepComplete, priceFromSheet, stepQuestionIds, stepsForDevice, withSkippedAnswers, type Answers } from '@fonzkart/core';
 import { makeStyles } from '@fonzkart/ui';
 import {
   ActionBar, Button, EmptyState, ErrorState, MAX_CONTENT, motion, PAGE_PADDING, ProductImage, deviceKindOf, QuestionStepView, radii,
@@ -97,7 +97,7 @@ export default function Questions() {
   const last = index === steps.length - 1;
   const next = () => {
     if (!last) return goTo(index + 1);
-    saveAnswers(answers);
+    saveAnswers(withSkippedAnswers(steps, answers)); // a skipped device age is sent as out of warranty
     router.push('/quote/offer');
   };
 

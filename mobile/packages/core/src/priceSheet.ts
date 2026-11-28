@@ -66,6 +66,13 @@ export function answerApplies(answer: unknown, key: string): boolean {
   return typeof answer === 'string' && answer === key;
 }
 
+/** The answer to a question as the server reads it: a device age left unanswered is "no" (out of warranty). */
+export function answerTo(answers: Record<string, unknown>, question: string): unknown {
+  const answer = answers[question];
+  if (question === 'warranty' && (answer === undefined || answer === null || (typeof answer === 'string' && !answer.trim()))) return 'no';
+  return answer;
+}
+
 /**
  * The offer for these answers, exactly as the server prices them. `only`: price only these questions (the live
  * price while the customer is still answering: questions not reached yet take nothing, so an accessory list not seen
@@ -80,7 +87,7 @@ export function priceFromSheet(sheet: PriceSheet, answers: Record<string, unknow
   for (const line of sheet.lines) {
     if (only && !only.has(line.question)) continue;
     if (line.kind === 'repair') {
-      if (answerApplies(answers[line.question], line.answer)) {
+      if (answerApplies(answerTo(answers, line.question), line.answer)) {
         const held = line.part === null ? undefined : parts.get(line.part);
         if (line.part !== null && (held === undefined || line.cost > held.cost)) parts.set(line.part, line);
       }
@@ -93,7 +100,7 @@ export function priceFromSheet(sheet: PriceSheet, answers: Record<string, unknow
 
   let kept = 1;
   for (const [question, lines] of shareQuestions) {
-    const answer = answers[question];
+    const answer = answerTo(answers, question);
     let left = 1;
     for (const line of lines) {
       if (answerApplies(answer, line.answer)) left *= 1 - clamp(line.share, 0, MAX_SHARE);

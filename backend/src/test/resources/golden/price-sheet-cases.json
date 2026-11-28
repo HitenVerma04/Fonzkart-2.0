@@ -329,10 +329,10 @@
     },
     "price" : 51239
   }, {
-    "name" : "nothing answered (no box, no bill, no charger)",
+    "name" : "nothing answered (no box, no bill, no charger; device age skipped = out of warranty)",
     "sheet" : "phone",
     "answers" : { },
-    "price" : 47720
+    "price" : 43900
   }, {
     "name" : "scratches and age",
     "sheet" : "phone",
@@ -351,7 +351,8 @@
       "physical_condition" : "below_average",
       "body_condition" : "good",
       "functional_issues" : [ ],
-      "accessories" : [ "charger", "box", "bill" ]
+      "accessories" : [ "charger", "box", "bill" ],
+      "warranty" : "0_3_months"
     },
     "price" : 34530
   }, {
@@ -360,7 +361,8 @@
     "answers" : {
       "physical_condition" : "flawless",
       "functional_issues" : [ "wifi", "sim2" ],
-      "accessories" : [ "charger", "box", "bill" ]
+      "accessories" : [ "charger", "box", "bill" ],
+      "warranty" : "0_3_months"
     },
     "price" : 46800
   }, {
@@ -368,7 +370,8 @@
     "sheet" : "phone",
     "answers" : {
       "functional_issues" : [ "back_camera", "back_camera_blur" ],
-      "accessories" : [ "charger", "box", "bill" ]
+      "accessories" : [ "charger", "box", "bill" ],
+      "warranty" : "0_3_months"
     },
     "price" : 44630
   }, {
@@ -387,7 +390,8 @@
     "name" : "missing accessories capped",
     "sheet" : "phone",
     "answers" : {
-      "accessories" : [ "charger" ]
+      "accessories" : [ "charger" ],
+      "warranty" : "0_3_months"
     },
     "price" : 48200
   }, {
@@ -395,7 +399,8 @@
     "sheet" : "phone",
     "answers" : {
       "purchase_location" : "global",
-      "accessories" : [ "charger", "box", "bill" ]
+      "accessories" : [ "charger", "box", "bill" ],
+      "warranty" : "0_3_months"
     },
     "price" : 46110
   }, {

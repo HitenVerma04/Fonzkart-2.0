@@ -472,7 +472,7 @@
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 17980
+    "returned": 9290
    }
   },
   {
@@ -484,13 +484,13 @@
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 3520
+    "returned": 3230
    }
   },
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 3520
+    "returned": 3230
    }
   },
   {
@@ -835,7 +835,7 @@
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 15340
+    "returned": 6300
    }
   },
   {
@@ -847,7 +847,7 @@
   {
    "step": "anon:calculatePrice",
    "outcome": {
-    "returned": 16340
+    "returned": 13560
    }
   }
  ],

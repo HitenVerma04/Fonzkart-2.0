@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn } from 'react-native-reanimated';
-import { groupOptions, isMultiSelect, toggleOption, type Answers, type QuestionOption, type QuestionStep } from '@fonzkart/core';
+import {
+  groupOptions, isMultiSelect, isRequired, requiredGroups, SKIPPABLE, toggleOption, type Answers, type QuestionOption, type QuestionStep,
+} from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { Icon, type IconName } from './Icon';
 import { Tap } from './Tap';
@@ -54,7 +56,7 @@ export function YesNo({ question, detail, value, onChange }: {
   const styles = useStyles();
   return (
     <View style={styles.question}>
-      <Text style={styles.label}>{question}</Text>
+      <Text style={styles.label}>{question}<Text style={styles.required} accessibilityLabel="required"> *</Text></Text>
       {detail ? <Text style={styles.description}>{detail}</Text> : null}
       <View style={styles.yesNoRow}>
         {([true, false] as const).map(answer => (
@@ -79,9 +81,11 @@ export function QuestionStepView({ step, answers, onChange }: {
   onChange: (key: string, value: Answers[string]) => void;
 }) {
   const styles = useStyles();
+  const star = <Text style={styles.required} accessibilityLabel="required"> *</Text>;
   const choices = (key: string, kind: string | undefined, options: QuestionOption[] | undefined) => {
     const multi = isMultiSelect(kind);
     const list = options ?? [];
+    const skippable = !multi && key in SKIPPABLE;
     // Tick-all-that-apply lists of short labels (functional problems, accessories) read faster as a two-column grid.
     const compact = multi && list.every(o => !o.description && o.label.length <= 28);
     const card = (option: QuestionOption) => {
@@ -95,7 +99,8 @@ export function QuestionStepView({ step, answers, onChange }: {
           multi={multi}
           compact={compact}
           selected={selected}
-          onPress={() => onChange(key, multi ? toggleOption(current, option.id) : option.id)}
+          // An optional choice (device age) is cleared by tapping it again.
+          onPress={() => onChange(key, multi ? toggleOption(current, option.id) : skippable && selected ? '' : option.id)}
         />
       );
     };
@@ -103,19 +108,26 @@ export function QuestionStepView({ step, answers, onChange }: {
     // Long problem lists come under headings (Camera, Buttons & controls, ...), like the sections of Device Details.
     const groups = multi ? groupOptions(list, key) : [];
     if (!groups.some(g => g.title)) return cards(list);
-    return groups.map(g => (
-      <View key={g.title} style={styles.group}>
-        <Text style={styles.groupTitle}>{g.title}</Text>
-        {cards(g.options)}
-      </View>
-    ));
+    return groups.map(g => {
+      const mustPick = requiredGroups(g.options).length > 0;
+      return (
+        <View key={g.title} style={styles.group}>
+          <Text style={styles.groupTitle}>{g.title}{mustPick ? star : null}</Text>
+          {mustPick ? <Text style={styles.groupHint}>Choose your battery health (one is required).</Text> : null}
+          {cards(g.options)}
+        </View>
+      );
+    });
   };
 
+  const stepRequired = !step.questions && step.type !== 'combined-step' && isRequired(step.id, step.type, step.options);
   return (
     <View style={styles.step}>
-      <Text style={styles.stepTitle}>{step.title}</Text>
+      <Text style={styles.stepTitle}>{step.title}{step.type === 'single-select' && stepRequired ? star : null}</Text>
       {step.subtitle ? <Text style={styles.stepSubtitle}>{step.subtitle}</Text> : null}
-      {isMultiSelect(step.type) ? <Text style={styles.multiHint}>Select all that apply, or none.</Text> : null}
+      {isMultiSelect(step.type) ? (
+        <Text style={styles.multiHint}>{stepRequired ? 'Select all that apply. * is required.' : 'Select all that apply, or none.'}</Text>
+      ) : null}
       <View style={styles.options}>
         {step.questions?.map(q => (
           <YesNo
@@ -129,7 +141,8 @@ export function QuestionStepView({ step, answers, onChange }: {
         {step.type === 'combined-step'
           ? step.sections?.map(section => (
               <View key={section.id} style={styles.group}>
-                <Text style={styles.groupTitle}>{section.title}</Text>
+                <Text style={styles.groupTitle}>{section.title}{isRequired(section.id, section.type, section.options) ? star : null}</Text>
+                {section.id in SKIPPABLE ? <Text style={styles.groupHint}>Leave empty if it is over 11 months old or out of warranty.</Text> : null}
                 {choices(section.id, section.type, section.options)}
               </View>
             ))
@@ -223,6 +236,8 @@ const useStyles = makeStyles(colors => ({
   options: { gap: 10, marginTop: 14 },
   group: { gap: 10, marginBottom: 14 },
   groupTitle: { ...type.heading, fontSize: 16, color: colors.text },
+  groupHint: { ...type.small, color: colors.muted, marginTop: -6 },
+  required: { color: '#ef4444', fontWeight: '800' },
   chip: { minWidth: 64, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 12, paddingVertical: 8, paddingHorizontal: 14 },
   chipWide: { flexGrow: 1, flexBasis: 0 },
   chipLabel: { fontSize: 15, lineHeight: 20, fontWeight: '600', letterSpacing: -0.2, color: colors.text },

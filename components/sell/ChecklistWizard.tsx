@@ -6,6 +6,28 @@ import { ArrowRight, Check, XCircle, AlertTriangle, CheckCircle2, Smartphone } f
 import * as Icons from 'lucide-react';
 import Image from 'next/image';
 
+/**
+ * Options of which exactly one must be ticked when a list shows them (an iPhone's battery health is below or above
+ * 85%): ticking one unticks the other. As in the apps (mobile/packages/core/src/questionnaire.ts).
+ */
+const ONE_OF: string[][] = [['battery_health_low', 'battery_health_high']];
+/** Single choices the customer may skip, and what a skipped one counts as (device age: out of warranty). */
+const SKIPPABLE: Record<string, string> = { warranty: 'no' };
+
+type Opt = { id: string; label: string; description?: string; icon?: string; group?: string };
+const requiredGroups = (options: Opt[] | undefined) => ONE_OF.filter(g => g.every(id => (options ?? []).some(o => o.id === id)));
+const listAnswered = (options: Opt[] | undefined, value: unknown) =>
+    requiredGroups(options).every(g => g.some(id => Array.isArray(value) && value.includes(id)));
+/** Ticks or unticks an option; an option of a ONE_OF group replaces the rest of its group and stays ticked. */
+const toggle = (value: unknown, id: string): string[] => {
+    const list = Array.isArray(value) ? (value as string[]) : [];
+    const group = ONE_OF.find(g => g.includes(id));
+    if (group) return list.includes(id) ? list : [...list.filter(x => !group.includes(x)), id];
+    return list.includes(id) ? list.filter(x => x !== id) : [...list, id];
+};
+/** The red asterisk on a question that must be answered. */
+const Required = () => <span className="ml-1 text-red-500" aria-label="required">*</span>;
+
 interface ChecklistWizardProps {
     deviceInfo: { name: string; variant: string; img: string };
     category?: string;
@@ -88,7 +110,14 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
             setCurrentStepIndex(prev => prev + 1);
             triggerScrollReset();
         } else {
-            onComplete(answers);
+            // A skipped device age counts as out of warranty (the server prices it the same way).
+            const filled = { ...answers };
+            for (const step of steps) {
+                for (const key of [step.id, ...(step.sections ?? []).map((sec: Opt) => sec.id)]) {
+                    if (key in SKIPPABLE && !filled[key]) filled[key] = SKIPPABLE[key];
+                }
+            }
+            onComplete(filled);
         }
     };
 
@@ -96,7 +125,7 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
         if (!currentStep) return false;
         // Require selection for single-select steps (Physical, Body, Warranty, Bill)
         if (currentStep.type === 'single-select') {
-            return !!answers[currentStep.id];
+            return !!answers[currentStep.id] || currentStep.id in SKIPPABLE;
         }
         // Boolean questions? (Tablets/etc) - Require all answered?
         if (currentStep.questions) {
@@ -108,12 +137,12 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
             // Assuming warranty and bill are required single-selects
             // We can check if all single-select sections have answers
             return currentStep.sections.every((sec: any) => {
-                if (sec.type === 'single-select') return !!answers[sec.id];
-                return true;
+                if (sec.type === 'single-select') return !!answers[sec.id] || sec.id in SKIPPABLE;
+                return listAnswered(sec.options, answers[sec.id]);
             });
         }
-        // Multi-select steps are optional (can proceed with none)
-        return true;
+        // Multi-select steps are optional (can proceed with none), except a required pick such as battery health
+        return listAnswered(currentStep.options, answers[currentStep.id]);
     };
 
     const renderIcon = (iconName: string) => {
@@ -141,7 +170,7 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Main Content Area */}
             <div className="flex-1 bg-card border rounded-2xl p-6 md:p-10 shadow-sm">
-                <h2 className="text-2xl font-bold mb-2">{currentStep.title}</h2>
+                <h2 className="text-2xl font-bold mb-2">{currentStep.title}{currentStep.type === 'single-select' && !(currentStep.id in SKIPPABLE) ? <Required /> : null}</h2>
                 <p className="text-muted-foreground mb-8">{currentStep.subtitle}</p>
 
                 <AnimatePresence mode="wait" onExitComplete={triggerScrollReset}>
@@ -155,7 +184,7 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                     >
                         {currentStep.questions && currentStep.questions.map((q: { id: string; text: string; subtext: string }) => (
                             <div key={q.id} className="space-y-3">
-                                <h3 className="font-semibold text-lg">{q.text}</h3>
+                                <h3 className="font-semibold text-lg">{q.text}<Required /></h3>
                                 <p className="text-sm text-muted-foreground">{q.subtext}</p>
                                 <div className="flex gap-4 mt-2">
                                     <button
@@ -187,11 +216,7 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                                             key={opt.id}
                                             onClick={() => {
                                                 if (isMulti) {
-                                                    const current = (answers[currentStep.id] as string[]) || [];
-                                                    const updated = current.includes(opt.id)
-                                                        ? current.filter((id: string) => id !== opt.id)
-                                                        : [...current, opt.id];
-                                                    handleAnswer(currentStep.id, updated);
+                                                    handleAnswer(currentStep.id, toggle(answers[currentStep.id], opt.id));
                                                 } else {
                                                     // Single select behavior
                                                     handleAnswer(currentStep.id, opt.id);
@@ -233,7 +258,8 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                                 <div className="space-y-8">
                                     {groups.map(g => (
                                         <div key={g.title} className="space-y-4">
-                                            <h3 className="font-semibold text-lg border-b pb-2">{g.title}</h3>
+                                            <h3 className="font-semibold text-lg border-b pb-2">{g.title}{requiredGroups(g.options).length ? <Required /> : null}</h3>
+                                            {requiredGroups(g.options).length ? <p className="-mt-2 text-sm text-muted-foreground">Choose your battery health (one is required).</p> : null}
                                             <div className={gridClass}>{g.options.map(renderOption)}</div>
                                         </div>
                                     ))}
@@ -245,7 +271,11 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                             <div className="space-y-10">
                                 {currentStep.sections.map((section: any) => (
                                     <div key={section.id} className="space-y-4">
-                                        <h3 className="font-semibold text-lg border-b pb-2">{section.title}</h3>
+                                        <h3 className="font-semibold text-lg border-b pb-2">
+                                            {section.title}
+                                            {(section.type === 'single-select' && !(section.id in SKIPPABLE)) || requiredGroups(section.options).length ? <Required /> : null}
+                                        </h3>
+                                        {section.id in SKIPPABLE ? <p className="-mt-2 text-sm text-muted-foreground">Leave empty if it is over 11 months old or out of warranty.</p> : null}
                                         <div className={`grid gap-4 ${section.type === 'single-select' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2' : 'grid-cols-1 md:grid-cols-2'}`}>
                                             {section.options?.map((opt: { id: string; label: string; description?: string; icon?: string }) => {
                                                 const isMulti = section.type !== 'single-select';
@@ -258,11 +288,9 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                                                         key={opt.id}
                                                         onClick={() => {
                                                             if (isMulti) {
-                                                                const current = (answers[section.id] as string[]) || [];
-                                                                const updated = current.includes(opt.id)
-                                                                    ? current.filter((id: string) => id !== opt.id)
-                                                                    : [...current, opt.id];
-                                                                handleAnswer(section.id, updated);
+                                                                handleAnswer(section.id, toggle(answers[section.id], opt.id));
+                                                            } else if (section.id in SKIPPABLE && answers[section.id] === opt.id) {
+                                                                handleAnswer(section.id, undefined); // tap again to clear an optional choice
                                                             } else {
                                                                 handleAnswer(section.id, opt.id);
                                                             }
