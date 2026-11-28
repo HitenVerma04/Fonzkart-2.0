@@ -288,7 +288,11 @@ export const questionnaireSteps = {
                 { id: 'proximity', label: 'Proximity Sensor', icon: 'Move', group: 'Sensors' },
                 { id: 'power_button', label: 'Power Button', icon: 'Power', group: 'Buttons & controls' },
                 { id: 'volume_button', label: 'Volume Button', icon: 'Volume2', group: 'Buttons & controls' },
-                { id: 'silent_button', label: 'Silent Button', icon: 'BellOff', group: 'Buttons & controls' },
+                // The extra side key, only on phones that have one (lib/device-traits.ts → sideKeyOf); one answer, one price.
+                { id: 'silent_button', label: 'Ring / Silent Switch', icon: 'BellOff', group: 'Buttons & controls', showFor: 'ring_switch' },
+                { id: 'silent_button', label: 'Action Button', icon: 'BellOff', group: 'Buttons & controls', showFor: 'action_button' },
+                { id: 'silent_button', label: 'Alert Slider', icon: 'BellOff', group: 'Buttons & controls', showFor: 'alert_slider' },
+                { id: 'silent_button', label: 'Plus Key', icon: 'BellOff', group: 'Buttons & controls', showFor: 'plus_key' },
                 { id: 'speaker', label: 'Speaker', icon: 'Speaker', group: 'Sound & vibration' },
                 { id: 'earpiece', label: 'Ear Piece', icon: 'Phone', group: 'Sound & vibration' },
                 { id: 'audio_jack', label: 'Audio Jack', icon: 'Headphones', group: 'Sound & vibration' },

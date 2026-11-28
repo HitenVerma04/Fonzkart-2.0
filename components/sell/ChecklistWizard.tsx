@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { questionnaireSteps } from '@/lib/data';
+import { deviceTraits, shownFor } from '@/lib/device-traits';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, XCircle, AlertTriangle, CheckCircle2, Smartphone } from 'lucide-react';
 import * as Icons from 'lucide-react';
@@ -25,11 +26,6 @@ const toggle = (value: unknown, id: string): string[] => {
     if (group) return list.includes(id) ? list : [...list.filter(x => !group.includes(x)), id];
     return list.includes(id) ? list.filter(x => x !== id) : [...list, id];
 };
-/** Words in a folding phone's name, as the apps and the backend decide it (Galaxy Z Fold / Flip, Razr, OnePlus Open). */
-const FOLD_WORDS = ['fold', 'flip', 'razr', 'duo', 'open', 'magic v'];
-/** Whether a step, section or option marked `showFor` (apple, android, foldable) is shown for this device. */
-const shownFor = (showFor: string | undefined, apple: boolean, foldable: boolean) =>
-    !showFor || (showFor === 'apple' ? apple : showFor === 'android' ? !apple : showFor === 'foldable' ? foldable : true);
 /** The reason Fonzkart cannot buy the device, when an answer on this step says so (an iPhone still locked to iCloud). */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const saleStoppedBy = (step: any, answers: Record<string, unknown>): string | undefined => {
@@ -87,12 +83,12 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // Customize steps based on device type (iPhone Battery Logic)
     const activeCategory = category === 'smartwatch' ? 'watch' : (category === 'smarttv' ? 'tv' : (category || 'smartphone'));
-    const deviceName = ` ${(deviceInfo?.name ?? '').toLowerCase()} `;
-    const isApple = deviceName.includes('iphone');
-    const isFoldable = FOLD_WORDS.some(w => deviceName.includes(` ${w}`));
-    // Steps, sections and options marked showFor appear only on those devices (iCloud lock on iPhones, hinge on folds).
+    const traits = deviceTraits(deviceInfo?.name ?? '');
+    const isApple = traits.apple;
+    // Steps, sections and options marked showFor appear only on those devices (iCloud lock on iPhones, hinge on folds,
+    // the side key on phones that have one).
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const keep = (list: any[] | undefined) => list?.filter(item => shownFor(item.showFor, isApple, isFoldable));
+    const keep = (list: any[] | undefined) => list?.filter(item => shownFor(item.showFor, traits));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let steps = keep((questionnaireSteps as any)[activeCategory] || (questionnaireSteps as any)['smartphone'])!.map((step: any) => ({
         ...step,

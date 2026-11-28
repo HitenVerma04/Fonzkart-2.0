@@ -169,12 +169,40 @@ test('fold and flip phones get the hinge check, iPhones the iCloud lock, and a l
   // Options marked for Android phones are not shown on iPhones.
   assert.deepEqual(stepsForDevice(q, 'smartphone', 'iPhone 15').at(-1)?.options?.map(o => o.id), ['wifi']);
   assert.deepEqual(stepsForDevice(q, 'smartphone', 'Pixel 9').at(-1)?.options?.map(o => o.id), ['wifi', 'in_display']);
-  assert.deepEqual(deviceTraits('OnePlus Open'), { apple: false, foldable: true });
-  assert.deepEqual(deviceTraits('Galaxy S24 Ultra'), { apple: false, foldable: false });
+  assert.deepEqual(deviceTraits('OnePlus Open'), { apple: false, foldable: true, sideKey: 'alert_slider' });
+  assert.deepEqual(deviceTraits('Galaxy S24 Ultra'), { apple: false, foldable: false, sideKey: null });
 
   assert.equal(saleStoppedBy(icloud, { icloud_lock: 'locked' }), 'Sign out first.');
   assert.equal(isStepComplete(icloud, { icloud_lock: 'locked' }), false);
   assert.equal(isStepComplete(icloud, { icloud_lock: 'not_locked' }), true);
   assert.equal(isStepComplete(fold, {}), false);
   assert.equal(isStepComplete(fold, { hinge: 'faulty' }), true);
+});
+
+test('the side key tile shows only on phones that have one, named as on the phone', async () => {
+  const { sideKeyOf } = await import('./questionnaire');
+  const expected: Record<string, string | null> = {
+    'iPhone X': 'ring_switch', 'iPhone 14 Pro Max': 'ring_switch', 'iPhone 15 Plus': 'ring_switch',
+    'iPhone 15 Pro': 'action_button', 'iPhone 16e': 'action_button', 'iPhone 17 Air': 'action_button',
+    'OnePlus 8T': 'alert_slider', 'OnePlus 12R': 'alert_slider', 'OnePlus 13': 'alert_slider', 'OnePlus Open': 'alert_slider',
+    'OnePlus Nord': 'alert_slider', 'OnePlus Nord 2T 5G': 'alert_slider', 'OnePlus Nord 4': 'alert_slider',
+    'OnePlus 13S': 'plus_key', 'OnePlus 15': 'plus_key', 'OnePlus 15R': 'plus_key', 'OnePlus Nord 5': 'plus_key',
+    'OnePlus 10T': null, 'OnePlus Nord CE 3 5G': null, 'OnePlus Nord N20 SE': null, 'OnePlus N6': null, 'Galaxy S24': null,
+  };
+  for (const [name, key] of Object.entries(expected)) assert.equal(sideKeyOf(name), key, name);
+
+  const buttons: QuestionStep = {
+    id: 'functional_issues', title: 'Issues', type: 'multi-select-grid',
+    options: [
+      { id: 'power_button', label: 'Power Button' },
+      { id: 'silent_button', label: 'Ring / Silent Switch', showFor: 'ring_switch' },
+      { id: 'silent_button', label: 'Action Button', showFor: 'action_button' },
+      { id: 'silent_button', label: 'Alert Slider', showFor: 'alert_slider' },
+    ],
+  };
+  const labels = (name: string) => stepsForDevice({ smartphone: [buttons] }, 'smartphone', name)[0]?.options?.map(o => o.label);
+  assert.deepEqual(labels('iPhone 13'), ['Power Button', 'Ring / Silent Switch']);
+  assert.deepEqual(labels('iPhone 16 Pro'), ['Power Button', 'Action Button']);
+  assert.deepEqual(labels('OnePlus 11R 5G'), ['Power Button', 'Alert Slider']);
+  assert.deepEqual(labels('Galaxy S24'), ['Power Button']);
 });

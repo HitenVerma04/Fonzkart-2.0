@@ -249,9 +249,31 @@
         },
         {
           "id": "silent_button",
-          "label": "Silent Button",
+          "label": "Ring / Silent Switch",
           "icon": "BellOff",
-          "group": "Buttons & controls"
+          "group": "Buttons & controls",
+          "showFor": "ring_switch"
+        },
+        {
+          "id": "silent_button",
+          "label": "Action Button",
+          "icon": "BellOff",
+          "group": "Buttons & controls",
+          "showFor": "action_button"
+        },
+        {
+          "id": "silent_button",
+          "label": "Alert Slider",
+          "icon": "BellOff",
+          "group": "Buttons & controls",
+          "showFor": "alert_slider"
+        },
+        {
+          "id": "silent_button",
+          "label": "Plus Key",
+          "icon": "BellOff",
+          "group": "Buttons & controls",
+          "showFor": "plus_key"
         },
         {
           "id": "speaker",
