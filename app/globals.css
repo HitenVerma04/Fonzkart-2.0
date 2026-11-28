@@ -542,3 +542,62 @@ html[data-festive] .fz-boot-mark img { opacity: 0; }
   .fz-sway, .fz-twinkle, .fz-turn, .fz-flame, .fz-bob, .fz-fall, .guard-float, .guard-drift, .guard-glint,
   .fac-spin, .fac-ride, .fac-beam, .fac-arm, .fac-press, .fac-puff, .fac-flow { animation: none; }
 }
+
+/* The Fonzkart name as lettering (components/Wordmark.tsx): "Fonz" in ink, "kart" in the brand green. */
+.fz-wordmark { display: inline-flex; align-items: baseline; font-weight: 900; letter-spacing: -0.035em; line-height: 1; white-space: nowrap; }
+.fz-fonz { color: #111827; }
+.dark .fz-fonz { color: #ffffff; }
+.fz-kart { color: hsl(var(--primary)); }
+.fz-wordmark .fz-ch { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.04em 0 0.1em; }
+.fz-wordmark .fz-ch > span { display: inline-block; }
+
+/* The page transition (components/nav/NavTransition.tsx). Everything rests hidden; the script animates it. */
+.fz-nav { position: fixed; inset: 0; z-index: 9990; visibility: hidden; pointer-events: none; overflow: hidden; }
+.fz-nav[data-on="1"] { visibility: visible; pointer-events: auto; cursor: progress; }
+.fz-nav-veil {
+  position: absolute; inset: 0; opacity: 0;
+  background: radial-gradient(circle at 50% 46%, rgba(var(--glow-a), 0.2) 0%, rgba(var(--glow-a), 0) 38%), hsl(var(--background) / 0.86);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+}
+.fz-nav-bar {
+  position: absolute; left: 0; top: 0; width: 100%; height: 3px; transform: scaleX(0); transform-origin: 0 50%;
+  border-radius: 0 3px 3px 0; background: linear-gradient(90deg, hsl(var(--primary) / 0.55), hsl(var(--primary)));
+  box-shadow: 0 0 12px hsl(var(--primary) / 0.7), 0 0 4px hsl(var(--primary) / 0.5);
+}
+.fz-nav-stage { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.fz-nav-cart { position: relative; opacity: 0; }
+.fz-nav-cart-body { transform-origin: 50% 90%; }
+.fz-nav-ring { position: absolute; left: 54%; top: 34%; width: 88px; height: 88px; margin: -44px 0 0 -44px; border-radius: 50%; border: 2px solid hsl(var(--primary)); opacity: 0; pointer-events: none; }
+.fz-nav-word { font-size: 36px; }
+.fz-nav-word .fz-ch > span { transform: translateY(110%); }
+.fz-nav-track, .fz-load-track { width: 76px; height: 3px; border-radius: 3px; overflow: hidden; background: hsl(var(--primary) / 0.15); }
+.fz-nav-track { opacity: 0; }
+.fz-nav-track::after, .fz-load-track::after { content: ""; display: block; width: 40%; height: 100%; border-radius: inherit; background: hsl(var(--primary)); animation: fz-sweep 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+@keyframes fz-sweep { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.fz-nav-flyer {
+  position: absolute; left: -26px; top: -26px; width: 52px; height: 52px; border-radius: 50%; opacity: 0;
+  display: flex; align-items: center; justify-content: center; background: var(--lit); color: var(--on-lit);
+  border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 12px 26px -8px rgba(var(--glow-a), 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  will-change: transform, opacity;
+}
+.fz-nav-flyer svg { width: 26px; height: 26px; color: inherit; }
+.fz-nav-trail { position: absolute; left: -7px; top: -7px; width: 14px; height: 14px; border-radius: 50%; background: hsl(var(--primary)); opacity: 0; filter: blur(2px); will-change: transform, opacity; }
+.fz-nav-lib { display: none; }
+
+/* The resting loader (components/ui/BrandLoader.tsx): app/loading.tsx full screen, and inline in lists. */
+.fz-load { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 32px 0; }
+.fz-load-full {
+  position: fixed; inset: 0; z-index: 100; padding: 0;
+  background: radial-gradient(circle at 50% 46%, rgba(var(--glow-a), 0.18) 0%, rgba(var(--glow-a), 0) 38%), hsl(var(--background) / 0.92);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  animation: fz-load-in 0.22s 0.12s both; /* a page that is ready at once never flashes it */
+}
+html[data-fz-nav] .fz-load-full { visibility: hidden; } /* the transition is already showing the same picture */
+@keyframes fz-load-in { from { opacity: 0; } to { opacity: 1; } }
+.fz-load-cart { animation: fz-bob 0.9s ease-in-out infinite alternate; }
+@keyframes fz-bob { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+.fz-load-word { font-size: 34px; }
+.fz-load-word-sm { font-size: 26px; }
+@media (prefers-reduced-motion: reduce) {
+  .fz-load-cart, .fz-nav-track::after, .fz-load-track::after { animation: none; }
+}

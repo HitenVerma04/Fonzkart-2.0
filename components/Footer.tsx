@@ -10,7 +10,7 @@ export default function Footer() {
                     <div className="space-y-4">
                         <Link href="/" className="flex items-center gap-0.5">
                             {/* Single Line Logo with CSS Variables */}
-                            <Logo />
+                            <Logo wordmark />
                         </Link>
                         <p className="text-muted-foreground text-sm leading-relaxed">
                             The smartest way to sell your old gadgets. Get instant quotes, free doorstep pickup, and instant payment.

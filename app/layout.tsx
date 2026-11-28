@@ -20,6 +20,8 @@ export const metadata: Metadata = {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import InitialLoader from "@/components/ui/InitialLoader";
+import NavTransition from "@/components/nav/NavTransition";
+import { Suspense } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import HeaderVisibility from "@/components/HeaderVisibility";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -86,6 +88,11 @@ export default function RootLayout({
           <HeaderVisibility>
             <MobileBottomNav />
           </HeaderVisibility>
+
+          {/* Page transition: the tapped icon flies into the cart while the next page loads */}
+          <Suspense fallback={null}>
+            <NavTransition />
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

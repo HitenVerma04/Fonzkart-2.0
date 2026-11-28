@@ -79,10 +79,10 @@ export function HeaderClientControls({ session, isAdminUser }: HeaderClientContr
                     <span>Sell</span>
                 </Link>
 
-                {/* 2. Direct Careers Icon Button with Hiring Pulse */}
+                {/* 2. Direct Careers Icon Button with Hiring Pulse (phones: in the bottom bar, which also has Orders and Account) */}
                 <Link
                     href="/careers"
-                    className="relative p-2 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                    className="relative hidden sm:block p-2 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Careers - We're Hiring"
                 >
                     <Briefcase className="h-4 w-4" />
@@ -95,7 +95,7 @@ export function HeaderClientControls({ session, isAdminUser }: HeaderClientContr
                 {/* 3. Direct Orders Icon Button */}
                 <Link
                     href="/orders"
-                    className="p-2 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                    className="hidden sm:block p-2 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="My Orders"
                 >
                     <ShoppingBag className="h-4 w-4" />
@@ -106,7 +106,7 @@ export function HeaderClientControls({ session, isAdminUser }: HeaderClientContr
                     <button
                         type="button"
                         onClick={() => setIsAccountPopOpen(!isAccountPopOpen)}
-                        className="p-1 rounded-full hover:bg-accent text-foreground transition-colors"
+                        className="hidden sm:block p-1 rounded-full hover:bg-accent text-foreground transition-colors"
                         aria-label="User Account Menu"
                     >
                         <span className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-xs border border-primary/20">
@@ -116,7 +116,7 @@ export function HeaderClientControls({ session, isAdminUser }: HeaderClientContr
                 ) : (
                     <Link
                         href="/login"
-                        className="p-2 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                        className="hidden sm:block p-2 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                         aria-label="Login"
                     >
                         <User className="h-4 w-4" />

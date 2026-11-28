@@ -12,7 +12,7 @@ import ChecklistWizard from './ChecklistWizard';
 import FinalQuote from './FinalQuote';
 import StepLogin from './StepLogin';
 import { Brand, Model, Variant } from '@/lib/store';
-import { useRouter } from 'next/navigation';
+import { useFlyRouter } from '@/components/nav/nav-events';
 
 type Step = 'category' | 'brand' | 'model' | 'variant' | 'quote_preview' | 'checklist' | 'login_check' | 'final_quote';
 
@@ -28,7 +28,7 @@ interface SellWizardProps {
 import { fetchBrands } from '@/actions/catalog';
 
 export default function SellWizard({ initialBrands, initialCategory, initialBrandId, initialModel, user: initialUser }: SellWizardProps) {
-    const router = useRouter();
+    const router = useFlyRouter();
     // If a category is provided via info, we start at 'brand' selection (skipping category select)
     // Exception: If category is 'repair', we treat it as smartphone but set isRepair=true
 

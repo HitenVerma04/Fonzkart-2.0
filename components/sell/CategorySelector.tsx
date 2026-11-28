@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useFlyRouter } from '@/components/nav/nav-events';
 
 interface CategorySelectorProps {
     onSelect: (category: string) => void;
@@ -979,7 +979,7 @@ const categories = [
 
 
 export default function CategorySelector({ onSelect }: CategorySelectorProps) {
-    const router = useRouter();
+    const router = useFlyRouter();
 
     const handleClick = (id: string) => {
         if (id === 'bulk-orders') {

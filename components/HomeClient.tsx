@@ -12,7 +12,7 @@ import { Logo } from '@/components/Logo';
 import { HomeSearch } from '@/components/HomeSearch';
 import { BrandRail } from '@/components/BrandRail';
 import { DynamicLogo } from '@/components/DynamicLogo';
-import { useRouter } from 'next/navigation';
+import { useFlyRouter } from '@/components/nav/nav-events';
 import { PriceGraphic, SpeedGraphic, SecurityGraphic } from '@/components/icons/FeatureIcons';
 import { Brand } from '@/lib/store';
 import { FestiveBanner } from '@/components/festive/FestiveBanner';
@@ -21,11 +21,8 @@ import { SellThisDevice } from '@/components/home/SellThisDevice';
 import { IndiaJourney } from '@/components/home/IndiaJourney';
 import { servedCities } from '@/lib/cities';
 
-/** City chips in the hero (phones); the full list is in the journey section at the bottom. */
-const HERO_CITIES = 8;
-
 export function HomeClient({ initialBrands, activeCities = [], displayPrices = [] }: { initialBrands: Brand[], activeCities?: string[], displayPrices?: any[] }) {
-    const router = useRouter();
+    const router = useFlyRouter();
 
     const handleCategorySelect = (category: string) => {
         if (category === 'bulk-orders') {
@@ -79,21 +76,7 @@ export function HomeClient({ initialBrands, activeCities = [], displayPrices = [
                             </div>
 
                             {/* Mobile View Specifics (Logo + Chips) */}
-                            <div className="block xl:hidden w-full space-y-4 pt-0 mb-12">
-                                {/* The cities: Bengaluru is live, every other one has a "Coming soon" tag above it. */}
-                                <div className="flex flex-wrap justify-center gap-x-2 gap-y-3 px-2 pt-6 pb-2">
-                                    {servedCities(activeCities).slice(0, HERO_CITIES).map(city => (
-                                        <div key={city.name} className="relative pt-2">
-                                            <span className={`absolute left-1/2 top-0 z-10 -translate-x-1/2 whitespace-nowrap rounded px-1.5 text-[7.5px] font-black uppercase leading-[13px] tracking-wider ${city.live ? 'bg-green-500 text-white' : 'border border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-400/50 dark:bg-amber-950 dark:text-amber-300'}`}>
-                                                {city.live ? 'Live' : 'Coming soon'}
-                                            </span>
-                                            <div className={`inline-flex items-center gap-1.5 px-3 pt-2 pb-1.5 rounded-full text-[10px] font-bold border shadow-sm cursor-default whitespace-nowrap ${city.live ? 'bg-green-50 dark:bg-green-950/40 text-black dark:text-white border-green-400' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'}`}>
-                                                <MapPin className={`w-3 h-3 ${city.live ? 'text-green-500' : 'text-amber-500'}`} />
-                                                {city.name}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="block xl:hidden w-full space-y-4 pt-6 mb-12">
                                 <div className="flex justify-center items-center py-2 w-full">
                                     <div className="scale-[1.5] origin-center transform flex justify-center items-center py-4">
                                         <DynamicLogo />

@@ -22,7 +22,7 @@ export default function Header() {
                     className="flex items-center gap-2 group transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
                     aria-label="Fonzkart Home"
                 >
-                    <Logo className="w-auto h-11 sm:h-12 py-0.5 text-primary" />
+                    <Logo wordmark className="w-auto h-11 sm:h-12 py-0.5 text-primary" />
                 </Link>
 
                 {/* Right Utilities & Navigation Actions */}

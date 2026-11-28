@@ -106,7 +106,7 @@ export function SidebarDrawer({ isOpen, onClose, session, isAdminUser }: Sidebar
                 {/* Drawer Header */}
                 <div className="shrink-0 z-20 flex items-center justify-between border-b border-border/40 bg-background/90 px-6 py-4 backdrop-blur-md">
                     <Link href="/" onClick={onClose} className="flex items-center gap-2" aria-label="Fonzkart Home">
-                        <Logo className="h-9 w-auto" />
+                        <Logo wordmark cartSize={56} className="h-9 w-auto" />
                     </Link>
                     <button
                         ref={closeBtnRef}
