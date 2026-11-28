@@ -133,6 +133,7 @@ public final class PartCatalog {
         all.put("smartphone", new Uses()
                 .add("physical_condition", "below_average", DISPLAY, 1)
                 .add("functional_issues", "screen_replaced", DISPLAY, 1)
+                .add("functional_issues", "touch_faulty", DISPLAY, 1)
                 .add("functional_issues", "wifi", BOARD, 0.7)
                 .add("functional_issues", "bluetooth", BOARD, 0.6)
                 .add("functional_issues", "sim1", BOARD, 0.6)

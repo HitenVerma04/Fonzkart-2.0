@@ -222,6 +222,49 @@ export const questionnaireSteps = {
             ]
         },
         {
+            // Only folding phones (showFor: the apps and ChecklistWizard pick them by name, as the backend does).
+            id: 'fold_check',
+            title: 'Fold & Flip Check',
+            subtitle: 'Only for folding phones: the outer screen and the hinge',
+            type: 'combined-step',
+            showFor: 'foldable',
+            sections: [
+                {
+                    id: 'cover_screen',
+                    title: 'Outer (cover) screen',
+                    type: 'single-select',
+                    options: [
+                        { id: 'fine', label: 'Working fine', description: 'No lines, spots or cracks', icon: 'CheckCircle2' },
+                        { id: 'damaged', label: 'Damaged', description: 'Lines, broken glass or spots on the outer screen', icon: 'AlertTriangle' },
+                    ]
+                },
+                {
+                    id: 'hinge',
+                    title: 'Hinge',
+                    type: 'single-select',
+                    options: [
+                        { id: 'fine', label: 'Opens and closes properly', description: 'Smooth, holds its position, no gap or noise', icon: 'CheckCircle2' },
+                        { id: 'faulty', label: 'Loose or does not open properly', description: 'Stiff, wobbly, gaps, or does not fold flat', icon: 'AlertTriangle' },
+                    ]
+                }
+            ]
+        },
+        {
+            // Only iPhones. A locked iPhone cannot be bought: choosing it stops the check (stopsSale).
+            id: 'icloud_lock',
+            title: 'iCloud / Apple ID Lock',
+            subtitle: 'Is the iPhone signed out of iCloud, with Find My turned off?',
+            type: 'single-select',
+            showFor: 'apple',
+            options: [
+                { id: 'not_locked', label: 'Not locked', description: 'Signed out of iCloud, Find My is off', icon: 'Unlock' },
+                {
+                    id: 'locked', label: 'Still locked', description: 'Still signed in to an Apple ID, or Find My is on', icon: 'Lock',
+                    stopsSale: 'We can’t buy an iPhone that is still locked to an Apple ID. On the iPhone, open Settings → your name → Sign Out (this also turns off Find My), then choose “Not locked”.',
+                },
+            ]
+        },
+        {
             id: 'functional_issues',
             title: 'Functional Problems',
             subtitle: 'Select any issues your device has (Check if applicable)',
@@ -232,6 +275,9 @@ export const questionnaireSteps = {
                 { id: 'sim2', label: 'Sim 2', icon: 'Smartphone', group: 'Network & connectivity' },
                 { id: 'bluetooth', label: 'Bluetooth', icon: 'Bluetooth', group: 'Network & connectivity' },
                 { id: 'screen_replaced', label: 'Screen Not Original', icon: 'Smartphone', group: 'Display' },
+                { id: 'touch_faulty', label: 'Touch Not Working Properly', icon: 'Hand', group: 'Display' },
+                { id: 'screen_discoloration', label: 'Screen Discoloration / Patches', icon: 'Palette', group: 'Display' },
+                { id: 'loose_screen', label: 'Loose Screen (Gap from Body)', icon: 'Maximize', group: 'Display' },
                 { id: 'camera_glass', label: 'Camera Glass / Lens Broken', icon: 'CameraOff', group: 'Camera' },
                 { id: 'back_camera', label: 'Back Camera', icon: 'Camera', group: 'Camera' },
                 { id: 'back_camera_blur', label: 'Back Camera Image Blur / Spot', icon: 'Image', group: 'Camera' },
@@ -245,6 +291,7 @@ export const questionnaireSteps = {
                 { id: 'silent_button', label: 'Silent Button', icon: 'BellOff', group: 'Buttons & controls' },
                 { id: 'speaker', label: 'Speaker', icon: 'Speaker', group: 'Sound & vibration' },
                 { id: 'earpiece', label: 'Ear Piece', icon: 'Phone', group: 'Sound & vibration' },
+                { id: 'audio_jack', label: 'Audio Jack', icon: 'Headphones', group: 'Sound & vibration' },
                 { id: 'microphone', label: 'Microphone', icon: 'Mic', group: 'Sound & vibration' },
                 { id: 'audio_ic', label: 'Audio IC', icon: 'Music', group: 'Sound & vibration' },
                 { id: 'vibrator', label: 'Vibrator', icon: 'Vibrate', group: 'Sound & vibration' },

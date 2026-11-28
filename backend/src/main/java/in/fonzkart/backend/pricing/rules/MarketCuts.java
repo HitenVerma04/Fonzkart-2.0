@@ -57,6 +57,15 @@ public final class MarketCuts {
         // A replaced, non-original screen (Fonzkart's own figure, 2026-11-28). It is a display repair, so with a cracked
         // screen too it is taken once.
         m.put("functional_issues=screen_replaced", 50.0);
+        // More screen problems (added 2026-11-28), Cashify's figures; Cashkr asks no such question. Touch not working
+        // is a display repair; discoloration is the average of Cashify's minor (7.1%) and major (19.6%).
+        m.put("functional_issues=touch_faulty", 54.8);
+        m.put("functional_issues=screen_discoloration", 13.4);
+        m.put("functional_issues=loose_screen", 9.2);
+        // Fold and flip phones (Fonzkart's own figures: neither platform's data covers them). A damaged outer screen
+        // as Cashify's chipped or cracked area outside the display (19.1%), a faulty hinge as a bent panel (24.2%).
+        m.put("cover_screen=damaged", 19.1);
+        m.put("hinge=faulty", 24.2);
         // Body. "Below average" (heavy dents, cracks or bent): the average of major dents (19.3%), cracked back or side
         // panel (23.4%) and bent (25.4%).
         m.put("body_condition=good", 5.4);

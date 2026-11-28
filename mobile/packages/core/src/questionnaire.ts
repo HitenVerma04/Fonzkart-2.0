@@ -9,6 +9,10 @@ export interface QuestionOption {
   icon?: string;
   /** The heading this option is shown under in a tick-all-that-apply list ("Camera", "Buttons & controls"). */
   group?: string;
+  /** Only for some devices: "apple" (iPhones), "android" (every other phone) or "foldable" (fold and flip phones). */
+  showFor?: string;
+  /** Choosing this means Fonzkart cannot buy the device as it is: the reason and what to do, shown instead of Continue. */
+  stopsSale?: string;
 }
 
 export interface YesNoQuestion {
@@ -23,6 +27,7 @@ export interface QuestionSection {
   title: string;
   type: 'single-select' | 'multi-select' | string;
   options?: QuestionOption[];
+  showFor?: string;
 }
 
 export interface QuestionStep {
@@ -34,6 +39,8 @@ export interface QuestionStep {
   options?: QuestionOption[];
   questions?: YesNoQuestion[];
   sections?: QuestionSection[];
+  /** Only for some devices, as on an option. */
+  showFor?: string;
 }
 
 export type Questionnaire = Record<string, QuestionStep[]>;
@@ -48,13 +55,43 @@ export function questionnaireCategory(category: string | undefined): string {
   return category || 'smartphone';
 }
 
+/** Words in a folding phone's name (Galaxy Z Fold / Flip, Razr, OnePlus Open, ...), as the backend's PartCatalog. */
+const FOLD_WORDS = ['fold', 'flip', 'razr', 'duo', 'open', 'magic v'];
+
+/** Whether a device name is an iPhone, and whether it folds (the backend decides the same way). */
+export function deviceTraits(deviceName: string): { apple: boolean; foldable: boolean } {
+  const name = ` ${deviceName.toLowerCase()} `;
+  return { apple: name.includes('iphone'), foldable: FOLD_WORDS.some(w => name.includes(` ${w}`)) };
+}
+
+/** Whether a step, section or option with this `showFor` is shown for the device (none: for every device). */
+export function shownFor(showFor: string | undefined, traits: { apple: boolean; foldable: boolean }): boolean {
+  if (!showFor) return true;
+  if (showFor === 'apple') return traits.apple;
+  if (showFor === 'android') return !traits.apple;
+  if (showFor === 'foldable') return traits.foldable;
+  return true;
+}
+
 /**
- * The steps shown for a device. Unknown categories get the smartphone steps. For iPhones the "Battery" issue is
- * split into battery health below / above 85%, as on the website.
+ * The steps shown for a device. Unknown categories get the smartphone steps. Steps, sections and options marked
+ * `showFor` appear only on those devices (the iCloud lock on iPhones, the hinge on fold and flip phones). For iPhones
+ * the "Battery" issue is split into battery health below / above 85%, as on the website.
  */
 export function stepsForDevice(questionnaire: Questionnaire, category: string | undefined, deviceName: string): QuestionStep[] {
-  const steps = questionnaire[questionnaireCategory(category)] ?? questionnaire.smartphone ?? [];
-  if (!deviceName.toLowerCase().includes('iphone')) return steps;
+  const traits = deviceTraits(deviceName);
+  const keep = <T extends { showFor?: string }>(list: T[] | undefined) => list?.filter(item => shownFor(item.showFor, traits));
+  const all = questionnaire[questionnaireCategory(category)] ?? questionnaire.smartphone ?? [];
+  const steps = all
+    .filter(step => shownFor(step.showFor, traits))
+    .map(step => ({
+      ...step,
+      ...(step.options ? { options: keep(step.options) } : {}),
+      ...(step.sections
+        ? { sections: keep(step.sections)!.map(section => (section.options ? { ...section, options: keep(section.options) } : section)) }
+        : {}),
+    }));
+  if (!traits.apple) return steps;
   return steps.map(step => {
     if (step.id !== 'functional_issues' || !step.options) return step;
     const options = step.options.flatMap(option =>
@@ -96,8 +133,24 @@ const listAnswered = (options: QuestionOption[] | undefined, value: Answers[stri
   return requiredGroups(options).every(group => group.some(id => list.includes(id)));
 };
 
-/** Whether "Continue" is allowed: required choices made (one battery health), every yes/no answered. */
+/** The reason Fonzkart cannot buy the device, when an answer on this step says so (an iPhone still locked to iCloud). */
+export function saleStoppedBy(step: QuestionStep, answers: Answers): string | undefined {
+  const lists: [string, QuestionOption[] | undefined][] = [[step.id, step.options], ...(step.sections ?? []).map(s => [s.id, s.options] as [string, QuestionOption[] | undefined])];
+  for (const [key, options] of lists) {
+    const value = answers[key];
+    const chosen = Array.isArray(value) ? value : typeof value === 'string' ? [value] : [];
+    const stop = options?.find(o => o.stopsSale && chosen.includes(o.id));
+    if (stop) return stop.stopsSale;
+  }
+  return undefined;
+}
+
+/**
+ * Whether "Continue" is allowed: required choices made (one battery health), every yes/no answered, and no answer
+ * that stops the sale.
+ */
 export function isStepComplete(step: QuestionStep, answers: Answers): boolean {
+  if (saleStoppedBy(step, answers)) return false;
   if (step.type === 'single-select') return !!answers[step.id] || step.id in SKIPPABLE;
   if (step.questions) return step.questions.every(q => typeof answers[q.id] === 'boolean');
   if (step.type === 'combined-step') {

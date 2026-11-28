@@ -41,6 +41,10 @@ public final class PricingDefaults {
         all.put("smartphone", new Builder()
                 .question("physical_condition", SINGLE, "good", 4, "average", 12, "below_average", 30)
                 .question("body_condition", SINGLE, "good", 3, "average", 8, "below_average", 18)
+                // Fold and flip phones only; a locked iPhone cannot be bought (the apps stop at it), so it takes the most.
+                .question("cover_screen", SINGLE, "damaged", 19)
+                .question("hinge", SINGLE, "faulty", 24)
+                .question("icloud_lock", SINGLE, "locked", 90)
                 .question("functional_issues", 50,
                         "wifi", 8, "sim1", 5, "sim2", 2, "bluetooth", 4, "front_camera", 8, "back_camera", 15,
                         "camera_glass", 5, "finger_sensor", 5, "face_sensor", 15, "power_button", 4, "volume_button", 3,
@@ -48,7 +52,8 @@ public final class PricingDefaults {
                         "charging_port", 6, "proximity", 4, "vibrator", 2, "battery", 8,
                         // iPhones ask for the battery health instead of "Battery"; above 85% is healthy.
                         "battery_health_low", 8, "battery_health_high", 0,
-                        "front_camera_blur", 5, "back_camera_blur", 8, "screen_replaced", 30)
+                        "front_camera_blur", 5, "back_camera_blur", 8, "screen_replaced", 30,
+                        "touch_faulty", 30, "screen_discoloration", 8, "loose_screen", 6, "audio_jack", 3)
                 .question("purchase_location", SINGLE, "global", 10)
                 .question("accessories", 10, "!charger", 1, "!box", 2, "!bill", 4)
                 .warranty()

@@ -25,6 +25,24 @@ const toggle = (value: unknown, id: string): string[] => {
     if (group) return list.includes(id) ? list : [...list.filter(x => !group.includes(x)), id];
     return list.includes(id) ? list.filter(x => x !== id) : [...list, id];
 };
+/** Words in a folding phone's name, as the apps and the backend decide it (Galaxy Z Fold / Flip, Razr, OnePlus Open). */
+const FOLD_WORDS = ['fold', 'flip', 'razr', 'duo', 'open', 'magic v'];
+/** Whether a step, section or option marked `showFor` (apple, android, foldable) is shown for this device. */
+const shownFor = (showFor: string | undefined, apple: boolean, foldable: boolean) =>
+    !showFor || (showFor === 'apple' ? apple : showFor === 'android' ? !apple : showFor === 'foldable' ? foldable : true);
+/** The reason Fonzkart cannot buy the device, when an answer on this step says so (an iPhone still locked to iCloud). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const saleStoppedBy = (step: any, answers: Record<string, unknown>): string | undefined => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const lists: [string, any[] | undefined][] = [[step?.id, step?.options], ...(step?.sections ?? []).map((sec: any) => [sec.id, sec.options])];
+    for (const [key, options] of lists) {
+        const value = answers[key];
+        const chosen = Array.isArray(value) ? value : typeof value === 'string' ? [value] : [];
+        const stop = options?.find(o => o.stopsSale && chosen.includes(o.id));
+        if (stop) return stop.stopsSale;
+    }
+    return undefined;
+};
 /** The red asterisk on a question that must be answered. */
 const Required = () => <span className="ml-1 text-red-500" aria-label="required">*</span>;
 
@@ -69,9 +87,21 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // Customize steps based on device type (iPhone Battery Logic)
     const activeCategory = category === 'smartwatch' ? 'watch' : (category === 'smarttv' ? 'tv' : (category || 'smartphone'));
-    let steps = (questionnaireSteps as any)[activeCategory] || (questionnaireSteps as any)['smartphone'];
+    const deviceName = ` ${(deviceInfo?.name ?? '').toLowerCase()} `;
+    const isApple = deviceName.includes('iphone');
+    const isFoldable = FOLD_WORDS.some(w => deviceName.includes(` ${w}`));
+    // Steps, sections and options marked showFor appear only on those devices (iCloud lock on iPhones, hinge on folds).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const keep = (list: any[] | undefined) => list?.filter(item => shownFor(item.showFor, isApple, isFoldable));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let steps = keep((questionnaireSteps as any)[activeCategory] || (questionnaireSteps as any)['smartphone'])!.map((step: any) => ({
+        ...step,
+        ...(step.options ? { options: keep(step.options) } : {}),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ...(step.sections ? { sections: keep(step.sections)!.map((sec: any) => (sec.options ? { ...sec, options: keep(sec.options) } : sec)) } : {}),
+    }));
 
-    if (deviceInfo?.name?.toLowerCase().includes('iphone')) {
+    if (isApple) {
         steps = steps.map((step: any) => {
             if (step.id === 'functional_issues' && step.options) {
                 // Create a shallow copy of options to modify "Battery"
@@ -121,8 +151,11 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
         }
     };
 
+    const stopped = saleStoppedBy(currentStep, answers);
+
     const isStepValid = () => {
         if (!currentStep) return false;
+        if (stopped) return false;
         // Require selection for single-select steps (Physical, Body, Warranty, Bill)
         if (currentStep.type === 'single-select') {
             return !!answers[currentStep.id] || currentStep.id in SKIPPABLE;
@@ -321,6 +354,13 @@ export default function ChecklistWizard({ deviceInfo, category, onComplete, onBa
                         )}
                     </motion.div>
                 </AnimatePresence>
+
+                {stopped ? (
+                    <div role="alert" className="mt-8 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                        <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
+                        <span>{stopped}</span>
+                    </div>
+                ) : null}
 
                 <div className="mt-10 flex justify-between items-center">
                     {(currentStepIndex > 0 || onBack) ? (

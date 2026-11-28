@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, ZoomIn } from 'react-native-reanimated';
 import {
-  groupOptions, isMultiSelect, isRequired, requiredGroups, SKIPPABLE, toggleOption, type Answers, type QuestionOption, type QuestionStep,
+  groupOptions, isMultiSelect, isRequired, requiredGroups, saleStoppedBy, SKIPPABLE, toggleOption, type Answers, type QuestionOption, type QuestionStep,
 } from '@fonzkart/core';
 import { makeStyles, useColors } from '@fonzkart/ui';
 import { Icon, type IconName } from './Icon';
@@ -121,6 +121,7 @@ export function QuestionStepView({ step, answers, onChange }: {
   };
 
   const stepRequired = !step.questions && step.type !== 'combined-step' && isRequired(step.id, step.type, step.options);
+  const stopped = saleStoppedBy(step, answers);
   return (
     <View style={styles.step}>
       <Text style={styles.stepTitle}>{step.title}{step.type === 'single-select' && stepRequired ? star : null}</Text>
@@ -148,6 +149,12 @@ export function QuestionStepView({ step, answers, onChange }: {
             ))
           : !step.questions && choices(step.id, step.type, step.options)}
       </View>
+      {stopped ? (
+        <View style={styles.stop} accessibilityRole="alert">
+          <Icon name="alert" size={18} color="#b91c1c" />
+          <Text style={styles.stopText}>{stopped}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -238,6 +245,8 @@ const useStyles = makeStyles(colors => ({
   groupTitle: { ...type.heading, fontSize: 16, color: colors.text },
   groupHint: { ...type.small, color: colors.muted, marginTop: -6 },
   required: { color: '#ef4444', fontWeight: '800' },
+  stop: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: '#fef2f2', borderColor: '#fecaca', borderWidth: 1, borderRadius: radii.md, padding: 12 },
+  stopText: { ...type.small, flex: 1, color: '#991b1b' },
   chip: { minWidth: 64, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 12, paddingVertical: 8, paddingHorizontal: 14 },
   chipWide: { flexGrow: 1, flexBasis: 0 },
   chipLabel: { fontSize: 15, lineHeight: 20, fontWeight: '600', letterSpacing: -0.2, color: colors.text },

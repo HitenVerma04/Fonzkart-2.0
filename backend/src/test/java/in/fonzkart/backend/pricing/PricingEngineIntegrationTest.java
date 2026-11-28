@@ -121,6 +121,15 @@ class PricingEngineIntegrationTest {
         // A faulty fingerprint sensor: 50% on an Android phone, the market's 23.5% on an iPhone.
         assertThat(line(lava, "functional_issues", "finger_sensor").cost()).isEqualTo(2700L);
         assertThat(line(iphone, "functional_issues", "finger_sensor").cost()).isEqualTo(10280L);
+        // Touch not working is a display repair at Cashify's 54.8%; the other new screen problems take a share.
+        assertThat(line(iphone, "functional_issues", "touch_faulty").part()).isEqualTo("display");
+        assertThat(line(iphone, "functional_issues", "touch_faulty").cost()).isEqualTo(24360L); // 54.8% of ₹45,000 − ₹300
+        assertThat(line(iphone, "functional_issues", "screen_discoloration").share()).isEqualTo(0.134);
+        assertThat(line(iphone, "functional_issues", "loose_screen").share()).isEqualTo(0.092);
+        // Fold and flip phones: outer screen and hinge; a locked iPhone takes the most (the apps stop before a quote).
+        assertThat(line(fold, "cover_screen", "damaged").share()).isEqualTo(0.191);
+        assertThat(line(fold, "hinge", "faulty").share()).isEqualTo(0.242);
+        assertThat(line(iphone, "icloud_lock", "locked").share()).isEqualTo(0.9);
         assertThat(line(iphone, "physical_condition", "good").share()).isEqualTo(0.15);
         assertThat(line(iphone, "physical_condition", "average").share()).isEqualTo(0.30);
         assertThat(line(iphone, "physical_condition", "good").kind()).isEqualTo(PriceSheet.VALUE);

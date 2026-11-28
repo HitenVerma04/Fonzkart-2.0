@@ -145,3 +145,36 @@ test('functional problems are shown under headings, from the options or the buil
   assert.deepEqual(groupOptions([{ id: 'charger', label: 'Charger' }, { id: 'box', label: 'Box' }], 'accessories'),
     [{ options: [{ id: 'charger', label: 'Charger' }, { id: 'box', label: 'Box' }] }]);
 });
+
+test('fold and flip phones get the hinge check, iPhones the iCloud lock, and a locked iPhone stops the sale', async () => {
+  const { saleStoppedBy, deviceTraits } = await import('./questionnaire');
+  const fold: QuestionStep = {
+    id: 'fold_check', title: 'Fold & Flip Check', type: 'combined-step', showFor: 'foldable',
+    sections: [{ id: 'hinge', title: 'Hinge', type: 'single-select', options: [{ id: 'fine', label: 'Fine' }, { id: 'faulty', label: 'Faulty' }] }],
+  };
+  const icloud: QuestionStep = {
+    id: 'icloud_lock', title: 'iCloud', type: 'single-select', showFor: 'apple',
+    options: [{ id: 'not_locked', label: 'Not locked' }, { id: 'locked', label: 'Still locked', stopsSale: 'Sign out first.' }],
+  };
+  const problems: QuestionStep = {
+    id: 'functional_issues', title: 'Issues', type: 'multi-select-grid',
+    options: [{ id: 'wifi', label: 'WiFi' }, { id: 'in_display', label: 'In-display', showFor: 'android' }],
+  };
+  const q: Questionnaire = { smartphone: [single, fold, icloud, problems] };
+  const ids = (name: string) => stepsForDevice(q, 'smartphone', name).map(s => s.id).join(',');
+  assert.equal(ids('Galaxy Z Fold5'), 'physical_condition,fold_check,functional_issues');
+  assert.equal(ids('Galaxy Z Flip 6'), 'physical_condition,fold_check,functional_issues');
+  assert.equal(ids('iPhone 15'), 'physical_condition,icloud_lock,functional_issues');
+  assert.equal(ids('Galaxy S24'), 'physical_condition,functional_issues');
+  // Options marked for Android phones are not shown on iPhones.
+  assert.deepEqual(stepsForDevice(q, 'smartphone', 'iPhone 15').at(-1)?.options?.map(o => o.id), ['wifi']);
+  assert.deepEqual(stepsForDevice(q, 'smartphone', 'Pixel 9').at(-1)?.options?.map(o => o.id), ['wifi', 'in_display']);
+  assert.deepEqual(deviceTraits('OnePlus Open'), { apple: false, foldable: true });
+  assert.deepEqual(deviceTraits('Galaxy S24 Ultra'), { apple: false, foldable: false });
+
+  assert.equal(saleStoppedBy(icloud, { icloud_lock: 'locked' }), 'Sign out first.');
+  assert.equal(isStepComplete(icloud, { icloud_lock: 'locked' }), false);
+  assert.equal(isStepComplete(icloud, { icloud_lock: 'not_locked' }), true);
+  assert.equal(isStepComplete(fold, {}), false);
+  assert.equal(isStepComplete(fold, { hinge: 'faulty' }), true);
+});
