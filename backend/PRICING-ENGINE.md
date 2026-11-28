@@ -51,6 +51,12 @@ on those platforms in November 2026 (spreadsheet Fonzkart-Phone-Resale-Prices.xl
 * **Fonzkart's own cuts (2026-11-28):** the owners set a few figures above the market's. Screen good 15%, average 30%,
   below average 50%; "Screen Not Original" (a new Functional Problems tile, a display repair, so taken once with a
   cracked screen) 50%; a faulty fingerprint sensor on an Android phone 50% (iPhones keep the market's 23.5%).
+* **More questions (2026-11-28):** Display tiles "Touch Not Working Properly" (display repair, Cashify 54.8%),
+  "Screen Discoloration / Patches" (13.4%) and "Loose Screen" (9.2%); "Audio Jack" (built-in 3%). Fold and flip phones
+  get a "Fold & Flip Check" step (outer screen damaged 19.1%, hinge faulty 24.2%: Fonzkart's figures from the nearest
+  Cashify answers). iPhones get "iCloud / Apple ID Lock": "Still locked" stops the check in the apps (`stopsSale`),
+  and prices at 90% if it ever reaches a quote. Steps, sections and options carry `showFor` (apple, android,
+  foldable); the apps and the website pick them by the model name, with the same fold words as `PartCatalog.foldable`.
 
 Other categories are unchanged.
 
