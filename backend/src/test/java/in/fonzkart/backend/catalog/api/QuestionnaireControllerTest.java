@@ -19,13 +19,26 @@ class QuestionnaireControllerTest {
     private MockMvc mvc;
 
     @Test
-    void servesTheGeneratedQuestionnaireUnchanged() throws Exception {
+    void servesTheGeneratedQuestionnaireUnchangedToAppsThatPickStepsByDevice() throws Exception {
         String file = new ClassPathResource("catalog/questionnaire.json").getContentAsString(StandardCharsets.UTF_8);
 
-        mvc.perform(get("/api/catalog/questionnaire"))
+        mvc.perform(get("/api/catalog/questionnaire").param("showFor", "true"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(file, true))
                 .andExpect(jsonPath("$.smartphone[0].id").value("physical_condition"))
-                .andExpect(jsonPath("$.smartphone[0].options[0].id").value("flawless"));
+                .andExpect(jsonPath("$.smartphone[0].options[0].id").value("flawless"))
+                .andExpect(jsonPath("$.smartphone[?(@.id == 'fold_check')]").isNotEmpty())
+                .andExpect(jsonPath("$.smartphone[?(@.id == 'icloud_lock')]").isNotEmpty());
+    }
+
+    @Test
+    void olderAppsGetNoDeviceOnlyQuestions() throws Exception {
+        mvc.perform(get("/api/catalog/questionnaire"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.smartphone[0].id").value("physical_condition"))
+                .andExpect(jsonPath("$.smartphone[?(@.id == 'fold_check')]").isEmpty())
+                .andExpect(jsonPath("$.smartphone[?(@.id == 'icloud_lock')]").isEmpty())
+                .andExpect(jsonPath("$.smartphone[?(@.id == 'functional_issues')].options[?(@.id == 'touch_faulty')]").isNotEmpty())
+                .andExpect(jsonPath("$..showFor").isEmpty());
     }
 }

@@ -4,7 +4,8 @@ import type { Answers, Questionnaire } from '@fonzkart/core';
 import { getJson, request } from './client';
 
 export const quoteApi = {
-  questionnaire: (signal?: AbortSignal) => getJson<Questionnaire>('/api/catalog/questionnaire', undefined, signal),
+  /** showFor: this app picks device-only steps (iCloud lock, hinge) itself; older apps get the list without them. */
+  questionnaire: (signal?: AbortSignal) => getJson<Questionnaire>('/api/catalog/questionnaire', { showFor: 'true' }, signal),
 
   /** The final offer for a variant: base price minus the deductions of the evaluation rules (server side only). */
   price: async (basePrice: number, answers: Answers, category: string, signal?: AbortSignal) =>
